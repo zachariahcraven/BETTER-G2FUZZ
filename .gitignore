@@ -1,0 +1,59 @@
+# ---- Secrets ----
+openai_key.txt
+.env
+
+# ---- AFL++ build outputs ----
+*.o
+*.so
+*.dSYM
+*.8
+a.out
+compile_commands.json
+afl-fuzz
+afl-showmap
+afl-tmin
+afl-analyze
+afl-gotcpu
+afl-as
+afl-cc
+afl-c++
+afl-clang
+afl-clang++
+afl-clang-fast
+afl-clang-fast++
+afl-clang-lto
+afl-clang-lto++
+afl-gcc
+afl-g++
+afl-gcc-fast
+afl-g++-fast
+afl-lto
+afl-lto++
+afl-ld
+afl-ld-lto
+afl-cs-proxy
+afl-qemu-trace
+afl-frida-trace.so
+/as
+/ld
+utils/afl_network_proxy/afl-network-client
+utils/afl_network_proxy/afl-network-server
+
+# ---- Python ----
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# ---- Campaign data (keep results out of git) ----
+eval/
+*_output/
+initial_seeds/
+core
+core.*
+
+# ---- Editors / OS ----
+.DS_Store
+.vscode/
+.idea/
+*.swp
