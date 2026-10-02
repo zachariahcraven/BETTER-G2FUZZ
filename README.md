@@ -1,3 +1,20 @@
+# BETTER-G2FUZZ
+
+Fork of [G2FUZZ](https://github.com/G2FUZZ/G2FUZZ) for a research project at Montana State University.
+Goal: replace G2Fuzz's random generator selection with a multi-armed bandit scheduler.
+
+| Doc | Purpose |
+| --- | --- |
+| [SETUP.md](SETUP.md) | Build the Docker image and run a campaign. **Start here.** |
+| [team-docs/CATCHAT_API_KEY.md](team-docs/CATCHAT_API_KEY.md) | Get a free MSU CatChat API key |
+
+Work happens on the `dev` branch. `main` tracks there upstream version.
+
+---
+
+*The rest of this file is the upstream G2FUZZ README. It describes a native (non-Docker) setup.
+For our setup, follow [SETUP.md](SETUP.md).*
+
 # Description
 Modern software often accepts inputs with highly complex grammars. To conduct greybox fuzzing and uncover security bugs in such software, it is essential to generate inputs that conform to the software input grammar. However, this is a well-known challenging task because it requires a deep understanding of the grammar, which is often not available and hard to infer. Recent advances in large language models (LLMs) have shown that they can be used to synthesize high-quality natural language text and code that conforms to the grammar of a given input format. Nevertheless, LLMs are often incapable or too costly to generate non-textual outputs, such as images, videos, and PDF files. This limitation hinders the application of LLMs in grammar-aware fuzzing.
 
