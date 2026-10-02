@@ -3160,6 +3160,15 @@ int main(int argc, char **argv_orig, char **envp) {
   u64 gen_last_update = get_cur_time();
   u64 use_time = 0;
 
+  /* G2F: configurable LLM-step trigger; defaults match upstream (300s, +60s per step) */
+  u64 g2f_plateau_ms = 300 * 1000, g2f_backoff_ms = 60 * 1000;
+  if (getenv("G2F_PLATEAU_SEC")) { g2f_plateau_ms = strtoull(getenv("G2F_PLATEAU_SEC"), NULL, 10) * 1000; }
+  if (getenv("G2F_BACKOFF_SEC")) { g2f_backoff_ms = strtoull(getenv("G2F_BACKOFF_SEC"), NULL, 10) * 1000; }
+  if (getenv("G2F_PLATEAU_SEC") || getenv("G2F_BACKOFF_SEC")) {
+    OKF("G2F: LLM step after %llus without finds (+%llus per step)",
+        g2f_plateau_ms / 1000, g2f_backoff_ms / 1000);
+  }
+
   // real start time, we reset, so this works correctly with -V
   afl->start_time = get_cur_time();
 
@@ -3377,7 +3386,8 @@ int main(int argc, char **argv_orig, char **envp) {
 
     ++runs_in_current_cycle;
 
-    if (get_cur_time() - afl->last_find_time > 300 * 1000 + use_time * 60 * 1000 && get_cur_time() - gen_last_update > 300 * 1000 + use_time * 60 * 1000){
+    u64 g2f_wait_ms = g2f_plateau_ms + use_time * g2f_backoff_ms;
+    if (get_cur_time() - afl->last_find_time > g2f_wait_ms && get_cur_time() - gen_last_update > g2f_wait_ms){
     // if (get_cur_time() - afl->last_find_time > 3000){
       // printf("=========== start ============\n");
 
