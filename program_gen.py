@@ -64,7 +64,11 @@ def feature_analysis(model, file_format, tmp_path, seeds_path, generators, outpu
                             target_generator_code = file.read()
 
                         messages_c = messages_for_generator_mutation(file_format, feature, feature_description, target_generator_code)
-                generator = reask(messages_c, extract_res_for_code_gen, 3, 0.7, model)
+                try:
+                    generator = reask(messages_c, extract_res_for_code_gen, 3, 0.7, model)
+                except Exception as e:  # G2F: LLM failed after retries; count it as a failed attempt
+                    print(">>>>>>>> LLM error while generating, skipping attempt:", repr(e))
+                    generator = None
 
                 if not generator:
                     feature_try_cnt += 1
@@ -82,7 +86,11 @@ def feature_analysis(model, file_format, tmp_path, seeds_path, generators, outpu
 
                 print("++++++++ 2.1.1.2 debug for generator")
                 
-                generated_code = self_debug(generator, 3, model, temperature = 0.2, output_path=os.path.dirname(tmp_path))
+                try:
+                    generated_code = self_debug(generator, 3, model, temperature = 0.2, output_path=os.path.dirname(tmp_path))
+                except Exception as e:  # G2F: LLM failed after retries during debugging
+                    print(">>>>>>>> LLM error while debugging, skipping attempt:", repr(e))
+                    generated_code = None
                 if generated_code:
                     feature_programs[feature] = generated_code
                     mv_files(tmp_path, seeds_path, file_format + "-" + str(generator_cnt))
@@ -228,6 +236,8 @@ if __name__ == "__main__":
             print("You need install the following library to improve the fuzzing performance")
             for l in library_need_to_be_installed:
                 print(l)
+        except Exception as e:  # G2F: an LLM failure in one format shouldn't skip the others
+            print(">> Seed generation failed for format", file_format, "->", repr(e))
 
     if len(library_need_to_be_installed):
         print("You need install the following library to improve the fuzzing performance")
