@@ -1,5 +1,6 @@
 # ---- Secrets ----
 openai_key.txt
+*.key
 .env
 
 # ---- AFL++ build outputs ----
