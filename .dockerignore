@@ -1,0 +1,21 @@
+# Never send secrets into the image (COPY . . does not read .gitignore)
+openai_key.txt
+*.key
+.env
+
+# Campaign data and local outputs
+eval/
+*_output/
+initial_seeds/
+
+# VCS / editor / OS noise
+.git/
+.DS_Store
+.vscode/
+.idea/
+**/__pycache__/
+**/*.pyc
+
+# Host build artifacts (the image builds its own)
+*.o
+*.so

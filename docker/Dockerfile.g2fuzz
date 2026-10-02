@@ -1,0 +1,104 @@
+#
+# G2Fuzz image for development and experiments.
+#
+# Based on the upstream AFL++ Dockerfile (../Dockerfile) with these changes:
+#   - builds `make source-only` instead of `make distrib` (no QEMU/Unicorn/Frida modes)
+#   - drops rustup and afl-cov (not needed for G2Fuzz)
+#   - keeps optional make steps non-fatal (no `sed` on GNUmakefile)
+#   - installs the `openai` Python package G2Fuzz needs, plus pillow and numpy for generators
+#   - prebuilds fuzz targets into /targets (currently: jhead)
+#
+# Build from the repo root:
+#   docker build -f docker/Dockerfile.g2fuzz -t g2fuzz:dev .
+#
+# The OpenAI key is never baked in; mount it at runtime:
+#   -v ~/.secrets/openai_key.txt:/eval/openai_key.txt:ro
+#
+
+FROM ubuntu:22.04
+LABEL "about"="G2Fuzz (AFL++ 4.32c + LLM-synthesized input generators)"
+
+ENV NO_CORESIGHT=1
+ENV NO_NYX=1
+ENV LLVM_VERSION=16
+ENV GCC_VERSION=11
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+ENV NO_ARCH_OPT=1
+ENV IS_DOCKER=1
+
+RUN apt-get update && apt-get full-upgrade -y && \
+    apt-get install -y --no-install-recommends wget ca-certificates apt-utils gnupg && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /etc/apt/keyrings && \
+    echo "deb [signed-by=/etc/apt/keyrings/llvm-snapshot.gpg.key] http://apt.llvm.org/jammy/ llvm-toolchain-jammy-${LLVM_VERSION} main" > /etc/apt/sources.list.d/llvm.list && \
+    wget -qO /etc/apt/keyrings/llvm-snapshot.gpg.key https://apt.llvm.org/llvm-snapshot.gpg.key
+
+RUN apt-get update && \
+    apt-get -y install --no-install-recommends \
+    make cmake automake meson ninja-build bison flex \
+    git xz-utils bzip2 wget nano vim less psmisc \
+    python3 python3-dev python3-pip python-is-python3 \
+    libtool libtool-bin libglib2.0-dev libpixman-1-dev \
+    gnuplot-nox bc \
+    gcc-${GCC_VERSION} g++-${GCC_VERSION} gcc-${GCC_VERSION}-plugin-dev gdb lcov \
+    clang-${LLVM_VERSION} clang-tools-${LLVM_VERSION} libc++1-${LLVM_VERSION} \
+    libc++-${LLVM_VERSION}-dev libc++abi1-${LLVM_VERSION} libc++abi-${LLVM_VERSION}-dev \
+    libclang1-${LLVM_VERSION} libclang-${LLVM_VERSION}-dev \
+    libclang-common-${LLVM_VERSION}-dev libclang-rt-${LLVM_VERSION}-dev libclang-cpp${LLVM_VERSION} \
+    libclang-cpp${LLVM_VERSION}-dev liblld-${LLVM_VERSION} liblld-${LLVM_VERSION}-dev \
+    libllvm${LLVM_VERSION} lld-${LLVM_VERSION} \
+    llvm-${LLVM_VERSION} llvm-${LLVM_VERSION}-dev llvm-${LLVM_VERSION}-runtime llvm-${LLVM_VERSION}-tools \
+    $([ "$(dpkg --print-architecture)" = "amd64" ] && echo gcc-${GCC_VERSION}-multilib gcc-multilib) && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_VERSION} 0 && \
+    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-${GCC_VERSION} 0 && \
+    update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-${GCC_VERSION} 0 && \
+    update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${LLVM_VERSION} 0 && \
+    update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-${LLVM_VERSION} 0
+
+# G2Fuzz's Python dependency (version pinned by the upstream README)
+RUN pip install --no-cache-dir openai==1.63.2
+
+# Libraries LLM-written generators commonly import. Preinstalled so generators don't fail on
+# ModuleNotFoundError (G2Fuzz discards a generator if its runtime pip install fails) and so
+# every campaign uses the same versions.
+RUN pip install --no-cache-dir pillow==11.3.0 numpy==2.2.6
+
+ENV LLVM_CONFIG=llvm-config-${LLVM_VERSION}
+ENV AFL_SKIP_CPUFREQ=1
+ENV AFL_TRY_AFFINITY=1
+ENV AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1
+
+WORKDIR /AFLplusplus
+COPY . .
+
+ARG CC=gcc-$GCC_VERSION
+ARG CXX=g++-$GCC_VERSION
+
+RUN make clean && make source-only && make install
+
+# Fail the build early if the pieces G2Fuzz needs are missing
+RUN command -v afl-fuzz && command -v afl-clang-fast && \
+    test -f /AFLplusplus/generator_mutation.py && \
+    test ! -s /AFLplusplus/openai_key.txt && \
+    python -c "import openai, PIL, numpy; print('openai', openai.__version__, 'pillow', PIL.__version__, 'numpy', numpy.__version__)"
+
+# ---- Fuzz targets: prebuilt into /targets/<name>.afl and /targets/<name>.cmp ----
+# Pinned commits so every teammate fuzzes the same binary.
+
+# jhead (JPEG/EXIF), from the G2Fuzz paper's target list
+ARG JHEAD_COMMIT=5007491cdc8c727c16ea6a27734535cfd0ed4349
+RUN git clone -q https://github.com/Matthias-Wandel/jhead /targets/src/jhead && \
+    cd /targets/src/jhead && git checkout -q ${JHEAD_COMMIT} && \
+    make CC=afl-clang-fast && cp jhead /targets/jhead.afl && \
+    make clean && AFL_LLVM_CMPLOG=1 make CC=afl-clang-fast && cp jhead /targets/jhead.cmp && \
+    afl-showmap -q -o /tmp/map -- /targets/jhead.afl /AFLplusplus/testcases/images/jpeg/not_kitty.jpg && \
+    test -s /tmp/map && rm /tmp/map
+
+RUN echo "export PS1='[g2fuzz \h] \w \$ '" >> ~/.bashrc
+
+WORKDIR /eval
