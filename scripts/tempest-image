@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# tempest-image: rebuild g2fuzz.sif on Tempest from this checkout (team-docs/TEMPEST.md section 4).
+# Run on the Mac, with the VPN on, after changing G2Fuzz code. The image holds the code, so
+# `git pull` on Tempest alone doesn't change what runs.
+#
+# Usage: scripts/tempest-image [--force]
+#   Builds an x86_64 image, streams it to Tempest, converts it with Apptainer on a compute node,
+#   and writes the git version to g2fuzz.sif.version (each run copies it to image-version.txt).
+#   Refuses while campaigns are queued or running, so one experiment never mixes code versions.
+#   --force replaces the image anyway (running jobs keep the image they started with).
+#
+# Settings: G2F_TEMPEST_HOST [tempest] (an ~/.ssh/config host), G2F_TEMPEST_REPO [BETTER-G2FUZZ]
+set -euo pipefail
+
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+HOST="${G2F_TEMPEST_HOST:-tempest}"
+REMOTE="${G2F_TEMPEST_REPO:-BETTER-G2FUZZ}"
+die() { echo "tempest-image: $*" >&2; exit 1; }
+
+docker info >/dev/null 2>&1 || die "Docker isn't running (macOS: colima start)"
+ssh -o BatchMode=yes -o ConnectTimeout=10 "$HOST" true 2>/dev/null ||
+  die "can't ssh to $HOST. Connect the VPN (team-docs/TEMPEST.md section 1)"
+if [ "${1:-}" != "--force" ]; then
+  jobs=$(ssh "$HOST" 'squeue -h -u $USER -o %j' | grep -c '^g2f-' || true)
+  [ "$jobs" = 0 ] || die "$jobs campaign(s) queued or running on Tempest. Wait for them, or use --force"
+fi
+
+version="$(git -C "$REPO" describe --always --dirty) built $(date '+%Y-%m-%d %H:%M')"
+case "$version" in *-dirty*) echo "note: uncommitted changes are in this image ($version)" ;; esac
+
+echo "== building the x86_64 image"
+docker buildx build --platform linux/amd64 -f "$REPO/docker/Dockerfile.g2fuzz" \
+  --label "g2f.version=$version" -t g2fuzz:amd64 --load "$REPO"
+
+echo "== copying it to $HOST (about 600 MB)"
+docker save g2fuzz:amd64 | gzip -1 | ssh "$HOST" "cat > $REMOTE/g2fuzz-amd64.tar.gz"
+
+echo "== converting it on a compute node"
+ssh "$HOST" "bash -l -s" <<EOF
+set -e
+cd $REMOTE
+gunzip -f g2fuzz-amd64.tar.gz
+# < /dev/null: srun would otherwise read the rest of this script as its input
+srun -A "\$(scripts/fuzz account)" -p fairshare -c 4 --mem 8G -t 60 -J g2f-image \
+  apptainer build --force g2fuzz.sif.new docker-archive:g2fuzz-amd64.tar < /dev/null
+mv g2fuzz.sif.new g2fuzz.sif && rm g2fuzz-amd64.tar
+echo "$version" > g2fuzz.sif.version
+echo "g2fuzz.sif is now: \$(cat g2fuzz.sif.version)"
+EOF

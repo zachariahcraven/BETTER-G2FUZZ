@@ -52,6 +52,7 @@ Day-to-day commands are in [WORKFLOW.md](WORKFLOW.md).
 ## 6. Output files
 
 Everything is in `eval/<campaign>/` and stays after the container exits.
+During a run, AFL++ writes `jhead_output/` on fast disk inside the container. The copy in `eval/` is updated every 30 s and when the run ends or is stopped.
 
 | Path | Contents |
 | --- | --- |

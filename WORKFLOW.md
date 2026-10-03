@@ -12,7 +12,7 @@ Day-to-day use after [SETUP.md](SETUP.md) or [TEMPEST.md](team-docs/TEMPEST.md).
 | `reuse <from> [name]` | New campaign with seeds and generators from `eval/<from>`. Skips seed generation (15–20 min) |
 | `run <name> [secs]` | Background run: seed generation if needed, then fuzz (default 3600 s) |
 | `shell <name>` | Interactive shell in the image, in that campaign |
-| `watch <name>` | Live view, updated every second |
+| `watch <name>` | Live view, updated every second (the run's numbers reach `eval/` every 30 s) |
 | `status [name]` | One campaign's numbers once. No name: same as `list` |
 | `results <name>` | Final summary |
 | `stop <name>` | Stop the run. Files stay |
@@ -45,6 +45,7 @@ afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 
 ```
 
 - Always pass `-k /AFLplusplus/`.
+- `-o` in `/eval` is 5–8x slower (shared folder or network disk). For speed, use `-o /tmp/jhead_output` and copy it to `/eval` at the end. `scripts/fuzz run` does this for you.
 - `--program` must be a key in `program_to_format.json`.
 - Targets are prebuilt as `/targets/<name>.afl` and `.cmp`. Add new ones in `docker/Dockerfile.g2fuzz`.
 

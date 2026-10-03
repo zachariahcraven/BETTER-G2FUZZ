@@ -61,4 +61,5 @@ core.*
 
 # Apptainer image and its source archive (team-docs/TEMPEST.md)
 *.sif
+*.sif.version
 g2fuzz-amd64.tar*

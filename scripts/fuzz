@@ -13,6 +13,8 @@
 #   results <name>                  Final summary: coverage, crashes, generators, LLM calls
 #   stop    <name>                  Stop a run (files in eval/ stay)
 #   list                            All campaigns: seeds, generators, run state
+#   llm     start [hours] | stop | status   Tempest only: the gpt-oss:120b server runs use
+#   account                         Tempest only: the Slurm account runs and the server use
 #
 #   --test  llmGen-M after 10 s without new coverage. Testing only, never for experiments.
 #
@@ -20,8 +22,11 @@
 #   G2F_KEY [~/.secrets/catchat.key]   G2F_BASE_URL [CatChat]   G2F_MODEL [gpt-oss:120b]
 #   G2F_TARGET [jhead]                 G2F_IMAGE [g2fuzz:dev]
 #   G2F_SEEDS [/AFLplusplus/testcases/images/jpeg]  (stock seeds, path inside the image)
+#   G2F_CPUSET  Docker only: cores for this run, e.g. 3 (one per parallel run, so they don't share)
 # Slurm + Apptainer, used when docker is missing (team-docs/TEMPEST.md):
-#   G2F_SIF [<repo>/g2fuzz.sif]  G2F_ACCOUNT  G2F_PARTITION  G2F_CPUS [2]  G2F_MEM [4G]
+#   G2F_SIF [<repo>/g2fuzz.sif]   G2F_PARTITION [fairshare]   G2F_CPUS [2]   G2F_MEM [4G]
+#   G2F_ACCOUNT [group-mattrevelle once you're in it, else your first group-* account]
+#   G2F_BASE_URL [the running `llm` server]   G2F_KEY [~/llm/dummy.key]   G2F_LLM_DIR [~/llm]
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -38,9 +43,15 @@ ACCOUNT="${G2F_ACCOUNT:-}"
 PARTITION="${G2F_PARTITION:-}"
 CPUS="${G2F_CPUS:-2}"
 MEM="${G2F_MEM:-4G}"
+LLM_DIR="${G2F_LLM_DIR:-$HOME/llm}"
 if [ -n "${G2F_BACKEND:-}" ]; then BACKEND="$G2F_BACKEND"
 elif command -v docker >/dev/null 2>&1 || ! command -v sbatch >/dev/null 2>&1; then BACKEND=docker
 else BACKEND=slurm; fi
+if [ "$BACKEND" = slurm ]; then
+  PARTITION="${PARTITION:-fairshare}"
+  # Tempest can't reach CatChat. Runs use our own server (`llm start`), which takes any key.
+  KEY="${G2F_KEY:-$LLM_DIR/dummy.key}"
+fi
 
 die() { echo "fuzz: $*" >&2; exit 1; }
 usage() { awk 'NR > 1 && !/^#/ { exit } NR > 1 { sub(/^# ?/, ""); print }' "${BASH_SOURCE[0]}"; }
@@ -77,6 +88,19 @@ parse_test() {
   done
 }
 
+# Sets ACCOUNT: G2F_ACCOUNT, else Dr. Revelle's group once you're in it, else your first group-*.
+# So runs switch to group-mattrevelle by themselves when it's added.
+slurm_account() {
+  [ -n "$ACCOUNT" ] && return
+  local a; a=$(sacctmgr -nP show assoc user="$USER" format=account 2>/dev/null || true)
+  case $'\n'"$a"$'\n' in *$'\n'group-mattrevelle$'\n'*) ACCOUNT=group-mattrevelle ;; esac
+  [ -n "$ACCOUNT" ] || ACCOUNT=$(awk '/^group-/ { print; exit }' <<< "$a")
+  [ -n "$ACCOUNT" ] || die "no group-* Slurm account found (team-docs/TEMPEST.md section 1)"
+}
+
+# This user's llm-serve job in the given state, as "<node> <end time>"; nothing if none.
+llm_job() { squeue -h -u "$USER" -n llm-serve -t "$1" -o '%N %e' 2>/dev/null | awk 'NR == 1'; }
+
 # Checks, then sets ARGS (docker run or apptainer options) and SLURM (sbatch/srun options).
 prepare() {
   [ -s "$KEY" ] || die "API key missing or empty: $KEY (see team-docs/CATCHAT_API_KEY.md)"
@@ -84,11 +108,22 @@ prepare() {
   [ "$TEST" = 1 ] && test_env="G2F_PLATEAU_SEC=10,G2F_BACKOFF_SEC=0,"
   if [ "$BACKEND" = slurm ]; then
     [ -f "$SIF" ] || die "image $SIF not found (see team-docs/TEMPEST.md)"
+    slurm_account
+    if [ -z "${G2F_BASE_URL:-}" ]; then
+      local j msg="no LLM server running. Start one: scripts/fuzz llm start [hours]"
+      j=$(llm_job RUNNING)
+      [ -n "$(llm_job PENDING)" ] && msg="the LLM server is still queued (scripts/fuzz llm status)"
+      if [ -n "$j" ]; then BASE_URL="http://${j%% *}:11434/v1"; LLM_END="${j#* }"
+      elif [ "$cmd" = shell ]; then echo "note: $msg. LLM calls will fail in this shell."
+      else die "$msg"; fi
+    fi
     : >> "$EVAL/$1/openai_key.txt"   # empty mount point for the key, as Docker makes
-    # cleanenv + no user site-packages keep the host's Python setup out of the container
+    # cleanenv keeps the host's Python setup out of the container. G2Fuzz pip-installs
+    # libraries the LLM asks for; Tempest caps --writable-tmpfs at 64 MB, so pip installs
+    # into the campaign (/eval/.pyuser) instead. Each campaign starts clean, as in Docker.
     ARGS=(--cleanenv --writable-tmpfs --pwd /eval --bind "$EVAL/$1:/eval"
           --bind "$KEY:/eval/openai_key.txt:ro"
-          --env "${test_env}OPENAI_BASE_URL=$BASE_URL,PYTHONNOUSERSITE=1")
+          --env "${test_env}OPENAI_BASE_URL=$BASE_URL,PIP_USER=1,PYTHONUSERBASE=/eval/.pyuser")
     SLURM=(--job-name "g2f-$1" --cpus-per-task "$CPUS" --mem "$MEM")
     [ -n "$ACCOUNT" ] && SLURM+=(--account "$ACCOUNT")
     [ -n "$PARTITION" ] && SLURM+=(--partition "$PARTITION")
@@ -99,6 +134,8 @@ prepare() {
     ARGS=(-v "$EVAL/$1:/eval" -v "$KEY:/eval/openai_key.txt:ro"
           -e "OPENAI_BASE_URL=$BASE_URL" --add-host=host.docker.internal:host-gateway)
     [ "$TEST" = 1 ] && ARGS+=(-e G2F_PLATEAU_SEC=10 -e G2F_BACKOFF_SEC=0)
+    # AFL++ can't see runs in other containers, so parallel runs could pick the same core
+    [ -n "${G2F_CPUSET:-}" ] && ARGS+=(--cpuset-cpus "$G2F_CPUSET")
   fi
   [ "$TEST" = 1 ] && echo "TEST MODE: llmGen-M after 10 s without new coverage (not for experiments)"
   return 0
@@ -151,7 +188,7 @@ cmd_run() {
     echo "no seeds yet: seed generation first (~15-20 min), then fuzzing"
     # Starts clean, stops if the LLM made no seeds (bad key, no VPN, CatChat down), and fills
     # initial_seeds/ only at the end, so a run stopped midway redoes seed generation.
-    inner="rm -rf $OUT && python /AFLplusplus/program_gen.py --output ./$OUT --program $TARGET > seedgen.log 2>&1; \
+    inner="find $OUT -mindepth 1 -delete && python /AFLplusplus/program_gen.py --output ./$OUT --program $TARGET > seedgen.log 2>&1; \
 ls $OUT/default/gen_seeds/* >/dev/null 2>&1 || { echo 'fuzz: seed generation made no seeds' >> seedgen.log; exit 1; }; \
 mkdir -p initial_seeds && cp $SEEDS/* $OUT/default/gen_seeds/* initial_seeds/ && "
   else
@@ -159,6 +196,30 @@ mkdir -p initial_seeds && cp $SEEDS/* $OUT/default/gen_seeds/* initial_seeds/ &&
   fi
   inner="$inner afl-fuzz -i initial_seeds -o $OUT -c /targets/$TARGET.cmp -m 1024 -V $secs \
 -k /AFLplusplus/ -- /targets/$TARGET.afl @@ > fuzz.log 2>&1"
+  # AFL++ is 5-8x slower writing its output to a shared folder (Mac) or network home (Tempest),
+  # so /eval/$OUT is fast local disk inside the container. /host is the campaign folder again;
+  # its $OUT copy is updated every 30 s and at the end, for watch/status/results.
+  mkdir -p "$d/$OUT"
+  # which code the run used (scripts/tempest-image records it; empty for older images)
+  if [ "$BACKEND" = slurm ]; then cat "$SIF.version" > "$d/image-version.txt" 2>/dev/null || true
+  else docker image inspect -f '{{index .Config.Labels "g2f.version"}}' "$IMAGE" > "$d/image-version.txt" 2>/dev/null || true; fi
+  {
+    echo '#!/bin/bash'
+    echo "# Written by scripts/fuzz run. Runs inside the image, in the campaign folder (/eval)."
+    echo "cd /eval"
+    echo "sync_out() { cp -a -u /eval/$OUT/. /host/$OUT/ 2>/dev/null; }"
+    echo "cp -a /host/$OUT/. /eval/$OUT/ 2>/dev/null   # generators copied in by reuse"
+    # The copy loop also stops its sleep, or Apptainer waits for it (and bash prints "Terminated")
+    echo '( trap '\''kill $s 2>/dev/null; exit 0'\'' TERM; while :; do sleep 30 & s=$!; wait $s; sync_out; done ) &'
+    echo 'syncer=$!'
+    echo 'stop_syncer() { kill $syncer && wait $syncer; } 2>/dev/null'
+    # docker stop signals only this script: stop AFL++ first so it writes its final stats
+    echo 'trap '\''pkill -TERM -x afl-fuzz; wait $body; stop_syncer; sync_out; printf "run.sh: stopped %(%F %T)T, output copied (cp exit %s)\n" -1 $? >> run.log; exit 143'\'' TERM INT'
+    echo "( $inner ) &"
+    echo 'body=$!; wait $body; rc=$?'
+    echo 'stop_syncer; sync_out'
+    echo 'exit $rc'
+  } > "$d/run.sh"
   if [ "$BACKEND" = slurm ]; then
     # time limit: fuzzing + up to 2 h of seed generation + 30 min for LLM steps that overrun -V
     local mins=$(( (secs + seedgen * 7200 + 1800 + 59) / 60 ))
@@ -166,21 +227,38 @@ mkdir -p initial_seeds && cp $SEEDS/* $OUT/default/gen_seeds/* initial_seeds/ &&
       echo '#!/bin/bash'
       echo "# Written by scripts/fuzz run. Log: slurm-<jobid>.out in this folder."
       echo "curl -s -o /dev/null --max-time 20 $BASE_URL/models || { echo \"fuzz: can't reach $BASE_URL from \$(hostname)\"; exit 1; }"
-      printf 'apptainer exec'; printf ' %q' "${ARGS[@]}" --env AFL_NO_UI=1 "$SIF" bash -c "$inner"; echo
+      echo 'fast=${TMPDIR:-/tmp}/g2f-$SLURM_JOB_ID; mkdir -p "$fast"   # node-local disk for the AFL++ output'
+      # The final copy runs here, outside the image: on scancel or the time limit, Slurm also
+      # stops the process that mounts the image, so the tools inside it are already gone.
+      printf 'copy_back() { cp -a -u "$fast"/. %q/ 2>/dev/null; echo "job.sbatch: output copied back (cp exit $?)"; rm -rf "$fast"; }\n' "$d/$OUT"
+      printf 'apptainer exec'; printf ' %q' "${ARGS[@]}"
+      printf ' --bind "$fast":%q --bind %q' "/eval/$OUT" "$d:/host"
+      printf ' %q' --env AFL_NO_UI=1 "$SIF" bash /eval/run.sh; echo ' &'
+      echo 'pid=$!'
+      echo 'trap '\''copy_back; exit 143'\'' TERM'
+      echo 'wait $pid; rc=$?; copy_back; exit $rc'
     } > "$d/job.sbatch"
     id=$(sbatch --parsable "${SLURM[@]}" --time "$mins" --output "$d/slurm-%j.out" "$d/job.sbatch")
     echo "${id%%;*}" > "$d/slurm.jobid"
-    echo "submitted Slurm job ${id%%;*} (fuzz ${secs}s, limit ${mins} min). Watch it: scripts/fuzz watch $name"
+    echo "submitted Slurm job ${id%%;*} (fuzz ${secs}s, limit ${mins} min, account $ACCOUNT). Watch it: scripts/fuzz watch $name"
+    # LLM_END is set when the run uses the `llm` server. Seed generation takes ~20 min. A new
+    # server lands on another node, so a run can't switch servers once it has started.
+    local end_s=0; [ -n "${LLM_END:-}" ] && end_s=$(date -d "$LLM_END" +%s 2>/dev/null || echo 0)
+    [ "$end_s" -gt 0 ] && [ "$end_s" -lt $(( $(date +%s) + secs + seedgen * 1800 )) ] &&
+      echo "warning: the LLM server stops at $LLM_END, before this run ends, and LLM steps fail after that." \
+           "Stop the run, start a longer server (llm stop, llm start <hours>), then run it again."
     return
   fi
-  docker rm "g2f-$name" >/dev/null 2>&1 || true
-  docker run -d --name "g2f-$name" "${ARGS[@]}" -e AFL_NO_UI=1 "$IMAGE" bash -c "$inner" >/dev/null
+  docker rm -v "g2f-$name" >/dev/null 2>&1 || true
+  # -v /eval/$OUT: an anonymous volume on the VM's own disk, removed with the container
+  docker run -d --name "g2f-$name" "${ARGS[@]}" -v "/eval/$OUT" -v "$d:/host" -e AFL_NO_UI=1 \
+    "$IMAGE" bash /eval/run.sh >/dev/null
   echo "started g2f-$name (fuzz ${secs}s). Watch it: scripts/fuzz watch $name"
 }
 
 # Prints one campaign's numbers. fuzzer_stats (and afl-whatsup) only update every 60 s and
-# fuzz.log once per test case, so this reads queue/ and crashes/ (live), plot_data (every 5 s)
-# and the clock instead.
+# fuzz.log once per test case, so this reads queue/, crashes/ and plot_data (copied to eval/
+# every 30 s by run.sh) and the clock instead.
 show_campaign() {
   local name="$1" d="$EVAL/$1" o="$EVAL/$1/$OUT/default"
   local state now phase="not started" plot g n steps=0 plateau=300 backoff=60 idle="-" llm=0 start="" rt="-"
@@ -277,7 +355,9 @@ cmd_stop() {
   fi
   docker_up
   docker inspect "g2f-$1" >/dev/null 2>&1 || die "no container g2f-$1 (see: scripts/fuzz list)"
-  docker rm -f "g2f-$1" >/dev/null && echo "stopped and removed g2f-$1"
+  # SIGTERM first: run.sh copies the output back to eval/ before the container goes
+  docker stop -t 60 "g2f-$1" >/dev/null 2>&1 || true
+  docker rm -f -v "g2f-$1" >/dev/null && echo "stopped and removed g2f-$1"
 }
 
 cmd_list() {
@@ -292,6 +372,40 @@ cmd_list() {
   [ "$any" = 1 ] || echo "(no campaigns yet: scripts/fuzz new)"
 }
 
+# The gpt-oss:120b server on an H100 (scripts/llm-serve.sbatch, team-docs/TEMPEST.md section 5).
+cmd_llm() {
+  [ "$BACKEND" = slurm ] || die "llm runs on Tempest. From the Mac, use an SSH tunnel (team-docs/TEMPEST.md section 5)"
+  local id hours log
+  case "${1:-status}" in
+    start)
+      hours="${2:-24}"
+      case "$hours" in ''|0|*[!0-9]*) die "hours must be a whole number, e.g. 24 (up to 336)" ;; esac
+      [ -z "$(squeue -h -u "$USER" -n llm-serve -o %i)" ] || die "a server is already queued or running (scripts/fuzz llm status)"
+      [ -f "$LLM_DIR/ollama.sif" ] && [ -d "$LLM_DIR/models" ] ||
+        die "no $LLM_DIR/ollama.sif or models/: do the one-time setup in team-docs/TEMPEST.md section 5"
+      slurm_account
+      id=$(sbatch --parsable --account "$ACCOUNT" --time $((hours * 60)) --chdir "$LLM_DIR" "$REPO/scripts/llm-serve.sbatch")
+      echo "submitted server job ${id%%;*} (${hours} h, account $ACCOUNT). Ready ~4 min after it starts: scripts/fuzz llm status"
+      ;;
+    stop)
+      # runs keep the server's address, so they'd lose their LLM
+      [ -z "$(squeue -h -u "$USER" -o %j | grep '^g2f-' || true)" ] ||
+        die "campaigns are still queued or running (squeue -u \$USER). Stop them first, or: scancel -n llm-serve"
+      scancel -u "$USER" -n llm-serve && echo "stopped the LLM server"
+      ;;
+    status)
+      id=$(squeue -h -u "$USER" -n llm-serve -o %i | awk 'NR == 1')
+      [ -n "$id" ] || { echo "no LLM server. Start one: scripts/fuzz llm start [hours]"; return; }
+      squeue -j "$id" -o '%.10i %.9T %.11M %.11L %N'
+      log="$LLM_DIR/llm-serve-$id.out"
+      if grep -q 'llm-serve: .* loaded' "$log" 2>/dev/null; then echo "ready: $(grep -m1 'llm-serve: .* loaded' "$log")"
+      elif [ -f "$log" ]; then echo "loading the model (~4 min)"
+      else echo "waiting for a GPU"; fi
+      ;;
+    *) die "usage: scripts/fuzz llm start [hours] | stop | status" ;;
+  esac
+}
+
 cmd="${1:-help}"; shift || true
 case "$cmd" in
   new)      cmd_new "$@"; echo "next: scripts/fuzz run $NEW_NAME [secs]" ;;
@@ -303,6 +417,8 @@ case "$cmd" in
   results)  cmd_results "$@" ;;
   stop)     cmd_stop "$@" ;;
   list|ls)  cmd_list ;;
+  llm)      cmd_llm "$@" ;;
+  account)  [ "$BACKEND" = slurm ] || die "account is for Tempest"; slurm_account; echo "$ACCOUNT" ;;
   help|-h|--help) usage ;;
   *) die "unknown command '$cmd' (try: scripts/fuzz help)" ;;
 esac
