@@ -11,8 +11,8 @@
 # Build from the repo root:
 #   docker build -f docker/Dockerfile.g2fuzz -t g2fuzz:dev .
 #
-# The OpenAI key is never baked in; mount it at runtime:
-#   -v ~/.secrets/openai_key.txt:/eval/openai_key.txt:ro
+# The API key is never baked in; mount it at runtime (scripts/fuzz does this):
+#   -v ~/.secrets/catchat.key:/eval/openai_key.txt:ro
 #
 
 FROM ubuntu:22.04

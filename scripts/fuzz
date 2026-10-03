@@ -1,0 +1,245 @@
+#!/usr/bin/env bash
+# fuzz: shortcuts for G2Fuzz campaigns. See WORKFLOW.md.
+#
+# Usage: scripts/fuzz <command> [args]
+#
+#   new     [name]                  Create a campaign folder in eval/
+#   reuse   <from> [name]           New campaign with seeds + generators copied from eval/<from>
+#   run     <name> [secs] [--test]  Background run: seed generation (if no seeds yet), then
+#                                   fuzz for <secs> seconds (default 3600)
+#   shell   <name> [--test]         Interactive container in a campaign (manual commands)
+#   watch   <name>                  Live view of a campaign, updated every second
+#   status  [name]                  One campaign's numbers once (no name: same as list)
+#   results <name>                  Final summary: coverage, crashes, generators, LLM calls
+#   stop    <name>                  Stop and remove a run's container (files in eval/ stay)
+#   list                            All campaigns: seeds, generators, container state
+#
+#   --test  llmGen-M after 10 s without new coverage. Testing only, never for experiments.
+#
+# Settings (environment variables, defaults in brackets):
+#   G2F_KEY [~/.secrets/catchat.key]   G2F_BASE_URL [CatChat]   G2F_MODEL [gpt-oss:120b]
+#   G2F_TARGET [jhead]                 G2F_IMAGE [g2fuzz:dev]
+#   G2F_SEEDS [/AFLplusplus/testcases/images/jpeg]  (stock seeds, path inside the image)
+set -euo pipefail
+
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+EVAL="$REPO/eval"
+IMAGE="${G2F_IMAGE:-g2fuzz:dev}"
+KEY="${G2F_KEY:-$HOME/.secrets/catchat.key}"
+BASE_URL="${G2F_BASE_URL:-https://catchat-api.msu.montana.edu/v1}"
+MODEL="${G2F_MODEL:-gpt-oss:120b}"
+TARGET="${G2F_TARGET:-jhead}"
+SEEDS="${G2F_SEEDS:-/AFLplusplus/testcases/images/jpeg}"
+OUT="${TARGET}_output"
+
+die() { echo "fuzz: $*" >&2; exit 1; }
+usage() { awk 'NR > 1 && !/^#/ { exit } NR > 1 { sub(/^# ?/, ""); print }' "${BASH_SOURCE[0]}"; }
+count() { [ -d "$1" ] && ls "$1" | wc -l | tr -d ' ' || echo 0; }
+lines() { [ -f "$1" ] && wc -l < "$1" | tr -d ' ' || echo 0; }
+gcount() { [ -f "$2" ] && { grep -c "$1" "$2" || true; } || echo 0; }   # matches in a file, 0 if none/missing
+docker_up() { docker info >/dev/null 2>&1 || die "Docker isn't running (macOS: colima start)"; }
+running() { [ "$(docker inspect -f '{{.State.Running}}' "g2f-$1" 2>/dev/null)" = true ]; }
+
+need_campaign() {
+  [ -n "${1:-}" ] || die "missing campaign name (see: scripts/fuzz list)"
+  [ -d "$EVAL/$1" ] || die "no campaign eval/$1 (see: scripts/fuzz list)"
+}
+
+# Parses "--test" out of the args; leaves the rest in POS.
+parse_test() {
+  TEST=0; POS=()
+  for a in "$@"; do
+    if [ "$a" = "--test" ]; then TEST=1; else POS+=("$a"); fi
+  done
+}
+
+docker_args() {
+  [ -s "$KEY" ] || die "API key missing or empty: $KEY (see team-docs/CATCHAT_API_KEY.md)"
+  docker_up
+  docker image inspect "$IMAGE" >/dev/null 2>&1 || die "image $IMAGE not found; build it (SETUP.md step 4)"
+  # host-gateway lets the container reach a local LLM (team-docs/LLM_PROVIDERS.md)
+  ARGS=(-v "$EVAL/$1:/eval" -v "$KEY:/eval/openai_key.txt:ro"
+        -e "OPENAI_BASE_URL=$BASE_URL" --add-host=host.docker.internal:host-gateway)
+  if [ "$TEST" = 1 ]; then
+    ARGS+=(-e G2F_PLATEAU_SEC=10 -e G2F_BACKOFF_SEC=0)
+    echo "TEST MODE: llmGen-M after 10 s without new coverage (not for experiments)"
+  fi
+}
+
+cmd_new() {
+  NEW_NAME="${1:-$TARGET-$(date +%m%d-%H%M)}"
+  case "$NEW_NAME" in ''|[.-]*|*[!A-Za-z0-9_.-]*) die "bad name '$NEW_NAME': use letters, digits, . _ -" ;; esac
+  local d="$EVAL/$NEW_NAME"
+  [ -e "$d" ] && die "eval/$NEW_NAME already exists; pick a new name"
+  mkdir -p "$d"
+  cp "$REPO/program_to_format.json" "$d/"
+  printf '{"model": ["%s"]}\n' "$MODEL" > "$d/model_setting.json"
+  echo "created eval/$NEW_NAME (target $TARGET, model $MODEL)"
+}
+
+cmd_reuse() {
+  local from="${1:-}"
+  [ -n "$from" ] || die "usage: scripts/fuzz reuse <from-campaign> [new-name]"
+  need_campaign "$from"
+  local src="$EVAL/$from"
+  [ -d "$src/initial_seeds" ] || die "eval/$from has no initial_seeds/"
+  [ -d "$src/$OUT/default/generators" ] || die "eval/$from has no generators ($OUT/default/generators)"
+  cmd_new "${2:-}"
+  local d="$EVAL/$NEW_NAME"
+  cp -r "$src/initial_seeds" "$d/"
+  mkdir -p "$d/$OUT/default"
+  cp -r "$src/$OUT/default/generators" "$d/$OUT/default/"
+  echo "copied $(count "$d/initial_seeds") seeds and $(count "$d/$OUT/default/generators") generators from eval/$from"
+}
+
+cmd_shell() {
+  parse_test "$@"; need_campaign "${POS[0]:-}"
+  docker_args "${POS[0]}"
+  exec docker run --rm -it "${ARGS[@]}" "$IMAGE"
+}
+
+cmd_run() {
+  parse_test "$@"; need_campaign "${POS[0]:-}"
+  local name="${POS[0]}" secs="${POS[1]:-3600}" d="$EVAL/${POS[0]}"
+  case "$secs" in ''|*[!0-9]*) die "secs must be whole seconds, e.g. 900" ;; esac
+  docker_args "$name"
+  running "$name" && die "g2f-$name is already running (scripts/fuzz watch $name)"
+  [ -d "$d/$OUT/default/queue" ] && die "eval/$name was already fuzzed; afl-fuzz won't overwrite it. Use: scripts/fuzz reuse $name"
+  local inner=""
+  if [ "$(count "$d/initial_seeds")" = 0 ]; then
+    echo "no seeds yet: seed generation first (~15-20 min), then fuzzing"
+    # Starts clean, stops if the LLM made no seeds (bad key, no VPN, CatChat down), and fills
+    # initial_seeds/ only at the end, so a run stopped midway redoes seed generation.
+    inner="rm -rf $OUT && python /AFLplusplus/program_gen.py --output ./$OUT --program $TARGET > seedgen.log 2>&1; \
+ls $OUT/default/gen_seeds/* >/dev/null 2>&1 || { echo 'fuzz: seed generation made no seeds' >> seedgen.log; exit 1; }; \
+mkdir -p initial_seeds && cp $SEEDS/* $OUT/default/gen_seeds/* initial_seeds/ && "
+  else
+    echo "reusing $(count "$d/initial_seeds") seeds: fuzzing only"
+  fi
+  inner="$inner afl-fuzz -i initial_seeds -o $OUT -c /targets/$TARGET.cmp -m 1024 -V $secs \
+-k /AFLplusplus/ -- /targets/$TARGET.afl @@ > fuzz.log 2>&1"
+  docker rm "g2f-$name" >/dev/null 2>&1 || true
+  docker run -d --name "g2f-$name" "${ARGS[@]}" -e AFL_NO_UI=1 "$IMAGE" bash -c "$inner" >/dev/null
+  echo "started g2f-$name (fuzz ${secs}s). Watch it: scripts/fuzz watch $name"
+}
+
+# Prints one campaign's numbers. fuzzer_stats (and afl-whatsup) only update every 60 s and
+# fuzz.log once per test case, so this reads queue/ and crashes/ (live), plot_data (every 5 s)
+# and the clock instead.
+show_campaign() {
+  local name="$1" d="$EVAL/$1" o="$EVAL/$1/$OUT/default"
+  local state now phase="not started" plot g n steps=0 plateau=300 backoff=60 idle="-" llm=0 start="" rt="-"
+  local t0 cov eps execs edges ts secs result
+  state=$(docker inspect -f '{{.State.Status}}' "g2f-$name" 2>/dev/null) || state="no container"
+  now=$(date +%s)
+  if [ -f "$d/fuzz.log" ]; then
+    # an LLM step is running if "Gen-M start" came after the last test-case line
+    phase=$(tail -n 2000 "$d/fuzz.log" | awk '/Fuzzing test case/ {k="fuzzing"} /Gen-M start/ {k="LLM step (fuzzing paused)"} END {print k ? k : "starting fuzzer"}')
+    [ "$state" = running ] || phase="finished"
+    steps=$(gcount 'Gen-M start' "$d/fuzz.log")
+    # only printed when G2F_PLATEAU_SEC/G2F_BACKOFF_SEC are set (--test); otherwise 300/60
+    g=$({ grep -a -m1 'G2F: LLM step after' "$d/fuzz.log" || true; } | sed -n 's/.*after \([0-9]*\)s.*+\([0-9]*\)s.*/\1 \2/p')
+    [ -n "$g" ] && read -r plateau backoff <<< "$g"
+  elif [ -f "$d/seedgen.log" ]; then
+    phase="seed generation"
+    [ "$state" = running ] || phase="seed generation stopped or failed (see eval/$name/seedgen.log)"
+  fi
+  plot=""; [ -f "$o/plot_data" ] && plot=$(tail -1 "$o/plot_data" | tr -d ' ')
+  # plot_data columns: time,cycles,cur_item,corpus,pending,favs,map_size,crashes,hangs,depth,execs/s,execs,edges,...
+  IFS=, read -r t0 _ _ _ _ _ cov _ _ _ eps execs edges _ <<< "$plot"
+  case "$t0" in ''|*[!0-9]*) ;; *) start=$(( $(date -r "$o/plot_data" +%s) - t0 )) ;; esac
+  if [ -n "$start" ]; then
+    [ "$state" = running ] && g=$now || g=$(date -r "$o/plot_data" +%s)   # run time stops when the run does
+    rt=$((g - start)); rt=$(printf '%d:%02d:%02d' $((rt / 3600)) $((rt / 60 % 60)) $((rt % 60)))
+    # newest find = highest queue id; its name holds the run time it was found at (time:<ms>)
+    n=$({ ls "$o/queue" 2>/dev/null || true; } | tail -1)
+    case "$n" in *time:*) n=${n#*time:}; n=$((g - start - ${n%%,*} / 1000)); idle="$(( n < 0 ? 0 : n ))s ago" ;; esac
+  fi
+  if [ -f "$d/llm_calls.jsonl" ]; then
+    llm="$(lines "$d/llm_calls.jsonl") ($(gcount '"status": "ok"' "$d/llm_calls.jsonl") ok)"
+    g=$(tail -1 "$d/llm_calls.jsonl" | sed -n 's/.*"ts": \([0-9]*\).*"secs": \([0-9.]*\), "status": "\([A-Za-z]*\)".*/\1 \2 \3/p')
+    [ -n "$g" ] && { read -r ts secs result <<< "$g"; llm="$llm   last: $result after ${secs}s, $((now - ts))s ago"; }
+  fi
+  printf '%s\n' \
+    "$name  [$state]" "" \
+    "phase        $phase" \
+    "run time     $rt" \
+    "corpus       $(count "$o/queue")" \
+    "crashes      $({ ls "$o/crashes" 2>/dev/null || true; } | grep -c '^id:' || true)" \
+    "coverage     ${edges:--} edges (${cov:--})" \
+    "speed        ${eps:--} execs/s, ${execs:--} total" \
+    "last find    $idle   (LLM step after $((plateau + steps * backoff))s without one)" \
+    "llmGen-M     $steps steps" \
+    "LLM calls    $llm"
+}
+
+cmd_status() {
+  [ -n "${1:-}" ] || { cmd_list; return; }
+  need_campaign "$1"
+  show_campaign "$1"
+}
+
+# Redraws show_campaign in place every second until the container stops.
+cmd_watch() {
+  need_campaign "${1:-}"
+  local out
+  trap 'printf "\033[?25h\n"' EXIT   # always give the cursor back
+  trap 'exit 0' INT TERM
+  printf '\033[2J\033[?25l'          # clear screen, hide cursor
+  while :; do
+    out=$(show_campaign "$1")
+    printf '\033[H'
+    printf '%s\n' "$out" | while IFS= read -r l; do printf '%s\033[K\n' "$l"; done
+    printf '\nCtrl-C closes this view; the run keeps going.\033[K\n\033[J'
+    case "$out" in *"[running]"*) sleep 1 ;; *) echo "Not running. Full summary: scripts/fuzz results $1"; return ;; esac
+  done
+}
+
+cmd_results() {
+  need_campaign "${1:-}"
+  local d="$EVAL/$1" o="$EVAL/$1/$OUT/default"
+  [ -f "$o/fuzzer_stats" ] || die "eval/$1 has no fuzzer_stats yet"
+  echo "== $1"
+  grep -E '^(run_time|execs_done|execs_per_sec|corpus_count|edges_found|total_edges|saved_crashes|stability)' "$o/fuzzer_stats"
+  echo "generators        : $(count "$o/generators")"
+  echo "llmGen-M steps    : $(gcount 'Gen-M start' "$d/fuzz.log")"
+  local calls ok; calls=$(lines "$d/llm_calls.jsonl"); ok=$(gcount '"status": "ok"' "$d/llm_calls.jsonl")
+  echo "LLM calls         : $calls ($ok ok, $((calls - ok)) errors)"
+  [ -f "$o/mutation_log/relationship.json" ] && echo "generator lineage : $(cat "$o/mutation_log/relationship.json")"
+  echo "crashes dir       : eval/$1/$OUT/default/crashes"
+}
+
+cmd_stop() {
+  [ -n "${1:-}" ] || die "usage: scripts/fuzz stop <name>"
+  docker_up
+  docker inspect "g2f-$1" >/dev/null 2>&1 || die "no container g2f-$1 (see: scripts/fuzz list)"
+  docker rm -f "g2f-$1" >/dev/null && echo "stopped and removed g2f-$1"
+}
+
+cmd_list() {
+  local n fz st any=0
+  printf '%-22s %-6s %-11s %-6s %s\n' CAMPAIGN SEEDS GENERATORS FUZZED CONTAINER
+  for d in "$EVAL"/*/; do
+    [ -d "$d" ] || continue
+    n=$(basename "$d"); any=1
+    fz=no; [ -d "$d/$OUT/default/queue" ] && fz=yes
+    st=$(docker inspect -f '{{.State.Status}}' "g2f-$n" 2>/dev/null) || st=-
+    printf '%-22s %-6s %-11s %-6s %s\n' "$n" "$(count "$d/initial_seeds")" "$(count "$d/$OUT/default/generators")" "$fz" "$st"
+  done
+  [ "$any" = 1 ] || echo "(no campaigns yet: scripts/fuzz new)"
+}
+
+cmd="${1:-help}"; shift || true
+case "$cmd" in
+  new)      cmd_new "$@"; echo "next: scripts/fuzz run $NEW_NAME [secs]" ;;
+  reuse)    cmd_reuse "$@"; echo "next: scripts/fuzz run $NEW_NAME [secs]" ;;
+  run)      cmd_run "$@" ;;
+  shell)    cmd_shell "$@" ;;
+  watch)    cmd_watch "$@" ;;
+  status)   cmd_status "$@" ;;
+  results)  cmd_results "$@" ;;
+  stop)     cmd_stop "$@" ;;
+  list|ls)  cmd_list ;;
+  help|-h|--help) usage ;;
+  *) die "unknown command '$cmd' (try: scripts/fuzz help)" ;;
+esac

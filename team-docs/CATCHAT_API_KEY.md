@@ -31,7 +31,7 @@ Keys expire after 180 days. Delete and recreate a key if it leaks.
 
 ```bash
 mkdir -p -m 700 ~/.secrets
-pbpaste > ~/.secrets/catchat.key
+pbpaste > ~/.secrets/catchat.key       # Linux/WSL: cat > ~/.secrets/catchat.key, paste, Ctrl-D
 chmod 600 ~/.secrets/catchat.key
 ```
 

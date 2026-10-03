@@ -5,10 +5,11 @@ Goal: replace G2Fuzz's random generator selection with a multi-armed bandit sche
 
 | Doc | Purpose |
 | --- | --- |
-| [SETUP.md](SETUP.md) | Build the Docker image and run a campaign. **Start here.** |
+| [SETUP.md](SETUP.md) | One-time setup and a first run. **Start here.** |
+| [WORKFLOW.md](WORKFLOW.md) | Day-to-day commands, code changes, Git |
 | [team-docs/CATCHAT_API_KEY.md](team-docs/CATCHAT_API_KEY.md) | Get a free MSU CatChat API key |
 
-Work happens on the `dev` branch. `main` tracks there upstream version.
+Work happens on the `dev` branch. `main` tracks the upstream version.
 
 ---
 

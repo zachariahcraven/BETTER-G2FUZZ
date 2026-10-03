@@ -1,110 +1,80 @@
-# Setup: Build the Image and Run G2Fuzz
+# Setup: First Run
 
-Everything runs inside Docker. Run commands from the repo root unless a step says otherwise.
+One-time setup, then a short test campaign. Run commands from the repo root.
+Tested on an arm64 Mac.
 
-> **Note:** Steps 1–8 are tested on an arm64 Mac, including the `llmGen-M` step.
+## 1. Install Docker
 
-## 1. Prerequisites (one time)
+| OS | Install |
+| --- | --- |
+| macOS | `brew install docker colima`, then `colima start --cpu 4 --memory 8 --disk 60` |
+| Linux | Docker Engine |
+| Windows | Docker Desktop with WSL2. Clone the repo and run every command inside WSL |
 
-**Docker**
-- macOS: `brew install docker colima`, then `colima start --cpu 4 --memory 8 --disk 60`
-- Linux: Docker Engine
-- Windows: Docker Desktop with WSL2
+Docker needs about 8 GB of RAM.
+On macOS, run `colima start` after each reboot and `colima stop` when you're done.
 
-**CatChat API key.** Follow [team-docs/CATCHAT_API_KEY.md](team-docs/CATCHAT_API_KEY.md).
-The key goes in `~/.secrets/catchat.key`. Never put it in the repo.
+## 2. Get the code
 
-Backup providers (GitHub Models, Ollama): [team-docs/LLM_PROVIDERS.md](team-docs/LLM_PROVIDERS.md).
+```bash
+git clone https://github.com/zachariahcraven/BETTER-G2FUZZ.git
+cd BETTER-G2FUZZ
+```
 
-## 2. Build the image (one time, 15–30 min)
+## 3. Get a CatChat key
+
+Follow [team-docs/CATCHAT_API_KEY.md](team-docs/CATCHAT_API_KEY.md). The key goes in `~/.secrets/catchat.key`.
+Off campus, connect to the MSU VPN.
+
+## 4. Build the image
 
 ```bash
 docker build -f docker/Dockerfile.g2fuzz -t g2fuzz:dev .
 ```
 
-Rebuild after changes to `src/`, `include/` or the Python files.
+The first build takes 15–30 min. Rebuild after changing `src/`, `include/` or the Python files.
 
-## 3. Create a campaign folder
-
-```bash
-mkdir -p eval/jhead-run1
-cp program_to_format.json eval/jhead-run1/
-echo '{"model": ["gpt-oss:120b"]}' > eval/jhead-run1/model_setting.json
-```
-
-`eval/` is ignored by git.
-
-## 4. Start a container
+## 5. First campaign
 
 ```bash
-docker run --rm -it \
-  -v "$PWD/eval/jhead-run1:/eval" \
-  -v "$HOME/.secrets/catchat.key:/eval/openai_key.txt:ro" \
-  -e OPENAI_BASE_URL=https://catchat-api.msu.montana.edu/v1 \
-  g2fuzz:dev
+scripts/fuzz new first
+scripts/fuzz run first 900 --test
+scripts/fuzz watch first
 ```
 
-You start in `/eval`. **Run steps 6–7 from `/eval`.**
-G2Fuzz reads `openai_key.txt`, `model_setting.json` and `program_to_format.json` from the current directory.
+- Seed generation runs first (15–20 min). Then fuzzing runs for 900 s.
+- `--test` fires the LLM step (`llmGen-M`) after 10 s without new coverage, so you see one. Never use it for experiments.
+- Ctrl-C closes `watch`. The run keeps going.
+- When it finishes: `scripts/fuzz results first`.
 
-## 5. Targets (prebuilt)
+Day-to-day commands are in [WORKFLOW.md](WORKFLOW.md).
 
-The image includes instrumented targets in `/targets/`. Nothing to build.
+## 6. Output files
 
-| Target | Normal build | CmpLog build | Input |
-| --- | --- | --- | --- |
-| jhead | `/targets/jhead.afl` | `/targets/jhead.cmp` | JPEG |
-
-New targets are added in `docker/Dockerfile.g2fuzz`.
-
-## 6. Generate seeds with the LLM
-
-```bash
-mkdir -p initial_seeds
-cp /AFLplusplus/testcases/images/jpeg/*.jpg initial_seeds/
-python /AFLplusplus/program_gen.py --output ./jhead_output --program jhead
-cp jhead_output/default/gen_seeds/* initial_seeds/
-```
-
-`--program` must be a key in `program_to_format.json`.
-
-## 7. Fuzz
-
-```bash
-afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -k /AFLplusplus/ -- /targets/jhead.afl @@
-```
-
-- Always pass `-k /AFLplusplus/`.
-- Add `-V 3600` to stop after an hour.
-- After 5+ minutes without new coverage, the stage shows `llmGen-M` while the LLM writes a generator.
-  Fuzzing pauses until the LLM step finishes.
-- **Testing only:** add `-e G2F_PLATEAU_SEC=10 -e G2F_BACKOFF_SEC=0` to `docker run` to trigger
-  `llmGen-M` after 10 s without finds. Leave these unset for real experiments.
-
-## 8. Results
-
-Output is in `eval/jhead-run1/jhead_output/default/` and stays after the container exits.
+Everything is in `eval/<campaign>/` and stays after the container exits.
 
 | Path | Contents |
 | --- | --- |
-| `queue/` | Corpus. `orig:jpg-N_k` entries came from G2Fuzz generators |
-| `crashes/` | Crashing inputs |
-| `generators/` | Python generators the LLM wrote |
-| `fuzzer_stats`, `plot_data` | Coverage and speed (`afl-plot` graphs these) |
-| `mutate_log` | Output of each LLM step |
-| `mutation_log/relationship.json` | Which generator was mutated into which |
-| `gen_seeds_energy_log` | Seeds added and time spent in the LLM |
-| `/eval/llm_calls.jsonl` | One line per LLM request: latency, success or error, retry attempt |
+| `seedgen.log`, `fuzz.log` | Logs from seed generation and fuzzing |
+| `llm_calls.jsonl` | One line per LLM request: latency, success or error, retry attempt |
+| `jhead_output/default/queue/` | Corpus. `orig:jpg-N_k` entries came from G2Fuzz generators |
+| `jhead_output/default/crashes/` | Crashing inputs |
+| `jhead_output/default/generators/` | Python generators the LLM wrote |
+| `jhead_output/default/fuzzer_stats`, `plot_data` | Coverage and speed (`afl-plot` graphs these) |
+| `jhead_output/default/mutation_log/relationship.json` | Which generator was mutated into which |
+| `jhead_output/default/gen_seeds_energy_log` | Seeds added and time spent in the LLM |
 
 ## Common problems
 
 | Problem | Fix |
 | --- | --- |
-| `Cannot connect to the Docker daemon` | Start Docker (`colima start` on macOS) |
-| `FileNotFoundError: model_setting.json` or `openai_key.txt` | Not in `/eval`, or the key mount is missing |
-| `openai.AuthenticationError` | Key file is wrong, expired, or doesn't match `OPENAI_BASE_URL` |
-| `openai.NotFoundError` / unknown model | Use an exact model ID (`gpt-oss:120b`) |
-| LLM requests time out off campus | Connect to the MSU VPN |
-| `llmGen-M` never shows up | Normal at first. It needs 5+ minutes without new coverage (or set `G2F_PLATEAU_SEC` when testing) |
-| Fuzzing stalls for minutes | An `llmGen-M` step is waiting on a slow LLM. Check `llm_calls.jsonl` for timeouts |
+| `Docker isn't running` | `colima start` (macOS) |
+| `image g2fuzz:dev not found` | Build it (step 4) |
+| `API key missing or empty` | Save the key (step 3) |
+| `watch` says seed generation stopped or failed | Check the key and VPN, read `seedgen.log`, then `run` again |
+| `openai.AuthenticationError` in a log | The key is wrong or expired |
+| `openai.NotFoundError` / unknown model | Use the exact model ID `gpt-oss:120b` |
+| LLM requests time out | Off campus: use the VPN. CatChat is slowest midday |
+| `llmGen-M` never shows up | Normal. It needs 5+ min without new coverage (or `--test`) |
+| Fuzzing stalls for minutes | An LLM step is waiting on CatChat. `watch` shows the phase |
 | Generators install odd pip packages | Expected. This is why everything runs in Docker |
