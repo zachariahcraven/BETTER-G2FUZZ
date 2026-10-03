@@ -19,3 +19,7 @@ initial_seeds/
 # Host build artifacts (the image builds its own)
 *.o
 *.so
+
+# Apptainer image and its source archive
+*.sif
+g2fuzz-amd64.tar*

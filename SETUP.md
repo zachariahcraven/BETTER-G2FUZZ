@@ -1,7 +1,7 @@
 # Setup: First Run
 
 One-time setup, then a short test campaign. Run commands from the repo root.
-Tested on an arm64 Mac.
+Tested on an arm64 Mac. For Tempest, follow [team-docs/TEMPEST.md](team-docs/TEMPEST.md) instead.
 
 ## 1. Install Docker
 

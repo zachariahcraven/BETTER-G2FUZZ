@@ -33,8 +33,12 @@ _fuzz() {
                names=($_FUZZ_EVAL/*/*_output/default/generators(N/:h:h:h:t)); names=(${names:*seeded}) ;;
       run)     names=(${all:|fuzzed}) ;;                                         # not fuzzed yet
       results) names=($_FUZZ_EVAL/*/*_output/default/fuzzer_stats(N:h:h:h:t)) ;;
-      stop)    names=(${${(f)"$(docker ps -a --filter name=g2f- --format '{{.Names}}' 2>/dev/null)"}#g2f-}) ;;
-      watch)   names=(${${(f)"$(docker ps --filter name=g2f- --format '{{.Names}}' 2>/dev/null)"}#g2f-}) ;;  # running
+      stop|watch)                                                           # have a run
+        if (( $+commands[docker] )); then
+          names=(${${(f)"$(docker ps -a --filter name=g2f- --format '{{.Names}}' 2>/dev/null)"}#g2f-})
+        else
+          names=($_FUZZ_EVAL/*/slurm.jobid(N:h:t))                           # Tempest
+        fi ;;
       shell|status) names=($all) ;;
       *) return 1 ;;
     esac

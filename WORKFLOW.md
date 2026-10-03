@@ -1,6 +1,6 @@
 # Workflow
 
-Day-to-day use after [SETUP.md](SETUP.md). Run commands from the repo root.
+Day-to-day use after [SETUP.md](SETUP.md) or [TEMPEST.md](team-docs/TEMPEST.md). Run commands from the repo root.
 
 ## Commands
 
@@ -11,11 +11,11 @@ Day-to-day use after [SETUP.md](SETUP.md). Run commands from the repo root.
 | `new [name]` | Create a campaign folder (default name `jhead-MMDD-HHMM`) |
 | `reuse <from> [name]` | New campaign with seeds and generators from `eval/<from>`. Skips seed generation (15–20 min) |
 | `run <name> [secs]` | Background run: seed generation if needed, then fuzz (default 3600 s) |
-| `shell <name>` | Interactive container in that campaign |
+| `shell <name>` | Interactive shell in the image, in that campaign |
 | `watch <name>` | Live view, updated every second |
 | `status [name]` | One campaign's numbers once. No name: same as `list` |
 | `results <name>` | Final summary |
-| `stop <name>` | Stop and remove the container. Files stay |
+| `stop <name>` | Stop the run. Files stay |
 | `list` | All campaigns |
 
 - `--test` on `run` or `shell` fires `llmGen-M` after 10 s without new coverage. Never use it for experiments.

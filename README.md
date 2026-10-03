@@ -8,6 +8,7 @@ Goal: replace G2Fuzz's random generator selection with a multi-armed bandit sche
 | [SETUP.md](SETUP.md) | One-time setup and a first run. **Start here.** |
 | [WORKFLOW.md](WORKFLOW.md) | Day-to-day commands, code changes, Git |
 | [team-docs/CATCHAT_API_KEY.md](team-docs/CATCHAT_API_KEY.md) | Get a free MSU CatChat API key |
+| [team-docs/TEMPEST.md](team-docs/TEMPEST.md) | Run campaigns on MSU's Tempest cluster |
 
 Work happens on the `dev` branch. `main` tracks the upstream version.
 
