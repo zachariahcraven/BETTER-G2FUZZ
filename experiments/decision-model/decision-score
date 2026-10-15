@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+"""Score the offline System One test: decision models against simple rules that need no model.
+
+Usage (from the experiment workspace): experiments/decision-model/decision-score   (reads experiments/decision-model/data/decision-preds-*.jsonl)
+pick4 (which of 4 generators pays off most): accuracy (random = 25%), log loss (random = 1.39),
+  ECE = calibration error of the top choice's probability (lower is better).
+good (will this generator pay off): AUC (random = 0.50), Brier score, and ECE; the "base rate"
+  row always answers the share of generators that pay off.
+Rules: longest code, most seeds, most finds in the first minutes (only fair to compare with the
+"with early stats" questions, where the models see the same numbers).
+"""
+import glob, json, math, os
+
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+os.chdir(ROOT)
+items = {it["id"]: it for it in (json.loads(l) for l in open("experiments/decision-model/data/decision-items.jsonl"))}
+
+
+def rule_probs(it, key):
+    """Uniform over the generators with the highest value of a feature (pick4), or the value (good)."""
+    f = it["features"]
+    if it["kind"] == "good":
+        return {"yes": list(f.values())[0][key]}
+    top = max(v[key] for v in f.values())
+    best = [L for L, v in f.items() if v[key] == top]
+    return {L: (1.0 / len(best) if L in best else 0.0) for L in f}
+
+
+def auc(scores, labels):
+    pos = [s for s, y in zip(scores, labels) if y]
+    neg = [s for s, y in zip(scores, labels) if not y]
+    if not pos or not neg:
+        return float("nan")
+    wins = sum((p > n) + 0.5 * (p == n) for p in pos for n in neg)
+    return wins / (len(pos) * len(neg))
+
+
+def ece(conf, correct, bins=10):
+    total, err = len(conf), 0.0
+    for b in range(bins):
+        idx = [i for i, c in enumerate(conf) if b / bins <= c < (b + 1) / bins or (b == bins - 1 and c == 1.0)]
+        if idx:
+            err += len(idx) / total * abs(sum(conf[i] for i in idx) / len(idx) - sum(correct[i] for i in idx) / len(idx))
+    return err
+
+
+def score(rows):
+    """rows: (item, probs). Returns the metrics for one kind of question."""
+    kind = rows[0][0]["kind"]
+    if kind == "pick4":
+        acc = [max(p, key=p.get) == it["label"] for it, p in rows]
+        ll = [-math.log(max(p.get(it["label"], 0.0), 1e-6)) for it, p in rows]
+        conf = [max(p.values()) for _, p in rows]
+        return "acc %3.0f%%  logloss %4.2f  ECE %4.2f" % (100.0 * sum(acc) / len(acc), sum(ll) / len(ll), ece(conf, acc))
+    y = [bool(it["label"]) for it, _ in rows]
+    s = [p["yes"] for _, p in rows]
+    probs = [min(max(v, 0.0), 1.0) for v in s]
+    brier = sum((p - t) ** 2 for p, t in zip(probs, y)) / len(y)
+    return "AUC %4.2f  Brier %5.3f  ECE %4.2f" % (auc(s, y), brier, ece(probs, y))
+
+
+preds = {}
+for path in sorted(glob.glob("experiments/decision-model/data/decision-preds-*.jsonl")):
+    model = os.path.basename(path)[len("decision-preds-"):-len(".jsonl")]
+    rows = [json.loads(l) for l in open(path)]
+    preds[model] = {r["id"]: r["probs"] for r in rows if r["probs"] and r["id"] in items}
+    errors = sum(1 for r in rows if r["error"])
+    secs = sorted(r["secs"] for r in rows)
+    print("%-11s %d answers, %d errors, median %.3f s per question" % (model, len(preds[model]), errors,
+                                                                      secs[len(secs) // 2] if secs else 0))
+
+groups = sorted({(it["target"], it["kind"], it["stats"]) for it in items.values()}, key=lambda g: (g[0] != "jhead", g))
+for target, kind, stats in groups:
+    its = [it for it in items.values() if it["target"] == target and it["kind"] == kind and it["stats"] == stats]
+    print("\n== %s, %s, %s (%d questions)" % (target, kind, "with early stats" if stats else "code only", len(its)))
+    if kind == "good":
+        rate = sum(1 for it in its if it["label"]) / float(len(its))
+        print("  %-24s %s" % ("base rate (%.0f%%)" % (100 * rate), score([(it, {"yes": rate}) for it in its])))
+    else:
+        print("  %-24s %s" % ("random", score([(it, {L: 0.25 for L in "ABCD"}) for it in its])))
+    for key, label in (("code_len", "rule: longest code"), ("seeds", "rule: most seeds"),
+                       ("early", "rule: most early finds")):
+        if kind == "good":
+            # a count is a ranking, not a probability: only its AUC means anything
+            print("  %-24s AUC %4.2f" % (label, auc([list(it["features"].values())[0][key] for it in its],
+                                                     [bool(it["label"]) for it in its])))
+        else:
+            print("  %-24s %s" % (label, score([(it, rule_probs(it, key)) for it in its])))
+    for model in sorted(preds):
+        rows = [(it, preds[model][it["id"]]) for it in its if it["id"] in preds[model]]
+        if rows:
+            print("  %-24s %s" % (model, score(rows)))

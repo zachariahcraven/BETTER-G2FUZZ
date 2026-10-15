@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<self_descriptive_document><metadata><document_type>Self-Descriptive XML Example</document_type><creation_date>2023-10-25</creation_date><description>XML document with meaningful tag names that describe the data structure</description></metadata><content><section><title>Self-Descriptive Features</title><description>XML documents include both data and metadata through meaningful tag names, making content human-readable and interpretable without external documentation.</description></section></content></self_descriptive_document>

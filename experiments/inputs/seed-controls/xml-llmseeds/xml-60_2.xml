@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data_with_special_chars><![CDATA[This contains <special> characters like & and < that would normally need escaping]]></data_with_special_chars>
+  <code_example><![CDATA[
+function example() {
+    if (x < 5 && y > 3) {
+        return x & y;
+    }
+}
+]]></code_example>
+  <xquery_update_facility><![CDATA[
+<!-- Example XQuery Update expressions for modifying XML content -->
+let $doc := doc("example.xml")
+return (
+    insert nodes <new-element>content</new-element> into $doc/root,
+    delete nodes $doc/root/old-element,
+    replace value of node $doc/root/target-element with "updated content"
+)
+]]></xquery_update_facility>
+  <schematron_validation><![CDATA[
+<!-- Example Schematron schema for business rule validation -->
+<schema xmlns="http://purl.oclc.org/dsdl/schematron">
+    <title>Schematron Validation Rules</title>
+    <pattern id="business_rules">
+        <rule context="order">
+            <assert test="price &gt; 0">Price must be positive</assert>
+            <assert test="quantity &gt; 0">Quantity must be positive</assert>
+            <assert test="price * quantity &lt; 10000">Order total must be less than 10000</assert>
+        </rule>
+        <rule context="customer">
+            <assert test="email[contains(., '@')]">Email must contain @</assert>
+            <assert test="phone[starts-with(., '+')]">Phone number must start with +</assert>
+        </rule>
+    </pattern>
+</schema>
+]]></schematron_validation>
+</root>

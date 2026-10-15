@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mixed_content description="Mixed content with whitespace significance handling" type="mixed_content_model"><content>
+&lt;![CDATA[This is a text node with 
+significant whitespace.
+    This indented text preserves its spacing.
+&lt;element&gt;Element content&lt;/element&gt;
+More text with 
+    preserved indentation.
+&lt;another_element&gt;More content&lt;/another_element&gt;
+Final text node with 
+    trailing whitespace significance.]]&gt;
+</content><sub_element>First sub-element</sub_element><text_after_elem1>
+    Text between elements with significant whitespace
+</text_after_elem1><sub_element2>Second sub-element</sub_element2></mixed_content>

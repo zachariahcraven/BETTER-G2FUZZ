@@ -1,0 +1,86 @@
+Loading weights:   0%|          | 0/170 [00:00<?, ?it/s]Loading weights:  64%|██████▍   | 109/170 [00:00<00:00, 1079.20it/s]Loading weights: 100%|██████████| 170/170 [00:00<00:00, 1031.76it/s]
+[von] Loaded von-1.3.0 weights from local file '/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/von/option_marker.pt' (input-conditioned calibration map active)
+von: 200/2440 questions, 48 s
+von: 400/2440 questions, 91 s
+von: 600/2440 questions, 110 s
+von: 800/2440 questions, 130 s
+von: 1000/2440 questions, 153 s
+von: 1200/2440 questions, 175 s
+von: 1400/2440 questions, 197 s
+von: 1600/2440 questions, 220 s
+von: 1800/2440 questions, 238 s
+von: 2000/2440 questions, 260 s
+von: 2200/2440 questions, 287 s
+von: 2400/2440 questions, 314 s
+von: done, 2440 questions in 321 s -> /home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/exp/decision-preds-von.jsonl
+Loading weights:   0%|          | 0/320 [00:00<?, ?it/s]Loading weights:  43%|████▎     | 137/320 [00:00<00:00, 1363.31it/s]Loading weights:  86%|████████▌ | 274/320 [00:00<00:00, 1163.55it/s]Loading weights: 100%|██████████| 320/320 [00:00<00:00, 1212.12it/s]
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+decider-2b: 200/2440 questions, 27 s
+decider-2b: 400/2440 questions, 49 s
+decider-2b: 600/2440 questions, 68 s
+decider-2b: 800/2440 questions, 88 s
+decider-2b: 1000/2440 questions, 108 s
+decider-2b: 1200/2440 questions, 127 s
+decider-2b: 1400/2440 questions, 146 s
+decider-2b: 1600/2440 questions, 164 s
+decider-2b: 1800/2440 questions, 180 s
+decider-2b: 2000/2440 questions, 198 s
+decider-2b: 2200/2440 questions, 218 s
+decider-2b: 2400/2440 questions, 238 s
+decider-2b: done, 2440 questions in 243 s -> /home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/exp/decision-preds-decider-2b.jsonl
+Loading weights:   0%|          | 0/760 [00:00<?, ?it/s]Loading weights:   0%|          | 1/760 [00:06<1:23:03,  6.57s/it]Loading weights:   0%|          | 2/760 [00:12<1:21:18,  6.44s/it]Loading weights:   1%|          | 8/760 [00:13<13:45,  1.10s/it]  Loading weights:   2%|▏         | 12/760 [00:13<07:52,  1.58it/s]Loading weights:   2%|▏         | 14/760 [00:13<06:52,  1.81it/s]Loading weights:   2%|▏         | 16/760 [00:14<05:30,  2.25it/s]Loading weights:   3%|▎         | 23/760 [00:14<02:40,  4.60it/s]Loading weights:   4%|▎         | 27/760 [00:14<02:07,  5.73it/s]Loading weights:   4%|▍         | 29/760 [00:15<02:22,  5.13it/s]Loading weights:   5%|▍         | 37/760 [00:15<01:29,  8.06it/s]Loading weights:   5%|▌         | 41/760 [00:16<01:18,  9.16it/s]Loading weights:   6%|▌         | 43/760 [00:16<01:39,  7.23it/s]Loading weights:   6%|▌         | 46/760 [00:16<01:28,  8.02it/s]Loading weights:   6%|▋         | 48/760 [00:17<01:41,  7.01it/s]Loading weights:   7%|▋         | 52/760 [00:17<01:22,  8.63it/s]Loading weights:   8%|▊         | 62/760 [00:18<01:00, 11.58it/s]Loading weights:   9%|▉         | 67/760 [00:18<00:54, 12.74it/s]Loading weights:   9%|▉         | 69/760 [00:18<00:57, 11.94it/s]Loading weights:  10%|█         | 76/760 [00:19<00:42, 15.94it/s]Loading weights:  11%|█         | 80/760 [00:19<00:44, 15.20it/s]Loading weights:  11%|█         | 82/760 [00:19<01:12,  9.32it/s]Loading weights:  12%|█▏        | 90/760 [00:20<00:44, 15.12it/s]Loading weights:  12%|█▏        | 93/760 [00:20<00:42, 15.78it/s]Loading weights:  13%|█▎        | 96/760 [00:21<01:14,  8.88it/s]Loading weights:  13%|█▎        | 99/760 [00:21<01:08,  9.65it/s]Loading weights:  13%|█▎        | 101/760 [00:21<01:29,  7.36it/s]Loading weights:  14%|█▍        | 107/760 [00:22<01:01, 10.65it/s]Loading weights:  15%|█▌        | 115/760 [00:22<00:39, 16.43it/s]Loading weights:  16%|█▌        | 118/760 [00:22<00:38, 16.89it/s]Loading weights:  16%|█▌        | 121/760 [00:23<01:07,  9.54it/s]Loading weights:  17%|█▋        | 129/760 [00:23<00:42, 14.70it/s]Loading weights:  17%|█▋        | 132/760 [00:23<00:43, 14.54it/s]Loading weights:  18%|█▊        | 135/760 [00:24<01:06,  9.45it/s]Loading weights:  19%|█▉        | 143/760 [00:24<00:47, 13.02it/s]Loading weights:  19%|█▉        | 147/760 [00:25<00:48, 12.60it/s]Loading weights:  20%|█▉        | 149/760 [00:25<01:04,  9.55it/s]Loading weights:  20%|██        | 152/760 [00:25<00:59, 10.16it/s]Loading weights:  20%|██        | 154/760 [00:26<01:20,  7.55it/s]Loading weights:  21%|██        | 158/760 [00:26<00:58, 10.25it/s]Loading weights:  21%|██        | 160/760 [00:26<00:56, 10.71it/s]Loading weights:  22%|██▏       | 167/760 [00:26<00:32, 18.27it/s]Loading weights:  22%|██▏       | 170/760 [00:26<00:32, 18.19it/s]Loading weights:  23%|██▎       | 173/760 [00:27<00:51, 11.36it/s]Loading weights:  23%|██▎       | 175/760 [00:27<00:59,  9.89it/s]Loading weights:  24%|██▍       | 182/760 [00:28<00:39, 14.48it/s]Loading weights:  24%|██▍       | 186/760 [00:28<00:45, 12.52it/s]Loading weights:  25%|██▍       | 188/760 [00:29<01:09,  8.21it/s]Loading weights:  26%|██▌       | 194/760 [00:29<00:44, 12.75it/s]Loading weights:  26%|██▌       | 197/760 [00:29<00:41, 13.49it/s]Loading weights:  26%|██▋       | 200/760 [00:29<00:46, 11.93it/s]Loading weights:  27%|██▋       | 202/760 [00:30<01:09,  8.01it/s]Loading weights:  27%|██▋       | 205/760 [00:30<01:01,  9.09it/s]Loading weights:  27%|██▋       | 207/760 [00:31<01:22,  6.72it/s]Loading weights:  28%|██▊       | 210/760 [00:31<01:01,  8.90it/s]Loading weights:  28%|██▊       | 212/760 [00:31<00:58,  9.44it/s]Loading weights:  29%|██▉       | 221/760 [00:31<00:30, 17.91it/s]Loading weights:  29%|██▉       | 224/760 [00:31<00:30, 17.79it/s]Loading weights:  30%|██▉       | 227/760 [00:32<00:55,  9.62it/s]Loading weights:  31%|███       | 233/760 [00:32<00:38, 13.75it/s]Loading weights:  31%|███▏      | 238/760 [00:32<00:31, 16.46it/s]Loading weights:  32%|███▏      | 241/760 [00:33<01:02,  8.33it/s]Loading weights:  33%|███▎      | 248/760 [00:34<00:44, 11.46it/s]Loading weights:  33%|███▎      | 252/760 [00:34<00:36, 13.90it/s]Loading weights:  34%|███▎      | 255/760 [00:35<00:59,  8.50it/s]Loading weights:  34%|███▍      | 258/760 [00:35<00:58,  8.54it/s]Loading weights:  34%|███▍      | 260/760 [00:36<01:09,  7.21it/s]Loading weights:  35%|███▍      | 264/760 [00:36<00:52,  9.54it/s]Loading weights:  35%|███▌      | 266/760 [00:36<00:51,  9.60it/s]Loading weights:  36%|███▌      | 274/760 [00:36<00:33, 14.70it/s]Loading weights:  36%|███▋      | 276/760 [00:36<00:32, 15.03it/s]Loading weights:  37%|███▋      | 278/760 [00:37<00:42, 11.33it/s]Loading weights:  37%|███▋      | 280/760 [00:37<01:07,  7.14it/s]Loading weights:  38%|███▊      | 288/760 [00:38<00:40, 11.59it/s]Loading weights:  38%|███▊      | 292/760 [00:38<00:45, 10.24it/s]Loading weights:  39%|███▊      | 294/760 [00:39<01:04,  7.27it/s]Loading weights:  40%|███▉      | 302/760 [00:39<00:37, 12.21it/s]Loading weights:  40%|████      | 305/760 [00:39<00:34, 13.23it/s]Loading weights:  40%|████      | 307/760 [00:40<01:01,  7.35it/s]Loading weights:  41%|████      | 311/760 [00:40<00:50,  8.91it/s]Loading weights:  41%|████      | 313/760 [00:41<01:02,  7.13it/s]Loading weights:  42%|████▏     | 319/760 [00:41<00:42, 10.38it/s]Loading weights:  43%|████▎     | 325/760 [00:41<00:33, 13.15it/s]Loading weights:  43%|████▎     | 328/760 [00:42<00:29, 14.45it/s]Loading weights:  43%|████▎     | 330/760 [00:42<00:40, 10.69it/s]Loading weights:  44%|████▎     | 332/760 [00:42<00:42, 10.01it/s]Loading weights:  44%|████▍     | 334/760 [00:43<00:51,  8.32it/s]Loading weights:  45%|████▍     | 341/760 [00:43<00:29, 14.00it/s]Loading weights:  45%|████▌     | 343/760 [00:43<00:28, 14.43it/s]Loading weights:  45%|████▌     | 345/760 [00:43<00:39, 10.50it/s]Loading weights:  46%|████▌     | 347/760 [00:44<00:54,  7.56it/s]Loading weights:  47%|████▋     | 354/760 [00:44<00:31, 12.88it/s]Loading weights:  47%|████▋     | 358/760 [00:44<00:26, 15.11it/s]Loading weights:  48%|████▊     | 361/760 [00:45<00:47,  8.41it/s]Loading weights:  48%|████▊     | 364/760 [00:45<00:45,  8.71it/s]Loading weights:  48%|████▊     | 366/760 [00:46<01:00,  6.52it/s]Loading weights:  49%|████▉     | 372/760 [00:46<00:40,  9.47it/s]Loading weights:  50%|█████     | 380/760 [00:47<00:28, 13.52it/s]Loading weights:  51%|█████     | 384/760 [00:47<00:29, 12.82it/s]Loading weights:  51%|█████     | 386/760 [00:47<00:41,  8.96it/s]Loading weights:  52%|█████▏    | 392/760 [00:48<00:32, 11.22it/s]Loading weights:  52%|█████▏    | 398/760 [00:48<00:28, 12.58it/s]Loading weights:  53%|█████▎    | 400/760 [00:49<00:42,  8.54it/s]Loading weights:  54%|█████▎    | 408/760 [00:49<00:25, 13.73it/s]Loading weights:  54%|█████▍    | 411/760 [00:49<00:24, 14.20it/s]Loading weights:  54%|█████▍    | 414/760 [00:50<00:39,  8.68it/s]Loading weights:  55%|█████▍    | 417/760 [00:50<00:36,  9.47it/s]Loading weights:  55%|█████▌    | 419/760 [00:51<00:49,  6.92it/s]Loading weights:  56%|█████▌    | 423/760 [00:51<00:34,  9.68it/s]Loading weights:  56%|█████▌    | 425/760 [00:51<00:32, 10.20it/s]Loading weights:  57%|█████▋    | 433/760 [00:51<00:17, 18.79it/s]Loading weights:  59%|█████▉    | 449/760 [00:51<00:07, 39.94it/s]Loading weights:  60%|██████    | 459/760 [00:51<00:05, 50.43it/s]Loading weights:  62%|██████▏   | 471/760 [00:52<00:04, 64.17it/s]Loading weights:  64%|██████▍   | 488/760 [00:52<00:03, 83.10it/s]Loading weights:  66%|██████▋   | 505/760 [00:52<00:02, 90.79it/s]Loading weights:  69%|██████▉   | 527/760 [00:52<00:01, 118.03it/s]Loading weights:  71%|███████   | 541/760 [00:52<00:01, 118.20it/s]Loading weights:  73%|███████▎  | 555/760 [00:52<00:01, 118.17it/s]Loading weights:  75%|███████▍  | 568/760 [00:52<00:01, 107.94it/s]Loading weights:  77%|███████▋  | 583/760 [00:52<00:01, 116.50it/s]Loading weights:  78%|███████▊  | 596/760 [00:53<00:01, 117.34it/s]Loading weights:  80%|████████  | 610/760 [00:53<00:01, 117.47it/s]Loading weights:  82%|████████▎ | 627/760 [00:53<00:01, 125.26it/s]Loading weights:  85%|████████▍ | 644/760 [00:53<00:00, 136.51it/s]Loading weights:  87%|████████▋ | 659/760 [00:53<00:00, 124.72it/s]Loading weights:  89%|████████▊ | 673/760 [00:53<00:00, 118.81it/s]Loading weights:  90%|█████████ | 686/760 [00:53<00:00, 117.48it/s]Loading weights:  93%|█████████▎| 704/760 [00:53<00:00, 128.25it/s]Loading weights:  95%|█████████▍| 721/760 [00:53<00:00, 138.57it/s]Loading weights:  97%|█████████▋| 736/760 [00:54<00:00, 135.51it/s]Loading weights:  99%|█████████▊| 750/760 [00:54<00:00, 129.30it/s]Loading weights: 100%|██████████| 760/760 [00:54<00:00, 13.94it/s] 
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+clef-flash: 200/2440 questions, 49 s
+clef-flash: 400/2440 questions, 93 s
+clef-flash: 600/2440 questions, 131 s
+clef-flash: 800/2440 questions, 169 s
+clef-flash: 1000/2440 questions, 206 s
+clef-flash: 1200/2440 questions, 242 s
+clef-flash: 1400/2440 questions, 276 s
+clef-flash: 1600/2440 questions, 308 s
+clef-flash: 1800/2440 questions, 338 s
+clef-flash: 2000/2440 questions, 370 s
+clef-flash: 2200/2440 questions, 406 s
+clef-flash: 2400/2440 questions, 443 s
+clef-flash: done, 2440 questions in 452 s -> /home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/exp/decision-preds-clef-flash.jsonl
+clef-flash  2440 answers, 0 errors, median 0.179 s per question
+decider-2b  2440 answers, 0 errors, median 0.091 s per question
+von         2440 answers, 0 errors, median 0.075 s per question
+
+== jhead, good, code only (837 questions)
+  base rate (17%)          AUC 0.50  Brier 0.138  ECE 0.00
+  rule: longest code       AUC 0.50
+  rule: most seeds         AUC 0.53
+  rule: most early finds   AUC 0.98
+  clef-flash               AUC 0.65  Brier 0.156  ECE 0.10
+  decider-2b               AUC 0.60  Brier 0.280  ECE 0.38
+  von                      AUC 0.50  Brier 0.199  ECE 0.12
+
+== jhead, good, with early stats (837 questions)
+  base rate (17%)          AUC 0.50  Brier 0.138  ECE 0.00
+  rule: longest code       AUC 0.50
+  rule: most seeds         AUC 0.53
+  rule: most early finds   AUC 0.98
+  clef-flash               AUC 0.99  Brier 0.020  ECE 0.06
+  decider-2b               AUC 0.98  Brier 0.092  ECE 0.25
+  von                      AUC 0.96  Brier 0.055  ECE 0.15
+
+== jhead, pick4, code only (383 questions)
+  random                   acc  24%  logloss 1.39  ECE 0.01
+  rule: longest code       acc  24%  logloss 10.53  ECE 0.76
+  rule: most seeds         acc  25%  logloss 7.90  ECE 0.51
+  rule: most early finds   acc  97%  logloss 0.17  ECE 0.01
+  clef-flash               acc  43%  logloss 1.48  ECE 0.27
+  decider-2b               acc  33%  logloss 1.51  ECE 0.20
+  von                      acc  21%  logloss 1.40  ECE 0.08
+
+== jhead, pick4, with early stats (383 questions)
+  random                   acc  24%  logloss 1.39  ECE 0.01
+  rule: longest code       acc  24%  logloss 10.53  ECE 0.76
+  rule: most seeds         acc  25%  logloss 7.90  ECE 0.51
+  rule: most early finds   acc  97%  logloss 0.17  ECE 0.01
+  clef-flash               acc  93%  logloss 0.26  ECE 0.05
+  decider-2b               acc  96%  logloss 0.18  ECE 0.05
+  von                      acc  21%  logloss 1.40  ECE 0.05

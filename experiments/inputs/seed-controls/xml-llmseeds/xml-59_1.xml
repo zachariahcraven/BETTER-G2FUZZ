@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This is a configuration file with XML Base specification compliance and XSLT 3.0 streaming support -->
+<configuration xmlns:xml="http://www.w3.org/XML/1998/namespace" 
+               xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+               xsl:version="3.0"
+               xml:base="http://example.com/configs/app/">
+    
+    <!-- XSLT 3.0 streaming configuration -->
+    <xslt-settings>
+        <streaming-enabled>true</streaming-enabled>
+        <incremental-processing>true</incremental-processing>
+        <!-- Streamable template rules for efficient processing of large documents -->
+        <streamable-rules>
+            <rule match="large-element" mode="stream">stream</rule>
+        </streamable-rules>
+    </xslt-settings>
+    
+    <!-- Database settings with relative URI references -->
+    <database>
+        <host>localhost</host>
+        <port>5432</port>
+        <name>my_database</name>
+        <!-- Relative URI resolves to http://example.com/configs/app/schemas/db.xsd -->
+        <schemaLocation>./schemas/db.xsd</schemaLocation>
+    </database>
+    
+    <!-- Application settings with xml:base for nested elements -->
+    <application>
+        <name>MyApplication</name>
+        <version>1.0.0</version>
+        <!-- Debug mode enabled for development -->
+        <debug>true</debug>
+        <!-- Relative URI resolves to http://example.com/configs/app/resources/logo.png -->
+        <logo>resources/logo.png</logo>
+    </application>
+    
+    <!-- External resources section with xml:base for relative URI resolution -->
+    <resources xml:base="http://example.com/assets/">
+        <stylesheet>css/styles.css</stylesheet>
+        <javascript>js/app.js</javascript>
+    </resources>
+</configuration>

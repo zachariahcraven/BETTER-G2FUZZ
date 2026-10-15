@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE invoice SYSTEM "invoice.dtd">
+<?xml version="1.0" ?>
+<invoice xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="invoice.xsd">
+  <invoice_id xml:lang="en">INV-2023-001</invoice_id>
+  <date xml:lang="en">2023-10-15</date>
+  <customer xml:lang="en">
+    <customer_id>CUST-12345</customer_id>
+    <customer_name>John Doe</customer_name>
+  </customer>
+  <xpath_examples xml:lang="en">
+    <xpath_example id="1">//items/item[@type=&quot;product&quot;]/item_name</xpath_example>
+    <xpath_example id="2">//customer/customer_name</xpath_example>
+    <xpath_example id="3">//item[quantity &gt; 1]/item_name</xpath_example>
+  </xpath_examples>
+  <items>
+    <item type="product" xml:lang="en">
+      <item_id>PROD-001</item_id>
+      <item_name>Wireless Mouse</item_name>
+      <quantity>2</quantity>
+      <price>25.99</price>
+      <item_name xml:lang="fr">Souris sans fil</item_name>
+      <item_name xml:lang="de">Drahtlose Maus</item_name>
+    </item>
+    <item type="service" xml:lang="en">
+      <item_id>SRV-002</item_id>
+      <item_name>Installation Service</item_name>
+      <quantity>1</quantity>
+      <price>50.00</price>
+      <item_name xml:lang="fr">Service d'installation</item_name>
+      <item_name xml:lang="de">Installationsdienst</item_name>
+    </item>
+  </items>
+  <dtd_examples xml:lang="en">
+    <dtd_example id="1">&lt;!DOCTYPE invoice [ &lt;!ELEMENT invoice (invoice_id, date, customer, items)&gt; &lt;!ELEMENT invoice_id (#PCDATA)&gt; ]&gt;</dtd_example>
+    <dtd_example id="2">&lt;!ENTITY company &quot;Tech Solutions Inc.&quot;&gt;</dtd_example>
+    <dtd_example id="3">&lt;!NOTATION pdf SYSTEM &quot;application/pdf&quot;&gt;</dtd_example>
+    <dtd_example id="4">&lt;!ATTLIST item quantity CDATA &quot;1&quot;&gt;</dtd_example>
+  </dtd_examples>
+</invoice>

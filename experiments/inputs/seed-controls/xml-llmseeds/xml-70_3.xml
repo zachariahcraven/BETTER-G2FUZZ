@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE invoice SYSTEM "invoice.dtd">
+<?xml version="1.0" ?>
+<invoice xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:inv="http://example.com/invoice" xmlns:cust="http://example.com/customer" xmlns:prod="http://example.com/product" xsi:noNamespaceSchemaLocation="invoice.xsd">
+  <inv:invoice_id xml:lang="en">INV-2023-001</inv:invoice_id>
+  <inv:date xml:lang="en">2023-10-15</inv:date>
+  <cust:customer xml:lang="en">
+    <cust:customer_id>CUST-12345</cust:customer_id>
+    <cust:customer_name>John Doe</cust:customer_name>
+  </cust:customer>
+  <inv:xpath_examples xml:lang="en">
+    <inv:xpath_example id="1">//items/item[@type=&quot;product&quot;]/item_name</inv:xpath_example>
+    <inv:xpath_example id="2">//customer/customer_name</inv:xpath_example>
+    <inv:xpath_example id="3">//item[quantity &gt; 1]/item_name</inv:xpath_example>
+  </inv:xpath_examples>
+  <inv:items>
+    <prod:item type="product" xml:lang="en">
+      <prod:item_id>PROD-001</prod:item_id>
+      <prod:item_name>Wireless Mouse</prod:item_name>
+      <prod:quantity>2</prod:quantity>
+      <prod:price>25.99</prod:price>
+      <prod:item_name xml:lang="fr">Souris sans fil</prod:item_name>
+      <prod:item_name xml:lang="de">Drahtlose Maus</prod:item_name>
+    </prod:item>
+    <inv:item type="service" xml:lang="en">
+      <inv:item_id>SRV-002</inv:item_id>
+      <inv:item_name>Installation Service</inv:item_name>
+      <inv:quantity>1</inv:quantity>
+      <inv:price>50.00</inv:price>
+      <inv:item_name xml:lang="fr">Service d'installation</inv:item_name>
+      <inv:item_name xml:lang="de">Installationsdienst</inv:item_name>
+    </inv:item>
+  </inv:items>
+  <inv:dtd_examples xml:lang="en">
+    <inv:dtd_example id="1">&lt;!DOCTYPE invoice [ &lt;!ELEMENT invoice (invoice_id, date, customer, items)&gt; &lt;!ELEMENT invoice_id (#PCDATA)&gt; ]&gt;</inv:dtd_example>
+    <inv:dtd_example id="2">&lt;!ENTITY company &quot;Tech Solutions Inc.&quot;&gt;</inv:dtd_example>
+    <inv:dtd_example id="3">&lt;!NOTATION pdf SYSTEM &quot;application/pdf&quot;&gt;</inv:dtd_example>
+    <inv:dtd_example id="4">&lt;!ATTLIST item quantity CDATA &quot;1&quot;&gt;</inv:dtd_example>
+  </inv:dtd_examples>
+  <inv:xsd_examples xml:lang="en">
+    <inv:xsd_example id="1">&lt;xs:element name=&quot;quantity&quot; type=&quot;xs:positiveInteger&quot; minOccurs=&quot;1&quot; maxOccurs=&quot;unbounded&quot;/&gt;</inv:xsd_example>
+    <inv:xsd_example id="2">&lt;xs:element name=&quot;price&quot; type=&quot;xs:decimal&quot; fixed=&quot;0.00&quot;/&gt;</inv:xsd_example>
+    <inv:xsd_example id="3">&lt;xs:unique name=&quot;uniqueItemID&quot;&gt;&lt;xs:selector xpath=&quot;item&quot;/&gt;&lt;xs:field xpath=&quot;item_id&quot;/&gt;&lt;/xs:unique&gt;</inv:xsd_example>
+    <inv:xsd_example id="4">&lt;xs:keyref name=&quot;itemRef&quot; refer=&quot;uniqueItemID&quot;&gt;&lt;xs:selector xpath=&quot;order_item&quot;/&gt;&lt;xs:field xpath=&quot;item_id_ref&quot;/&gt;&lt;/xs:keyref&gt;</inv:xsd_example>
+    <inv:xsd_example id="5">&lt;xs:complexType name=&quot;ItemType&quot;&gt;&lt;xs:sequence&gt;&lt;xs:element name=&quot;item_id&quot; type=&quot;xs:string&quot;/&gt;&lt;xs:element name=&quot;item_name&quot; type=&quot;xs:string&quot;/&gt;&lt;/xs:sequence&gt;&lt;xs:attribute name=&quot;type&quot; type=&quot;ItemTypeType&quot; use=&quot;required&quot;/&gt;&lt;/xs:complexType&gt;</inv:xsd_example>
+    <inv:xsd_example id="6">&lt;xs:simpleType name=&quot;ItemTypeType&quot;&gt;&lt;xs:restriction base=&quot;xs:string&quot;&gt;&lt;xs:enumeration value=&quot;product&quot;/&gt;&lt;xs:enumeration value=&quot;service&quot;/&gt;&lt;/xs:restriction&gt;&lt;/xs:simpleType&gt;</inv:xsd_example>
+  </inv:xsd_examples>
+  <inv:namespace_scoping_demo xml:lang="en">
+    <inv:description>Demonstration of custom namespace prefix reuse with lexical scoping</inv:description>
+    <inv:scope id="1" name="Global Scope">
+      <inv:prefix>inv: (http://example.com/invoice), cust: (http://example.com/customer), prod: (http://example.com/product)</inv:prefix>
+    </inv:scope>
+    <inv:scope id="2" name="Item Scope">
+      <inv:prefix>prod: (http://example.com/product) - reused for product items</inv:prefix>
+    </inv:scope>
+    <inv:scope id="3" name="Service Item Scope">
+      <inv:prefix>inv: (http://example.com/invoice) - reused for service items</inv:prefix>
+    </inv:scope>
+    <inv:scope id="4" name="Nested Element Scope">
+      <inv:prefix>Prefixes can be redefined in nested scopes (e.g., a different ns: for currency)</inv:prefix>
+    </inv:scope>
+  </inv:namespace_scoping_demo>
+</invoice>

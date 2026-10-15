@@ -1,0 +1,173 @@
+Loading weights:   0%|          | 0/170 [00:00<?, ?it/s]Loading weights: 100%|██████████| 170/170 [00:00<00:00, 10692.21it/s]
+[von] Loaded von-1.3.0 weights from local file '/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/von/option_marker.pt' (input-conditioned calibration map active)
+von: 200/3444 questions, 44 s
+von: 400/3444 questions, 88 s
+von: 600/3444 questions, 106 s
+von: 800/3444 questions, 127 s
+von: 1000/3444 questions, 150 s
+von: 1200/3444 questions, 172 s
+von: 1400/3444 questions, 194 s
+von: 1600/3444 questions, 218 s
+von: 1800/3444 questions, 236 s
+von: 2000/3444 questions, 258 s
+von: 2200/3444 questions, 285 s
+von: 2400/3444 questions, 313 s
+von: 2600/3444 questions, 336 s
+von: 2800/3444 questions, 356 s
+von: 3000/3444 questions, 373 s
+von: 3200/3444 questions, 396 s
+von: 3400/3444 questions, 415 s
+von: done, 3444 questions in 422 s -> /home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/exp/decision-preds-von.jsonl
+Loading weights:   0%|          | 0/320 [00:00<?, ?it/s]Loading weights: 100%|██████████| 320/320 [00:00<00:00, 10068.54it/s]
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+decider-2b: 200/3444 questions, 26 s
+decider-2b: 400/3444 questions, 49 s
+decider-2b: 600/3444 questions, 68 s
+decider-2b: 800/3444 questions, 89 s
+decider-2b: 1000/3444 questions, 109 s
+decider-2b: 1200/3444 questions, 128 s
+decider-2b: 1400/3444 questions, 146 s
+decider-2b: 1600/3444 questions, 164 s
+decider-2b: 1800/3444 questions, 181 s
+decider-2b: 2000/3444 questions, 198 s
+decider-2b: 2200/3444 questions, 218 s
+decider-2b: 2400/3444 questions, 239 s
+decider-2b: 2600/3444 questions, 260 s
+decider-2b: 2800/3444 questions, 278 s
+decider-2b: 3000/3444 questions, 295 s
+decider-2b: 3200/3444 questions, 316 s
+decider-2b: 3400/3444 questions, 334 s
+decider-2b: done, 3444 questions in 339 s -> /home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/exp/decision-preds-decider-2b.jsonl
+Loading weights:   0%|          | 0/760 [00:00<?, ?it/s]Loading weights:   0%|          | 1/760 [00:00<02:45,  4.58it/s]Loading weights:   0%|          | 2/760 [00:00<03:00,  4.21it/s]Loading weights:   4%|▍         | 29/760 [00:00<00:10, 72.02it/s]Loading weights:   7%|▋         | 53/760 [00:00<00:06, 114.73it/s]Loading weights:  11%|█         | 82/760 [00:00<00:04, 158.70it/s]Loading weights:  14%|█▍        | 106/760 [00:00<00:03, 179.44it/s]Loading weights:  18%|█▊        | 134/760 [00:01<00:03, 202.65it/s]Loading weights:  21%|██        | 158/760 [00:01<00:02, 210.99it/s]Loading weights:  24%|██▍       | 186/760 [00:01<00:02, 224.94it/s]Loading weights:  28%|██▊       | 213/760 [00:01<00:02, 235.36it/s]Loading weights:  31%|███▏      | 239/760 [00:01<00:02, 236.36it/s]Loading weights:  35%|███▌      | 266/760 [00:01<00:02, 243.31it/s]Loading weights:  39%|███▊      | 293/760 [00:01<00:01, 243.40it/s]Loading weights:  42%|████▏     | 318/760 [00:01<00:01, 245.01it/s]Loading weights:  46%|████▌     | 346/760 [00:01<00:01, 251.48it/s]Loading weights:  49%|████▉     | 372/760 [00:01<00:01, 240.06it/s]Loading weights:  52%|█████▎    | 399/760 [00:02<00:01, 242.49it/s]Loading weights:  56%|█████▌    | 425/760 [00:02<00:01, 244.74it/s]Loading weights:  93%|█████████▎| 709/760 [00:02<00:00, 980.82it/s]Loading weights: 100%|██████████| 760/760 [00:02<00:00, 329.04it/s]
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+clef-flash: 200/3444 questions, 48 s
+clef-flash: 400/3444 questions, 92 s
+clef-flash: 600/3444 questions, 129 s
+clef-flash: 800/3444 questions, 167 s
+clef-flash: 1000/3444 questions, 204 s
+clef-flash: 1200/3444 questions, 239 s
+clef-flash: 1400/3444 questions, 274 s
+clef-flash: 1600/3444 questions, 306 s
+clef-flash: 1800/3444 questions, 336 s
+clef-flash: 2000/3444 questions, 367 s
+clef-flash: 2200/3444 questions, 403 s
+clef-flash: 2400/3444 questions, 440 s
+clef-flash: 2600/3444 questions, 479 s
+clef-flash: 2800/3444 questions, 511 s
+clef-flash: 3000/3444 questions, 542 s
+clef-flash: 3200/3444 questions, 578 s
+clef-flash: 3400/3444 questions, 611 s
+clef-flash: done, 3444 questions in 620 s -> /home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/exp/decision-preds-clef-flash.jsonl
+clef-flash  3444 answers, 0 errors, median 0.175 s per question
+decider-2b  3444 answers, 0 errors, median 0.090 s per question
+von         3444 answers, 0 errors, median 0.073 s per question
+
+== jhead, good, code only (837 questions)
+  base rate (17%)          AUC 0.50  Brier 0.138  ECE 0.00
+  rule: longest code       AUC 0.50
+  rule: most seeds         AUC 0.53
+  rule: most early finds   AUC 0.98
+  clef-flash               AUC 0.65  Brier 0.156  ECE 0.10
+  decider-2b               AUC 0.60  Brier 0.280  ECE 0.38
+  von                      AUC 0.50  Brier 0.199  ECE 0.12
+
+== jhead, good, with early stats (837 questions)
+  base rate (17%)          AUC 0.50  Brier 0.138  ECE 0.00
+  rule: longest code       AUC 0.50
+  rule: most seeds         AUC 0.53
+  rule: most early finds   AUC 0.98
+  clef-flash               AUC 0.99  Brier 0.020  ECE 0.06
+  decider-2b               AUC 0.98  Brier 0.092  ECE 0.25
+  von                      AUC 0.96  Brier 0.055  ECE 0.15
+
+== jhead, pick4, code only (383 questions)
+  random                   acc  24%  logloss 1.39  ECE 0.01
+  rule: longest code       acc  24%  logloss 10.53  ECE 0.76
+  rule: most seeds         acc  25%  logloss 7.90  ECE 0.51
+  rule: most early finds   acc  97%  logloss 0.17  ECE 0.01
+  clef-flash               acc  43%  logloss 1.48  ECE 0.27
+  decider-2b               acc  33%  logloss 1.51  ECE 0.20
+  von                      acc  21%  logloss 1.40  ECE 0.08
+
+== jhead, pick4, with early stats (383 questions)
+  random                   acc  24%  logloss 1.39  ECE 0.01
+  rule: longest code       acc  24%  logloss 10.53  ECE 0.76
+  rule: most seeds         acc  25%  logloss 7.90  ECE 0.51
+  rule: most early finds   acc  97%  logloss 0.17  ECE 0.01
+  clef-flash               acc  93%  logloss 0.26  ECE 0.05
+  decider-2b               acc  96%  logloss 0.18  ECE 0.05
+  von                      acc  21%  logloss 1.40  ECE 0.05
+
+== png, good, code only (225 questions)
+  base rate (12%)          AUC 0.50  Brier 0.102  ECE 0.00
+  rule: longest code       AUC 0.52
+  rule: most seeds         AUC 0.63
+  rule: most early finds   AUC 1.00
+  clef-flash               AUC 0.62  Brier 0.248  ECE 0.36
+  decider-2b               AUC 0.54  Brier 0.341  ECE 0.49
+  von                      AUC 0.49  Brier 0.184  ECE 0.17
+
+== png, good, with early stats (225 questions)
+  base rate (12%)          AUC 0.50  Brier 0.102  ECE 0.00
+  rule: longest code       AUC 0.52
+  rule: most seeds         AUC 0.63
+  rule: most early finds   AUC 1.00
+  clef-flash               AUC 1.00  Brier 0.016  ECE 0.09
+  decider-2b               AUC 1.00  Brier 0.142  ECE 0.35
+  von                      AUC 0.96  Brier 0.070  ECE 0.17
+
+== png, pick4, code only (50 questions)
+  random                   acc  30%  logloss 1.39  ECE 0.05
+  rule: longest code       acc  38%  logloss 8.57  ECE 0.62
+  rule: most seeds         acc  40%  logloss 7.34  ECE 0.53
+  rule: most early finds   acc 100%  logloss 0.00  ECE 0.00
+  clef-flash               acc  54%  logloss 1.13  ECE 0.11
+  decider-2b               acc  24%  logloss 1.67  ECE 0.32
+  von                      acc  24%  logloss 1.39  ECE 0.07
+
+== png, pick4, with early stats (50 questions)
+  random                   acc  30%  logloss 1.39  ECE 0.05
+  rule: longest code       acc  38%  logloss 8.57  ECE 0.62
+  rule: most seeds         acc  40%  logloss 7.34  ECE 0.53
+  rule: most early finds   acc 100%  logloss 0.00  ECE 0.00
+  clef-flash               acc  94%  logloss 0.18  ECE 0.10
+  decider-2b               acc  98%  logloss 0.19  ECE 0.10
+  von                      acc  22%  logloss 1.40  ECE 0.05
+
+== tiff, good, code only (187 questions)
+  base rate (15%)          AUC 0.50  Brier 0.127  ECE 0.00
+  rule: longest code       AUC 0.46
+  rule: most seeds         AUC 0.65
+  rule: most early finds   AUC 0.91
+  clef-flash               AUC 0.58  Brier 0.334  ECE 0.43
+  decider-2b               AUC 0.65  Brier 0.328  ECE 0.45
+  von                      AUC 0.56  Brier 0.158  ECE 0.13
+
+== tiff, good, with early stats (187 questions)
+  base rate (15%)          AUC 0.50  Brier 0.127  ECE 0.00
+  rule: longest code       AUC 0.46
+  rule: most seeds         AUC 0.65
+  rule: most early finds   AUC 0.91
+  clef-flash               AUC 0.94  Brier 0.033  ECE 0.06
+  decider-2b               AUC 0.90  Brier 0.133  ECE 0.30
+  von                      AUC 0.93  Brier 0.068  ECE 0.13
+
+== tiff, pick4, code only (40 questions)
+  random                   acc  10%  logloss 1.39  ECE 0.15
+  rule: longest code       acc  10%  logloss 12.43  ECE 0.90
+  rule: most seeds         acc  48%  logloss 6.30  ECE 0.47
+  rule: most early finds   acc  90%  logloss 0.14  ECE 0.03
+  clef-flash               acc  48%  logloss 1.40  ECE 0.21
+  decider-2b               acc  48%  logloss 1.41  ECE 0.16
+  von                      acc  12%  logloss 1.39  ECE 0.16
+
+== tiff, pick4, with early stats (40 questions)
+  random                   acc  10%  logloss 1.39  ECE 0.15
+  rule: longest code       acc  10%  logloss 12.43  ECE 0.90
+  rule: most seeds         acc  48%  logloss 6.30  ECE 0.47
+  rule: most early finds   acc  90%  logloss 0.14  ECE 0.03
+  clef-flash               acc  95%  logloss 0.21  ECE 0.09
+  decider-2b               acc  90%  logloss 0.29  ECE 0.09
+  von                      acc  35%  logloss 1.39  ECE 0.08

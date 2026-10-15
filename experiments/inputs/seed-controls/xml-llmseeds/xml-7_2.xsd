@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="invoice">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="invoice_id" type="xs:string"/>
+        <xs:element name="date" type="xs:date"/>
+        <xs:element name="customer">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="customer_id" type="xs:string"/>
+              <xs:element name="customer_name" type="xs:string"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="items">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="item" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="item_id" type="xs:string"/>
+                    <xs:element name="item_name" type="xs:string"/>
+                    <xs:element name="quantity" type="xs:positiveInteger"/>
+                    <xs:element name="price" type="xs:decimal"/>
+                  </xs:sequence>
+                  <xs:attribute name="type" use="required">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="product"/>
+                        <xs:enumeration value="service"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

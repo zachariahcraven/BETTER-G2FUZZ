@@ -1,0 +1,58 @@
+<?xml version="1.0" ?>
+<invoice xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:prov="http://www.w3.org/ns/prov#" xmlns:dcat="http://www.w3.org/ns/dcat#" xsi:noNamespaceSchemaLocation="invoice.xsd">
+  <invoice_id>INV-2023-001</invoice_id>
+  <date>2023-10-15</date>
+  <customer>
+    <customer_id>CUST-12345</customer_id>
+    <customer_name>John Doe</customer_name>
+  </customer>
+  <xpath_examples>
+    <xpath_example id="1">//items/item[@type=&quot;product&quot;]/item_name</xpath_example>
+    <xpath_example id="2">//customer/customer_name</xpath_example>
+    <xpath_example id="3">//item[quantity &gt; 1]/item_name</xpath_example>
+  </xpath_examples>
+  <items>
+    <item type="product">
+      <item_id>PROD-001</item_id>
+      <item_name>Wireless Mouse</item_name>
+      <quantity>2</quantity>
+      <price>25.99</price>
+    </item>
+    <item type="service">
+      <item_id>SRV-002</item_id>
+      <item_name>Installation Service</item_name>
+      <quantity>1</quantity>
+      <price>50.00</price>
+    </item>
+  </items>
+  <metadata>
+    <dc:metadata>
+      <dc:title>Invoice for Office Supplies</dc:title>
+      <dc:creator>Accounting Department</dc:creator>
+      <dc:subject>Invoice, Billing, Office Supplies</dc:subject>
+      <dc:description>Detailed invoice for items purchased by customer</dc:description>
+      <dc:publisher>Acme Corporation</dc:publisher>
+      <dc:contributor>Finance Team</dc:contributor>
+      <dc:date>2023-10-15</dc:date>
+      <dc:type>Invoice</dc:type>
+      <dc:format>application/xml</dc:format>
+      <dc:identifier>INV-2023-001</dc:identifier>
+      <dc:source>ERP System</dc:source>
+      <dc:language>en</dc:language>
+      <dc:relation>Customer CUST-12345</dc:relation>
+      <dc:coverage>Global</dc:coverage>
+      <dc:rights>Confidential</dc:rights>
+    </dc:metadata>
+    <prov:activity prov:type="InvoiceGeneration" prov:id="activity-1">
+      <prov:startedAtTime>2023-10-15T14:30:00Z</prov:startedAtTime>
+      <prov:used prov:entity="customer:CUST-12345"/>
+      <prov:hadPrimarySource>ERP-System-Order-12345</prov:hadPrimarySource>
+    </prov:activity>
+    <dcat:dataset dcat:id="dataset-invoice-2023-001">
+      <dcat:title>Invoice Dataset</dcat:title>
+      <dcat:description>Complete invoice data with itemized details</dcat:description>
+      <dcat:keyword>invoice, billing, financial</dcat:keyword>
+      <dcat:theme>Finance</dcat:theme>
+    </dcat:dataset>
+  </metadata>
+</invoice>

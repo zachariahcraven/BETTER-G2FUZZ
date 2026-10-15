@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<healthcare_records><patient><patient_id>P-2023-001</patient_id><name>Jane Smith</name><date_of_birth>1985-04-22</date_of_birth><gender>Female</gender><visit><date>2023-10-10</date><doctor>Dr. Robert Johnson</doctor><diagnosis>Hypertension</diagnosis></visit></patient></healthcare_records>

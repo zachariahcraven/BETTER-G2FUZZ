@@ -1,0 +1,50 @@
+<!DOCTYPE root [
+  <!ENTITY company "Example Corp">
+  <!ENTITY city "New York">
+  <!ENTITY symbol "&copy;">
+  <!ENTITY less_than "&lt;">
+  <!ENTITY ampersand "&amp;">
+  <!ENTITY xquery_support "XQuery 1.0/3.1 support: Allows querying and transformation of XML data using the XQuery language, supporting FLWOR expressions, full-text search, and more.">
+  <!ENTITY xpointer_xlink_support "XPointer and XLink support: Facilitates fragment identification and linking within or across XML documents (XPointer for addressing; XLink for hyperlinks).">
+  <!ENTITY char_data_normalization "Character data normalization and whitespace handling control: Allows fine-grained control over whitespace significance via xml:space attributes and schema-based whitespace facets.">
+  <!ENTITY schematron_validation "Validation via Schematron or Schematron-like rules: Allows custom logic validation using pattern-based rules, often embedded in or alongside XSD/DTD.">
+]>
+<root>
+  <info>
+    <company>&company;</company>
+    <location>&city;</location>
+    <copyright>&symbol;</copyright>
+    <escaped>Use &less_than; and &amp; for XML escaping</escaped>
+  </info>
+  <note>Entity references allow reuse: &company; is based in &city;.</note>
+  <features>
+    <feature>&xquery_support;</feature>
+    <feature>&xpointer_xlink_support;</feature>
+    <feature>&char_data_normalization;</feature>
+    <feature>&schematron_validation;</feature>
+  </features>
+  <!-- Example demonstrating xml:space attribute for whitespace handling control -->
+  <whitespace_control>
+    <preformatted xml:space="preserve">   This preserves   all whitespace
+   including leading, trailing, and internal spaces.   </preformatted>
+    <normalized xml:space="default">   This text has whitespace significance determined by the application.   </normalized>
+  </whitespace_control>
+  <!-- Example of Schematron-style validation rules embedded in comments -->
+  <schematron_rules>
+    <!-- 
+      Example Schematron-like validation rules:
+      - Rule: <company> must not be empty
+      - Rule: <location> must be a valid city name
+      - Rule: <copyright> must contain a valid copyright symbol
+    -->
+    <rule context="info">
+      <assert test="company/text() != ''">Company name must not be empty.</assert>
+      <assert test="location/text() != ''">Location must be specified.</assert>
+    </rule>
+    <pattern id="company_validation">
+      <rule context="company">
+        <assert test="normalize-space() != ''">The company element must contain non-whitespace content.</assert>
+      </rule>
+    </pattern>
+  </schematron_rules>
+</root>

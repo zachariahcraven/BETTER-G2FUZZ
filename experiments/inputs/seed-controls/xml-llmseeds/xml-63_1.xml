@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="style.xsl"?>
+<?streaming-processing mode="sax" target="parser"?>
+<document xmlns="http://example.com/default" 
+          xmlns:ds="http://www.w3.org/2000/09/xmldsig#" 
+          xmlns:xenc="http://www.w3.org/2001/04/xmlenc#" 
+          xmlns:dsig11="http://www.w3.org/2009/xmlenc11#"
+          xmlns:custom="http://example.com/custom"
+          xmlns:stream="http://example.com/streaming">
+    <title>Processing Instructions, Signature, Encryption, Namespace Scoping, and Event-based Streaming Parsing</title>
+    <content>This XML document demonstrates processing instructions, digital signatures, encryption, default namespace scoping, and event-based streaming parsing.</content>
+    <instruction>This processing instruction guides applications on how to process this document.</instruction>
+    
+    <!-- Event-based streaming parsing demonstration -->
+    <stream:streaming-support>
+        <stream:parser type="SAX" features="low-memory, high-performance, event-driven">
+            <stream:example>
+                <!-- SAX parser processes this element by emitting events as it encounters start-element, character, end-element, etc. -->
+                <stream:event-sequence>
+                    <stream:start-element name="stream:example"/>
+                    <stream:characters value="This content is processed via character events"/>
+                    <stream:end-element name="stream:example"/>
+                </stream:event-sequence>
+            </stream:example>
+            
+            <!-- StAX (streaming API for XML) support -->
+            <stream:parser type="StAX" features="pull-parsing, iterator-based, cursor-based">
+                <stream:pull-example>
+                    <!-- StAX allows pulling events one at a time from the parser -->
+                    <stream:pull-event type="START_ELEMENT" element="stream:pull-example"/>
+                    <stream:pull-event type="CHARACTERS" value="Pull-based processing model"/>
+                    <stream:pull-event type="END_ELEMENT" element="stream:pull-example"/>
+                </stream:pull-example>
+            </stream:parser>
+        </stream:parser>
+    </stream:streaming-support>
+    
+    <!-- Default namespace scoping demonstration -->
+    <scope-example>
+        <!-- Elements without prefix inherit the default namespace http://example.com/default -->
+        <nested-element>
+            <deeper-nested>
+                <!-- All these elements are in the default namespace due to inheritance -->
+                <data>Value in default namespace</data>
+            </deeper-nested>
+        </nested-element>
+        
+        <!-- Custom namespace elements -->
+        <custom:specific>Element in custom namespace</custom:specific>
+    </scope-example>
+    
+    <!-- Namespace scoping with redefinition -->
+    <scope-boundary xmlns="http://example.com/alternate">
+        <!-- This element and its children now use http://example.com/alternate as default namespace -->
+        <element-in-alternate>Now in alternate namespace</element-in-alternate>
+        <another-element>Still in alternate namespace</another-element>
+        
+        <!-- Nested scope with yet another default namespace -->
+        <inner-scope xmlns="http://example.com/inner">
+            <deep-element>This is in inner namespace</deep-element>
+        </inner-scope>
+        
+        <!-- Back to alternate namespace -->
+        <back-to-alternate>Back in alternate namespace</back-to-alternate>
+    </scope-boundary>
+    
+    <!-- Attributes also inherit namespace context -->
+    <element-with-attributes attribute-value="unprefixed-attr" custom:custom-attr="prefixed-attr">
+        <!-- unprefixed attributes have no namespace, while prefixed ones use their namespace -->
+    </element-with-attributes>
+    
+    <!-- Digital Signature support -->
+    <security>
+        <ds:Signature Id="Signature-1">
+            <ds:SignedInfo>
+                <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+                <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+                <ds:Reference URI="#content-1">
+                    <ds:Transforms>
+                        <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+                        <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+                    </ds:Transforms>
+                    <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+                    <ds:DigestValue>base64encodeddigestvalue=</ds:DigestValue>
+                </ds:Reference>
+            </ds:SignedInfo>
+            <ds:SignatureValue>base64encodedsignature=</ds:SignatureValue>
+            <ds:KeyInfo>
+                <ds:X509Data>
+                    <ds:X509Certificate>base64encodedcertificate=</ds:X509Certificate>
+                </ds:X509Data>
+            </ds:KeyInfo>
+        </ds:Signature>
+        
+        <!-- XML Encryption (XMLEnc) support -->
+        <xenc:EncryptedData Id="EncryptedData-1" Type="http://www.w3.org/2001/04/xmlenc#Content">
+            <xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
+            <xenc:CipherData>
+                <xenc:CipherValue>base64encryptedcontent=</xenc:CipherValue>
+            </xenc:CipherData>
+        </xenc:EncryptedData>
+        
+        <!-- Additional XMLEnc example: Encrypting a specific element -->
+        <xenc:EncryptedKey Id="EncryptedKey-1">
+            <xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"/>
+            <dsig11:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+            <xenc:CipherData>
+                <xenc:CipherValue>base64encryptedkey=</xenc:CipherValue>
+            </xenc:CipherData>
+        </xenc:EncryptedKey>
+        
+        <!-- Example of encrypted element content -->
+        <xenc:EncryptedData Id="EncryptedData-2" Type="http://www.w3.org/2001/04/xmlenc#Element">
+            <xenc:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#tripledes-cbc"/>
+            <xenc:CipherData>
+                <xenc:CipherValue>base64encryptedelementcontent=</xenc:CipherValue>
+            </xenc:CipherData>
+        </xenc:EncryptedData>
+    </security>
+</document>

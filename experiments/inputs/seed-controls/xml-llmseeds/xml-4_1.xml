@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:ns1="http://example.com/custom" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:custom="http://example.com/custom"><xs:schema version="1.0"><xs:element name="exampleElement" type="xs:string" /></xs:schema><ns1:customData>This is custom data</ns1:customData><ns1:moreData attribute="value">More custom content</ns1:moreData></root>

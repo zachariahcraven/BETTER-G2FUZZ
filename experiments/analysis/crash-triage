@@ -1,0 +1,8 @@
+#!/bin/bash
+# Crash triage on a Slurm CPU node: replays saved crashes on the AddressSanitizer builds in
+# the image's /targets and groups them into unique bugs (experiments/analysis/lib/crash_triage.py). Same arguments.
+# Usage (from the project root): experiments/analysis/crash-triage [campaign ...]
+X=/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp
+cd "$X" || exit 1
+exec srun -A group-csci-591-automated-vulnerability-discovery -p fairshare -c 2 --mem 8G -t 120 -J g2f-triage \
+  apptainer exec -B /home/group "$X/g2fuzz.sif" python3 experiments/analysis/lib/crash_triage.py "$@"

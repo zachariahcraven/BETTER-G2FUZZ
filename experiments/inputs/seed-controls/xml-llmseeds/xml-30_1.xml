@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <feature>
+        <name>Version and encoding declaration</name>
+        <description>XML documents can begin with a prolog specifying version (typically 1.0 or 1.1) and encoding, aiding parsers.</description>
+    </feature>
+    <feature>
+        <name>Canonical XML support</name>
+        <description>A standardized serialization form (C14N) for deterministic processing, useful in digital signatures and comparisons.</description>
+    </feature>
+</root>

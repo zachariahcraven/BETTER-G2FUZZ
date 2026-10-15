@@ -1,10 +1,10 @@
 # Tab completion for scripts/fuzz (zsh). Load it from ~/.zshrc:
 #   source /path/to/BETTER-G2FUZZ/scripts/fuzz-completion.zsh
-# Campaign names come from eval/, filtered to the ones each command can use.
+# Campaign names come from results/campaigns/<experiment>/, filtered to the ones each command can use.
 
 (( $+functions[compdef] )) || { autoload -Uz compinit && compinit; }
 
-_FUZZ_EVAL=${${(%):-%x}:A:h:h}/eval
+_FUZZ_EVAL=${${(%):-%x}:A:h:h}/results/campaigns
 
 _fuzz() {
   local -a cmds all fuzzed seeded names
@@ -18,6 +18,7 @@ _fuzz() {
     'results:final summary of a campaign'
     'stop:stop and remove a container'
     'list:all campaigns'
+    'path:a campaign'"'"'s folder'
     'help:show usage'
   )
   if (( CURRENT == 2 )); then
@@ -25,21 +26,21 @@ _fuzz() {
     return
   fi
 
-  all=($_FUZZ_EVAL/*(N/:t))
-  fuzzed=($_FUZZ_EVAL/*/*_output/default/queue(N/:h:h:h:t))
+  all=($_FUZZ_EVAL/*/*(N/:t))
+  fuzzed=($_FUZZ_EVAL/*/*/*_output/default/queue(N/:h:h:h:t))
   if (( CURRENT == 3 )); then
     case $words[2] in
-      reuse)   seeded=($_FUZZ_EVAL/*/initial_seeds(N/:h:t))                     # has seeds and generators
-               names=($_FUZZ_EVAL/*/*_output/default/generators(N/:h:h:h:t)); names=(${names:*seeded}) ;;
+      reuse)   seeded=($_FUZZ_EVAL/*/*/initial_seeds(N/:h:t))                   # has seeds and generators
+               names=($_FUZZ_EVAL/*/*/*_output/default/generators(N/:h:h:h:t)); names=(${names:*seeded}) ;;
       run)     names=(${all:|fuzzed}) ;;                                         # not fuzzed yet
-      results) names=($_FUZZ_EVAL/*/*_output/default/fuzzer_stats(N:h:h:h:t)) ;;
+      results) names=($_FUZZ_EVAL/*/*/*_output/default/fuzzer_stats(N:h:h:h:t)) ;;
       stop|watch)                                                           # have a run
         if (( $+commands[docker] )); then
           names=(${${(f)"$(docker ps -a --filter name=g2f- --format '{{.Names}}' 2>/dev/null)"}#g2f-})
         else
-          names=($_FUZZ_EVAL/*/slurm.jobid(N:h:t))                           # Tempest
+          names=($_FUZZ_EVAL/*/*/slurm.jobid(N:h:t))                         # Tempest
         fi ;;
-      shell|status) names=($all) ;;
+      shell|status|path) names=($all) ;;
       *) return 1 ;;
     esac
     _describe campaign names

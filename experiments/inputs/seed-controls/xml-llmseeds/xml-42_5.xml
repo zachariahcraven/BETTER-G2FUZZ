@@ -1,0 +1,48 @@
+<?xml version="1.0" ?>
+<university>
+  <departments>
+    <department id="CS">
+      <name>Computer Science</name>
+    </department>
+    <department id="MATH">
+      <name>Mathematics</name>
+    </department>
+    <department id="PHYS">
+      <name>Physics</name>
+    </department>
+  </departments>
+  <courses>
+    <course id="CS101" dept-id="CS">
+      <name>Introduction to Computer Science</name>
+    </course>
+    <course id="MATH201" dept-id="MATH">
+      <name>Calculus II</name>
+    </course>
+    <course id="PHYS301" dept-id="PHYS">
+      <name>Classical Mechanics</name>
+    </course>
+  </courses>
+  <students>
+    <student id="ST001" major="CS">
+      <name>John Smith</name>
+      <courses course-refs="CS101 MATH201"/>
+    </student>
+    <student id="ST002" major="PHYS">
+      <name>Jane Doe</name>
+      <courses course-refs="PHYS301 CS101"/>
+    </student>
+  </students>
+  <professors>
+    <professor id="PF001" department="CS">
+      <name>Dr. Alan Turing</name>
+    </professor>
+    <professor id="PF002" department="MATH">
+      <name>Dr. Grace Hopper</name>
+    </professor>
+  </professors>
+  <notes>This document demonstrates ID/IDREF/IDREFS constraints: 
+- 'id' attributes define unique identifiers (CS, MATH, PHYS, CS101, etc.)
+- 'idref' attributes reference these IDs (dept-id, major, department)
+- 'idrefs' attributes reference multiple IDs (course-refs)
+Referential integrity ensures that all IDREFs point to valid IDs.</notes>
+</university>

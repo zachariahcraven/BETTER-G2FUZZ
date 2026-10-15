@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="invoice">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="invoice_id" type="xs:string"/>
+        <xs:element name="date" type="xs:date"/>
+        <xs:element name="customer">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="customer_id" type="xs:string"/>
+              <xs:element name="customer_name" type="xs:string"/>
+            </xs:sequence>
+            <xs:attribute name="xml:lang" type="xs:language" use="optional"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="xpath_examples">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="xpath_example" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:simpleContent>
+                    <xs:extension base="xs:string">
+                      <xs:attribute name="id" type="xs:positiveInteger" use="required"/>
+                    </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="xml:lang" type="xs:language" use="optional"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="items">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="item" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="item_id" type="xs:string"/>
+                    <xs:element name="item_name" type="xs:string"/>
+                    <xs:element name="quantity" type="xs:positiveInteger"/>
+                    <xs:element name="price" type="xs:decimal"/>
+                    <xs:element name="item_name" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:extension base="xs:string">
+                            <xs:attribute name="xml:lang" type="xs:language" use="optional"/>
+                          </xs:extension>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="type" use="required">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="product"/>
+                        <xs:enumeration value="service"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="xml:lang" type="xs:language" use="optional"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="xml11_normalization_options">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="control_characters">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="example" type="xs:string" minOccurs="0"/>
+                  </xs:sequence>
+                  <xs:attribute name="allow_restricted" type="xs:boolean" use="optional" default="false"/>
+                  <xs:attribute name="normalize_line_endings" type="xs:boolean" use="optional" default="false"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="line_endings">
+                <xs:complexType>
+                  <xs:attribute name="normalize_crlf" type="xs:boolean" use="optional" default="true"/>
+                  <xs:attribute name="normalize_lf" type="xs:boolean" use="optional" default="true"/>
+                  <xs:attribute name="normalize_cr" type="xs:boolean" use="optional" default="true"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="character_normalization">
+                <xs:complexType>
+                  <xs:attribute name="normalization_form" use="optional" default="NFC">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="NFC"/>
+                        <xs:enumeration value="NFD"/>
+                        <xs:enumeration value="NFKC"/>
+                        <xs:enumeration value="NFKD"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="note" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+            <xs:attribute name="xml:lang" type="xs:language" use="optional"/>
+            <xs:attribute name="version" type="xs:string" use="optional" default="1.1"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="xml:lang" type="xs:language" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

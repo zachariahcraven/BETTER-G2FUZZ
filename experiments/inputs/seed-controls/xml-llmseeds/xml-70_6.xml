@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<ns_demo xmlns:inv="http://example.com/invoice" xmlns:cust="http://example.com/customer" xmlns:prod="http://example.com/product" xml:lang="en">
+  <inv:global_scope>
+    <inv:description>Global scope namespace declarations</inv:description>
+    <inv:namespace prefix="inv" uri="http://example.com/invoice"/>
+    <inv:namespace prefix="cust" uri="http://example.com/customer"/>
+    <inv:namespace prefix="prod" uri="http://example.com/product"/>
+  </inv:global_scope>
+  <inv:scope name="Invoice Scope">
+    <inv:scope_desc>Invoices use inv: prefix for invoice-related elements</inv:scope_desc>
+    <inv:example>&lt;inv:invoice&gt;&lt;inv:invoice_id&gt;INV-001&lt;/inv:invoice_id&gt;&lt;/inv:invoice&gt;</inv:example>
+  </inv:scope>
+  <cust:scope name="Customer Scope">
+    <cust:scope_desc>Customer-related elements use cust: prefix</cust:scope_desc>
+    <cust:example>&lt;cust:customer&gt;&lt;cust:customer_id&gt;CUST-001&lt;/cust:customer_id&gt;&lt;/cust:customer&gt;</cust:example>
+  </cust:scope>
+  <prod:scope name="Product Scope">
+    <prod:scope_desc>Product-related elements use prod: prefix</prod:scope_desc>
+    <prod:example>&lt;prod:item&gt;&lt;prod:item_id&gt;PROD-001&lt;/prod:item_id&gt;&lt;/prod:item&gt;</prod:example>
+  </prod:scope>
+  <inv:nested_scope>
+    <inv:scope_desc>Nested scopes can reuse prefixes or define new ones</inv:scope_desc>
+    <inv:namespace prefix="curr" uri="http://example.com/currency"/>
+    <inv:example>&lt;inv:pricing&gt;&lt;curr:amount currency=&quot;USD&quot;&gt;25.99&lt;/curr:amount&gt;&lt;/inv:pricing&gt;</inv:example>
+  </inv:nested_scope>
+  <inv:scope name="Prefix Shadowing">
+    <inv:scope_desc>Prefixes can be redefined in nested scopes</inv:scope_desc>
+    <inv:example>&lt;inv:outer&gt;&lt;prod:inner&gt;Original prod: scope&lt;/prod:inner&gt;&lt;prod:inner&gt;Same prefix, same scope&lt;/prod:inner&gt;&lt;/inv:outer&gt;</inv:example>
+  </inv:scope>
+</ns_demo>

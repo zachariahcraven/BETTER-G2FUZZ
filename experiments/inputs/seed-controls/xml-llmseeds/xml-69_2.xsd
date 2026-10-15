@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:dc="http://purl.org/dc/elements/1.1/"
+           xmlns:prov="http://www.w3.org/ns/prov#"
+           xmlns:dcat="http://www.w3.org/ns/dcat#">
+  <xs:element name="invoice">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="invoice_id" type="xs:string"/>
+        <xs:element name="date" type="xs:date"/>
+        <xs:element name="customer">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="customer_id" type="xs:string"/>
+              <xs:element name="customer_name" type="xs:string"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="xpath_examples">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="xpath_example" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:simpleContent>
+                    <xs:extension base="xs:string">
+                      <xs:attribute name="id" type="xs:positiveInteger" use="required"/>
+                    </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="items">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="item" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="item_id" type="xs:string"/>
+                    <xs:element name="item_name" type="xs:string"/>
+                    <xs:element name="quantity" type="xs:positiveInteger"/>
+                    <xs:element name="price" type="xs:decimal"/>
+                  </xs:sequence>
+                  <xs:attribute name="type" use="required">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="product"/>
+                        <xs:enumeration value="service"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="metadata">
+          <xs:complexType>
+            <xs:sequence>
+              <!-- Dublin Core metadata section -->
+              <xs:element name="dc:metadata">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="dc:title" type="xs:string"/>
+                    <xs:element name="dc:creator" type="xs:string"/>
+                    <xs:element name="dc:subject" type="xs:string"/>
+                    <xs:element name="dc:description" type="xs:string"/>
+                    <xs:element name="dc:publisher" type="xs:string"/>
+                    <xs:element name="dc:contributor" type="xs:string" minOccurs="0"/>
+                    <xs:element name="dc:date" type="xs:date"/>
+                    <xs:element name="dc:type" type="xs:string"/>
+                    <xs:element name="dc:format" type="xs:string"/>
+                    <xs:element name="dc:identifier" type="xs:string"/>
+                    <xs:element name="dc:source" type="xs:string" minOccurs="0"/>
+                    <xs:element name="dc:language" type="xs:string" minOccurs="0"/>
+                    <xs:element name="dc:relation" type="xs:string" minOccurs="0"/>
+                    <xs:element name="dc:coverage" type="xs:string" minOccurs="0"/>
+                    <xs:element name="dc:rights" type="xs:string" minOccurs="0"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <!-- PROV-O metadata section -->
+              <xs:element name="prov:activity">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="prov:startedAtTime" type="xs:dateTime"/>
+                    <xs:element name="prov:used" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:attribute name="prov:entity" type="xs:anyURI" use="required"/>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="prov:hadPrimarySource" type="xs:string" minOccurs="0"/>
+                  </xs:sequence>
+                  <xs:attribute name="prov:type" type="xs:string" use="required"/>
+                  <xs:attribute name="prov:id" type="xs:string" use="required"/>
+                </xs:complexType>
+              </xs:element>
+              <!-- DCAT metadata section -->
+              <xs:element name="dcat:dataset">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="dcat:title" type="xs:string"/>
+                    <xs:element name="dcat:description" type="xs:string"/>
+                    <xs:element name="dcat:keyword" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="dcat:theme" type="xs:string" minOccurs="0"/>
+                  </xs:sequence>
+                  <xs:attribute name="dcat:id" type="xs:string" use="required"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

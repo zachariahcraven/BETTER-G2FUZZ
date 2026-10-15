@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="style.xsl"?>
+<document xmlns:ex="http://example.com/ns" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <ex:title>Namespace-aware DOM Example</ex:title>
+    <ex:content>This XML document demonstrates namespace-aware DOM parsing with tree-based representation.</ex:content>
+    <xsd:schema id="exampleSchema"/>
+    <instruction>This processing instruction guides applications on how to process this document.</instruction>
+</document>

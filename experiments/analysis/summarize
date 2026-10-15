@@ -1,0 +1,64 @@
+#!/usr/bin/env python3
+"""Summarize the lineup experiments: one CSV row per campaign, plus a per-target, per-model table.
+
+Usage (from the experiment workspace): experiments/analysis/summarize        -> results/tables/lineup-results.csv
+Reads `scripts/fuzz results <campaign>` for every results/campaigns/*/{lineup,tiff,png,xml,wad}-* folder (lineup = jhead).
+"""
+import csv, glob, os, re, statistics, subprocess
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+os.chdir(ROOT)
+FIELDS = ["run_time", "execs_done", "execs_per_sec", "corpus_count", "edges_found",
+          "total_edges", "saved_crashes", "generators", "llmGen-M steps"]
+
+rows = []
+TARGET = {"lineup": "jhead", "tiff": "tiff", "png": "png", "xml": "xml", "wad": "wad"}
+for d in sorted(glob.glob("results/campaigns/*/*-*-r*")):
+    if "/archive/" in d:
+        continue
+    name = os.path.basename(d)
+    m = re.match(r"(lineup|tiff|png|xml|wad)(\d+h)?-(.+)-r(\d+)$", name)   # optional run tag, e.g. xml4h
+    if not m:
+        continue
+    out = subprocess.run(["scripts/fuzz", "results", name], stdout=subprocess.PIPE,
+                         stderr=subprocess.STDOUT, universal_newlines=True).stdout
+    vals = dict(re.findall(r"^(\S[^:\n]*?)\s*: (.*)$", out, re.M))
+    row = {"campaign": name, "target": TARGET[m.group(1)] + ("-" + m.group(2) if m.group(2) else ""),
+           "model": m.group(3), "rep": int(m.group(4))}
+    for f in FIELDS:
+        v = vals.get(f, "")
+        try:
+            row[f] = float(v) if "." in v else int(v)
+        except ValueError:
+            row[f] = ""
+    calls = re.match(r"(\d+) \((\d+) ok, (\d+) errors\)", vals.get("LLM calls", ""))
+    row["llm_calls"], row["llm_ok"], row["llm_errors"] = calls.groups() if calls else ("", "", "")
+    try:
+        with open(os.path.join(d, "llm-version.txt")) as f:
+            row["model_version"] = f.read().split("\n")[1].replace("model: ", "")
+    except (OSError, IndexError):
+        row["model_version"] = ""
+    rows.append(row)
+
+cols = ["campaign", "target", "model", "rep"] + FIELDS + ["llm_calls", "llm_ok", "llm_errors", "model_version"]
+with open("results/tables/lineup-results.csv", "w", newline="") as f:
+    w = csv.DictWriter(f, fieldnames=cols)
+    w.writeheader()
+    w.writerows(rows)
+
+def stat(vs):
+    vs = [v for v in vs if v != ""]
+    if not vs:
+        return "-"
+    return "%.0f" % statistics.mean(vs) + ("" if len(vs) < 2 else " ± %.0f" % statistics.stdev(vs))
+
+print("%-6s %-12s %4s %14s %12s %10s %8s %10s %9s" % ("target", "model", "runs", "edges", "execs/s", "crashes",
+                                                  "gens", "llmGen-M", "LLM err"))
+for target, model in sorted({(r["target"], r["model"]) for r in rows}, key=lambda k: (k[0] != "jhead", k)):
+    rs = [r for r in rows if r["target"] == target and r["model"] == model]
+    print("%-6s %-12s %4d %14s %12s %10s %8s %10s %9s" % (
+        target, model, len(rs), stat([r["edges_found"] for r in rs]), stat([r["execs_per_sec"] for r in rs]),
+        stat([r["saved_crashes"] for r in rs]), stat([r["generators"] for r in rs]),
+        stat([r["llmGen-M steps"] for r in rs]),
+        sum(int(r["llm_errors"] or 0) for r in rs)))
+print("\nPer-campaign rows: results/tables/lineup-results.csv")

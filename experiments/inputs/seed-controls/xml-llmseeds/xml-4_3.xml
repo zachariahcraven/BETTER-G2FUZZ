@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:library xmlns:ns0="http://example.com/books" xmlns:ns1="http://example.com/publisher" xmlns:book="http://example.com/books" xmlns:pub="http://example.com/publisher"><ns0:book id="b01"><ns0:title>Python Programming</ns0:title><ns0:author>John Doe</ns0:author><ns1:publisher>Tech Books Inc.</ns1:publisher></ns0:book></ns0:library>

@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<project version="1.0">
+  <notations type="notation-declarations">
+    <notation name="GIF" publicId="-//CompuServe//NOTATION Graphics Interchange Format 89a//EN" systemId="http://www.w3.org/Graphics/GIF/gif89a.dtd"/>
+    <notation name="PNG" publicId="-//W3C//NOTATION Portable Network Graphics//EN" systemId="http://www.w3.org/TR/PNG/"/>
+  </notations>
+  <file name="report.xml" type="config" size="1024" notation="XML">Configuration file for the project</file>
+  <file name="data.csv" type="data" size="2048" notation="CSV">Data file containing project statistics</file>
+  <unparsed-entity name="logo.gif" systemId="assets/logo.gif" notation="GIF"/>
+  <unparsed-entity name="icon.png" systemId="assets/icon.png" notation="PNG"/>
+  <directory name="assets" type="folder" permissions="rw-r--r--"/>
+</project>

@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root><data_with_special_chars>This contains &lt;special&gt; characters like &amp; and &lt; that would normally need escaping</data_with_special_chars><code_example>function example() {
+    if (x &lt; 5 &amp;&amp; y &gt; 3) {
+        return x &amp; y;
+    }
+}</code_example></root>

@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.w3.org/2001/XMLSchema http://www.w3.org/2001/XMLSchema"><xs:element name="exampleElement" type="xs:string" /><xs:simpleType name="exampleType"><xs:restriction base="xs:string"><xs:enumeration value="option1" /><xs:enumeration value="option2" /></xs:restriction></xs:simpleType></xs:schema>

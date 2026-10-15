@@ -1,0 +1,86 @@
+#!/usr/bin/env python3
+"""Credit each queue entry and crash to the generator whose seed it descends from.
+
+Usage (from the experiment workspace): experiments/analysis/generator-credit   -> results/tables/generator-credit.csv
+Covers every results/campaigns/*/{lineup,tiff,png,xml,wad}-* campaign (lineup = jhead).
+AFL++ names queue/crash files id:N,src:P[+Q],...; seeds G2Fuzz added are named orig:<gen>_<k>.
+Each file is followed up its first src: parent to a root seed, and that seed's generator gets
+the credit. Shows how unevenly generators pay off, i.e. what a bandit could gain over random.
+"""
+import csv, glob, os, re, statistics
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+os.chdir(ROOT)
+GEN = re.compile(r"orig:([A-Za-z0-9]+-\d+)_\d+")
+TARGET = {"lineup": "jhead", "tiff": "tiff", "png": "png", "xml": "xml", "wad": "wad"}
+
+def parse(name):
+    m = re.match(r"id:(\d+)", name)
+    src = re.search(r"src:(\d+)", name)
+    gen = GEN.search(name)
+    return (int(m.group(1)) if m else None, int(src.group(1)) if src else None,
+            gen.group(1) if gen else ("stock:" + name.split("orig:")[1] if "orig:" in name else None))
+
+rows, per_model = [], {}
+for d in sorted(glob.glob("results/campaigns/*/*-*-r*")):
+    if "/archive/" in d:
+        continue
+    m = re.match(r"(lineup|tiff|png|xml|wad)(\d+h)?-(.+)-r(\d+)$", os.path.basename(d))   # optional run tag
+    out = glob.glob(os.path.join(d, "*_output", "default"))
+    if not m or not out or not os.path.isdir(os.path.join(out[0], "queue")):
+        continue   # not a lineup campaign, or not fuzzing yet
+    model, out = (TARGET[m.group(1)] + ("-" + m.group(2) if m.group(2) else ""), m.group(3)), out[0]
+    parent, origin = {}, {}
+    for f in os.listdir(os.path.join(out, "queue")):
+        i, src, gen = parse(f)
+        if i is None:
+            continue
+        parent[i] = src
+        if gen:
+            origin[i] = gen
+
+    def root_gen(i, seen=0):
+        while i is not None and i not in origin and seen < 100000:
+            i, seen = parent.get(i), seen + 1
+        return origin.get(i, "unknown")
+
+    entries, crashes = {}, {}
+    for i in parent:
+        g = root_gen(i)
+        entries[g] = entries.get(g, 0) + 1
+    for f in os.listdir(os.path.join(out, "crashes")) if os.path.isdir(os.path.join(out, "crashes")) else []:
+        _, src, _ = parse(f)
+        if src is not None:
+            g = root_gen(src)
+            crashes[g] = crashes.get(g, 0) + 1
+    gens = sorted(g for g in entries if not g.startswith("stock:") and g != "unknown")
+    for g in sorted(set(entries) | set(crashes)):
+        rows.append({"campaign": os.path.basename(d), "target": model[0], "model": model[1], "source": g,
+                     "queue_entries": entries.get(g, 0), "crashes": crashes.get(g, 0)})
+    # descendants beyond the seeds themselves, per generator
+    desc = sorted((entries[g] for g in gens), reverse=True)
+    total = sum(entries.values())
+    from_gens = sum(desc)
+    top = max(1, round(len(desc) * 0.2))
+    s = per_model.setdefault(model, {"gens": [], "productive": [], "top20": [], "best": [], "gen_share": [], "crash_gens": []})
+    s["gens"].append(len(desc))
+    s["productive"].append(sum(1 for g in gens if entries[g] > 3))
+    s["top20"].append(100.0 * sum(desc[:top]) / from_gens if from_gens else 0)
+    s["best"].append(100.0 * desc[0] / from_gens if desc else 0)
+    s["gen_share"].append(100.0 * from_gens / total if total else 0)
+    s["crash_gens"].append(sum(1 for g in gens if crashes.get(g)))
+
+with open("results/tables/generator-credit.csv", "w", newline="") as f:
+    w = csv.DictWriter(f, fieldnames=["campaign", "target", "model", "source", "queue_entries", "crashes"])
+    w.writeheader()
+    w.writerows(rows)
+
+mean = lambda v: "%.0f" % statistics.mean(v)
+print("%-6s %-12s %5s %11s %13s %12s %14s %11s" % ("target", "model", "gens", "productive", "top 20% gens", "best gen", "queue from gens",
+                                             "crash gens"))
+for model in sorted(per_model, key=lambda k: (k[0] != "jhead", k)):
+    s = per_model[model]
+    print("%-6s %-12s %5s %11s %12s%% %11s%% %14s%% %11s" % (model[0], model[1], mean(s["gens"]), mean(s["productive"]), mean(s["top20"]),
+                                                     mean(s["best"]), mean(s["gen_share"]), mean(s["crash_gens"])))
+print("\nproductive = more than 3 queue entries credited (seeds + their finds); "
+      "top 20%%/best gen = share of generator-credited entries.\nPer-source rows: results/tables/generator-credit.csv")

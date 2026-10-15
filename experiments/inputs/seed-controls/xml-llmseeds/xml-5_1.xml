@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<project version="1.0">
+  <file name="report.xml" type="config" size="1024">Configuration file for the project</file>
+  <file name="data.csv" type="data" size="2048">Data file containing project statistics</file>
+  <directory name="assets" type="folder" permissions="rw-r--r--"/>
+</project>

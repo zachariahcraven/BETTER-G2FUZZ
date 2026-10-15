@@ -1,0 +1,153 @@
+#!/usr/bin/env python3
+"""Build the offline System One test: questions about generators whose payoff is already known.
+
+Usage (from the experiment workspace): experiments/decision-model/decision-data   -> experiments/decision-model/data/decision-items.jsonl
+For every finished campaign (results/campaigns/*/{lineup,tiff,png}-*-r*), a generator's payoff is the number of
+queue entries the fuzzer found starting from its seeds (descendants, not counting the seeds),
+traced through the src: names as in experiments/analysis/generator-credit. Two kinds of question, each asked from
+the code alone and again with early stats (seeds made, finds in the first EARLY_MIN minutes):
+  pick4  four generators from one campaign: which pays off most (only sets with a clear winner)
+  good   one generator: will it pay off (at least GOOD descendants)
+"""
+import glob, json, os, random, re
+
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+os.chdir(ROOT)
+GOOD = 5              # descendants for a generator to count as paying off
+EARLY_MIN = 10        # minutes of fuzzing the early stats cover
+PICKS = 10            # pick4 sets drawn per campaign (before dropping unclear ones)
+PICK_CODE = 3500      # characters of code per generator in pick4 (4 fit in Von's 8192 tokens)
+GOOD_CODE = 8000      # characters of code in a good question
+TARGET = {"lineup": "jhead", "tiff": "tiff", "png": "png"}
+DESC = {"jhead": "jhead, a command-line tool that reads and prints the EXIF metadata of JPEG files",
+        "tiff": "libtiff's TIFF reader, which decodes every image in a TIFF file",
+        "png": "libpng's PNG reader, which decodes the whole image of a PNG file"}
+GEN = re.compile(r"orig:([A-Za-z0-9]+-\d+)_\d+")
+
+
+def field(name, key):
+    m = re.search(r"(?:^|,)%s:(\d+)" % key, name)
+    return int(m.group(1)) if m else None
+
+
+def campaign_stats(out):
+    """Per generator: seeds in the queue, descendants at the end, descendants by EARLY_MIN."""
+    parent, origin, found = {}, {}, {}
+    for f in os.listdir(os.path.join(out, "queue")):
+        i = field(f, "id")
+        if i is None:
+            continue
+        parent[i] = field(f, "src")
+        found[i] = field(f, "time") or 0
+        g = GEN.search(f)
+        if g:
+            origin[i] = g.group(1)
+    stats = {}
+    for i in parent:
+        j, n = i, 0
+        while j is not None and j not in origin and n < 100000:
+            j, n = parent.get(j), n + 1
+        g = origin.get(j)
+        if g is None:
+            continue
+        s = stats.setdefault(g, {"seeds": 0, "desc": 0, "early": 0})
+        if i in origin:
+            s["seeds"] += 1
+        else:
+            s["desc"] += 1
+            s["early"] += found[i] <= EARLY_MIN * 60000
+    return stats
+
+
+def run_time(out):
+    try:
+        return int(re.search(r"^run_time\s*: (\d+)", open(os.path.join(out, "fuzzer_stats")).read(), re.M).group(1))
+    except (OSError, AttributeError):
+        return 0
+
+
+def code_block(code, limit):
+    if len(code) > limit:
+        code = code[:limit] + "\n# ... (truncated)"
+    return "```python\n%s\n```" % code
+
+
+def early_line(s):
+    return ("Early results: it made %d seed files, and in the first %d minutes the fuzzer found %d new "
+            "code paths starting from them." % (s["seeds"], EARLY_MIN, s["early"]))
+
+
+items = []
+for d in sorted(glob.glob("results/campaigns/*/*-*-r*")):
+    if "/archive/" in d:
+        continue
+    m = re.match(r"(lineup|tiff|png)-(.+)-r(\d+)$", os.path.basename(d))
+    out = glob.glob(os.path.join(d, "*_output", "default"))
+    if not m or not out or run_time(out[0]) < 3500:
+        continue   # not a lineup campaign, or not finished (fuzzer_stats is rewritten while it runs)
+    target, writer, out = TARGET[m.group(1)], m.group(2), out[0]
+    stats = campaign_stats(out)
+    code = {}
+    for g in stats:
+        p = os.path.join(out, "generators", g + ".py")
+        if os.path.isfile(p):
+            code[g] = open(p, errors="replace").read()
+    gens = sorted(code)
+    intro = ("A coverage-guided fuzzer tests %s. Python generators write sample files; the fuzzer starts "
+             "from those files and mutates them for one hour. A generator pays off when the fuzzer finds "
+             "many new code paths starting from its files." % DESC[target])
+    base = {"campaign": os.path.basename(d), "target": target, "writer": writer}
+
+    for g in gens:
+        for with_stats in (False, True):
+            state = "%s\n\nThe generator:\n%s" % (intro, code_block(code[g], GOOD_CODE))
+            if with_stats:
+                state += "\n\n" + early_line(stats[g])
+            items.append(dict(base, id="%s:good:%s:%d" % (base["campaign"], g, with_stats), kind="good",
+                              stats=with_stats, state=state, label=stats[g]["desc"] >= GOOD,
+                              question={"type": "noul", "instructions":
+                                        "Will the fuzzer find at least %d new code paths starting from this "
+                                        "generator's files within one hour?" % GOOD},
+                              features={g: dict(stats[g], code_len=len(code[g]))}))
+
+    rng, seen = random.Random(base["campaign"]), set()
+    for _ in range(PICKS * 5 if len(gens) >= 4 else 0):
+        if len(seen) >= PICKS:
+            break
+        pick = tuple(sorted(rng.sample(gens, 4)))
+        ranked = sorted(pick, key=lambda g: stats[g]["desc"], reverse=True)
+        best, second = stats[ranked[0]]["desc"], stats[ranked[1]]["desc"]
+        if pick in seen or best < GOOD or best < 2 * second + 1:
+            continue   # no clear winner
+        seen.add(pick)
+        order = list(pick)
+        rng.shuffle(order)
+        letters = dict(zip("ABCD", order))
+        for with_stats in (False, True):
+            parts = [intro, "Four generators, A to D:"]
+            for L, g in letters.items():
+                parts.append("Generator %s:\n%s" % (L, code_block(code[g], PICK_CODE)))
+                if with_stats:
+                    parts.append(early_line(stats[g]))
+            items.append(dict(base, id="%s:pick4:%s:%d" % (base["campaign"], "+".join(pick), with_stats),
+                              kind="pick4", stats=with_stats, state="\n\n".join(parts),
+                              label=[L for L, g in letters.items() if g == ranked[0]][0],
+                              question={"type": "choice", "instructions":
+                                        "Which generator's files will lead the fuzzer to the most new code paths "
+                                        "within one hour?",
+                                        "criteria": {L: "Generator %s" % L for L in letters}},
+                              features={L: dict(stats[g], code_len=len(code[g]), name=g)
+                                        for L, g in letters.items()}))
+
+with open("experiments/decision-model/data/decision-items.jsonl", "w") as f:
+    for it in items:
+        f.write(json.dumps(it) + "\n")
+kinds = {}
+for it in items:
+    k = (it["target"], it["kind"])
+    kinds[k] = kinds.get(k, 0) + 1
+print("wrote experiments/decision-model/data/decision-items.jsonl:", len(items), "questions")
+for (t, k), n in sorted(kinds.items()):
+    pos = [it for it in items if it["target"] == t and it["kind"] == k]
+    extra = (" (%.0f%% pay off)" % (100.0 * sum(it["label"] for it in pos) / len(pos))) if k == "good" else ""
+    print("  %-6s %-6s %4d%s" % (t, k, n, extra))

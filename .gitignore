@@ -35,10 +35,10 @@ afl-ld-lto
 afl-cs-proxy
 afl-qemu-trace
 afl-frida-trace.so
-/as
-/ld
-utils/afl_network_proxy/afl-network-client
-utils/afl_network_proxy/afl-network-server
+/afl/as
+/afl/ld
+afl/utils/afl_network_proxy/afl-network-client
+afl/utils/afl_network_proxy/afl-network-server
 
 # ---- Python ----
 __pycache__/
@@ -46,12 +46,19 @@ __pycache__/
 .venv/
 venv/
 
-# ---- Campaign data (keep results out of git) ----
-eval/
+# ---- Campaign data and outputs (results/tables/ and results/figures/ stay in git) ----
+results/campaigns/
+results/cov/
+results/cache/
+results/logs/
 *_output/
 initial_seeds/
 core
 core.*
+
+# ---- Local target builds (the image builds its own into /targets) ----
+targets/bin/
+**/build/
 
 # ---- Editors / OS ----
 .DS_Store
@@ -59,7 +66,7 @@ core.*
 .idea/
 *.swp
 
-# Apptainer image and its source archive (team-docs/TEMPEST.md)
+# Apptainer image and its source archive (docs/TEMPEST.md)
 *.sif
 *.sif.version
 g2fuzz-amd64.tar*

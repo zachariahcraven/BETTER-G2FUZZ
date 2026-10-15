@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<document xml:base="https://example.com/docs/"><p>This is <b>bold</b><i> text.</i></p><section title="Rich Text Examples"><p>The <strong>quick</strong><em>brown</em></p> fox jumps over the </section><list-item>Item with <link url="https://example.com">hyperlinked</link> text and <code>code</code> snippet.</list-item><section xml:base="chapters/" title="Chapter References"><p>See <a href="chapter1.html">Chapter 1</a> and <a href="chapter2.html">Chapter 2</a> for more details.</p></section></document>

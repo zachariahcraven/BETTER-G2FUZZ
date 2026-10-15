@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+           elementFormDefault="qualified">
+  <xs:element name="invoice">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="invoice_id" type="xs:string"/>
+        <xs:element name="date" type="xs:date"/>
+        <xs:element name="customer">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="customer_id" type="xs:string"/>
+              <xs:element name="customer_name" type="xs:string"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="xpath_examples">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="xpath_example" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:simpleContent>
+                    <xs:extension base="xs:string">
+                      <xs:attribute name="id" type="xs:positiveInteger" use="required"/>
+                    </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="rdf_serialization">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="rdf_description">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="invoice_uri" type="xs:string"/>
+                    <xs:element name="invoice_date" type="xs:date"/>
+                    <xs:element name="invoice_customer" type="xs:string"/>
+                    <xs:element name="items">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="item" maxOccurs="unbounded">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="item_type" type="xs:string"/>
+                                <xs:element name="item_name" type="xs:string"/>
+                                <xs:element name="item_quantity" type="xs:positiveInteger"/>
+                                <xs:element name="item_price" type="xs:decimal"/>
+                              </xs:sequence>
+                              <xs:attribute name="rdf:ID" type="xs:string" use="required"/>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="about" type="xs:string" use="required"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="items">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="item" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="item_id" type="xs:string"/>
+                    <xs:element name="item_name" type="xs:string"/>
+                    <xs:element name="quantity" type="xs:positiveInteger"/>
+                    <xs:element name="price" type="xs:decimal"/>
+                  </xs:sequence>
+                  <xs:attribute name="type" use="required">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="product"/>
+                        <xs:enumeration value="service"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

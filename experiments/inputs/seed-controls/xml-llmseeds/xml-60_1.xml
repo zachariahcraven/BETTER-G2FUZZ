@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root><data_with_special_chars>This contains &lt;special&gt; characters like &amp; and &lt; that would normally need escaping</data_with_special_chars><code_example>function example() {
+    if (x &lt; 5 &amp;&amp; y &gt; 3) {
+        return x &amp; y;
+    }
+}</code_example><xquery_update_facility>&lt;!-- Example XQuery Update expressions for modifying XML content --&gt;
+let $doc := doc("example.xml")
+return (
+    insert nodes &lt;new-element&gt;content&lt;/new-element&gt; into $doc/root,
+    delete nodes $doc/root/old-element,
+    replace value of node $doc/root/target-element with "updated content"
+)</xquery_update_facility><schematron_validation>&lt;!-- Example Schematron schema for business rule validation --&gt;
+&lt;schema xmlns="http://purl.oclc.org/dsdl/schematron"&gt;
+    &lt;title&gt;Schematron Validation Rules&lt;/title&gt;
+    &lt;pattern id="business_rules"&gt;
+        &lt;rule context="order"&gt;
+            &lt;assert test="price &amp;gt; 0"&gt;Price must be positive&lt;/assert&gt;
+            &lt;assert test="quantity &amp;gt; 0"&gt;Quantity must be positive&lt;/assert&gt;
+            &lt;assert test="price * quantity &amp;lt; 10000"&gt;Order total must be less than 10000&lt;/assert&gt;
+        &lt;/rule&gt;
+        &lt;rule context="customer"&gt;
+            &lt;assert test="email[contains(., '@')]"&gt;Email must contain @&lt;/assert&gt;
+            &lt;assert test="phone[starts-with(., '+')]"&gt;Phone number must start with +&lt;/assert&gt;
+        &lt;/rule&gt;
+    &lt;/pattern&gt;
+&lt;/schema&gt;</schematron_validation></root>

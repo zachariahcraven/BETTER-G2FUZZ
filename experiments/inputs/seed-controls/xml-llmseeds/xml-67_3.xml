@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<root>
+    <feature>
+        <name>Character encoding flexibility</name>
+        <description>XML supports multiple encodings (e.g., UTF-8, UTF-16, ISO-8859-1), declared in the XML declaration (e.g., &lt;?xml version="1.0" encoding="UTF-8"?&gt;).</description>
+    </feature>
+    <feature>
+        <name>XML Signature Reference transforms</name>
+        <description>Supports preprocessing of referenced data (e.g., base64 decoding, XPath filtering, canonicalization) before signature computation.</description>
+    </feature>
+</root>

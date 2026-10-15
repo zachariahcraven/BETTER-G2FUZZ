@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<wellformed_example version="1.0">
+  <header>
+    <title>Well-formed XML Document with XSD Support</title>
+  </header>
+  <content>
+    <section id="1">
+      <paragraph>This XML document demonstrates strict syntax rules.</paragraph>
+      <nested_example attribute1="value1" attribute2="value2"/>
+      <self_closing_tag name="example"/>
+      <cdata_section>&lt;![CDATA[This is CDATA content that won't be parsed as XML.]]&gt;</cdata_section>
+      <xsd_support>
+        <description>Provides a more powerful and extensible schema language than DTDs, supporting data typing, namespaces, complex element/attribute constraints, and inheritance.</description>
+        <features>
+          <feature>Data typing (e.g., string, integer, date)</feature>
+          <feature>Namespace support for element/attribute scoping</feature>
+          <feature>Complex element and attribute constraints</feature>
+          <feature>Element/attribute inheritance and substitution groups</feature>
+        </features>
+        <xsd_example>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;xs:schema xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+  &lt;xs:element name=&quot;person&quot;&gt;
+    &lt;xs:complexType&gt;
+      &lt;xs:sequence&gt;
+        &lt;xs:element name=&quot;name&quot; type=&quot;xs:string&quot;/&gt;
+        &lt;xs:element name=&quot;age&quot; type=&quot;xs:integer&quot;/&gt;
+      &lt;/xs:sequence&gt;
+    &lt;/xs:complexType&gt;
+  &lt;/xs:element&gt;
+&lt;/xs:schema&gt;</xsd_example>
+      </xsd_support>
+    </section>
+  </content>
+</wellformed_example>

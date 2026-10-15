@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<library>
+  <book id="1">
+    <title>The Great Gatsby</title>
+    <author>F. Scott Fitzgerald</author>
+    <year>1925</year>
+    <chapter number="1">
+      <title>The Beginning</title>
+      <content>In my younger and more vulnerable years...</content>
+    </chapter>
+  </book>
+  <book id="2">
+    <title>1984</title>
+    <author>George Orwell</author>
+    <year>1949</year>
+    <chapter number="1">
+      <title>The Truth</title>
+      <content>It was a bright cold day in April...</content>
+    </chapter>
+  </book>
+</library>

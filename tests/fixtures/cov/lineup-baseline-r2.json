@@ -1,0 +1,1 @@
+{"seeds": {"target": "/targets/jhead.afl", "files": 1, "total_edges": 128, "stock_edges": 128, "new_edges": 0, "per_generator": {"stock": {"files": 1, "edges": 128, "unique": 128}}}, "queue": {"target": "/targets/jhead.afl", "files": 1497, "total_edges": 571, "stock_edges": null, "new_edges": null, "per_generator": {"stock": {"files": 1497, "edges": 571, "unique": 571}}}}

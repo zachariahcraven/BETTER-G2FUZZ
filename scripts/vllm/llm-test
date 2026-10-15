@@ -1,0 +1,21 @@
+#!/bin/bash
+# Usage: scripts/vllm/llm-test <model> ["prompt"]
+# Sends one chat request to a running serve-<model> job (via endpoints/<model>.env) and
+# prints the reply, token count and speed. Run it on the Tempest login node.
+set -eu
+M=${1:?usage: llm-test <model> [prompt]}
+P=${2:-Reply with one sentence: what is coverage-guided fuzzing?}
+ENV=${G2F_VLLM_DIR:-$HOME/llm-jobs}/endpoints/$M.env
+[ -f "$ENV" ] || { echo "no running server for $M (scripts/vllm/serve $M)"; exit 1; }
+set -a; . "$ENV"; set +a
+body=$(python3 -c 'import json,sys; print(json.dumps({"model":sys.argv[1],"max_tokens":800,"messages":[{"role":"user","content":sys.argv[2]}]}))' "$M" "$P")
+t0=$(date +%s.%N)
+out=$(curl -sS -m 300 "$G2F_BASE_URL/chat/completions" -H "Authorization: Bearer $(cat "$G2F_KEY")" \
+  -H "Content-Type: application/json" -d "$body")
+t1=$(date +%s.%N)
+python3 -c '
+import json,sys
+d=json.loads(sys.argv[1]); el=float(sys.argv[3])-float(sys.argv[2])
+if "choices" not in d: print("ERROR:", d); sys.exit(1)
+n=d["usage"]["completion_tokens"]; print(d["choices"][0]["message"]["content"].strip())
+print("[%s: %d tokens in %.1fs = %.0f tok/s]" % (sys.argv[4], n, el, n/el))' "$out" "$t0" "$t1" "$M"

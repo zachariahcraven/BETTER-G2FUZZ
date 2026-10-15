@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="inventory-3.0.xsl"?>
+<?xml version="1.0" ?>
+<inventory>
+  <!-- XSLT 3.0 transformation: Supports streaming and JSON output conversion -->
+  <!-- XSLT 2.0 transformation: Supports sequence processing for multiple features -->
+  <!-- XSLT 1.0 transformation: Use template 'item-template' for basic rendering -->
+  <item id="I001" category="electronics">
+    <product type="laptop">
+      <name>ProBook X300</name>
+      <description>Professional laptop with high-end specifications</description>
+      <pricing>
+        <base-price currency="USD">1299.99</base-price>
+        <discounts>
+          <discount type="bulk" min-quantity="10">0.15</discount>
+        </discounts>
+      </pricing>
+      <features>
+        <feature priority="high">Intel Core i7 processor</feature>
+        <feature priority="medium">16GB RAM</feature>
+      </features>
+    </product>
+  </item>
+</inventory>

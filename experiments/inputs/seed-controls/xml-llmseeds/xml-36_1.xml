@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<document><p>This is <b>bold</b><i> text.</i></p><section title="Rich Text Examples"><p>The <strong>quick</strong><em>brown</em></p> fox jumps over the </section><list-item>Item with <link url="https://example.com">hyperlinked</link> text and <code>code</code> snippet.</list-item><feature id="xpath-support"> <title>XPath 1.0/2.0/3.0/3.1 expression support</title><description>Enables precise navigation and selection of nodes within the XML document tree using expressive path expressions.</description></feature>.</document>

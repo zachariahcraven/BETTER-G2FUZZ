@@ -1,0 +1,178 @@
+[
+  {
+    "kind": "SEGV",
+    "frame": "P_GroupLines p_setup.c:575",
+    "file": "eval/bandit-wad-bandit-r3/doom_wad_output/default/crashes/id:000010,sig:11,src:000005,time:411543,execs:42277,op:flip2,pos:39737",
+    "map": "MAP01",
+    "bytes_changed": 1,
+    "models": [
+      "codernext",
+      "gemma31b",
+      "qwen36nt",
+      "qwen38",
+      "qwen4b"
+    ],
+    "title": "SEGV in P_GroupLines p_setup.c:575",
+    "found_by": "found by: codernext, gemma31b, qwen36nt, qwen38, qwen4b (LLM runs only)"
+  },
+  {
+    "kind": "global-buffer-overflow",
+    "frame": "R_PointToDist r_main.c:408",
+    "file": "eval/wad-qwen38-r5/doom_wad_output/default/crashes/id:000075,sig:11,src:001182,time:2613404,execs:351624,op:havoc,rep:2",
+    "map": "MAP01",
+    "bytes_changed": 4,
+    "models": [
+      "qwen38",
+      "qwen4b"
+    ],
+    "title": "global-buffer-overflow in R_PointToDist r_main.c:408",
+    "found_by": "found by: qwen38, qwen4b (LLM runs only)"
+  },
+  {
+    "kind": "heap-buffer-overflow",
+    "frame": "P_CheckSight p_sight.c:321",
+    "file": "eval/wad-codernext-r1/doom_wad_output/default/crashes/id:000061,sig:11,src:000003,time:2003304,execs:228651,op:quick,pos:19,val:+3",
+    "map": "MAP01",
+    "bytes_changed": 1,
+    "models": [
+      "codernext",
+      "qwen4b"
+    ],
+    "title": "heap-buffer-overflow in P_CheckSight p_sight.c:321",
+    "found_by": "found by: codernext, qwen4b (LLM runs only)"
+  },
+  {
+    "kind": "signal-4",
+    "frame": "",
+    "file": "eval/bandit-wad-random-r2/doom_wad_output/default/crashes/id:000009,sig:11,src:000005,time:400095,execs:41407,op:flip2,pos:11318",
+    "map": "MAP01",
+    "bytes_changed": 1,
+    "models": [
+      "codernext",
+      "qwen4b"
+    ],
+    "title": "signal-4 (no stack trace)",
+    "found_by": "found by: codernext, qwen4b (LLM runs only)"
+  },
+  {
+    "kind": "stack-overflow",
+    "frame": "P_CrossBSPNode p_sight.c:279",
+    "file": "eval/wad-qwen36nt-r1/doom_wad_output/default/crashes/id:000110,sig:11,src:000002,time:3516280,execs:500839,op:havoc,rep:5",
+    "map": "MAP01",
+    "bytes_changed": 25,
+    "models": [
+      "codernext",
+      "qwen36nt"
+    ],
+    "title": "stack-overflow in P_CrossBSPNode p_sight.c:279",
+    "found_by": "found by: codernext, qwen36nt (LLM runs only)"
+  },
+  {
+    "kind": "negative-size-param",
+    "frame": "P_LoadSectors p_setup.c:274",
+    "file": "eval/wad-gemma31b-r5/doom_wad_output/default/crashes/id:000018,sig:11,src:000005,time:340550,execs:37556,op:quick,pos:39839",
+    "map": "MAP01",
+    "bytes_changed": 1,
+    "models": [
+      "gemma31b"
+    ],
+    "title": "negative-size-param in P_LoadSectors p_setup.c:274",
+    "found_by": "found by: gemma31b (LLM runs only)"
+  },
+  {
+    "kind": "SEGV",
+    "frame": "P_GroupLines p_setup.c:614",
+    "file": "eval/bandit-wad-banditp5-r3/doom_wad_output/default/crashes/id:000009,sig:11,src:000005,time:222388,execs:21579,op:quick,pos:17409",
+    "map": "MAP01",
+    "bytes_changed": 1,
+    "models": [
+      "codernext",
+      "gemma31b",
+      "qwen36nt",
+      "qwen38",
+      "qwen4b"
+    ],
+    "title": "SEGV in P_GroupLines p_setup.c:614",
+    "found_by": "found by: codernext, gemma31b, qwen36nt, qwen38, qwen4b (LLM runs only)"
+  },
+  {
+    "kind": "SEGV",
+    "frame": "P_PlayerThink p_user.c:267",
+    "file": "eval/bandit-wad-banditp5-r3/doom_wad_output/default/crashes/id:000029,sig:11,src:000003,time:1116343,execs:126490,op:quick,pos:18,val:+6",
+    "map": "MAP01",
+    "bytes_changed": 1,
+    "models": [
+      "codernext",
+      "gemma31b",
+      "qwen36nt",
+      "qwen38",
+      "qwen4b"
+    ],
+    "title": "SEGV in P_PlayerThink p_user.c:267",
+    "found_by": "found by: codernext, gemma31b, qwen36nt, qwen38, qwen4b (LLM runs only)"
+  },
+  {
+    "kind": "SEGV",
+    "frame": "P_SetThingPosition p_maputl.c:413",
+    "file": "eval/bandit-wad-banditp5-r5/doom_wad_output/default/crashes/id:000021,sig:11,src:000005,time:469576,execs:44265,op:flip4,pos:39736",
+    "map": "MAP01",
+    "bytes_changed": 1,
+    "models": [
+      "codernext",
+      "gemma31b",
+      "qwen36nt",
+      "qwen38",
+      "qwen4b"
+    ],
+    "title": "SEGV in P_SetThingPosition p_maputl.c:413",
+    "found_by": "found by: codernext, gemma31b, qwen36nt, qwen38, qwen4b (LLM runs only)"
+  },
+  {
+    "kind": "SEGV",
+    "frame": "R_CheckTextureNumForName r_data.c:759",
+    "file": "eval/bandit-wad-randomp5-r2/doom_wad_output/default/crashes/id:000033,sig:11,src:000005,time:898480,execs:81602,op:int32,pos:39870,val:be:-32768",
+    "map": "MAP01",
+    "bytes_changed": 4,
+    "models": [
+      "codernext",
+      "gemma31b",
+      "qwen36nt",
+      "qwen38",
+      "qwen4b"
+    ],
+    "title": "SEGV in R_CheckTextureNumForName r_data.c:759",
+    "found_by": "found by: codernext, gemma31b, qwen36nt, qwen38, qwen4b (LLM runs only)"
+  },
+  {
+    "kind": "SEGV",
+    "frame": "R_PrecacheLevel r_data.c:900",
+    "file": "eval/bandit-wad-banditp5-r2/doom_wad_output/default/crashes/id:000026,sig:11,src:000005,time:751383,execs:67220,op:arith16,pos:39870,val:-31",
+    "map": "MAP01",
+    "bytes_changed": 2,
+    "models": [
+      "codernext",
+      "gemma31b",
+      "qwen36nt",
+      "qwen38",
+      "qwen4b"
+    ],
+    "title": "SEGV in R_PrecacheLevel r_data.c:900",
+    "found_by": "found by: codernext, gemma31b, qwen36nt, qwen38, qwen4b (LLM runs only)"
+  },
+  {
+    "kind": "SEGV",
+    "frame": "R_RenderSegLoop r_segs.c:334",
+    "file": "eval/bandit-wad-bandit-r4/doom_wad_output/default/crashes/id:000011,sig:11,src:000005,time:417749,execs:43515,op:flip4,pos:27102",
+    "map": "MAP01",
+    "bytes_changed": 1,
+    "models": [
+      "codernext",
+      "gemma31b",
+      "qwen36nt",
+      "qwen38",
+      "qwen4b"
+    ],
+    "title": "SEGV in R_RenderSegLoop r_segs.c:334",
+    "found_by": "found by: codernext, gemma31b, qwen36nt, qwen38, qwen4b (LLM runs only)"
+  }
+]

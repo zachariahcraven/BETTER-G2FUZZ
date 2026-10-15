@@ -1,0 +1,89 @@
+#!/usr/bin/env python3
+"""Ask one System One decision model every question in experiments/decision-model/data/decision-items.jsonl.
+
+Usage: experiments/decision-model/decision-eval <von|decider-2b|clef-flash>   -> experiments/decision-model/data/decision-preds-<model>.jsonl
+  DECISION_LIMIT=<n>: only n questions, spread through the file (smoke test)
+Runs inside the vLLM container on a GPU (experiments/decision-model/decision-eval.sbatch). Each answer is the model's
+probability for every option (pick4) or for "yes" (good). Models load from shared-models, offline:
+  von         von-sdk 1.3.7 (experiments/decision-model/pylib), the published engine for its option-marker head
+  decider-2b  plain transformers, the prompt layout and per-type temperatures on its model card
+              (its bundled decider/ code is not run)
+  clef-flash  Cloudflare's joint_schema_model.py from the model folder (reviewed: torch only)
+"""
+import json, os, sys, time
+
+MODELS = "/home/group/csci-591-automated-vulnerability-discovery/students/shared-models"
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+name = sys.argv[1] if len(sys.argv) > 1 else ""
+items = [json.loads(l) for l in open(os.path.join(ROOT, "experiments/decision-model/data/decision-items.jsonl"))]
+limit = int(os.environ.get("DECISION_LIMIT", 0))
+if limit:   # an even spread through the file, so a smoke test covers both kinds of question
+    items = items[::max(1, len(items) // limit)][:limit]
+out_path = os.path.join(ROOT, "experiments/decision-model/data/decision-preds-%s.jsonl" % name)
+import torch
+
+
+def request(it):
+    return {"model": name, "state": it["state"], "questions": {"q": it["question"]}}
+
+
+if name == "von":
+    os.environ.setdefault("VON_CHECKPOINT_DIR", os.path.join(MODELS, "von"))
+    os.environ.setdefault("VON_DEVICE", "cuda")
+    from von.engine import VonEngine
+    engine = VonEngine(device="cuda")
+
+    def answer(it):
+        a = engine.evaluate(state=it["state"], questions={"q": it["question"]}).answers["q"]
+        return a.probabilities if it["kind"] == "pick4" else {"yes": a.noul}
+
+elif name == "decider-2b":
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+    path = os.path.join(MODELS, "decider-2b")
+    temps = json.load(open(os.path.join(path, "decider_config.json")))["temperature_by_type"]
+    tok = AutoTokenizer.from_pretrained(path)
+    lm = AutoModelForCausalLM.from_pretrained(path, dtype=torch.bfloat16).cuda().eval()
+    letter_ids = [tok.encode(L, add_special_tokens=False)[0] for L in "ABCD"]
+
+    def answer(it):
+        q = it["question"]
+        if q["type"] == "choice":
+            keys = list(q["criteria"])
+            opts = ["%s: %s" % (k, q["criteria"][k]) for k in keys]
+        else:
+            keys, opts = ["no", "yes"], ["no", "yes"]
+        prompt = "Context:\n%s\n\nQuestion: %s\nOptions:%s\nAnswer: (" % (
+            it["state"], q["instructions"], "".join("\n(%s) %s" % (L, o) for L, o in zip("ABCD", opts)))
+        ids = tok(prompt, return_tensors="pt").to("cuda")
+        with torch.inference_mode():
+            logits = lm(**ids).logits[0, -1]
+        p = torch.softmax(logits[letter_ids[:len(keys)]].float() / temps[q["type"]], -1).tolist()
+        probs = dict(zip(keys, p))
+        return probs if it["kind"] == "pick4" else {"yes": probs["yes"]}
+
+elif name == "clef-flash":
+    path = os.path.join(MODELS, "clef-flash")
+    sys.path.insert(0, path)
+    from joint_schema_model import load_release_model, systemone
+    model, processor = load_release_model(path, device="cuda")
+
+    def answer(it):
+        a = systemone(model, processor, request(it))["answers"]["q"]
+        return a["probabilities"] if it["kind"] == "pick4" else {"yes": a["noul"]}
+
+else:
+    sys.exit("usage: experiments/decision-model/decision-eval <von|decider-2b|clef-flash>")
+
+start, n = time.time(), 0
+with open(out_path, "w") as f:
+    for it in items:
+        t = time.time()
+        try:
+            probs, err = answer(it), None
+        except Exception as e:   # one bad question shouldn't lose the rest
+            probs, err = None, "%s: %s" % (type(e).__name__, str(e)[:200])
+        f.write(json.dumps({"id": it["id"], "probs": probs, "error": err, "secs": round(time.time() - t, 4)}) + "\n")
+        n += 1
+        if n % 200 == 0:
+            print("%s: %d/%d questions, %.0f s" % (name, n, len(items), time.time() - start), flush=True)
+print("%s: done, %d questions in %.0f s -> %s" % (name, n, time.time() - start, out_path))

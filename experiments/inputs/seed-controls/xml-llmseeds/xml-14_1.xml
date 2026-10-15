@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="style.xsl"?>
+<document>
+    <title>Processing Instructions Example</title>
+    <content>This XML document demonstrates processing instructions.</content>
+    <instruction>This processing instruction guides applications on how to process this document.</instruction>
+</document>

@@ -1,0 +1,67 @@
+<?xml version="1.0" ?>
+<orders xmlns="http://example.com/orders" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://example.com/orders orders.xsd">
+  <!--
+    XSD 1.1 Assertion Examples:
+    1. Assert that orderTotal equals sum of item prices: 
+       <xs:assert test="sum(orderItem/price * quantity) = orderTotal"/>
+    2. Assert that discountPercentage is between 0 and 100:
+       <xs:assert test="discountPercentage >= 0 and discountPercentage <= 100"/>
+    3. Cross-field constraint: orderDate must be before deliveryDate:
+       <xs:assert test="orderDate <= deliveryDate"/>
+    4. Assert that at least one item exists in the order:
+       <xs:assert test="count(orderItem) > 0"/>
+    -->
+  <order id="ORD001" customerID="CUST123">
+    <orderDate>2023-06-15</orderDate>
+    <deliveryDate>2023-06-20</deliveryDate>
+    <customer loyaltyTier="gold">
+      <name>John Smith</name>
+    </customer>
+    <orderItems>
+      <orderItem itemId="ITEM456">
+        <productName>Wireless Headphones</productName>
+        <quantity>2</quantity>
+        <price currency="USD">79.99</price>
+      </orderItem>
+      <orderItem itemId="ITEM789">
+        <productName>USB-C Cable</productName>
+        <quantity>1</quantity>
+        <price currency="USD">14.99</price>
+      </orderItem>
+    </orderItems>
+    <totals>
+      <subtotal>174.97</subtotal>
+      <discountPercentage>10</discountPercentage>
+      <tax>15.75</tax>
+      <orderTotal>168.22</orderTotal>
+    </totals>
+    <!--
+    Example XSD 1.1 assertions for validation:
+    - Assert orderTotal equals (subtotal - (subtotal * discountPercentage/100)) + tax
+    - Assert discountPercentage is between 0 and 100
+    - Assert orderDate <= deliveryDate
+    - Assert at least one orderItem exists
+    - Assert total quantity matches sum of individual quantities
+    -->
+  </order>
+  <order id="ORD002" customerID="CUST456">
+    <orderDate>2023-07-01</orderDate>
+    <deliveryDate>2023-07-05</deliveryDate>
+    <customer loyaltyTier="bronze">
+      <name>Jane Doe</name>
+    </customer>
+    <orderItems>
+      <orderItem itemId="ITEM101">
+        <productName>Smart Watch</productName>
+        <quantity>1</quantity>
+        <price currency="USD">249.99</price>
+      </orderItem>
+    </orderItems>
+    <totals>
+      <subtotal>249.99</subtotal>
+      <discountPercentage>0</discountPercentage>
+      <tax>22.50</tax>
+      <orderTotal>272.49</orderTotal>
+    </totals>
+  </order>
+</orders>

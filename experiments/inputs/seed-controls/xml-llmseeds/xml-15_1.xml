@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<wellformed_example version="1.0">
+  <header>
+    <title>Well-formed XML Document</title>
+  </header>
+  <content>
+    <section id="1">
+      <paragraph>This XML document demonstrates strict syntax rules.</paragraph>
+      <nested_example attribute1="value1" attribute2="value2"/>
+      <self_closing_tag name="example"/>
+      <cdata_section>&lt;![CDATA[This is CDATA content that won't be parsed as XML.]]&gt;</cdata_section>
+    </section>
+  </content>
+</wellformed_example>

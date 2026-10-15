@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<project xmlns:xml11="http://www.w3.org/XML/1.999" version="1.1">
+  <file name="report.xml" type="config" size="1024">Configuration file for the project</file>
+  <file name="data.csv" type="data" size="2048">Data file containing project statistics</file>
+  <directory name="assets" type="folder" permissions="rw-r--r--"/>
+  <specification version="1.1" conformance="extended">
+    <features>
+      <unicode support="extended" description="Support for extended Unicode characters (U+20000 to U+2FFFF and beyond)"/>
+      <normalization control="enabled" description="Normalization control with NFKC_Casefold and other options"/>
+    </features>
+  </specification>
+</project>

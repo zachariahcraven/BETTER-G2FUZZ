@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<jsonld_transformation xmlns:jsonld="http://www.w3.org/ns/json-ld#">
+  <metadata>
+    <source_format>JSON-LD</source_format>
+    <target_format>XML</target_format>
+    <method>XSLT or XML-to-JSON converter</method>
+  </metadata>
+  <context name="BookContext">
+    <term jsonld_term="@context">http://schema.org/</term>
+    <term jsonld_term="Book">http://schema.org/Book</term>
+    <term jsonld_term="name">http://schema.org/name</term>
+    <term jsonld_term="author">http://schema.org/author</term>
+    <term jsonld_term="datePublished">http://schema.org/datePublished</term>
+  </context>
+  <data type="Book">
+    <id>http://example.org/books/1</id>
+    <name>The Great Gatsby</name>
+    <author type="Person">
+      <name>F. Scott Fitzgerald</name>
+    </author>
+    <datePublished>1925</datePublished>
+  </data>
+  <transformation_rules>
+    <rule from="jsonld:Book" to="xml:book"/>
+    <xslt_snippet>&lt;xsl:template match=&quot;jsonld:Book&quot;&gt;
+    &lt;book&gt;
+        &lt;title&gt;&lt;xsl:value-of select=&quot;jsonld:name&quot;/&gt;&lt;/title&gt;
+        &lt;author&gt;&lt;xsl:value-of select=&quot;jsonld:author/jsonld:name&quot;/&gt;&lt;/author&gt;
+        &lt;year&gt;&lt;xsl:value-of select=&quot;jsonld:datePublished&quot;/&gt;&lt;/year&gt;
+    &lt;/book&gt;
+&lt;/xsl:template&gt;</xslt_snippet>
+  </transformation_rules>
+</jsonld_transformation>

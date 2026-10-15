@@ -1,0 +1,66 @@
+<?xml version="1.0" ?>
+<wellformed_example version="1.0">
+  <header>
+    <title>Well-formed XML Document with XSD Support</title>
+  </header>
+  <content>
+    <section id="1">
+      <paragraph>This XML document demonstrates strict syntax rules.</paragraph>
+      <nested_example attribute1="value1" attribute2="value2"/>
+      <self_closing_tag name="example"/>
+      <cdata_section>&lt;![CDATA[This is CDATA content that won't be parsed as XML.]]&gt;</cdata_section>
+      <xsd_support>
+        <description>Provides a more powerful and extensible schema language than DTDs, supporting data typing, namespaces, complex element/attribute constraints, and inheritance.</description>
+        <features>
+          <feature>Data typing (e.g., string, integer, date)</feature>
+          <feature>Namespace support for element/attribute scoping</feature>
+          <feature>Complex element and attribute constraints</feature>
+          <feature>Element/attribute inheritance and substitution groups</feature>
+        </features>
+        <xsd_example>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;xs:schema xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+  &lt;xs:element name=&quot;person&quot;&gt;
+    &lt;xs:complexType&gt;
+      &lt;xs:sequence&gt;
+        &lt;xs:element name=&quot;name&quot; type=&quot;xs:string&quot;/&gt;
+        &lt;xs:element name=&quot;age&quot; type=&quot;xs:integer&quot;/&gt;
+      &lt;/xs:sequence&gt;
+    &lt;/xs:complexType&gt;
+  &lt;/xs:element&gt;
+&lt;/xs:schema&gt;</xsd_example>
+      </xsd_support>
+      <xmldsig_support>
+        <description>Enables digital signatures for XML documents, ensuring authenticity, integrity, and non-repudiation of XML content or parts thereof.</description>
+        <features>
+          <feature>Digital signatures for authenticity and integrity</feature>
+          <feature>Support for signing entire documents or specific parts</feature>
+          <feature>Non-repudiation capabilities</feature>
+          <feature>Standardized by W3C as XML Signature (XMLDSig)</feature>
+        </features>
+        <xmldsig_example>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;Signature xmlns=&quot;http://www.w3.org/2000/09/xmldsig#&quot;&gt;
+  &lt;SignedInfo&gt;
+    &lt;CanonicalizationMethod Algorithm=&quot;http://www.w3.org/2001/10/xml-exc-c14n#&quot;/&gt;
+    &lt;SignatureMethod Algorithm=&quot;http://www.w3.org/2000/09/xmldsig#rsa-sha1&quot;/&gt;
+    &lt;Reference URI=&quot;#content&quot;&gt;
+      &lt;Transforms&gt;
+        &lt;Transform Algorithm=&quot;http://www.w3.org/2001/10/xml-exc-c14n#&quot;/&gt;
+      &lt;/Transforms&gt;
+      &lt;DigestMethod Algorithm=&quot;http://www.w3.org/2000/09/xmldsig#sha1&quot;/&gt;
+      &lt;DigestValue&gt;base64-encoded-digest-value&lt;/DigestValue&gt;
+    &lt;/Reference&gt;
+  &lt;/SignedInfo&gt;
+  &lt;SignatureValue&gt;base64-encoded-signature&lt;/SignatureValue&gt;
+  &lt;KeyInfo&gt;
+    &lt;KeyValue&gt;
+      &lt;RSAKeyValue&gt;
+        &lt;Modulus&gt;modulus-value&lt;/Modulus&gt;
+        &lt;Exponent&gt;exponent-value&lt;/Exponent&gt;
+      &lt;/RSAKeyValue&gt;
+    &lt;/KeyValue&gt;
+  &lt;/KeyInfo&gt;
+&lt;/Signature&gt;</xmldsig_example>
+      </xmldsig_support>
+    </section>
+  </content>
+</wellformed_example>

@@ -1,12 +1,15 @@
 #
 # G2Fuzz image for development and experiments.
 #
-# Based on the upstream AFL++ Dockerfile (../Dockerfile) with these changes:
+# Based on the upstream AFL++ Dockerfile (afl/Dockerfile) with these changes:
 #   - builds `make source-only` instead of `make distrib` (no QEMU/Unicorn/Frida modes)
 #   - drops rustup and afl-cov (not needed for G2Fuzz)
 #   - keeps optional make steps non-fatal (no `sed` on GNUmakefile)
 #   - installs the `openai` Python package G2Fuzz needs, plus pillow and numpy for generators
-#   - prebuilds fuzz targets into /targets (currently: jhead)
+#   - prebuilds every fuzz target into /targets: <name>.afl, .cmp (CmpLog) and .asan (crash triage),
+#     plus its stock seeds in /targets/seeds/<name>/ (built by targets/<folder>/build.sh)
+#
+# Layout in the image: /AFLplusplus is afl/ (AFL++), /AFLplusplus/g2fuzz is g2fuzz/ (afl-fuzz -k).
 #
 # Build from the repo root:
 #   docker build -f docker/Dockerfile.g2fuzz -t g2fuzz:dev .
@@ -74,30 +77,38 @@ ENV AFL_TRY_AFFINITY=1
 ENV AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1
 
 WORKDIR /AFLplusplus
-COPY . .
+COPY afl/ .
 
 ARG CC=gcc-$GCC_VERSION
 ARG CXX=g++-$GCC_VERSION
 
 RUN make clean && make source-only && make install
-
-# Fail the build early if the pieces G2Fuzz needs are missing
 RUN command -v afl-fuzz && command -v afl-clang-fast && \
-    test -f /AFLplusplus/generator_mutation.py && \
-    test ! -s /AFLplusplus/openai_key.txt && \
     python -c "import openai, PIL, numpy; print('openai', openai.__version__, 'pillow', PIL.__version__, 'numpy', numpy.__version__)"
 
-# ---- Fuzz targets: prebuilt into /targets/<name>.afl and /targets/<name>.cmp ----
-# Pinned commits so every teammate fuzzes the same binary.
+# ---- Fuzz targets: /targets/<name>.{afl,cmp,asan} and /targets/seeds/<name>/ ----
+# Pinned sources (commits or checksummed tarballs) so every teammate fuzzes the same binary.
+# Libraries the TIFF and PNG targets link against are Ubuntu's builds, not instrumented: coverage is
+# measured in libtiff/libpng only, but deflate- and JPEG-compressed images still decode.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends autoconf zlib1g-dev libjpeg-turbo8-dev && \
+    rm -rf /var/lib/apt/lists/*
+COPY targets/common /opt/g2f-targets/common
+COPY targets/jhead /opt/g2f-targets/jhead
+RUN bash /opt/g2f-targets/jhead/build.sh /targets
+COPY targets/libtiff /opt/g2f-targets/libtiff
+RUN bash /opt/g2f-targets/libtiff/build.sh /targets
+COPY targets/libpng /opt/g2f-targets/libpng
+RUN bash /opt/g2f-targets/libpng/build.sh /targets
+COPY targets/libxml2 /opt/g2f-targets/libxml2
+RUN bash /opt/g2f-targets/libxml2/build.sh /targets
+COPY targets/doom /opt/g2f-targets/doom
+RUN bash /opt/g2f-targets/doom/build.sh /targets
 
-# jhead (JPEG/EXIF), from the G2Fuzz paper's target list
-ARG JHEAD_COMMIT=5007491cdc8c727c16ea6a27734535cfd0ed4349
-RUN git clone -q https://github.com/Matthias-Wandel/jhead /targets/src/jhead && \
-    cd /targets/src/jhead && git checkout -q ${JHEAD_COMMIT} && \
-    make CC=afl-clang-fast && cp jhead /targets/jhead.afl && \
-    make clean && AFL_LLVM_CMPLOG=1 make CC=afl-clang-fast && cp jhead /targets/jhead.cmp && \
-    afl-showmap -q -o /tmp/map -- /targets/jhead.afl /AFLplusplus/testcases/images/jpeg/not_kitty.jpg && \
-    test -s /tmp/map && rm /tmp/map
+# ---- G2Fuzz's Python layer, last: it changes most often and rebuilds in seconds ----
+COPY g2fuzz/ /AFLplusplus/g2fuzz/
+RUN test -f /AFLplusplus/g2fuzz/generator_mutation.py && test -f /AFLplusplus/g2fuzz/program_gen.py && \
+    test ! -e /AFLplusplus/g2fuzz/openai_key.txt
 
 RUN echo "export PS1='[g2fuzz \h] \w \$ '" >> ~/.bashrc
 

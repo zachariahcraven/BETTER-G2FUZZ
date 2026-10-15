@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data_with_special_chars><![CDATA[This contains <special> characters like & and < that would normally need escaping]]></data_with_special_chars>
+  <code_example><![CDATA[
+function example() {
+    if (x < 5 && y > 3) {
+        return x & y;
+    }
+}
+]]></code_example>
+</root>

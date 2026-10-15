@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <feature>
+        <name>Version and encoding declaration</name>
+        <description>XML documents can begin with a prolog specifying version (typically 1.0 or 1.1) and encoding, aiding parsers.</description>
+    </feature>
+    <feature>
+        <name>General and parameter entity declaration/reuse</name>
+        <description>Supports user-defined entities (both internal and external) for text substitution and modular document construction.</description>
+    </feature>
+</root>

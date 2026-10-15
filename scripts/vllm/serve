@@ -1,0 +1,35 @@
+#!/bin/bash
+# serve: start a vLLM model server on a Tempest GPU, for chat and for scripts/fuzz runs.
+#
+# Usage: scripts/vllm/serve <model> [hours]      (default 2 h; partition max 14 days)
+#   Models: the serve-<model>.sbatch files next to this script.
+#   Log: $G2F_VLLM_DIR/<model>-<jobid>.out   Endpoint while running: $G2F_VLLM_DIR/endpoints/<model>.env
+#   Use it in a run:  set -a; . ~/llm-jobs/endpoints/<model>.env; set +a; scripts/fuzz run <campaign>
+#   Quick check:      scripts/vllm/llm-test <model>      Stop: scancel <jobid>
+# Settings: G2F_VLLM_DIR [~/llm-jobs]; G2F_VLLM_ACCOUNT, G2F_VLLM_PARTITION, G2F_VLLM_GRES
+#   override the sbatch file (note: changing the GPU count needs a matching TP in the file);
+#   G2F_VLLM_EXCLUDE: nodes to avoid, e.g. gpu049
+set -euo pipefail
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+die() { echo "serve: $*" >&2; exit 1; }
+
+M="${1:-}"; H="${2:-2}"
+models=$(cd "$HERE" && ls serve-*.sbatch | sed 's/^serve-//; s/\.sbatch$//' | paste -sd ' ')
+[ -n "$M" ] || die "usage: scripts/vllm/serve <model> [hours]. Models: $models"
+[ -f "$HERE/serve-$M.sbatch" ] || die "unknown model '$M'. Models: $models"
+[[ "$H" =~ ^[0-9]+$ ]] && [ "$H" -ge 1 ] || die "hours must be a whole number >= 1"
+command -v sbatch >/dev/null || die "run this on Tempest"
+
+DIR="${G2F_VLLM_DIR:-$HOME/llm-jobs}"
+mkdir -p "$DIR"
+# Optional overrides of the sbatch file's account/partition/GPUs, e.g. to queue on gpufairshare:
+#   G2F_VLLM_ACCOUNT=group-... G2F_VLLM_PARTITION=gpufairshare G2F_VLLM_GRES=gpu:h100:1 scripts/vllm/serve ...
+extra=()
+[ -n "${G2F_VLLM_ACCOUNT:-}" ] && extra+=(--account="$G2F_VLLM_ACCOUNT")
+[ -n "${G2F_VLLM_PARTITION:-}" ] && extra+=(--partition="$G2F_VLLM_PARTITION")
+[ -n "${G2F_VLLM_GRES:-}" ] && extra+=(--gres="$G2F_VLLM_GRES")
+[ -n "${G2F_VLLM_EXCLUDE:-}" ] && extra+=(--exclude="$G2F_VLLM_EXCLUDE")
+id=$(sbatch --parsable --time=$((H * 60)) --output="$DIR/%x-%j.out" "${extra[@]}" \
+  --export=ALL,VLLM_SERVE="$HERE/vllm-serve.sh",G2F_VLLM_DIR="$DIR" "$HERE/serve-$M.sbatch")
+echo "submitted $M as job ${id%%;*} for $H h. Log: $DIR/$M-${id%%;*}.out"
+echo "ready in ~2-5 min once it has a GPU: scripts/vllm/llm-test $M"

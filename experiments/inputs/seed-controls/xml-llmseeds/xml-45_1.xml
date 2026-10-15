@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <feature>
+        <name>Version and encoding declaration</name>
+        <description>XML documents can begin with a prolog specifying version (typically 1.0 or 1.1) and encoding, aiding parsers.</description>
+    </feature>
+    <feature>
+        <name>ID/IDREF/IDREFS type support</name>
+        <description>Built-in schema types for defining unique identifiers and references between elements (often used for internal linking and integrity).</description>
+    </feature>
+    <feature>
+        <name>External entity inclusion</name>
+        <description>Permits inclusion of external resources (e.g., DTD subsets, parsed/unparsed entities) via external entity references.</description>
+    </feature>
+</root>

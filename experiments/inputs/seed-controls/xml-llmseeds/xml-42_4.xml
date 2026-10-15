@@ -1,0 +1,16 @@
+<?xml-stylesheet type="text/xsl" href="products.xsl"?>
+<?xml version="1.0" ?>
+<products>
+  <!-- XSLT transformation: Apply 'summary-view' template for this product -->
+  <!-- XSLT transformation: Apply 'detailed-view' template for this product -->
+  <product id="P001" transform-type="detailed">
+    <name>Laptop</name>
+    <price currency="USD">999.99</price>
+    <description>High-performance laptop for professionals</description>
+  </product>
+  <product id="P002" transform-type="summary">
+    <name>Mouse</name>
+    <price currency="USD">29.99</price>
+    <description>Wireless optical mouse</description>
+  </product>
+</products>

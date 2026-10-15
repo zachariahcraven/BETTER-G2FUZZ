@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<world>
+  <continent name="Asia">
+    <country code="JP">
+      <name>Japan</name>
+      <city population="13960000">
+        <name>Tokyo</name>
+        <district type="special">
+          <name>Shinjuku</name>
+        </district>
+      </city>
+    </country>
+  </continent>
+  <continent name="Europe">
+    <country code="FR">
+      <name>France</name>
+      <city population="2148000">
+        <name>Paris</name>
+        <district type="administrative">
+          <name>1st Arrondissement</name>
+        </district>
+      </city>
+    </country>
+  </continent>
+</world>

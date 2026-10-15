@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<encrypted_data xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><algorithm>AES-256-CBC</algorithm><data_reference>./tmp/invoice.xml</data_reference><ds:KeyInfo><ds:KeyName>encryption-key-2023-001</ds:KeyName><ds:MgmtData>Key managed by secure key management service</ds:MgmtData><ds:KeyValue><ds:RSAKeyValue><ds:Modulus>ANz9CwAAAQBaY2V4dHJhY3RlZGtleWluZm9ybWF0aW9uZm9yZXhmaWxlc3VwZm9ydGV4dGVuc2liaWxpdHk=</ds:Modulus><ds:Exponent>AQAB</ds:Exponent></ds:RSAKeyValue></ds:KeyValue></ds:KeyInfo></encrypted_data>

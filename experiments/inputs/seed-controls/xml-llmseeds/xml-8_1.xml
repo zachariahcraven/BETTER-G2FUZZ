@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This is a configuration file -->
+<configuration>
+    <!-- Database settings -->
+    <database>
+        <host>localhost</host>
+        <port>5432</port>
+        <name>my_database</name>
+    </database>
+    
+    <!-- Application settings -->
+    <application>
+        <name>MyApplication</name>
+        <version>1.0.0</version>
+        <!-- Debug mode enabled for development -->
+        <debug>true</debug>
+    </application>
+</configuration>

@@ -1,0 +1,20 @@
+<!DOCTYPE root [
+  <!ENTITY company "Example Corp">
+  <!ENTITY city "New York">
+  <!ENTITY symbol "&copy;">
+  <!ENTITY less_than "&lt;">
+  <!ENTITY ampersand "&amp;">
+  <!ENTITY xquery_support "XQuery 1.0/3.1 support: Allows querying and transformation of XML data using the XQuery language, supporting FLWOR expressions, full-text search, and more.">
+]>
+<root>
+  <info>
+    <company>&company;</company>
+    <location>&city;</location>
+    <copyright>&symbol;</copyright>
+    <escaped>Use &less_than; and &amp; for XML escaping</escaped>
+  </info>
+  <note>Entity references allow reuse: &company; is based in &city;.</note>
+  <features>
+    <feature>&xquery_support;</feature>
+  </features>
+</root>

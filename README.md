@@ -5,17 +5,17 @@ Goal: replace G2Fuzz's random generator selection with a multi-armed bandit sche
 
 | Doc | Purpose |
 | --- | --- |
-| [SETUP.md](SETUP.md) | One-time setup and a first run. **Start here.** |
-| [WORKFLOW.md](WORKFLOW.md) | Day-to-day commands, code changes, Git |
-| [team-docs/CATCHAT_API_KEY.md](team-docs/CATCHAT_API_KEY.md) | Get a free MSU CatChat API key |
-| [team-docs/TEMPEST.md](team-docs/TEMPEST.md) | Run campaigns on MSU's Tempest cluster |
+| [docs/SETUP.md](docs/SETUP.md) | One-time setup and a first run. **Start here.** |
+| [docs/WORKFLOW.md](docs/WORKFLOW.md) | Day-to-day commands, code changes, Git |
+| [docs/CATCHAT_API_KEY.md](docs/CATCHAT_API_KEY.md) | Get a free MSU CatChat API key |
+| [docs/TEMPEST.md](docs/TEMPEST.md) | Run campaigns on MSU's Tempest cluster |
 
 Work happens on the `dev` branch. `main` tracks the upstream version.
 
 ---
 
 *The rest of this file is the upstream G2FUZZ README. It describes a native (non-Docker) setup.
-For our setup, follow [SETUP.md](SETUP.md).*
+For our setup, follow [docs/SETUP.md](docs/SETUP.md).*
 
 # Description
 Modern software often accepts inputs with highly complex grammars. To conduct greybox fuzzing and uncover security bugs in such software, it is essential to generate inputs that conform to the software input grammar. However, this is a well-known challenging task because it requires a deep understanding of the grammar, which is often not available and hard to infer. Recent advances in large language models (LLMs) have shown that they can be used to synthesize high-quality natural language text and code that conforms to the grammar of a given input format. Nevertheless, LLMs are often incapable or too costly to generate non-textual outputs, such as images, videos, and PDF files. This limitation hinders the application of LLMs in grammar-aware fuzzing.
@@ -36,7 +36,7 @@ pip install openai==1.63.2
 cd evaluation_path
 git clone https://github.com/G2FUZZ/G2FUZZ
 cp ./G2FUZZ/openai_key.txt .
-cp ./G2FUZZ/program_to_format.json .
+cp ./G2FUZZ/g2fuzz/program_to_format.json .
 cp ./G2FUZZ/model_setting.json .
 ```
 
@@ -53,12 +53,12 @@ The method for compiling the target program is also consistent with AFL++, requi
 ## Step II: Run seed generation to get init output
 ```
 cd evaluation_path
-python ./G2FUZZ/program_gen.py --output ./<program_name>_output --program <program_name>
+python ./G2FUZZ/g2fuzz/program_gen.py --output ./<program_name>_output --program <program_name>
 ```
 
 For example:
 ```
-python ./G2FUZZ/program_gen.py --output ./jhead_output --program jhead
+python ./G2FUZZ/g2fuzz/program_gen.py --output ./jhead_output --program jhead
 ```
 
 ## Step III: Run fuzzing

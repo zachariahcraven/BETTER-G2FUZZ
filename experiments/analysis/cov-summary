@@ -1,0 +1,134 @@
+#!/usr/bin/env python3
+"""Summarize coverage measured outside the fuzzer for G2Fuzz campaigns."""
+import argparse
+import csv
+import glob
+import json
+import os
+import re
+import sys
+
+
+def parse_campaign_name(name):
+    """Parse a campaign filename (without .json) into (target, model, rep)."""
+    b = re.match(r"bandit-([a-z]+)-(\w+)-r(\d+)$", name)
+    if b:
+        return b.group(1), "sched-" + b.group(2), int(b.group(3))
+    m = re.match(r"(lineup|tiff|png|xml|wad)(\d+h)?-(.+)-r(\d+)$", name)
+    if m:
+        t = "jhead" if m.group(1) == "lineup" else m.group(1)
+        return t + ("-" + m.group(2) if m.group(2) else ""), m.group(3), int(m.group(4))
+    return None
+
+
+def median(values):
+    """Return the median as an integer (even count: floor of mean of middle two)."""
+    v = sorted(values)
+    n = len(v)
+    if n % 2:
+        return v[n // 2]
+    return (v[n // 2 - 1] + v[n // 2]) // 2
+
+
+def _ranks(values):
+    """Assign average ranks for ties."""
+    order = sorted(range(len(values)), key=lambda i: values[i])
+    r = [0.0] * len(values)
+    i = 0
+    while i < len(values):
+        j = i
+        while j + 1 < len(values) and values[order[j + 1]] == values[order[i]]:
+            j += 1
+        for k in range(i, j + 1):
+            r[order[k]] = (i + j) / 2 + 1
+        i = j + 1
+    return r
+
+
+def spearman(x, y):
+    """Compute Spearman rank correlation coefficient."""
+    rx, ry = _ranks(x), _ranks(y)
+    mx, my = sum(rx) / len(rx), sum(ry) / len(ry)
+    num = sum((a - mx) * (b - my) for a, b in zip(rx, ry))
+    den = (sum((a - mx) ** 2 for a in rx) * sum((b - my) ** 2 for b in ry)) ** 0.5
+    return num / den if den else 0.0
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Summarize G2Fuzz coverage results.")
+    parser.add_argument("--cov", default="results/cov", help="Directory of campaign JSON files")
+    parser.add_argument("--out", default="results/tables/cov-results.csv", help="Output CSV path")
+    args = parser.parse_args()
+
+    campaigns = []
+    for path in sorted(glob.glob(os.path.join(args.cov, "*.json"))):
+        name = os.path.basename(path)[:-5]
+        parsed = parse_campaign_name(name)
+        if not parsed:
+            print(f"skipping {name}: unrecognized campaign name", file=sys.stderr)
+            continue
+        try:
+            with open(path) as f:
+                data = json.load(f)
+            seeds = data["seeds"]
+            queue = data["queue"]
+        except Exception:
+            print(f"skipping {name}: unreadable or malformed JSON", file=sys.stderr)
+            continue
+
+        target, model, rep = parsed
+        generators = len([g for g in seeds.get("per_generator", {}) if g != "stock"])
+        campaigns.append({
+            "campaign": name,
+            "target": target,
+            "model": model,
+            "rep": rep,
+            "seed_files": seeds["files"],
+            "seed_edges": seeds["total_edges"],
+            "new_edges": seeds["new_edges"],
+            "generators": generators,
+            "queue_edges": queue["total_edges"],
+        })
+
+    # Write CSV sorted by campaign
+    campaigns.sort(key=lambda c: c["campaign"])
+    fieldnames = ["campaign", "target", "model", "rep", "seed_files", "seed_edges",
+                  "new_edges", "generators", "queue_edges"]
+    with open(args.out, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(campaigns)
+
+    # Build per-(target, model) table
+    groups = {}
+    for c in campaigns:
+        key = (c["target"], c["model"])
+        groups.setdefault(key, []).append(c)
+
+    table_rows = []
+    for (target, model), vs in groups.items():
+        table_rows.append((
+            target, model, len(vs),
+            median([v["seed_edges"] for v in vs]),
+            median([v["new_edges"] for v in vs]),
+            median([v["queue_edges"] for v in vs]),
+        ))
+    table_rows.sort(key=lambda r: (r[0], -r[5]))
+
+    for target, model, runs, m_seed, m_new, m_queue in table_rows:
+        print(f"{target} {model} {runs} {m_seed} {m_new} {m_queue}")
+
+    # Spearman per target (exclude baseline and sched-*)
+    for target in sorted({c["target"] for c in campaigns}):
+        vs = [c for c in campaigns
+              if c["target"] == target
+              and c["model"] != "baseline"
+              and not c["model"].startswith("sched-")]
+        if len(vs) < 4:
+            continue
+        rho = spearman([v["seed_edges"] for v in vs], [v["queue_edges"] for v in vs])
+        print(f"spearman {target}: rho={rho:.2f} n={len(vs)}")
+
+
+if __name__ == "__main__":
+    main()

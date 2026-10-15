@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='utf-8'?>
+<invoices><invoice><invoice_id>INV-2023-001</invoice_id><date>2023-10-15</date><customer>Acme Corp</customer><line_item><description>Consulting Services</description><quantity>40</quantity><unit_price>150.00</unit_price></line_item></invoice></invoices>

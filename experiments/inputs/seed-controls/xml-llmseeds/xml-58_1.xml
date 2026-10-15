@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root><data_with_special_chars>This contains &lt;special&gt; characters like &amp; and &lt; that would normally need escaping</data_with_special_chars><code_example>function example() {
+    if (x &lt; 5 &amp;&amp; y &gt; 3) {
+        return x &amp; y;
+    }
+}</code_example><xquery_update_facility>&lt;!-- Example XQuery Update expressions for modifying XML content --&gt;
+let $doc := doc("example.xml")
+return (
+    insert nodes &lt;new-element&gt;content&lt;/new-element&gt; into $doc/root,
+    delete nodes $doc/root/old-element,
+    replace value of node $doc/root/target-element with "updated content"
+)</xquery_update_facility></root>

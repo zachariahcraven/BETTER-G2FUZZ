@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<xquery-examples>
+  <flwor-example id="1">
+    <description>Find all books published after 1940 with titles starting with 'The'</description>
+    <query>for $b in //book
+where $b/year &gt; 1940 and starts-with($b/title, &quot;The&quot;)
+return &lt;result&gt;{$b/title}&lt;/result&gt;</query>
+  </flwor-example>
+  <functional-example id="2">
+    <description>Calculate average publication year of all books</description>
+    <query>let $books := //book
+let $years := for $b in $books return number($b/year)
+let $count := count($years)
+let $sum := sum($years)
+return &lt;average-year&gt;{$sum div $count}&lt;/average-year&gt;</query>
+  </functional-example>
+  <construction-example id="3">
+    <description>Construct a new element with transformed book data</description>
+    <query>for $b in //book
+return &lt;book-summary id=&quot;{$b/@id}&quot;&gt;
+         &lt;title&gt;{$b/title/text()}&lt;/title&gt;
+         &lt;author&gt;{$b/author/text()}&lt;/author&gt;
+         &lt;year&gt;{$b/year/text()}&lt;/year&gt;
+       &lt;/book-summary&gt;</query>
+  </construction-example>
+  <fulltext-example id="4">
+    <description>Search for books containing 'society' in their content</description>
+    <query>for $b in //book
+where $b/content contains text &quot;society&quot;
+return $b/title</query>
+  </fulltext-example>
+  <module-example id="5">
+    <description>Import and use a standard XQuery module</description>
+    <query>import module namespace math = &quot;http://www.w3.org/2005/xpath-functions/math&quot;;
+ 
+for $b in //book
+let $year := number($b/year)
+where math:sin($year) &gt; 0
+return $b/title</query>
+  </module-example>
+</xquery-examples>

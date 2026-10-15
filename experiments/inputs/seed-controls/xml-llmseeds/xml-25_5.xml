@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE documentation [
+  <!-- General entities for text substitution -->
+  <!ENTITY companyname "TechCorp Solutions">
+  <!ENTITY version "2.0">
+  <!ENTITY release-date "2023-10-15">
+  <!ENTITY contact-email "support@techcorp.com">
+  <!ENTITY website "https://www.techcorp.com">
+  
+  <!-- Parameter entities for modularity in the DTD -->
+  <!ENTITY % person-info "
+    <!ENTITY first-name 'John'>
+    <!ENTITY last-name 'Doe'>
+    <!ENTITY position 'Senior Developer'>
+  ">
+  
+  <!-- External entity (commented as it's not supported in this example) -->
+  <!-- <!ENTITY external-content SYSTEM "external-data.xml"> -->
+]>
+<documentation>
+  <!-- Using general entities -->
+  <project>
+    <name>&companyname; Documentation</name>
+    <version>&version;</version>
+    <release-date>&release-date;</release-date>
+  </project>
+  
+  <!-- Using parameter entities (must be declared before use) -->
+  &person-info;
+  
+  <team-member>
+    <full-name>&first-name; &last-name;</full-name>
+    <role>&position;</role>
+    <contact>&contact-email;</contact>
+  </team-member>
+  
+  <!-- Another team member with different values -->
+  <team-member>
+    <full-name>&first-name; &last-name; (Alternate)</full-name>
+    <role>&position; (Alternate)</role>
+    <contact>backup@techcorp.com</contact>
+  </team-member>
+  
+  <!-- Using website entity -->
+  <support-info>
+    <website>&website;</website>
+    <helpdesk>&contact-email;</helpdesk>
+  </support-info>
+  
+  <!-- Entity reuse demonstration -->
+  <footer>
+    <copyright>&companyname; &release-date;. All rights reserved.</copyright>
+    <contact>&contact-email;</contact>
+  </footer>
+</documentation>

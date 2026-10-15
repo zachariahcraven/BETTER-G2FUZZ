@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<company>
+  <department name="Engineering">
+    <team name="Backend">
+      <employee id="E001">
+        <name>Alice Johnson</name>
+        <role>Senior Developer</role>
+        <skills>
+          <skill>Python</skill>
+          <skill>Java</skill>
+        </skills>
+      </employee>
+      <employee id="E002">
+        <name>Bob Smith</name>
+        <role>Developer</role>
+        <skills>
+          <skill>Node.js</skill>
+        </skills>
+      </employee>
+    </team>
+  </department>
+  <department name="Marketing">
+    <team name="Digital">
+      <employee id="M001">
+        <name>Carol Davis</name>
+        <role>Marketing Manager</role>
+      </employee>
+    </team>
+  </department>
+</company>

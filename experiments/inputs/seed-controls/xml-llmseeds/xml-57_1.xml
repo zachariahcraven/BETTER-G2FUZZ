@@ -1,0 +1,36 @@
+<!DOCTYPE root [
+  <!ENTITY company "Example Corp">
+  <!ENTITY city "New York">
+  <!ENTITY symbol "&copy;">
+  <!ENTITY less_than "&lt;">
+  <!ENTITY ampersand "&amp;">
+  <!ENTITY xquery_support "XQuery 1.0/3.1 support: Allows querying and transformation of XML data using the XQuery language, supporting FLWOR expressions, full-text search, and more.">
+  <!ENTITY xpointer_xlink_support "XPointer and XLink support: Facilitates fragment identification and linking within or across XML documents (XPointer for addressing; XLink for hyperlinks).">
+  <!ENTITY char_data_normalization "Character data normalization and whitespace handling control: Allows fine-grained control over whitespace significance via xml:space attributes and schema-based whitespace facets.">
+  <!ENTITY xinclude_support "XInclude support: Permits inclusion of external XML fragments via &lt;xi:include&gt;, enabling modular document composition without entity workarounds.">
+]>
+<root xmlns:xi="http://www.w3.org/2001/XInclude">
+  <info>
+    <company>&company;</company>
+    <location>&city;</location>
+    <copyright>&symbol;</copyright>
+    <escaped>Use &less_than; and &amp; for XML escaping</escaped>
+  </info>
+  <note>Entity references allow reuse: &company; is based in &city;.</note>
+  <features>
+    <feature>&xquery_support;</feature>
+    <feature>&xpointer_xlink_support;</feature>
+    <feature>&char_data_normalization;</feature>
+    <feature>&xinclude_support;</feature>
+  </features>
+  <!-- Example demonstrating xml:space attribute for whitespace handling control -->
+  <whitespace_control>
+    <preformatted xml:space="preserve">   This preserves   all whitespace
+   including leading, trailing, and internal spaces.   </preformatted>
+    <normalized xml:space="default">   This text has whitespace significance determined by the application.   </normalized>
+  </whitespace_control>
+  <!-- Example demonstrating XInclude support (commented out as actual external files are not present) -->
+  <xinclude_example>
+    <xi:include href="external_fragment.xml" parse="xml" xpointer="element(1)"/>
+  </xinclude_example>
+</root>

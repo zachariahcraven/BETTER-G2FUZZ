@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<documents>
+  <document id="doc1" title="Poem with Preserved Whitespace" xml:space="preserve">
+    <content>    The Road Not Taken
+    Robert Frost
+    
+    Two roads diverged in a yellow wood,
+    And sorry I could not travel both
+    And be one traveler, long I stood
+    And looked down one as far as I could
+    To where it bent in the undergrowth;
+    
+    Then took the other, as just as fair,
+    And having perhaps the better claim,
+    Because it was grassy and wanted wear;
+    Though as for that the passing there
+    Had worn them really about the same,
+    </content>
+  </document>
+  <document id="doc2" title="Formatted Text with Normalized Whitespace" xml:space="default">
+    <content>    This    is    a    paragraph    with    extra    spaces.
+    XML    processors    will    normalize    this    to    single    spaces
+    when    xml:space=&quot;default&quot;    is    used.
+    </content>
+  </document>
+  <document id="doc3" title="Mixed Whitespace Handling">
+    <content>
+      <code xml:space="preserve">def hello():
+    print(&quot;Hello, World!&quot;)
+    if True:
+        print(&quot;Indented&quot;)
+</code>
+      <text xml:space="default">    This    text    will    have    its    whitespace    normalized.
+    Multiple    spaces    become    single    spaces.
+    </text>
+    </content>
+  </document>
+</documents>

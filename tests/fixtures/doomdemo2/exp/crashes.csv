@@ -1,0 +1,43 @@
+campaign,target,model,rep,crash,kind,frames
+wad-baseline-r1,wad,baseline,1,"id:000050,sig:11,src:000381,time:786833,execs:123705,op:colorization,rep:2",global-buffer-overflow,R_CheckPlane r_plane.c:306 | R_StoreWallRange r_segs.c:706 | R_ClipPassWallSegment r_bsp.c:222
+wad-baseline-r1,wad,baseline,1,"id:000066,sig:11,src:000466,time:1813895,execs:349510,op:quick,pos:34799",negative-size-param,P_LoadBlockMap p_setup.c:535 | P_SetupLevel p_setup.c:796 | G_DoLoadLevel g_game.c:655
+wad-baseline-r1,wad,baseline,1,"id:000070,sig:11,src:000498,time:1973737,execs:383658,op:colorization,rep:1",stack-overflow,P_CrossSubsector p_sight.c:129 | P_CrossBSPNode p_sight.c:279 | P_CrossBSPNode p_sight.c:279
+wad-baseline-r2,wad,baseline,2,"id:000048,sig:11,src:000323,time:1178858,execs:74291,op:colorization,rep:1",heap-buffer-overflow,P_BlockLinesIterator p_maputl.c:492 | P_CheckPosition p_map.c:465 | P_TryMove p_map.c:490
+wad-baseline-r4,wad,baseline,4,"id:000042,sig:11,src:000411,time:2243818,execs:146309,op:quick,pos:17588",SEGV,P_CheckMeleeRange p_enemy.c:178 | A_Chase p_enemy.c:711 | P_SetMobjState p_mobj.c:72
+wad-codernext-r1,wad,codernext,1,"id:000013,sig:11,src:000005,time:338979,execs:37365,op:quick,pos:34799",negative-size-param,P_LoadBlockMap p_setup.c:535 | P_SetupLevel p_setup.c:796 | G_DoLoadLevel g_game.c:655
+wad-codernext-r1,wad,codernext,1,"id:000040,sig:11,src:000386,time:790485,execs:103437,op:inf,rep:3",stack-overflow,P_CrossBSPNode p_sight.c:279 | P_CrossBSPNode p_sight.c:279 | P_CrossBSPNode p_sight.c:279
+wad-codernext-r1,wad,codernext,1,"id:000055,sig:11,src:000872,time:1530079,execs:163415,op:havoc,rep:1",signal-4,
+wad-codernext-r1,wad,codernext,1,"id:000061,sig:11,src:000003,time:2003304,execs:228651,op:quick,pos:19,val:+3",heap-buffer-overflow,P_CheckSight p_sight.c:321 | P_LookForPlayers p_enemy.c:517 | A_Look p_enemy.c:611
+wad-codernext-r1,wad,codernext,1,"id:000069,sig:11,src:001215,time:2695646,execs:303947,op:inf,rep:3",heap-buffer-overflow,P_BlockLinesIterator p_maputl.c:492 | P_CheckPosition p_map.c:465 | P_TryMove p_map.c:490
+wad-codernext-r2,wad,codernext,2,"id:000011,sig:11,src:000005,time:151137,execs:18107,op:quick,pos:13988",SEGV,P_CheckMeleeRange p_enemy.c:178 | A_Chase p_enemy.c:711 | P_SetMobjState p_mobj.c:72
+wad-codernext-r2,wad,codernext,2,"id:000051,sig:11,src:000610,time:1269183,execs:138747,op:int16,pos:29041,val:+0",global-buffer-overflow,R_CheckPlane r_plane.c:306 | R_StoreWallRange r_segs.c:709 | R_Subsector r_bsp.c:532
+wad-codernext-r3,wad,codernext,3,"id:000037,sig:11,src:000474,time:746411,execs:93790,op:havoc,rep:3",stack-overflow,P_CrossSubsector p_sight.c:129 | P_CrossBSPNode p_sight.c:279 | P_CrossBSPNode p_sight.c:279
+wad-codernext-r3,wad,codernext,3,"id:000073,sig:11,src:000380,time:1791801,execs:226876,op:havoc,rep:1",SEGV,P_GroupLines p_setup.c:575 | P_SetupLevel p_setup.c:806 | G_DoLoadLevel g_game.c:655
+wad-gemma31b-r1,wad,gemma31b,1,"id:000016,sig:11,src:000005,time:335032,execs:37246,op:quick,pos:34799",negative-size-param,P_LoadBlockMap p_setup.c:535 | P_SetupLevel p_setup.c:796 | G_DoLoadLevel g_game.c:655
+wad-gemma31b-r1,wad,gemma31b,1,"id:000067,sig:11,src:000726,time:2168480,execs:253700,op:quick,pos:34873",heap-buffer-overflow,P_BlockLinesIterator p_maputl.c:492 | P_CheckPosition p_map.c:465 | P_TryMove p_map.c:490
+wad-gemma31b-r1,wad,gemma31b,1,"id:000087,sig:11,src:000565,time:2852577,execs:357480,op:havoc,rep:1",SEGV,P_GroupLines p_setup.c:575 | P_SetupLevel p_setup.c:806 | G_DoLoadLevel g_game.c:655
+wad-gemma31b-r2,wad,gemma31b,2,"id:000055,sig:11,src:000572,time:1485379,execs:176084,op:flip1,pos:29517",global-buffer-overflow,R_CheckPlane r_plane.c:306 | R_StoreWallRange r_segs.c:709 | R_Subsector r_bsp.c:532
+wad-gemma31b-r3,wad,gemma31b,3,"id:000052,sig:11,src:000002,time:1587729,execs:172264,op:havoc,rep:1",SEGV,P_CheckMeleeRange p_enemy.c:178 | A_Chase p_enemy.c:711 | P_SetMobjState p_mobj.c:72
+wad-qwen36nt-r1,wad,qwen36nt,1,"id:000015,sig:11,src:000005,time:332229,execs:37182,op:quick,pos:34799",negative-size-param,P_LoadBlockMap p_setup.c:535 | P_SetupLevel p_setup.c:796 | G_DoLoadLevel g_game.c:655
+wad-qwen36nt-r1,wad,qwen36nt,1,"id:000018,sig:11,src:000005,time:372750,execs:41906,op:flip2,pos:39737",SEGV,P_GroupLines p_setup.c:575 | P_SetupLevel p_setup.c:806 | G_DoLoadLevel g_game.c:655
+wad-qwen36nt-r1,wad,qwen36nt,1,"id:000039,sig:11,src:000699,time:1074260,execs:121552,op:quick,pos:34873,val:+1",heap-buffer-overflow,P_BlockLinesIterator p_maputl.c:492 | P_CheckPosition p_map.c:465 | P_TryMove p_map.c:490
+wad-qwen36nt-r1,wad,qwen36nt,1,"id:000045,sig:11,src:000699,time:1159272,execs:129829,op:int16,pos:14618,val:be:+255",SEGV,P_CheckMeleeRange p_enemy.c:178 | A_Chase p_enemy.c:711 | P_SetMobjState p_mobj.c:72
+wad-qwen36nt-r1,wad,qwen36nt,1,"id:000075,sig:11,src:001186,time:1956078,execs:257711,op:flip2,pos:33858",global-buffer-overflow,R_CheckPlane r_plane.c:306 | R_StoreWallRange r_segs.c:709 | R_Subsector r_bsp.c:532
+wad-qwen36nt-r1,wad,qwen36nt,1,"id:000110,sig:11,src:000002,time:3516280,execs:500839,op:havoc,rep:5",stack-overflow,P_CrossBSPNode p_sight.c:279 | P_CrossBSPNode p_sight.c:279 | P_CrossBSPNode p_sight.c:279
+wad-qwen36nt-r4,wad,qwen36nt,4,"id:000049,sig:11,src:000006,time:1992754,execs:250204,op:int16,pos:57225,val:-32768",stack-overflow,P_CrossSubsector p_sight.c:129 | P_CrossBSPNode p_sight.c:279 | P_CrossBSPNode p_sight.c:279
+wad-qwen38-r1,wad,qwen38,1,"id:000013,sig:11,src:000005,time:338787,execs:37118,op:quick,pos:34799",negative-size-param,P_LoadBlockMap p_setup.c:535 | P_SetupLevel p_setup.c:796 | G_DoLoadLevel g_game.c:655
+wad-qwen38-r1,wad,qwen38,1,"id:000043,sig:11,src:000603,time:1539759,execs:199911,op:quick,pos:35475,val:+10",heap-buffer-overflow,P_BlockLinesIterator p_maputl.c:492 | P_CheckPosition p_map.c:465 | P_TryMove p_map.c:490
+wad-qwen38-r1,wad,qwen38,1,"id:000069,sig:11,src:001110,time:2343794,execs:322941,op:quick,pos:29432",global-buffer-overflow,R_CheckPlane r_plane.c:306 | R_StoreWallRange r_segs.c:706 | R_Subsector r_bsp.c:532
+wad-qwen38-r1,wad,qwen38,1,"id:000097,sig:11,src:000006,time:3417584,execs:512249,op:quick,pos:26002",SEGV,P_CheckMeleeRange p_enemy.c:178 | A_Chase p_enemy.c:711 | P_SetMobjState p_mobj.c:72
+wad-qwen38-r3,wad,qwen38,3,"id:000099,sig:11,src:001007,time:2035288,execs:318635,op:havoc,rep:1",SEGV,P_GroupLines p_setup.c:575 | P_SetupLevel p_setup.c:806 | G_DoLoadLevel g_game.c:655
+wad-qwen38-r5,wad,qwen38,5,"id:000038,sig:11,src:000641,time:923877,execs:127293,op:int32,pos:29126,val:+16",stack-overflow,P_CrossSubsector p_sight.c:129 | P_CrossBSPNode p_sight.c:279 | P_CrossBSPNode p_sight.c:279
+wad-qwen38-r5,wad,qwen38,5,"id:000072,sig:11,src:001182,time:2582143,execs:343271,op:havoc,rep:2",global-buffer-overflow,R_PointToDist r_main.c:408 | R_StoreWallRange r_segs.c:405 | R_ClipPassWallSegment r_bsp.c:222
+wad-qwen4b-r1,wad,qwen4b,1,"id:000015,sig:11,src:000005,time:604365,execs:37437,op:quick,pos:34799",negative-size-param,P_LoadBlockMap p_setup.c:535 | P_SetupLevel p_setup.c:796 | G_DoLoadLevel g_game.c:655
+wad-qwen4b-r1,wad,qwen4b,1,"id:000035,sig:11,src:000005,time:1282286,execs:92124,op:havoc,rep:3",SEGV,P_CheckMeleeRange p_enemy.c:178 | A_Chase p_enemy.c:711 | P_SetMobjState p_mobj.c:72
+wad-qwen4b-r2,wad,qwen4b,2,"id:000056,sig:11,src:001079,time:1711517,execs:224250,op:havoc,rep:1",global-buffer-overflow,R_CheckPlane r_plane.c:306 | R_StoreWallRange r_segs.c:706 | R_Subsector r_bsp.c:532
+wad-qwen4b-r2,wad,qwen4b,2,"id:000059,sig:11,src:001050,time:1753035,execs:235896,op:havoc,rep:1",global-buffer-overflow,R_PointToDist r_main.c:408 | R_StoreWallRange r_segs.c:405 | R_ClipSolidWallSegment r_bsp.c:144
+wad-qwen4b-r2,wad,qwen4b,2,"id:000066,sig:11,src:000743,time:2759814,execs:352609,op:quick,pos:34873",heap-buffer-overflow,P_BlockLinesIterator p_maputl.c:492 | P_CheckPosition p_map.c:465 | P_TryMove p_map.c:490
+wad-qwen4b-r3,wad,qwen4b,3,"id:000021,sig:11,src:000005,time:371975,execs:42193,op:flip2,pos:39737",SEGV,P_GroupLines p_setup.c:575 | P_SetupLevel p_setup.c:806 | G_DoLoadLevel g_game.c:655
+wad-qwen4b-r3,wad,qwen4b,3,"id:000063,sig:11,src:000003,time:2228348,execs:255020,op:int32,pos:15,val:+0",heap-buffer-overflow,P_CheckSight p_sight.c:321 | P_LookForPlayers p_enemy.c:517 | A_Look p_enemy.c:611
+wad-qwen4b-r4,wad,qwen4b,4,"id:000085,sig:11,src:001116,time:2783291,execs:356532,op:int16,pos:57225,val:be:+127",stack-overflow,P_CrossSubsector p_sight.c:129 | P_CrossBSPNode p_sight.c:279 | P_CrossBSPNode p_sight.c:279
+wad-qwen4b-r5,wad,qwen4b,5,"id:000052,sig:11,src:000413,time:1682148,execs:195286,op:quick,pos:19418,val:+2",signal-4,

@@ -1,0 +1,19 @@
+<!DOCTYPE project [
+  <!ELEMENT project (file*, directory*)>
+  <!ATTLIST project version CDATA #REQUIRED>
+  
+  <!ELEMENT file (#PCDATA)>
+  <!ATTLIST file name CDATA #REQUIRED
+                  type (config|data|other) #REQUIRED
+                  size CDATA #REQUIRED>
+  
+  <!ELEMENT directory (file*|directory*)>
+  <!ATTLIST directory name CDATA #REQUIRED
+                       type (folder|subfolder) #REQUIRED
+                       permissions CDATA #IMPLIED>
+]>
+<project version="1.0">
+  <file name="report.xml" type="config" size="1024">Configuration file for the project</file>
+  <file name="data.csv" type="data" size="2048">Data file containing project statistics</file>
+  <directory name="assets" type="folder" permissions="rw-r--r--" />
+</project>

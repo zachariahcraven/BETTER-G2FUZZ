@@ -1,0 +1,52 @@
+<!ELEMENT invoice (invoice_id, date, customer, xpath_examples, items, dtd_examples, xsd_examples)>
+<!ATTLIST invoice xml:lang CDATA #IMPLIED>
+
+<!ELEMENT invoice_id (#PCDATA)>
+<!ATTLIST invoice_id xml:lang CDATA #IMPLIED>
+
+<!ELEMENT date (#PCDATA)>
+<!ATTLIST date xml:lang CDATA #IMPLIED>
+
+<!ELEMENT customer (customer_id, customer_name)>
+<!ATTLIST customer xml:lang CDATA #IMPLIED>
+
+<!ELEMENT customer_id (#PCDATA)>
+<!ELEMENT customer_name (#PCDATA)>
+
+<!ELEMENT xpath_examples (xpath_example+)>
+<!ATTLIST xpath_examples xml:lang CDATA #IMPLIED>
+
+<!ELEMENT xpath_example (#PCDATA)>
+<!ATTLIST xpath_example id ID #REQUIRED>
+
+<!ELEMENT items (item+)>
+
+<!ELEMENT item (item_id, item_name, quantity, price, item_name*)>
+<!ATTLIST item type (product|service) #REQUIRED xml:lang CDATA #IMPLIED>
+
+<!ELEMENT item_id (#PCDATA)>
+<!ELEMENT item_name (#PCDATA)>
+<!ATTLIST item_name xml:lang CDATA #IMPLIED>
+
+<!ELEMENT quantity (#PCDATA)>
+<!ELEMENT price (#PCDATA)>
+
+<!ELEMENT xpath_examples (xpath_example+)>
+<!ATTLIST xpath_examples xml:lang CDATA #IMPLIED>
+
+<!ELEMENT dtd_examples (dtd_example+)>
+<!ATTLIST dtd_examples xml:lang CDATA #IMPLIED>
+
+<!ELEMENT dtd_example (#PCDATA)>
+<!ATTLIST dtd_example id ID #REQUIRED>
+
+<!ELEMENT xsd_examples (xsd_example+)>
+<!ATTLIST xsd_examples xml:lang CDATA #IMPLIED>
+
+<!ELEMENT xsd_example (#PCDATA)>
+<!ATTLIST xsd_example id ID #REQUIRED>
+
+<!ENTITY company "Tech Solutions Inc.">
+<!ENTITY vat SYSTEM "http://example.com/vat-rates">
+<!NOTATION pdf SYSTEM "application/pdf">
+<!NOTATION xml SYSTEM "text/xml">
