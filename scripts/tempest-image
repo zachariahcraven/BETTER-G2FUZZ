@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# tempest-image: rebuild g2fuzz.sif on Tempest from this checkout (team-docs/TEMPEST.md section 4).
+# tempest-image: rebuild g2fuzz.sif on Tempest from this checkout (docs/TEMPEST.md section 4).
 # Run on the Mac, with the VPN on, after changing G2Fuzz code. The image holds the code, so
 # `git pull` on Tempest alone doesn't change what runs.
 #
@@ -19,7 +19,7 @@ die() { echo "tempest-image: $*" >&2; exit 1; }
 
 docker info >/dev/null 2>&1 || die "Docker isn't running (macOS: colima start)"
 ssh -o BatchMode=yes -o ConnectTimeout=10 "$HOST" true 2>/dev/null ||
-  die "can't ssh to $HOST. Connect the VPN (team-docs/TEMPEST.md section 1)"
+  die "can't ssh to $HOST. Connect the VPN (docs/TEMPEST.md section 1)"
 if [ "${1:-}" != "--force" ]; then
   jobs=$(ssh "$HOST" 'squeue -h -u $USER -o %j' | grep -c '^g2f-' || true)
   [ "$jobs" = 0 ] || die "$jobs campaign(s) queued or running on Tempest. Wait for them, or use --force"

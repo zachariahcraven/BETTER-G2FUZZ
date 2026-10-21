@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# fuzz: shortcuts for G2Fuzz campaigns. See WORKFLOW.md.
+# fuzz: shortcuts for G2Fuzz campaigns. See docs/WORKFLOW.md.
 #
 # Usage: scripts/fuzz <command> [args]
 #
@@ -23,7 +23,7 @@
 #   G2F_TARGET [jhead]                 G2F_IMAGE [g2fuzz:dev]
 #   G2F_SEEDS [/AFLplusplus/testcases/images/jpeg]  (stock seeds, path inside the image)
 #   G2F_CPUSET  Docker only: cores for this run, e.g. 3 (one per parallel run, so they don't share)
-# Slurm + Apptainer, used when docker is missing (team-docs/TEMPEST.md):
+# Slurm + Apptainer, used when docker is missing (docs/TEMPEST.md):
 #   G2F_SIF [<repo>/g2fuzz.sif]   G2F_PARTITION [fairshare]   G2F_CPUS [2]   G2F_MEM [4G]
 #   G2F_ACCOUNT [group-mattrevelle once you're in it, else your first group-* account]
 #   G2F_BASE_URL [the running `llm` server]   G2F_KEY [~/llm/dummy.key]   G2F_LLM_DIR [~/llm]
@@ -95,7 +95,7 @@ slurm_account() {
   local a; a=$(sacctmgr -nP show assoc user="$USER" format=account 2>/dev/null || true)
   case $'\n'"$a"$'\n' in *$'\n'group-mattrevelle$'\n'*) ACCOUNT=group-mattrevelle ;; esac
   [ -n "$ACCOUNT" ] || ACCOUNT=$(awk '/^group-/ { print; exit }' <<< "$a")
-  [ -n "$ACCOUNT" ] || die "no group-* Slurm account found (team-docs/TEMPEST.md section 1)"
+  [ -n "$ACCOUNT" ] || die "no group-* Slurm account found (docs/TEMPEST.md section 1)"
 }
 
 # This user's llm-serve job in the given state, as "<node> <end time>"; nothing if none.
@@ -103,11 +103,11 @@ llm_job() { squeue -h -u "$USER" -n llm-serve -t "$1" -o '%N %e' 2>/dev/null | a
 
 # Checks, then sets ARGS (docker run or apptainer options) and SLURM (sbatch/srun options).
 prepare() {
-  [ -s "$KEY" ] || die "API key missing or empty: $KEY (see team-docs/CATCHAT_API_KEY.md)"
+  [ -s "$KEY" ] || die "API key missing or empty: $KEY (see docs/CATCHAT_API_KEY.md)"
   local test_env=""
   [ "$TEST" = 1 ] && test_env="G2F_PLATEAU_SEC=10,G2F_BACKOFF_SEC=0,"
   if [ "$BACKEND" = slurm ]; then
-    [ -f "$SIF" ] || die "image $SIF not found (see team-docs/TEMPEST.md)"
+    [ -f "$SIF" ] || die "image $SIF not found (see docs/TEMPEST.md)"
     slurm_account
     if [ -z "${G2F_BASE_URL:-}" ]; then
       local j msg="no LLM server running. Start one: scripts/fuzz llm start [hours]"
@@ -129,8 +129,8 @@ prepare() {
     [ -n "$PARTITION" ] && SLURM+=(--partition "$PARTITION")
   else
     docker_up
-    docker image inspect "$IMAGE" >/dev/null 2>&1 || die "image $IMAGE not found; build it (SETUP.md step 4)"
-    # host-gateway lets the container reach a local LLM (team-docs/LLM_PROVIDERS.md)
+    docker image inspect "$IMAGE" >/dev/null 2>&1 || die "image $IMAGE not found; build it (docs/SETUP.md step 4)"
+    # host-gateway lets the container reach a local LLM (docs/LLM_PROVIDERS.md)
     ARGS=(-v "$EVAL/$1:/eval" -v "$KEY:/eval/openai_key.txt:ro"
           -e "OPENAI_BASE_URL=$BASE_URL" --add-host=host.docker.internal:host-gateway)
     [ "$TEST" = 1 ] && ARGS+=(-e G2F_PLATEAU_SEC=10 -e G2F_BACKOFF_SEC=0)
@@ -147,7 +147,7 @@ cmd_new() {
   local d="$EVAL/$NEW_NAME"
   [ -e "$d" ] && die "eval/$NEW_NAME already exists; pick a new name"
   mkdir -p "$d"
-  cp "$REPO/program_to_format.json" "$d/"
+  cp "$REPO/g2fuzz/program_to_format.json" "$d/"
   printf '{"model": ["%s"]}\n' "$MODEL" > "$d/model_setting.json"
   echo "created eval/$NEW_NAME (target $TARGET, model $MODEL)"
 }
@@ -188,14 +188,14 @@ cmd_run() {
     echo "no seeds yet: seed generation first (~15-20 min), then fuzzing"
     # Starts clean, stops if the LLM made no seeds (bad key, no VPN, CatChat down), and fills
     # initial_seeds/ only at the end, so a run stopped midway redoes seed generation.
-    inner="find $OUT -mindepth 1 -delete && python /AFLplusplus/program_gen.py --output ./$OUT --program $TARGET > seedgen.log 2>&1; \
+    inner="find $OUT -mindepth 1 -delete && python /AFLplusplus/g2fuzz/program_gen.py --output ./$OUT --program $TARGET > seedgen.log 2>&1; \
 ls $OUT/default/gen_seeds/* >/dev/null 2>&1 || { echo 'fuzz: seed generation made no seeds' >> seedgen.log; exit 1; }; \
 mkdir -p initial_seeds && cp $SEEDS/* $OUT/default/gen_seeds/* initial_seeds/ && "
   else
     echo "reusing $(count "$d/initial_seeds") seeds: fuzzing only"
   fi
   inner="$inner afl-fuzz -i initial_seeds -o $OUT -c /targets/$TARGET.cmp -m 1024 -V $secs \
--k /AFLplusplus/ -- /targets/$TARGET.afl @@ > fuzz.log 2>&1"
+-k /AFLplusplus/g2fuzz/ -- /targets/$TARGET.afl @@ > fuzz.log 2>&1"
   # AFL++ is 5-8x slower writing its output to a shared folder (Mac) or network home (Tempest),
   # so /eval/$OUT is fast local disk inside the container. /host is the campaign folder again;
   # its $OUT copy is updated every 30 s and at the end, for watch/status/results.
@@ -372,9 +372,9 @@ cmd_list() {
   [ "$any" = 1 ] || echo "(no campaigns yet: scripts/fuzz new)"
 }
 
-# The gpt-oss:120b server on an H100 (scripts/llm-serve.sbatch, team-docs/TEMPEST.md section 5).
+# The gpt-oss:120b server on an H100 (scripts/llm-serve.sbatch, docs/TEMPEST.md section 5).
 cmd_llm() {
-  [ "$BACKEND" = slurm ] || die "llm runs on Tempest. From the Mac, use an SSH tunnel (team-docs/TEMPEST.md section 5)"
+  [ "$BACKEND" = slurm ] || die "llm runs on Tempest. From the Mac, use an SSH tunnel (docs/TEMPEST.md section 5)"
   local id hours log
   case "${1:-status}" in
     start)
@@ -382,7 +382,7 @@ cmd_llm() {
       case "$hours" in ''|0|*[!0-9]*) die "hours must be a whole number, e.g. 24 (up to 336)" ;; esac
       [ -z "$(squeue -h -u "$USER" -n llm-serve -o %i)" ] || die "a server is already queued or running (scripts/fuzz llm status)"
       [ -f "$LLM_DIR/ollama.sif" ] && [ -d "$LLM_DIR/models" ] ||
-        die "no $LLM_DIR/ollama.sif or models/: do the one-time setup in team-docs/TEMPEST.md section 5"
+        die "no $LLM_DIR/ollama.sif or models/: do the one-time setup in docs/TEMPEST.md section 5"
       slurm_account
       id=$(sbatch --parsable --account "$ACCOUNT" --time $((hours * 60)) --chdir "$LLM_DIR" "$REPO/scripts/llm-serve.sbatch")
       echo "submitted server job ${id%%;*} (${hours} h, account $ACCOUNT). Ready ~4 min after it starts: scripts/fuzz llm status"

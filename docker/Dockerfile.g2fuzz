@@ -1,12 +1,14 @@
 #
 # G2Fuzz image for development and experiments.
 #
-# Based on the upstream AFL++ Dockerfile (../Dockerfile) with these changes:
+# Based on the upstream AFL++ Dockerfile (afl/Dockerfile) with these changes:
 #   - builds `make source-only` instead of `make distrib` (no QEMU/Unicorn/Frida modes)
 #   - drops rustup and afl-cov (not needed for G2Fuzz)
 #   - keeps optional make steps non-fatal (no `sed` on GNUmakefile)
 #   - installs the `openai` Python package G2Fuzz needs, plus pillow and numpy for generators
 #   - prebuilds fuzz targets into /targets (currently: jhead)
+#
+# Layout in the image: /AFLplusplus is afl/ (AFL++), /AFLplusplus/g2fuzz is g2fuzz/ (afl-fuzz -k).
 #
 # Build from the repo root:
 #   docker build -f docker/Dockerfile.g2fuzz -t g2fuzz:dev .
@@ -74,7 +76,8 @@ ENV AFL_TRY_AFFINITY=1
 ENV AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1
 
 WORKDIR /AFLplusplus
-COPY . .
+COPY afl/ .
+COPY g2fuzz/ /AFLplusplus/g2fuzz/
 
 ARG CC=gcc-$GCC_VERSION
 ARG CXX=g++-$GCC_VERSION
@@ -83,8 +86,8 @@ RUN make clean && make source-only && make install
 
 # Fail the build early if the pieces G2Fuzz needs are missing
 RUN command -v afl-fuzz && command -v afl-clang-fast && \
-    test -f /AFLplusplus/generator_mutation.py && \
-    test ! -s /AFLplusplus/openai_key.txt && \
+    test -f /AFLplusplus/g2fuzz/generator_mutation.py && \
+    test ! -s /AFLplusplus/g2fuzz/openai_key.txt && \
     python -c "import openai, PIL, numpy; print('openai', openai.__version__, 'pillow', PIL.__version__, 'numpy', numpy.__version__)"
 
 # ---- Fuzz targets: prebuilt into /targets/<name>.afl and /targets/<name>.cmp ----

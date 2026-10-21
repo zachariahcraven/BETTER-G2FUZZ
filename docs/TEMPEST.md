@@ -145,7 +145,7 @@ scripts/fuzz run first 900 --test
 scripts/fuzz watch first
 ```
 
-Everything in [WORKFLOW.md](../WORKFLOW.md) works. These commands differ:
+Everything in [WORKFLOW.md](WORKFLOW.md) works. These commands differ:
 
 | Command | On Tempest |
 | --- | --- |

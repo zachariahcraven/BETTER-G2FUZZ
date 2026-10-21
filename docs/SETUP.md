@@ -1,7 +1,7 @@
 # Setup: First Run
 
 One-time setup, then a short test campaign. Run commands from the repo root.
-Tested on an arm64 Mac. For Tempest, follow [team-docs/TEMPEST.md](team-docs/TEMPEST.md) instead.
+Tested on an arm64 Mac. For Tempest, follow [TEMPEST.md](TEMPEST.md) instead.
 
 ## 1. Install Docker
 
@@ -23,7 +23,7 @@ cd BETTER-G2FUZZ
 
 ## 3. Get a CatChat key
 
-Follow [team-docs/CATCHAT_API_KEY.md](team-docs/CATCHAT_API_KEY.md). The key goes in `~/.secrets/catchat.key`.
+Follow [CATCHAT_API_KEY.md](CATCHAT_API_KEY.md). The key goes in `~/.secrets/catchat.key`.
 Off campus, connect to the MSU VPN.
 
 ## 4. Build the image
@@ -32,7 +32,7 @@ Off campus, connect to the MSU VPN.
 docker build -f docker/Dockerfile.g2fuzz -t g2fuzz:dev .
 ```
 
-The first build takes 15–30 min. Rebuild after changing `src/`, `include/` or the Python files.
+The first build takes 15–30 min. Rebuild after changing `afl/src/`, `afl/include/` or the Python files in `g2fuzz/`.
 
 ## 5. First campaign
 

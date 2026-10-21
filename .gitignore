@@ -35,10 +35,10 @@ afl-ld-lto
 afl-cs-proxy
 afl-qemu-trace
 afl-frida-trace.so
-/as
-/ld
-utils/afl_network_proxy/afl-network-client
-utils/afl_network_proxy/afl-network-server
+/afl/as
+/afl/ld
+afl/utils/afl_network_proxy/afl-network-client
+afl/utils/afl_network_proxy/afl-network-server
 
 # ---- Python ----
 __pycache__/
@@ -59,7 +59,7 @@ core.*
 .idea/
 *.swp
 
-# Apptainer image and its source archive (team-docs/TEMPEST.md)
+# Apptainer image and its source archive (docs/TEMPEST.md)
 *.sif
 *.sif.version
 g2fuzz-amd64.tar*

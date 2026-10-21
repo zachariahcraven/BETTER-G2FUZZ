@@ -1,7 +1,7 @@
 # Never send secrets into the image (COPY . . does not read .gitignore)
-openai_key.txt
-*.key
-.env
+**/openai_key.txt
+**/*.key
+**/.env
 
 # Campaign data and local outputs
 eval/

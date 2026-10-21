@@ -1,6 +1,6 @@
 # Workflow
 
-Day-to-day use after [SETUP.md](SETUP.md) or [TEMPEST.md](team-docs/TEMPEST.md). Run commands from the repo root.
+Day-to-day use after [SETUP.md](SETUP.md) or [TEMPEST.md](TEMPEST.md). Run commands from the repo root.
 
 ## Commands
 
@@ -37,16 +37,16 @@ For anything the script doesn't cover, run `scripts/fuzz shell <campaign>`. Insi
 
 ```bash
 # Seed generation. Skip if the campaign already has initial_seeds/.
-python /AFLplusplus/program_gen.py --output ./jhead_output --program jhead
+python /AFLplusplus/g2fuzz/program_gen.py --output ./jhead_output --program jhead
 mkdir -p initial_seeds && cp /AFLplusplus/testcases/images/jpeg/* jhead_output/default/gen_seeds/* initial_seeds/
 
 # Fuzz with the AFL++ screen
-afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@
+afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/jhead.afl @@
 ```
 
-- Always pass `-k /AFLplusplus/`.
+- Always pass `-k /AFLplusplus/g2fuzz/` (the folder with G2Fuzz's Python).
 - `-o` in `/eval` is 5–8x slower (shared folder or network disk). For speed, use `-o /tmp/jhead_output` and copy it to `/eval` at the end. `scripts/fuzz run` does this for you.
-- `--program` must be a key in `program_to_format.json`.
+- `--program` must be a key in `g2fuzz/program_to_format.json`.
 - Targets are prebuilt as `/targets/<name>.afl` and `.cmp`. Add new ones in `docker/Dockerfile.g2fuzz`.
 
 ## Change the code
@@ -55,10 +55,10 @@ Rebuild the image after any change ([SETUP step 4](SETUP.md#4-build-the-image), 
 
 | What | File |
 | --- | --- |
-| Generator and mutator selection (scheduler hook) | `generator_mutation.py` |
-| Seed generation | `program_gen.py` |
-| LLM calls, retries, logging | `py_utils/llm_utils.py` |
-| When `llmGen-M` triggers | `src/afl-fuzz.c` (search `G2F:`) |
+| Generator and mutator selection (scheduler hook) | `g2fuzz/generator_mutation.py` |
+| Seed generation | `g2fuzz/program_gen.py` |
+| LLM calls, retries, logging | `g2fuzz/py_utils/llm_utils.py` |
+| When `llmGen-M` triggers | `afl/src/afl-fuzz.c` (search `G2F:`) |
 | Image contents and targets | `docker/Dockerfile.g2fuzz` |
 
 ## Git

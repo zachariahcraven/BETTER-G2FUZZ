@@ -61,4 +61,4 @@ You should get back one Python code block.
 | `OPENAI_BASE_URL` | `https://catchat-api.msu.montana.edu/v1` |
 | `model_setting.json` | `{"model": ["gpt-oss:120b"]}` |
 
-Full run instructions: [SETUP.md](../SETUP.md).
+Full run instructions: [SETUP.md](SETUP.md).
