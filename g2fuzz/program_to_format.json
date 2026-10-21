@@ -17,6 +17,7 @@
     "tiff_read_rgba_fuzzer":["tiff"],
     "xml_fuzzer":["xml"],
     "doom_wad":["wad"],
+    "doom_demo":["lmp"],
     "tiffcp":["tiff"],
     "pdf_fuzzer":["pdf"],
     "pdfimages":["pdf"],

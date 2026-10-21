@@ -1,16 +1,223 @@
 campaign,target,model,rep,run_time,execs_done,execs_per_sec,corpus_count,edges_found,total_edges,saved_crashes,generators,llmGen-M steps,llm_calls,llm_ok,llm_errors,model_version
+demo-baseline-r1,demo,baseline,1,3600,166008,46.11,1951,2911,9121,62,0,0,0,0,0,
+demo-baseline-r2,demo,baseline,2,3600,139329,38.7,1578,2578,9121,30,0,0,0,0,0,
+demo-baseline-r3,demo,baseline,3,3600,155600,43.22,1856,2667,9121,22,0,0,0,0,0,
+demo-baseline-r4,demo,baseline,4,3600,465574,129.33,1782,2819,9121,23,0,0,0,0,0,
+demo-baseline-r5,demo,baseline,5,3600,284348,78.98,1908,2650,9121,21,0,0,0,0,0,
+demo-codernext-r1,demo,codernext,1,3600,491566,136.55,1689,2534,9121,86,40,0,45,45,0,Qwen3-Coder-Next-FP8-agent = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+demo-codernext-r2,demo,codernext,2,3600,225785,62.72,1573,2759,9121,33,48,0,70,70,0,Qwen3-Coder-Next-FP8-agent = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+demo-codernext-r3,demo,codernext,3,3600,90449,25.12,1673,2945,9121,78,51,0,67,67,0,Qwen3-Coder-Next-FP8-agent = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+demo-codernext-r4,demo,codernext,4,3600,159164,44.21,1606,2967,9121,60,32,0,50,50,0,Qwen3-Coder-Next-FP8-agent = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+demo-codernext-r5,demo,codernext,5,3601,215196,59.76,1759,2905,9121,59,41,0,49,49,0,Qwen3-Coder-Next-FP8-agent = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+demo-ctl-junk-r1,demo,ctl-junk,1,3600,135574,37.66,1577,2814,9121,82,0,0,0,0,0,
+demo-ctl-junk-r2,demo,ctl-junk,2,3600,93419,25.95,1513,2821,9121,24,0,0,0,0,0,
+demo-ctl-junk-r3,demo,ctl-junk,3,3600,130913,36.36,1436,2778,9121,46,0,0,0,0,0,
+demo-ctl-junk-r4,demo,ctl-junk,4,3600,199940,55.54,1502,2869,9121,16,0,0,0,0,0,
+demo-ctl-junk-r5,demo,ctl-junk,5,3600,112140,31.15,1740,2902,9121,26,0,0,0,0,0,
+demo-ctl-llmseeds-r1,demo,ctl-llmseeds,1,3600,195313,54.25,1672,2909,9121,17,0,0,0,0,0,
+demo-ctl-llmseeds-r2,demo,ctl-llmseeds,2,3600,244610,67.95,1832,2779,9121,30,0,0,0,0,0,
+demo-ctl-llmseeds-r3,demo,ctl-llmseeds,3,3600,208152,57.82,1735,2854,9121,16,0,0,0,0,0,
+demo-ctl-llmseeds-r4,demo,ctl-llmseeds,4,3600,161324,44.81,1811,2908,9121,39,0,0,0,0,0,
+demo-ctl-llmseeds-r5,demo,ctl-llmseeds,5,3600,144767,40.21,1825,2752,9121,13,0,0,0,0,0,
+demo-qwen4b-r1,demo,qwen4b,1,3600,299851,83.29,2112,2965,9121,114,53,0,92,92,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+demo-qwen4b-r2,demo,qwen4b,2,3600,222421,61.78,2133,2966,9121,47,87,0,144,144,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+demo-qwen4b-r3,demo,qwen4b,3,3600,427610,118.78,1726,2652,9121,27,44,0,72,72,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+demo-qwen4b-r4,demo,qwen4b,4,3600,323711,89.92,2025,2848,9121,47,51,0,79,79,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+demo-qwen4b-r5,demo,qwen4b,5,3600,182015,50.56,1609,2758,9121,52,43,0,85,85,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+xml12h-baseline-r1,xml-12h,baseline,1,43200,596525148,13808.45,9453,4332,45358,0,0,0,0,0,0,
+xml12h-baseline-r2,xml-12h,baseline,2,43200,144686250,3349.22,6622,3017,45358,0,0,0,0,0,0,
+xml12h-baseline-r3,xml-12h,baseline,3,43200,341749665,7910.86,8325,4063,45358,0,0,0,0,0,0,
+xml12h-baseline-r4,xml-12h,baseline,4,43200,639519573,14803.69,8481,4376,45358,0,0,0,0,0,0,
+xml12h-baseline-r5,xml-12h,baseline,5,43200,231897015,5367.98,6906,3000,45358,0,0,0,0,0,0,
+png-baseline-r1,png,baseline,1,3600,130096726,36137.93,1861,1581,5000,0,0,0,0,0,0,
+png-baseline-r2,png,baseline,2,3600,129786191,36051.67,2068,1604,5000,0,0,0,0,0,0,
+png-baseline-r3,png,baseline,3,3600,129831939,36064.35,1885,1579,5000,0,0,0,0,0,0,
+png-baseline-r4,png,baseline,4,3600,113123154,31423.04,1961,1571,5000,0,0,0,0,0,0,
+png-baseline-r5,png,baseline,5,3600,111187446,30885.33,1775,1564,5000,0,0,0,0,0,0,
+png-codernext-r1,png,codernext,1,3600,64964332,18045.5,2139,1613,5000,0,48,1,67,67,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+png-codernext-r2,png,codernext,2,3600,31177035,8660.22,1733,1614,5000,0,40,0,60,60,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+png-codernext-r3,png,codernext,3,3600,36184656,10051.25,1891,1608,5000,0,41,2,83,83,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+png-codernext-r4,png,codernext,4,3600,101362852,28156.25,2099,1621,5000,0,44,0,69,69,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+png-codernext-r5,png,codernext,5,3600,86375151,23993.04,1968,1649,5000,0,41,0,56,56,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+png-gemma31b-r1,png,gemma31b,1,3600,96798019,26888.24,2005,1619,5000,0,25,0,28,28,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
+png-gemma31b-r2,png,gemma31b,2,3600,109857262,30515.86,1884,1613,5000,0,28,0,33,33,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
+png-gemma31b-r3,png,gemma31b,3,3600,113620661,31561.25,1970,1612,5000,0,30,0,33,33,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
+png-qwen36nt-r1,png,qwen36nt,1,3600,89164441,24767.82,1806,1614,5000,0,30,0,36,36,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+png-qwen36nt-r2,png,qwen36nt,2,,,,,,,,,,,,,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+png-qwen36nt-r3,png,qwen36nt,3,3600,112386239,31218.36,2026,1625,5000,0,27,0,34,34,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+png-qwen36nt-r4,png,qwen36nt,4,3600,94153247,26153.58,1791,1640,5000,0,33,0,46,46,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+png-qwen36nt-r5,png,qwen36nt,5,3600,116267868,32296.6,1961,1629,5000,0,26,0,39,39,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+png-qwen38-r1,png,qwen38,1,3600,91771104,25491.9,1842,1619,5000,0,26,0,33,33,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
+png-qwen38-r2,png,qwen38,2,3600,100320192,27866.63,1865,1622,5000,0,28,0,43,43,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
+png-qwen38-r3,png,qwen38,3,3600,473989,131.65,895,1285,5000,0,26,2,36,36,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
+png-qwen4b-r1,png,qwen4b,1,,,,,,,,,,,,,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+png-qwen4b-r2,png,qwen4b,2,3600,109671704,30464.29,2096,1609,5000,0,50,0,98,98,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+png-qwen4b-r3,png,qwen4b,3,3600,99732193,27703.34,1963,1617,5000,0,29,0,48,48,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+png-qwen4b-r4,png,qwen4b,4,3600,120678562,33521.8,2083,1631,5000,0,32,0,58,57,1,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+png-qwen4b-r5,png,qwen4b,5,3600,110048537,30569.02,1986,1587,5000,0,30,0,57,56,1,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+tiff-baseline-r1,tiff,baseline,1,3600,45804630,12723.48,5433,4356,13696,0,0,0,0,0,0,
+tiff-baseline-r2,tiff,baseline,2,3600,48440136,13455.57,6077,4320,13696,0,0,0,0,0,0,
+tiff-baseline-r3,tiff,baseline,3,3600,46010740,12780.75,6223,4576,13696,0,0,0,0,0,0,
+tiff-baseline-r4,tiff,baseline,4,3600,49835879,13843.25,5543,4403,13696,0,0,0,0,0,0,
+tiff-baseline-r5,tiff,baseline,5,3600,46084470,12801.21,5538,4321,13696,0,0,0,0,0,0,
+tiff-codernext-r1,tiff,codernext,1,3600,30398737,8444.06,5771,4418,13696,0,38,0,95,95,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+tiff-codernext-r2,tiff,codernext,2,3600,23578972,6549.66,6214,4416,13696,0,54,0,118,118,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+tiff-codernext-r3,tiff,codernext,3,3600,31529470,8758.14,5292,4197,13696,0,47,0,124,124,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+tiff-codernext-r4,tiff,codernext,4,3600,25140917,6983.58,5156,4361,13696,0,60,0,129,129,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+tiff-codernext-r5,tiff,codernext,5,3600,23641823,6567.15,5408,4356,13696,0,76,0,120,120,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+tiff-gemma31b-r1,tiff,gemma31b,1,3600,16669862,4630.49,5145,4397,13696,0,28,1,47,47,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
+tiff-gemma31b-r2,tiff,gemma31b,2,3600,7490265,2080.62,4457,4065,13696,0,28,0,62,62,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
+tiff-gemma31b-r3,tiff,gemma31b,3,3600,22685787,6301.57,4990,4411,13696,0,29,0,44,44,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
+tiff-qwen36nt-r1,tiff,qwen36nt,1,3600,20748053,5763.33,5411,4316,13696,0,38,1,43,43,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+tiff-qwen36nt-r2,tiff,qwen36nt,2,3600,37168551,10324.57,5596,4576,13696,0,33,0,48,48,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+tiff-qwen36nt-r3,tiff,qwen36nt,3,3600,34304191,9528.94,5708,4224,13696,0,30,0,43,43,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+tiff-qwen36nt-r4,tiff,qwen36nt,4,3600,13891222,3858.6,5029,4249,13696,0,60,0,96,96,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+tiff-qwen36nt-r5,tiff,qwen36nt,5,3600,16036772,4454.65,4831,4338,13696,0,29,0,49,49,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+tiff-qwen38-r1,tiff,qwen38,1,3600,29136506,8093.44,5643,4502,13696,0,35,0,55,55,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
+tiff-qwen38-r2,tiff,qwen38,2,3600,25151664,6986.57,5684,4428,13696,0,29,0,48,48,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
+tiff-qwen38-r3,tiff,qwen38,3,3600,39444879,10956.9,5287,4341,13696,0,26,0,35,35,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
+tiff-qwen4b-r1,tiff,qwen4b,1,3600,22450989,6236.34,5381,4149,13696,0,50,0,123,123,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+tiff-qwen4b-r2,tiff,qwen4b,2,3600,42166141,11712.81,5891,4493,13696,0,36,0,66,66,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+tiff-qwen4b-r3,tiff,qwen4b,3,3600,47286984,13135.25,5633,4428,13696,0,30,0,47,47,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+tiff-qwen4b-r4,tiff,qwen4b,4,3600,6159912,1711.0,3889,4013,13696,0,34,0,75,74,1,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+tiff-qwen4b-r5,tiff,qwen4b,5,3600,11971455,3325.4,4704,4009,13696,0,36,0,84,84,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wad-baseline-r1,wad,baseline,1,3600,681389,189.27,791,1664,9113,92,0,0,0,0,0,
+wad-baseline-r2,wad,baseline,2,3600,266596,74.05,583,1694,9113,83,0,0,0,0,0,
+wad-baseline-r3,wad,baseline,3,3600,244597,67.94,622,1625,9113,54,0,0,0,0,0,
+wad-baseline-r4,wad,baseline,4,3600,245442,68.18,584,1652,9113,50,0,0,0,0,0,
+wad-baseline-r5,wad,baseline,5,3600,232191,64.5,461,1554,9113,64,0,0,0,0,0,
+wad-codernext-r1,wad,codernext,1,3600,389735,108.26,1372,1788,9113,86,45,0,72,72,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wad-codernext-r2,wad,codernext,2,3600,573595,159.33,1587,1938,9113,137,45,0,71,71,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wad-codernext-r3,wad,codernext,3,3600,523825,145.51,1550,1980,9113,104,40,0,54,54,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wad-codernext-r4,wad,codernext,4,3600,591500,164.3,1665,1915,9113,124,55,0,69,69,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wad-codernext-r5,wad,codernext,5,3600,472674,131.3,1422,1995,9113,98,45,0,64,64,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wad-gemma31b-r1,wad,gemma31b,1,3600,466335,129.54,1491,1929,9113,102,31,0,36,36,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
+wad-gemma31b-r2,wad,gemma31b,2,3600,411997,114.44,1354,1806,9113,97,30,0,34,34,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
+wad-gemma31b-r3,wad,gemma31b,3,3600,437344,121.48,1379,2055,9113,83,32,0,35,35,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
+wad-gemma31b-r4,wad,gemma31b,4,3600,451594,125.44,1477,1887,9113,102,35,0,40,40,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
+wad-gemma31b-r5,wad,gemma31b,5,3600,417594,116.0,1355,1989,9113,84,30,0,33,33,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
+wad-qwen36nt-r1,wad,qwen36nt,1,3600,521695,144.91,1646,2067,9113,120,24,0,33,33,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+wad-qwen36nt-r2,wad,qwen36nt,2,3600,435487,120.97,1425,2177,9113,95,18,0,35,35,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+wad-qwen36nt-r3,wad,qwen36nt,3,3600,440147,122.26,1559,1981,9113,82,23,0,27,27,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+wad-qwen36nt-r4,wad,qwen36nt,4,3600,455897,126.64,1295,1866,9113,75,28,0,38,38,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+wad-qwen36nt-r5,wad,qwen36nt,5,3600,515399,143.17,1536,1907,9113,101,22,0,27,27,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+wad-qwen38-r1,wad,qwen38,1,3600,531071,147.52,1429,1858,9113,98,22,0,30,30,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
+wad-qwen38-r2,wad,qwen38,2,3600,482950,134.15,1487,1974,9113,100,34,0,53,53,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
+wad-qwen38-r3,wad,qwen38,3,3600,574261,159.52,1555,2038,9113,139,26,0,31,31,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
+wad-qwen38-r4,wad,qwen38,4,3600,505853,140.51,1471,1828,9113,112,30,0,35,35,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
+wad-qwen38-r5,wad,qwen38,5,3600,477519,132.64,1443,1968,9113,90,27,0,43,43,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
+wad-qwen4b-r1,wad,qwen4b,1,3600,238646,66.29,1087,1725,9113,63,23,0,40,40,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wad-qwen4b-r2,wad,qwen4b,2,3600,461753,128.26,1335,1862,9113,82,26,0,41,41,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wad-qwen4b-r3,wad,qwen4b,3,3600,539011,149.72,1359,1880,9113,99,23,0,38,38,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wad-qwen4b-r4,wad,qwen4b,4,3600,459924,127.76,1432,1914,9113,99,19,0,31,31,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wad-qwen4b-r5,wad,qwen4b,5,3600,442325,122.87,1295,1868,9113,81,27,0,43,43,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+xml-baseline-r1,xml,baseline,1,3600,26844229,7456.71,6067,2786,45358,0,0,0,0,0,0,
+xml-baseline-r2,xml,baseline,2,3600,30219620,8394.26,3975,2128,45358,0,0,0,0,0,0,
+xml-baseline-r3,xml,baseline,3,3600,39552682,10986.83,3926,2179,45358,0,0,0,0,0,0,
+xml-baseline-r4,xml,baseline,4,3600,41785517,11607.01,4058,2185,45358,0,0,0,0,0,0,
+xml-baseline-r5,xml,baseline,5,3600,46008165,12779.96,3733,2036,45358,0,0,0,0,0,0,
+xml-codernext-r1,xml,codernext,1,3600,37219703,10337.62,7625,4622,45358,0,71,0,92,92,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+xml-codernext-r2,xml,codernext,2,3600,35414027,9837.08,7845,4869,45358,0,65,0,80,80,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+xml-codernext-r3,xml,codernext,3,3600,38881352,10800.37,7825,4757,45358,0,55,0,69,69,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+xml-codernext-r4,xml,codernext,4,3600,31926745,8868.5,7065,3929,45358,0,52,0,64,64,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+xml-codernext-r5,xml,codernext,5,3600,39210231,10891.72,7741,4716,45358,0,50,0,55,55,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+xml-gemma31b-r1,xml,gemma31b,1,3600,38452392,10681.21,7646,4338,45358,0,30,0,34,34,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
+xml-gemma31b-r2,xml,gemma31b,2,3600,36177760,10049.27,7540,4542,45358,0,25,0,29,29,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
+xml-gemma31b-r3,xml,gemma31b,3,3600,30454617,8459.55,6439,3438,45358,0,27,0,37,37,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
+xml-gemma31b-r4,xml,gemma31b,4,3600,47524944,13201.35,7995,4456,45358,0,29,0,33,33,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
+xml-gemma31b-r5,xml,gemma31b,5,3600,40732270,11314.41,7308,4072,45358,0,26,0,31,31,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
+xml-qwen36nt-r1,xml,qwen36nt,1,3600,36489245,10135.88,6353,3111,45358,0,38,0,43,43,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+xml-qwen36nt-r2,xml,qwen36nt,2,3600,36570079,10158.15,6250,3583,45358,0,45,0,50,50,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+xml-qwen36nt-r3,xml,qwen36nt,3,3600,43094276,11970.57,6825,3642,45358,0,40,0,45,45,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+xml-qwen36nt-r4,xml,qwen36nt,4,3600,39510317,10975.07,7174,3747,45358,0,30,0,37,37,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+xml-qwen36nt-r5,xml,qwen36nt,5,3600,38456972,10682.46,7531,4110,45358,0,35,0,40,40,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+xml-qwen38-r1,xml,qwen38,1,3600,33193625,9220.45,6485,3517,45358,0,29,0,35,35,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
+xml-qwen38-r2,xml,qwen38,2,3600,37296018,10359.96,7566,4311,45358,0,33,0,40,40,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
+xml-qwen38-r3,xml,qwen38,3,3600,42610558,11836.25,7311,4450,45358,0,35,0,39,39,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
+xml-qwen38-r4,xml,qwen38,4,3600,43646947,12124.14,7786,4569,45358,0,51,0,55,55,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
+xml-qwen38-r5,xml,qwen38,5,3600,34069344,9463.63,7053,3786,45358,0,30,0,37,37,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
+xml-qwen4b-r1,xml,qwen4b,1,3600,27277887,7576.93,6755,3708,45358,0,35,0,48,48,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+xml-qwen4b-r2,xml,qwen4b,2,3600,35350850,9819.68,6927,3894,45358,0,30,0,37,37,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+xml-qwen4b-r3,xml,qwen4b,3,3600,32049641,8902.66,5875,2893,45358,0,32,0,44,44,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+xml-qwen4b-r4,xml,qwen4b,4,3600,38218455,10616.21,6782,3536,45358,0,31,0,46,46,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+xml-qwen4b-r5,xml,qwen4b,5,3600,44768059,12435.47,7421,3895,45358,0,38,0,44,44,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wad4h-baseline-r1,wad-4h,baseline,1,14400,2739814,190.26,1287,1844,9113,161,0,0,0,0,0,
+wad4h-baseline-r2,wad-4h,baseline,2,14400,2633642,182.89,1123,1741,9113,125,0,0,0,0,0,
+wad4h-baseline-r3,wad-4h,baseline,3,14400,2257245,156.75,1618,2045,9113,153,0,0,0,0,0,
+wad4h-baseline-r4,wad-4h,baseline,4,14400,1856873,128.95,818,1784,9113,121,0,0,0,0,0,
+wad4h-baseline-r5,wad-4h,baseline,5,14400,1666977,115.76,1303,1840,9113,152,0,0,0,0,0,
+wad4h-codernext-r1,wad-4h,codernext,1,14400,2331065,161.88,2514,2443,9113,230,41,1,51,51,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wad4h-codernext-r2,wad-4h,codernext,2,14400,2743505,190.52,2475,2380,9113,239,42,1,74,74,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wad4h-codernext-r3,wad-4h,codernext,3,14400,2686436,186.56,2579,2417,9113,306,44,0,73,73,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wad4h-codernext-r4,wad-4h,codernext,4,14400,2448749,170.05,2738,3872,9113,217,45,0,69,69,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wad4h-codernext-r5,wad-4h,codernext,5,14400,2688780,186.72,2341,2308,9113,241,30,0,44,44,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wad4h-qwen36nt-r1,wad-4h,qwen36nt,1,14400,2890576,200.73,2398,2429,9113,295,29,1,44,44,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+wad4h-qwen36nt-r2,wad-4h,qwen36nt,2,14400,2666979,185.21,2274,2283,9113,229,31,0,39,39,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+wad4h-qwen36nt-r3,wad-4h,qwen36nt,3,14400,2935382,203.85,2433,2332,9113,267,25,0,34,34,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+wad4h-qwen36nt-r4,wad-4h,qwen36nt,4,14400,2885007,200.35,2350,2211,9113,222,27,2,39,39,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+wad4h-qwen36nt-r5,wad-4h,qwen36nt,5,14400,3114850,216.31,2304,9099,9113,232,28,0,39,39,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+wad4h-qwen4b-r1,wad-4h,qwen4b,1,14400,2648299,183.91,2218,2162,9113,183,32,0,64,64,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wad4h-qwen4b-r2,wad-4h,qwen4b,2,14400,2173789,150.96,3064,3619,9113,260,32,0,53,53,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wad4h-qwen4b-r3,wad-4h,qwen4b,3,14400,2888962,200.62,2754,3349,9113,325,42,0,70,70,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wad4h-qwen4b-r4,wad-4h,qwen4b,4,14400,2563188,178.0,2083,2128,9113,203,34,2,56,56,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wad4h-qwen4b-r5,wad-4h,qwen4b,5,14400,2532499,175.87,2373,2230,9113,215,28,1,50,50,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wad4ht-baseline-r1,wad-4ht,baseline,1,14400,2571356,178.57,1383,1752,9113,173,0,0,0,0,0,
+wad4ht-baseline-r2,wad-4ht,baseline,2,14400,3138056,217.92,1395,2209,9113,155,0,0,0,0,0,
+wad4ht-baseline-r3,wad-4ht,baseline,3,14400,1011758,70.26,1261,1950,9113,110,0,0,0,0,0,
+wad4ht-baseline-r4,wad-4ht,baseline,4,14400,1054982,73.26,890,1630,9113,86,0,0,0,0,0,
+wad4ht-baseline-r5,wad-4ht,baseline,5,6193,457082,73.8,728,9113,9113,69,0,0,0,0,0,
+wad4ht-baseline-r6,wad-4ht,baseline,6,14400,2445978,169.86,1171,1862,9113,163,0,0,0,0,0,
+wad4ht-codernext-r1,wad-4ht,codernext,1,14400,2611970,181.39,2429,2314,9113,242,44,0,65,65,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wad4ht-codernext-r2,wad-4ht,codernext,2,14400,2765403,192.04,2438,2276,9113,232,42,0,49,49,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wad4ht-codernext-r3,wad-4ht,codernext,3,14400,2532303,175.85,2454,2425,9113,397,40,0,61,61,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wad4ht-codernext-r4,wad-4ht,codernext,4,14400,2673256,185.64,2975,3176,9113,257,47,2,59,59,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wad4ht-codernext-r5,wad-4ht,codernext,5,14400,3288344,228.36,2391,2283,9113,249,35,0,52,52,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wad4ht-qwen36nt-r1,wad-4ht,qwen36nt,1,14400,2653147,184.25,2332,2260,9113,202,41,1,51,51,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+wad4ht-qwen36nt-r2,wad-4ht,qwen36nt,2,14400,2609175,181.19,2849,2414,9113,364,28,1,48,48,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+wad4ht-qwen36nt-r3,wad-4ht,qwen36nt,3,14400,2247673,156.09,3163,3625,9113,328,28,0,53,53,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+wad4ht-qwen36nt-r4,wad-4ht,qwen36nt,4,14400,3163843,219.71,2410,2140,9113,311,22,0,28,28,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+wad4ht-qwen36nt-r5,wad-4ht,qwen36nt,5,14400,2093373,145.37,2897,3721,9113,348,28,0,38,38,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+wad4ht-qwen4b-r1,wad-4ht,qwen4b,1,14400,2453180,170.36,2250,2257,9113,184,26,1,44,44,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wad4ht-qwen4b-r2,wad-4ht,qwen4b,2,14400,2661820,184.85,2505,3012,9113,413,23,3,32,32,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wad4ht-qwen4b-r3,wad-4ht,qwen4b,3,14400,3123414,216.9,2368,2242,9113,221,30,0,53,53,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wad4ht-qwen4b-r4,wad-4ht,qwen4b,4,14400,2511545,174.41,2530,2379,9113,250,28,0,57,57,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wad4ht-qwen4b-r5,wad-4ht,qwen4b,5,14400,3104331,215.58,2270,2196,9113,280,28,0,41,40,1,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+xml4h-baseline-r1,xml-4h,baseline,1,14400,225025400,15626.76,7523,3879,45358,0,0,0,0,0,0,
+xml4h-baseline-r2,xml-4h,baseline,2,14400,223492992,15520.3,8176,4321,45358,0,0,0,0,0,0,
+xml4h-baseline-r3,xml-4h,baseline,3,14400,154152663,10705.01,6552,2899,45358,0,0,0,0,0,0,
+xml4h-baseline-r4,xml-4h,baseline,4,14400,131037550,9099.83,6797,3046,45358,0,0,0,0,0,0,
+xml4h-baseline-r5,xml-4h,baseline,5,14400,151784345,10540.57,7485,3539,45358,0,0,0,0,0,0,
+xml4h-codernext-r1,xml-4h,codernext,1,14400,179037130,12433.13,9287,5050,45358,0,64,0,74,74,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+xml4h-codernext-r2,xml-4h,codernext,2,14400,188732594,13106.43,8613,4861,45358,0,65,0,74,74,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+xml4h-codernext-r3,xml-4h,codernext,3,14400,185746132,12899.03,8901,4723,45358,0,70,0,92,92,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+xml4h-codernext-r4,xml-4h,codernext,4,14400,187691185,13034.1,9056,4926,45358,0,53,0,67,67,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+xml4h-codernext-r5,xml-4h,codernext,5,14400,175337082,12176.18,8822,4883,45358,0,74,0,79,79,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+xml4h-qwen36nt-r1,xml-4h,qwen36nt,1,14400,167660638,11643.08,9027,4589,45358,0,34,0,46,46,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+xml4h-qwen36nt-r2,xml-4h,qwen36nt,2,14400,174042264,12086.27,8837,4775,45358,0,35,0,42,42,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+xml4h-qwen36nt-r3,xml-4h,qwen36nt,3,14400,197158153,13691.51,8837,4522,45358,0,38,1,43,43,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+xml4h-qwen36nt-r4,xml-4h,qwen36nt,4,14400,174947913,12149.14,8808,4663,45358,0,30,0,34,34,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+xml4h-qwen36nt-r5,xml-4h,qwen36nt,5,14400,180577506,12540.06,7560,3968,45358,0,35,0,39,39,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+xml4h-qwen4b-r1,xml-4h,qwen4b,1,14400,200281590,13908.44,7573,4276,45358,0,21,1,28,28,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+xml4h-qwen4b-r2,xml-4h,qwen4b,2,14400,194490605,13506.29,8316,4362,45358,0,30,0,37,37,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+xml4h-qwen4b-r3,xml-4h,qwen4b,3,14400,177617679,12334.55,7432,3763,45358,0,33,0,45,45,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+xml4h-qwen4b-r4,xml-4h,qwen4b,4,14400,146638224,10183.18,7838,3739,45358,0,26,0,34,34,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+xml4h-qwen4b-r5,xml-4h,qwen4b,5,14400,176409393,12250.58,8688,4351,45358,0,30,0,37,37,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
 lineup-abl9b-r1,jhead,abl9b,1,3600,6845453,1901.51,1437,582,1962,22,17,0,39,39,0,Huihui-Qwen3.5-9B-abliterated = huihui-ai/Huihui-Qwen3.5-9B-abliterated @ 05b9e7c9b978ba29bdb8f50a49c30e4b91183339
 lineup-abl9b-r2,jhead,abl9b,2,3600,7626496,2118.46,1576,662,1962,20,18,0,33,32,1,Huihui-Qwen3.5-9B-abliterated = huihui-ai/Huihui-Qwen3.5-9B-abliterated @ 05b9e7c9b978ba29bdb8f50a49c30e4b91183339
 lineup-abl9b-r3,jhead,abl9b,3,3600,8512758,2364.65,1289,607,1962,20,16,0,37,37,0,Huihui-Qwen3.5-9B-abliterated = huihui-ai/Huihui-Qwen3.5-9B-abliterated @ 05b9e7c9b978ba29bdb8f50a49c30e4b91183339
 lineup-baseline-r1,jhead,baseline,1,3600,6952077,1931.13,1447,606,1962,19,0,0,0,0,0,
 lineup-baseline-r2,jhead,baseline,2,3600,6944787,1929.1,1497,674,1962,22,0,0,0,0,0,
 lineup-baseline-r3,jhead,baseline,3,3600,6698130,1860.58,1456,651,1962,21,0,0,0,0,0,
+lineup-baseline-r4,jhead,baseline,4,3600,8247701,2291.01,1559,692,1962,12,0,0,0,0,0,
+lineup-baseline-r5,jhead,baseline,5,3600,5953555,1653.71,1617,656,1962,19,0,0,0,0,0,
 lineup-coder30b-r1,jhead,coder30b,1,3600,6191811,1719.92,1504,589,1962,19,22,0,29,29,0,Qwen3-Coder-30B-A3B-Instruct-FP8 = Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8 @ dcaee4d4dfc5ee71ad501f01f530e5652438fde0
 lineup-coder30b-r2,jhead,coder30b,2,3600,5882491,1634.02,1485,685,1962,23,20,0,25,24,1,Qwen3-Coder-30B-A3B-Instruct-FP8 = Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8 @ dcaee4d4dfc5ee71ad501f01f530e5652438fde0
 lineup-coder30b-r3,jhead,coder30b,3,3600,7807112,2168.63,1589,664,1962,21,20,0,34,34,0,Qwen3-Coder-30B-A3B-Instruct-FP8 = Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8 @ dcaee4d4dfc5ee71ad501f01f530e5652438fde0
 lineup-codernext-r1,jhead,codernext,1,3600,7272925,2020.25,1601,734,1962,23,20,0,33,33,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
 lineup-codernext-r2,jhead,codernext,2,3600,7800938,2166.92,1513,675,1962,17,20,0,26,26,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
 lineup-codernext-r3,jhead,codernext,3,3600,8106912,2251.91,1700,731,1962,23,20,0,25,25,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+lineup-codernext-r4,jhead,codernext,4,3600,6838434,1899.56,1656,729,1962,18,20,0,25,25,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+lineup-codernext-r5,jhead,codernext,5,3600,7064670,1962.4,1481,674,1962,18,20,0,25,25,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
 lineup-devstral24b-r1,jhead,devstral24b,1,3600,8283210,2300.71,1650,677,1962,18,24,0,53,53,0,Devstral-Small-2-24B-Instruct-2512 = mistralai/Devstral-Small-2-24B-Instruct-2512 @ 55c5b41e98c2dbd21b0c8afffc540dcfc9eb5128
 lineup-devstral24b-r2,jhead,devstral24b,2,3600,7445248,2068.12,1687,738,1962,19,25,0,57,55,2,Devstral-Small-2-24B-Instruct-2512 = mistralai/Devstral-Small-2-24B-Instruct-2512 @ 55c5b41e98c2dbd21b0c8afffc540dcfc9eb5128
 lineup-devstral24b-r3,jhead,devstral24b,3,3600,7175941,1993.3,1662,668,1962,23,22,0,48,48,0,Devstral-Small-2-24B-Instruct-2512 = mistralai/Devstral-Small-2-24B-Instruct-2512 @ 55c5b41e98c2dbd21b0c8afffc540dcfc9eb5128
@@ -38,58 +245,36 @@ lineup-qwen36-r3,jhead,qwen36,3,3600,7303106,2028.64,1421,657,1962,20,20,0,34,29
 lineup-qwen36nt-r1,jhead,qwen36nt,1,3600,6358909,1766.36,1662,716,1962,19,20,0,35,35,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
 lineup-qwen36nt-r2,jhead,qwen36nt,2,3600,7020866,1950.23,1560,684,1962,20,15,0,32,32,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
 lineup-qwen36nt-r3,jhead,qwen36nt,3,3600,6835409,1898.72,1575,728,1962,18,17,0,28,28,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+lineup-qwen36nt-r4,jhead,qwen36nt,4,3600,6640592,1844.6,1643,687,1962,21,20,0,31,31,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
+lineup-qwen36nt-r5,jhead,qwen36nt,5,3600,6997239,1943.67,1593,683,1962,18,20,0,27,27,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
 lineup-qwen38-r1,jhead,qwen38,1,3600,4068818,1130.22,1006,484,1962,20,16,0,25,24,1,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
 lineup-qwen38-r2,jhead,qwen38,2,3600,6687149,1857.54,1659,727,1962,18,18,0,20,20,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
 lineup-qwen38-r3,jhead,qwen38,3,3600,6223249,1728.67,1525,661,1962,21,16,0,24,24,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
 lineup-qwen4b-r1,jhead,qwen4b,1,3600,6918740,1921.87,607,395,1962,22,7,1,39,37,2,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
 lineup-qwen4b-r2,jhead,qwen4b,2,3600,6458796,1794.11,1523,660,1962,22,15,0,31,30,1,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
 lineup-qwen4b-r3,jhead,qwen4b,3,3600,8112331,2253.4,1592,647,1962,23,20,0,37,34,3,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-png-baseline-r1,png,baseline,1,3600,130096726,36137.93,1861,1581,5000,0,0,0,0,0,0,
-png-baseline-r2,png,baseline,2,3600,129786191,36051.67,2068,1604,5000,0,0,0,0,0,0,
-png-baseline-r3,png,baseline,3,3600,129831939,36064.35,1885,1579,5000,0,0,0,0,0,0,
-png-codernext-r1,png,codernext,1,3600,64964332,18045.5,2139,1613,5000,0,48,1,67,67,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
-png-codernext-r2,png,codernext,2,3600,31177035,8660.22,1733,1614,5000,0,40,0,60,60,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
-png-codernext-r3,png,codernext,3,3600,36184656,10051.25,1891,1608,5000,0,41,2,83,83,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
-png-gemma31b-r1,png,gemma31b,1,3600,96798019,26888.24,2005,1619,5000,0,25,0,28,28,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
-png-gemma31b-r2,png,gemma31b,2,3600,109857262,30515.86,1884,1613,5000,0,28,0,33,33,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
-png-gemma31b-r3,png,gemma31b,3,3600,113620661,31561.25,1970,1612,5000,0,30,0,33,33,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
-png-qwen36nt-r1,png,qwen36nt,1,3600,89164441,24767.82,1806,1614,5000,0,30,0,36,36,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-png-qwen36nt-r2,png,qwen36nt,2,,,,,,,,,,,,,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-png-qwen36nt-r3,png,qwen36nt,3,3600,112386239,31218.36,2026,1625,5000,0,27,0,34,34,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-png-qwen38-r1,png,qwen38,1,3600,91771104,25491.9,1842,1619,5000,0,26,0,33,33,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
-png-qwen38-r2,png,qwen38,2,3600,100320192,27866.63,1865,1622,5000,0,28,0,43,43,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
-png-qwen38-r3,png,qwen38,3,3600,473989,131.65,895,1285,5000,0,26,2,36,36,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
-png-qwen4b-r1,png,qwen4b,1,,,,,,,,,,,,,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-png-qwen4b-r2,png,qwen4b,2,3600,109671704,30464.29,2096,1609,5000,0,50,0,98,98,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-png-qwen4b-r3,png,qwen4b,3,3600,99732193,27703.34,1963,1617,5000,0,29,0,48,48,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-tiff-baseline-r1,tiff,baseline,1,3600,45804630,12723.48,5433,4356,13696,0,0,0,0,0,0,
-tiff-baseline-r2,tiff,baseline,2,3600,48440136,13455.57,6077,4320,13696,0,0,0,0,0,0,
-tiff-baseline-r3,tiff,baseline,3,3600,46010740,12780.75,6223,4576,13696,0,0,0,0,0,0,
-tiff-codernext-r1,tiff,codernext,1,3600,30398737,8444.06,5771,4418,13696,0,38,0,95,95,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
-tiff-codernext-r2,tiff,codernext,2,3600,23578972,6549.66,6214,4416,13696,0,54,0,118,118,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
-tiff-codernext-r3,tiff,codernext,3,3600,31529470,8758.14,5292,4197,13696,0,47,0,124,124,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
-tiff-gemma31b-r1,tiff,gemma31b,1,3600,16669862,4630.49,5145,4397,13696,0,28,1,47,47,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
-tiff-gemma31b-r2,tiff,gemma31b,2,3600,7490265,2080.62,4457,4065,13696,0,28,0,62,62,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
-tiff-gemma31b-r3,tiff,gemma31b,3,3600,22685787,6301.57,4990,4411,13696,0,29,0,44,44,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
-tiff-qwen36nt-r1,tiff,qwen36nt,1,3600,20748053,5763.33,5411,4316,13696,0,38,1,43,43,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-tiff-qwen36nt-r2,tiff,qwen36nt,2,3600,37168551,10324.57,5596,4576,13696,0,33,0,48,48,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-tiff-qwen36nt-r3,tiff,qwen36nt,3,3600,34304191,9528.94,5708,4224,13696,0,30,0,43,43,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-tiff-qwen38-r1,tiff,qwen38,1,3600,29136506,8093.44,5643,4502,13696,0,35,0,55,55,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
-tiff-qwen38-r2,tiff,qwen38,2,3600,25151664,6986.57,5684,4428,13696,0,29,0,48,48,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
-tiff-qwen38-r3,tiff,qwen38,3,3600,39444879,10956.9,5287,4341,13696,0,26,0,35,35,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
-tiff-qwen4b-r1,tiff,qwen4b,1,3600,22450989,6236.34,5381,4149,13696,0,50,0,123,123,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-tiff-qwen4b-r2,tiff,qwen4b,2,3600,42166141,11712.81,5891,4493,13696,0,36,0,66,66,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-tiff-qwen4b-r3,tiff,qwen4b,3,3600,47286984,13135.25,5633,4428,13696,0,30,0,47,47,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-wad-baseline-r1,wad,baseline,1,3600,681389,189.27,791,1664,9113,92,0,0,0,0,0,
-wad-baseline-r2,wad,baseline,2,3600,266596,74.05,583,1694,9113,83,0,0,0,0,0,
-wad-baseline-r3,wad,baseline,3,3600,244597,67.94,622,1625,9113,54,0,0,0,0,0,
-wad-baseline-r4,wad,baseline,4,3600,245442,68.18,584,1652,9113,50,0,0,0,0,0,
-wad-baseline-r5,wad,baseline,5,3600,232191,64.5,461,1554,9113,64,0,0,0,0,0,
-wad-codernext-r1,wad,codernext,1,3600,389735,108.26,1372,1788,9113,86,45,0,72,72,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
-wad-codernext-r2,wad,codernext,2,3600,573595,159.33,1587,1938,9113,137,45,0,71,71,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
-wad-codernext-r3,wad,codernext,3,3600,523825,145.51,1550,1980,9113,104,40,0,54,54,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
-wad-codernext-r4,wad,codernext,4,3600,591500,164.3,1665,1915,9113,124,55,0,69,69,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
-wad-codernext-r5,wad,codernext,5,3600,472674,131.3,1422,1995,9113,98,45,0,64,64,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+lineup-qwen4b-r4,jhead,qwen4b,4,3600,7177131,1993.65,1408,703,1962,15,20,0,47,46,1,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+lineup-qwen4b-r5,jhead,qwen4b,5,3600,6362797,1767.44,1445,666,1962,20,20,0,42,42,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+png-ctl-junk-r1,png,ctl-junk,1,3600,123464283,34295.59,2009,1580,5000,0,0,0,0,0,0,
+png-ctl-junk-r2,png,ctl-junk,2,3600,123487262,34301.94,1955,1573,5000,0,0,0,0,0,0,
+png-ctl-junk-r3,png,ctl-junk,3,3600,115923510,32200.91,2055,1589,5000,0,0,0,0,0,0,
+png-ctl-junk-r4,png,ctl-junk,4,3600,111919643,31088.7,1991,1575,5000,0,0,0,0,0,0,
+png-ctl-junk-r5,png,ctl-junk,5,3600,125350010,34819.3,2113,1595,5000,0,0,0,0,0,0,
+png-ctl-llmseeds-r1,png,ctl-llmseeds,1,3600,83428041,23174.28,2013,1612,5000,0,0,0,0,0,0,
+png-ctl-llmseeds-r2,png,ctl-llmseeds,2,3600,99886430,27746.19,1992,1627,5000,0,0,0,0,0,0,
+png-ctl-llmseeds-r3,png,ctl-llmseeds,3,3600,102055029,28348.58,2070,1617,5000,0,0,0,0,0,0,
+png-ctl-llmseeds-r4,png,ctl-llmseeds,4,3600,84650734,23514.02,2033,1598,5000,0,0,0,0,0,0,
+png-ctl-llmseeds-r5,png,ctl-llmseeds,5,3600,108101564,30028.15,2065,1631,5000,0,0,0,0,0,0,
+tiff-ctl-junk-r1,tiff,ctl-junk,1,3600,52245974,14512.76,6335,4781,13696,0,0,0,0,0,0,
+tiff-ctl-junk-r2,tiff,ctl-junk,2,3600,36001802,10000.49,5881,4588,13696,0,0,0,0,0,0,
+tiff-ctl-junk-r3,tiff,ctl-junk,3,3600,43473934,12076.05,6213,4493,13696,0,0,0,0,0,0,
+tiff-ctl-junk-r4,tiff,ctl-junk,4,3600,44777896,12438.27,5469,4265,13696,0,0,0,0,0,0,
+tiff-ctl-junk-r5,tiff,ctl-junk,5,3600,43018153,11949.46,6041,4385,13696,0,0,0,0,0,0,
+tiff-ctl-llmseeds-r1,tiff,ctl-llmseeds,1,3600,25978221,7216.15,5342,4398,13696,0,0,0,0,0,0,
+tiff-ctl-llmseeds-r2,tiff,ctl-llmseeds,2,3600,13451675,3736.56,4472,4257,13696,0,0,0,0,0,0,
+tiff-ctl-llmseeds-r3,tiff,ctl-llmseeds,3,3600,14985106,4162.5,4937,4340,13696,0,0,0,0,0,0,
+tiff-ctl-llmseeds-r4,tiff,ctl-llmseeds,4,3600,17736565,4926.82,5117,4199,13696,0,0,0,0,0,0,
+tiff-ctl-llmseeds-r5,tiff,ctl-llmseeds,5,3600,14149133,3930.29,4630,4330,13696,0,0,0,0,0,0,
 wad-ctl-junk-r1,wad,ctl-junk,1,3600,399944,111.09,1387,1943,9113,85,0,0,0,0,0,
 wad-ctl-junk-r2,wad,ctl-junk,2,3600,467331,129.81,1419,1783,9113,93,0,0,0,0,0,
 wad-ctl-junk-r3,wad,ctl-junk,3,3600,514355,142.88,1613,1949,9113,111,0,0,0,0,0,
@@ -100,56 +285,6 @@ wad-ctl-llmseeds-r2,wad,ctl-llmseeds,2,3600,223312,62.03,1235,1781,9113,60,0,0,0
 wad-ctl-llmseeds-r3,wad,ctl-llmseeds,3,3600,272316,75.64,1123,1807,9113,48,0,0,0,0,0,
 wad-ctl-llmseeds-r4,wad,ctl-llmseeds,4,3600,284848,79.12,1100,1874,9113,53,0,0,0,0,0,
 wad-ctl-llmseeds-r5,wad,ctl-llmseeds,5,3600,405394,112.61,1440,2101,9113,89,0,0,0,0,0,
-wad-gemma31b-r1,wad,gemma31b,1,3600,466335,129.54,1491,1929,9113,102,31,0,36,36,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
-wad-gemma31b-r2,wad,gemma31b,2,3600,411997,114.44,1354,1806,9113,97,30,0,34,34,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
-wad-gemma31b-r3,wad,gemma31b,3,3600,437344,121.48,1379,2055,9113,83,32,0,35,35,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
-wad-gemma31b-r4,wad,gemma31b,4,3600,451594,125.44,1477,1887,9113,102,35,0,40,40,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
-wad-gemma31b-r5,wad,gemma31b,5,3600,417594,116.0,1355,1989,9113,84,30,0,33,33,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
-wad-qwen36nt-r1,wad,qwen36nt,1,3600,521695,144.91,1646,2067,9113,120,24,0,33,33,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-wad-qwen36nt-r2,wad,qwen36nt,2,3600,435487,120.97,1425,2177,9113,95,18,0,35,35,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-wad-qwen36nt-r3,wad,qwen36nt,3,3600,440147,122.26,1559,1981,9113,82,23,0,27,27,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-wad-qwen36nt-r4,wad,qwen36nt,4,3600,455897,126.64,1295,1866,9113,75,28,0,38,38,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-wad-qwen36nt-r5,wad,qwen36nt,5,3600,515399,143.17,1536,1907,9113,101,22,0,27,27,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-wad-qwen38-r1,wad,qwen38,1,3600,531071,147.52,1429,1858,9113,98,22,0,30,30,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
-wad-qwen38-r2,wad,qwen38,2,3600,482950,134.15,1487,1974,9113,100,34,0,53,53,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
-wad-qwen38-r3,wad,qwen38,3,3600,574261,159.52,1555,2038,9113,139,26,0,31,31,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
-wad-qwen38-r4,wad,qwen38,4,3600,505853,140.51,1471,1828,9113,112,30,0,35,35,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
-wad-qwen38-r5,wad,qwen38,5,3600,477519,132.64,1443,1968,9113,90,27,0,43,43,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
-wad-qwen4b-r1,wad,qwen4b,1,3600,238646,66.29,1087,1725,9113,63,23,0,40,40,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-wad-qwen4b-r2,wad,qwen4b,2,3600,461753,128.26,1335,1862,9113,82,26,0,41,41,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-wad-qwen4b-r3,wad,qwen4b,3,3600,539011,149.72,1359,1880,9113,99,23,0,38,38,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-wad-qwen4b-r4,wad,qwen4b,4,3600,459924,127.76,1432,1914,9113,99,19,0,31,31,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-wad-qwen4b-r5,wad,qwen4b,5,3600,442325,122.87,1295,1868,9113,81,27,0,43,43,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-wad4h-baseline-r1,wad-4h,baseline,1,14400,2739814,190.26,1287,1844,9113,161,0,0,0,0,0,
-wad4h-baseline-r2,wad-4h,baseline,2,14400,2633642,182.89,1123,1741,9113,125,0,0,0,0,0,
-wad4h-baseline-r3,wad-4h,baseline,3,14400,2257245,156.75,1618,2045,9113,153,0,0,0,0,0,
-wad4h-baseline-r4,wad-4h,baseline,4,14400,1856873,128.95,818,1784,9113,121,0,0,0,0,0,
-wad4h-baseline-r5,wad-4h,baseline,5,14400,1666977,115.76,1303,1840,9113,152,0,0,0,0,0,
-wad4h-codernext-r1,wad-4h,codernext,1,14400,2331065,161.88,2514,2443,9113,230,41,1,51,51,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
-wad4h-codernext-r2,wad-4h,codernext,2,14400,2743505,190.52,2475,2380,9113,239,42,1,74,74,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
-wad4h-codernext-r3,wad-4h,codernext,3,14400,2686436,186.56,2579,2417,9113,306,44,0,73,73,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
-wad4h-codernext-r4,wad-4h,codernext,4,14400,2448749,170.05,2738,3872,9113,217,45,0,69,69,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
-wad4h-codernext-r5,wad-4h,codernext,5,14400,2688780,186.72,2341,2308,9113,241,30,0,44,44,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
-wad4h-qwen36nt-r1,wad-4h,qwen36nt,1,14400,2890576,200.73,2398,2429,9113,295,29,1,44,44,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-wad4h-qwen36nt-r2,wad-4h,qwen36nt,2,14400,2666979,185.21,2274,2283,9113,229,31,0,39,39,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-wad4h-qwen36nt-r3,wad-4h,qwen36nt,3,14400,2935382,203.85,2433,2332,9113,267,25,0,34,34,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-wad4h-qwen36nt-r4,wad-4h,qwen36nt,4,14400,2885007,200.35,2350,2211,9113,222,27,2,39,39,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-wad4h-qwen36nt-r5,wad-4h,qwen36nt,5,14400,3114850,216.31,2304,9099,9113,232,28,0,39,39,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-wad4h-qwen4b-r1,wad-4h,qwen4b,1,14400,2648299,183.91,2218,2162,9113,183,32,0,64,64,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-wad4h-qwen4b-r2,wad-4h,qwen4b,2,14400,2173789,150.96,3064,3619,9113,260,32,0,53,53,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-wad4h-qwen4b-r3,wad-4h,qwen4b,3,14400,2888962,200.62,2754,3349,9113,325,42,0,70,70,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-wad4h-qwen4b-r4,wad-4h,qwen4b,4,14400,2563188,178.0,2083,2128,9113,203,34,2,56,56,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-wad4h-qwen4b-r5,wad-4h,qwen4b,5,14400,2532499,175.87,2373,2230,9113,215,28,1,50,50,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-xml-baseline-r1,xml,baseline,1,3600,26844229,7456.71,6067,2786,45358,0,0,0,0,0,0,
-xml-baseline-r2,xml,baseline,2,3600,30219620,8394.26,3975,2128,45358,0,0,0,0,0,0,
-xml-baseline-r3,xml,baseline,3,3600,39552682,10986.83,3926,2179,45358,0,0,0,0,0,0,
-xml-baseline-r4,xml,baseline,4,3600,41785517,11607.01,4058,2185,45358,0,0,0,0,0,0,
-xml-baseline-r5,xml,baseline,5,3600,46008165,12779.96,3733,2036,45358,0,0,0,0,0,0,
-xml-codernext-r1,xml,codernext,1,3600,37219703,10337.62,7625,4622,45358,0,71,0,92,92,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
-xml-codernext-r2,xml,codernext,2,3600,35414027,9837.08,7845,4869,45358,0,65,0,80,80,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
-xml-codernext-r3,xml,codernext,3,3600,38881352,10800.37,7825,4757,45358,0,55,0,69,69,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
-xml-codernext-r4,xml,codernext,4,3600,31926745,8868.5,7065,3929,45358,0,52,0,64,64,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
-xml-codernext-r5,xml,codernext,5,3600,39210231,10891.72,7741,4716,45358,0,50,0,55,55,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
 xml-ctl-junk-r1,xml,ctl-junk,1,3600,30180216,8383.39,3852,2157,45358,0,0,0,0,0,0,
 xml-ctl-junk-r2,xml,ctl-junk,2,3600,28393307,7887.03,4033,2157,45358,0,0,0,0,0,0,
 xml-ctl-junk-r3,xml,ctl-junk,3,3600,40155702,11154.34,3823,2013,45358,0,0,0,0,0,0,
@@ -160,43 +295,43 @@ xml-ctl-llmseeds-r2,xml,ctl-llmseeds,2,3600,37503042,10417.25,7766,4504,45358,0,
 xml-ctl-llmseeds-r3,xml,ctl-llmseeds,3,3600,33925728,9423.77,7742,4592,45358,0,0,0,0,0,0,
 xml-ctl-llmseeds-r4,xml,ctl-llmseeds,4,3600,34671370,9630.77,7738,4547,45358,0,0,0,0,0,0,
 xml-ctl-llmseeds-r5,xml,ctl-llmseeds,5,3600,33598327,9332.86,7743,4581,45358,0,0,0,0,0,0,
-xml-gemma31b-r1,xml,gemma31b,1,3600,38452392,10681.21,7646,4338,45358,0,30,0,34,34,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
-xml-gemma31b-r2,xml,gemma31b,2,3600,36177760,10049.27,7540,4542,45358,0,25,0,29,29,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
-xml-gemma31b-r3,xml,gemma31b,3,3600,30454617,8459.55,6439,3438,45358,0,27,0,37,37,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
-xml-gemma31b-r4,xml,gemma31b,4,3600,47524944,13201.35,7995,4456,45358,0,29,0,33,33,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
-xml-gemma31b-r5,xml,gemma31b,5,3600,40732270,11314.41,7308,4072,45358,0,26,0,31,31,0,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475
-xml-qwen36nt-r1,xml,qwen36nt,1,3600,36489245,10135.88,6353,3111,45358,0,38,0,43,43,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-xml-qwen36nt-r2,xml,qwen36nt,2,3600,36570079,10158.15,6250,3583,45358,0,45,0,50,50,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-xml-qwen36nt-r3,xml,qwen36nt,3,3600,43094276,11970.57,6825,3642,45358,0,40,0,45,45,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-xml-qwen36nt-r4,xml,qwen36nt,4,3600,39510317,10975.07,7174,3747,45358,0,30,0,37,37,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-xml-qwen36nt-r5,xml,qwen36nt,5,3600,38456972,10682.46,7531,4110,45358,0,35,0,40,40,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-xml-qwen38-r1,xml,qwen38,1,3600,33193625,9220.45,6485,3517,45358,0,29,0,35,35,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
-xml-qwen38-r2,xml,qwen38,2,3600,37296018,10359.96,7566,4311,45358,0,33,0,40,40,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
-xml-qwen38-r3,xml,qwen38,3,3600,42610558,11836.25,7311,4450,45358,0,35,0,39,39,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
-xml-qwen38-r4,xml,qwen38,4,3600,43646947,12124.14,7786,4569,45358,0,51,0,55,55,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
-xml-qwen38-r5,xml,qwen38,5,3600,34069344,9463.63,7053,3786,45358,0,30,0,37,37,0,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a
-xml-qwen4b-r1,xml,qwen4b,1,3600,27277887,7576.93,6755,3708,45358,0,35,0,48,48,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-xml-qwen4b-r2,xml,qwen4b,2,3600,35350850,9819.68,6927,3894,45358,0,30,0,37,37,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-xml-qwen4b-r3,xml,qwen4b,3,3600,32049641,8902.66,5875,2893,45358,0,32,0,44,44,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-xml-qwen4b-r4,xml,qwen4b,4,3600,38218455,10616.21,6782,3536,45358,0,31,0,46,46,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-xml-qwen4b-r5,xml,qwen4b,5,3600,44768059,12435.47,7421,3895,45358,0,38,0,44,44,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-xml4h-baseline-r1,xml-4h,baseline,1,14400,225025400,15626.76,7523,3879,45358,0,0,0,0,0,0,
-xml4h-baseline-r2,xml-4h,baseline,2,14400,223492992,15520.3,8176,4321,45358,0,0,0,0,0,0,
-xml4h-baseline-r3,xml-4h,baseline,3,14400,154152663,10705.01,6552,2899,45358,0,0,0,0,0,0,
-xml4h-baseline-r4,xml-4h,baseline,4,14400,131037550,9099.83,6797,3046,45358,0,0,0,0,0,0,
-xml4h-baseline-r5,xml-4h,baseline,5,14400,151784345,10540.57,7485,3539,45358,0,0,0,0,0,0,
-xml4h-codernext-r1,xml-4h,codernext,1,14400,179037130,12433.13,9287,5050,45358,0,64,0,74,74,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
-xml4h-codernext-r2,xml-4h,codernext,2,14400,188732594,13106.43,8613,4861,45358,0,65,0,74,74,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
-xml4h-codernext-r3,xml-4h,codernext,3,14400,185746132,12899.03,8901,4723,45358,0,70,0,92,92,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
-xml4h-codernext-r4,xml-4h,codernext,4,14400,187691185,13034.1,9056,4926,45358,0,53,0,67,67,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
-xml4h-codernext-r5,xml-4h,codernext,5,14400,175337082,12176.18,8822,4883,45358,0,74,0,79,79,0,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
-xml4h-qwen36nt-r1,xml-4h,qwen36nt,1,14400,167660638,11643.08,9027,4589,45358,0,34,0,46,46,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-xml4h-qwen36nt-r2,xml-4h,qwen36nt,2,14400,174042264,12086.27,8837,4775,45358,0,35,0,42,42,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-xml4h-qwen36nt-r3,xml-4h,qwen36nt,3,14400,197158153,13691.51,8837,4522,45358,0,38,1,43,43,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-xml4h-qwen36nt-r4,xml-4h,qwen36nt,4,14400,174947913,12149.14,8808,4663,45358,0,30,0,34,34,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-xml4h-qwen36nt-r5,xml-4h,qwen36nt,5,14400,180577506,12540.06,7560,3968,45358,0,35,0,39,39,0,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989
-xml4h-qwen4b-r1,xml-4h,qwen4b,1,14400,200281590,13908.44,7573,4276,45358,0,21,1,28,28,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-xml4h-qwen4b-r2,xml-4h,qwen4b,2,14400,194490605,13506.29,8316,4362,45358,0,30,0,37,37,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-xml4h-qwen4b-r3,xml-4h,qwen4b,3,14400,177617679,12334.55,7432,3763,45358,0,33,0,45,45,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-xml4h-qwen4b-r4,xml-4h,qwen4b,4,14400,146638224,10183.18,7838,3739,45358,0,26,0,34,34,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
-xml4h-qwen4b-r5,xml-4h,qwen4b,5,14400,176409393,12250.58,8688,4351,45358,0,30,0,37,37,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wadp-bare-codernext-r1,wad-p,bare-codernext,1,3600,307564,85.43,1134,1704,9113,47,44,0,56,55,1,Qwen3-Coder-Next-FP8-agent = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wadp-bare-codernext-r2,wad-p,bare-codernext,2,3600,361108,100.31,1333,1756,9113,87,45,0,58,58,0,Qwen3-Coder-Next-FP8-agent = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wadp-bare-codernext-r3,wad-p,bare-codernext,3,3600,527558,146.54,1489,1852,9113,100,45,0,86,86,0,Qwen3-Coder-Next-FP8-agent = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wadp-bare-codernext-r4,wad-p,bare-codernext,4,3600,423273,117.58,1375,1835,9113,96,45,0,77,76,1,Qwen3-Coder-Next-FP8-agent = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wadp-bare-codernext-r5,wad-p,bare-codernext,5,3600,460772,127.99,1354,1856,9113,76,45,0,58,58,0,Qwen3-Coder-Next-FP8-agent = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wadp-bare-qwen4b-r1,wad-p,bare-qwen4b,1,3600,362189,100.61,1387,1926,9113,73,28,0,43,43,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wadp-bare-qwen4b-r2,wad-p,bare-qwen4b,2,3600,582513,161.81,1528,1901,9113,133,23,0,40,40,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wadp-bare-qwen4b-r3,wad-p,bare-qwen4b,3,3600,435199,120.89,1412,1897,9113,83,33,0,56,56,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wadp-bare-qwen4b-r4,wad-p,bare-qwen4b,4,3600,436921,121.37,1439,1933,9113,94,36,0,64,64,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wadp-bare-qwen4b-r5,wad-p,bare-qwen4b,5,3600,482014,133.89,1498,1981,9113,98,29,0,56,56,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wadp-ctl-junk-r1,wad-p,ctl-junk,1,3600,279794,77.72,1377,1874,9113,14,0,0,0,0,0,
+wadp-ctl-junk-r2,wad-p,ctl-junk,2,3600,291920,81.09,1117,1743,9113,8,0,0,0,0,0,
+wadp-ctl-junk-r3,wad-p,ctl-junk,3,3600,239449,66.51,1120,1777,9113,12,0,0,0,0,0,
+wadp-ctl-junk-r4,wad-p,ctl-junk,4,3600,292703,81.31,1166,1797,9113,14,0,0,0,0,0,
+wadp-ctl-junk-r5,wad-p,ctl-junk,5,3600,252580,70.16,1197,1788,9113,13,0,0,0,0,0,
+wadp-ctl-llmseeds-r1,wad-p,ctl-llmseeds,1,3600,278717,77.42,1069,1793,9113,8,0,0,0,0,0,
+wadp-ctl-llmseeds-r2,wad-p,ctl-llmseeds,2,3600,280654,77.96,1201,1708,9113,6,0,0,0,0,0,
+wadp-ctl-llmseeds-r3,wad-p,ctl-llmseeds,3,3600,316441,87.9,1179,1782,9113,9,0,0,0,0,0,
+wadp-ctl-llmseeds-r4,wad-p,ctl-llmseeds,4,3600,292386,81.22,1195,1870,9113,9,0,0,0,0,0,
+wadp-ctl-llmseeds-r5,wad-p,ctl-llmseeds,5,3600,271224,75.34,1110,1950,9113,8,0,0,0,0,0,
+wadp-name-codernext-r1,wad-p,name-codernext,1,3600,590864,164.13,1646,1992,9113,131,78,0,124,122,2,Qwen3-Coder-Next-FP8-agent = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wadp-name-codernext-r2,wad-p,name-codernext,2,3600,497148,138.1,1576,1815,9113,116,85,0,154,151,3,Qwen3-Coder-Next-FP8-agent = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wadp-name-codernext-r3,wad-p,name-codernext,3,3600,502078,139.47,1497,1956,9113,97,55,0,82,82,0,Qwen3-Coder-Next-FP8-agent = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wadp-name-codernext-r4,wad-p,name-codernext,4,3600,513132,142.53,1394,1957,9113,97,49,0,77,76,1,Qwen3-Coder-Next-FP8-agent = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wadp-name-codernext-r5,wad-p,name-codernext,5,3600,504861,140.24,1526,2103,9113,81,65,0,113,112,1,Qwen3-Coder-Next-FP8-agent = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wadp-name-qwen4b-r1,wad-p,name-qwen4b,1,3600,415356,115.38,1339,1889,9113,108,32,0,80,80,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wadp-name-qwen4b-r2,wad-p,name-qwen4b,2,3600,462872,128.58,1467,1898,9113,108,35,0,72,72,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wadp-name-qwen4b-r3,wad-p,name-qwen4b,3,3600,509473,141.52,1365,1947,9113,91,32,0,59,59,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wadp-name-qwen4b-r4,wad-p,name-qwen4b,4,3600,457310,127.03,1342,1908,9113,79,30,0,57,57,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wadp-name-qwen4b-r5,wad-p,name-qwen4b,5,3600,467130,129.76,1549,1877,9113,110,45,0,90,90,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wadp-spec-codernext-r1,wad-p,spec-codernext,1,3600,532439,147.9,1458,1956,9113,87,83,0,137,137,0,Qwen3-Coder-Next-FP8-agent = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wadp-spec-codernext-r2,wad-p,spec-codernext,2,3600,525637,146.01,1518,2063,9113,101,70,0,143,143,0,Qwen3-Coder-Next-FP8-agent = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wadp-spec-codernext-r3,wad-p,spec-codernext,3,3600,552209,153.39,1514,1949,9113,91,63,0,156,153,3,Qwen3-Coder-Next-FP8-agent = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wadp-spec-codernext-r4,wad-p,spec-codernext,4,3600,528306,146.75,1445,1959,9113,97,45,0,79,78,1,Qwen3-Coder-Next-FP8-agent = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wadp-spec-codernext-r5,wad-p,spec-codernext,5,3600,609149,169.21,1676,1987,9113,152,73,0,124,122,2,Qwen3-Coder-Next-FP8-agent = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c
+wadp-spec-qwen4b-r1,wad-p,spec-qwen4b,1,3600,422480,117.36,1453,1927,9113,84,81,0,255,255,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wadp-spec-qwen4b-r2,wad-p,spec-qwen4b,2,3600,532536,147.93,1400,1929,9113,114,35,0,157,157,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wadp-spec-qwen4b-r3,wad-p,spec-qwen4b,3,3600,512168,142.27,1416,1884,9113,106,27,0,189,189,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wadp-spec-qwen4b-r4,wad-p,spec-qwen4b,4,3600,474292,131.75,1415,1982,9113,80,51,0,177,177,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+wadp-spec-qwen4b-r5,wad-p,spec-qwen4b,5,3600,543319,150.92,1414,1872,9113,116,37,0,131,131,0,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a

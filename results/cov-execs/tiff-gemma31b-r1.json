@@ -1,0 +1,534 @@
+{
+ "target": "/targets/tiff_read_rgba_fuzzer.afl",
+ "files": 4242,
+ "total_edges": 3924,
+ "stock_edges": null,
+ "new_edges": null,
+ "per_generator": {
+  "stock": {
+   "files": 4138,
+   "edges": 3911,
+   "unique": 2895
+  },
+  "id:000001,time:0,execs:0,orig:tiff-10": {
+   "files": 1,
+   "edges": 539,
+   "unique": 0
+  },
+  "id:000002,time:0,execs:0,orig:tiff-16": {
+   "files": 1,
+   "edges": 557,
+   "unique": 0
+  },
+  "id:000003,time:0,execs:0,orig:tiff-16": {
+   "files": 1,
+   "edges": 489,
+   "unique": 0
+  },
+  "id:000004,time:0,execs:0,orig:tiff-16": {
+   "files": 1,
+   "edges": 499,
+   "unique": 0
+  },
+  "id:000005,time:0,execs:0,orig:tiff-16": {
+   "files": 1,
+   "edges": 592,
+   "unique": 0
+  },
+  "id:000006,time:0,execs:0,orig:tiff-18": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  },
+  "id:000007,time:0,execs:0,orig:tiff-18": {
+   "files": 1,
+   "edges": 520,
+   "unique": 0
+  },
+  "id:000008,time:0,execs:0,orig:tiff-18": {
+   "files": 1,
+   "edges": 499,
+   "unique": 0
+  },
+  "id:000009,time:0,execs:0,orig:tiff-18": {
+   "files": 1,
+   "edges": 532,
+   "unique": 0
+  },
+  "id:000010,time:0,execs:0,orig:tiff-18": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  },
+  "id:000011,time:0,execs:0,orig:tiff-19": {
+   "files": 1,
+   "edges": 72,
+   "unique": 0
+  },
+  "id:000012,time:0,execs:0,orig:tiff-1": {
+   "files": 1,
+   "edges": 537,
+   "unique": 0
+  },
+  "id:000013,time:0,execs:0,orig:tiff-20": {
+   "files": 1,
+   "edges": 478,
+   "unique": 0
+  },
+  "id:000014,time:0,execs:0,orig:tiff-20": {
+   "files": 1,
+   "edges": 557,
+   "unique": 0
+  },
+  "id:000015,time:0,execs:0,orig:tiff-20": {
+   "files": 1,
+   "edges": 557,
+   "unique": 0
+  },
+  "id:000016,time:0,execs:0,orig:tiff-20": {
+   "files": 1,
+   "edges": 481,
+   "unique": 0
+  },
+  "id:000017,time:0,execs:0,orig:tiff-20": {
+   "files": 1,
+   "edges": 481,
+   "unique": 0
+  },
+  "id:000018,time:0,execs:0,orig:tiff-21": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  },
+  "id:000019,time:0,execs:0,orig:tiff-21": {
+   "files": 1,
+   "edges": 520,
+   "unique": 0
+  },
+  "id:000020,time:0,execs:0,orig:tiff-21": {
+   "files": 1,
+   "edges": 499,
+   "unique": 0
+  },
+  "id:000021,time:0,execs:0,orig:tiff-21": {
+   "files": 1,
+   "edges": 532,
+   "unique": 0
+  },
+  "id:000022,time:0,execs:0,orig:tiff-21": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  },
+  "id:000023,time:0,execs:0,orig:tiff-21": {
+   "files": 1,
+   "edges": 549,
+   "unique": 0
+  },
+  "id:000024,time:0,execs:0,orig:tiff-22": {
+   "files": 1,
+   "edges": 74,
+   "unique": 0
+  },
+  "id:000025,time:0,execs:0,orig:tiff-22": {
+   "files": 1,
+   "edges": 581,
+   "unique": 0
+  },
+  "id:000026,time:0,execs:0,orig:tiff-24": {
+   "files": 1,
+   "edges": 72,
+   "unique": 0
+  },
+  "id:000027,time:0,execs:0,orig:tiff-25": {
+   "files": 1,
+   "edges": 532,
+   "unique": 0
+  },
+  "id:000028,time:0,execs:0,orig:tiff-26": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  },
+  "id:000029,time:0,execs:0,orig:tiff-26": {
+   "files": 1,
+   "edges": 520,
+   "unique": 0
+  },
+  "id:000030,time:0,execs:0,orig:tiff-26": {
+   "files": 1,
+   "edges": 499,
+   "unique": 0
+  },
+  "id:000031,time:0,execs:0,orig:tiff-26": {
+   "files": 1,
+   "edges": 532,
+   "unique": 0
+  },
+  "id:000032,time:0,execs:0,orig:tiff-26": {
+   "files": 1,
+   "edges": 564,
+   "unique": 0
+  },
+  "id:000033,time:0,execs:0,orig:tiff-27": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  },
+  "id:000034,time:0,execs:0,orig:tiff-27": {
+   "files": 1,
+   "edges": 520,
+   "unique": 0
+  },
+  "id:000035,time:0,execs:0,orig:tiff-27": {
+   "files": 1,
+   "edges": 499,
+   "unique": 0
+  },
+  "id:000036,time:0,execs:0,orig:tiff-27": {
+   "files": 1,
+   "edges": 532,
+   "unique": 0
+  },
+  "id:000037,time:0,execs:0,orig:tiff-27": {
+   "files": 1,
+   "edges": 564,
+   "unique": 0
+  },
+  "id:000038,time:0,execs:0,orig:tiff-27": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  },
+  "id:000039,time:0,execs:0,orig:tiff-2": {
+   "files": 1,
+   "edges": 557,
+   "unique": 0
+  },
+  "id:000040,time:0,execs:0,orig:tiff-2": {
+   "files": 1,
+   "edges": 489,
+   "unique": 0
+  },
+  "id:000041,time:0,execs:0,orig:tiff-2": {
+   "files": 1,
+   "edges": 499,
+   "unique": 0
+  },
+  "id:000042,time:0,execs:0,orig:tiff-4": {
+   "files": 1,
+   "edges": 478,
+   "unique": 0
+  },
+  "id:000043,time:0,execs:0,orig:tiff-4": {
+   "files": 1,
+   "edges": 557,
+   "unique": 0
+  },
+  "id:000044,time:0,execs:0,orig:tiff-4": {
+   "files": 1,
+   "edges": 557,
+   "unique": 0
+  },
+  "id:000045,time:0,execs:0,orig:tiff-4": {
+   "files": 1,
+   "edges": 481,
+   "unique": 0
+  },
+  "id:000046,time:0,execs:0,orig:tiff-4": {
+   "files": 1,
+   "edges": 481,
+   "unique": 0
+  },
+  "id:000047,time:0,execs:0,orig:tiff-5": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  },
+  "id:000048,time:0,execs:0,orig:tiff-5": {
+   "files": 1,
+   "edges": 520,
+   "unique": 0
+  },
+  "id:000049,time:0,execs:0,orig:tiff-5": {
+   "files": 1,
+   "edges": 499,
+   "unique": 0
+  },
+  "id:000050,time:0,execs:0,orig:tiff-5": {
+   "files": 1,
+   "edges": 532,
+   "unique": 0
+  },
+  "id:000051,time:0,execs:0,orig:tiff-6": {
+   "files": 1,
+   "edges": 567,
+   "unique": 0
+  },
+  "id:000052,time:0,execs:0,orig:tiff-9": {
+   "files": 1,
+   "edges": 423,
+   "unique": 0
+  },
+  "id:001928,time:0,execs:1372670,orig:tiff-24": {
+   "files": 1,
+   "edges": 72,
+   "unique": 0
+  },
+  "id:001927,time:0,execs:1372662,orig:tiff-22": {
+   "files": 1,
+   "edges": 581,
+   "unique": 0
+  },
+  "id:001889,time:0,execs:1372358,orig:tiff-1": {
+   "files": 1,
+   "edges": 537,
+   "unique": 0
+  },
+  "id:001890,time:0,execs:1372366,orig:tiff-2": {
+   "files": 1,
+   "edges": 557,
+   "unique": 0
+  },
+  "id:001891,time:0,execs:1372374,orig:tiff-2": {
+   "files": 1,
+   "edges": 489,
+   "unique": 0
+  },
+  "id:001892,time:0,execs:1372382,orig:tiff-2": {
+   "files": 1,
+   "edges": 499,
+   "unique": 0
+  },
+  "id:001893,time:0,execs:1372390,orig:tiff-4": {
+   "files": 1,
+   "edges": 478,
+   "unique": 0
+  },
+  "id:001894,time:0,execs:1372398,orig:tiff-4": {
+   "files": 1,
+   "edges": 557,
+   "unique": 0
+  },
+  "id:001895,time:0,execs:1372406,orig:tiff-4": {
+   "files": 1,
+   "edges": 557,
+   "unique": 0
+  },
+  "id:001896,time:0,execs:1372414,orig:tiff-4": {
+   "files": 1,
+   "edges": 481,
+   "unique": 0
+  },
+  "id:001897,time:0,execs:1372422,orig:tiff-4": {
+   "files": 1,
+   "edges": 481,
+   "unique": 0
+  },
+  "id:001898,time:0,execs:1372430,orig:tiff-5": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  },
+  "id:001899,time:0,execs:1372438,orig:tiff-5": {
+   "files": 1,
+   "edges": 520,
+   "unique": 0
+  },
+  "id:001900,time:0,execs:1372446,orig:tiff-5": {
+   "files": 1,
+   "edges": 499,
+   "unique": 0
+  },
+  "id:001901,time:0,execs:1372454,orig:tiff-5": {
+   "files": 1,
+   "edges": 532,
+   "unique": 0
+  },
+  "id:001902,time:0,execs:1372462,orig:tiff-6": {
+   "files": 1,
+   "edges": 567,
+   "unique": 0
+  },
+  "id:001903,time:0,execs:1372470,orig:tiff-9": {
+   "files": 1,
+   "edges": 423,
+   "unique": 0
+  },
+  "id:001904,time:0,execs:1372478,orig:tiff-10": {
+   "files": 1,
+   "edges": 539,
+   "unique": 0
+  },
+  "id:001905,time:0,execs:1372486,orig:tiff-16": {
+   "files": 1,
+   "edges": 557,
+   "unique": 0
+  },
+  "id:001906,time:0,execs:1372494,orig:tiff-16": {
+   "files": 1,
+   "edges": 489,
+   "unique": 0
+  },
+  "id:001907,time:0,execs:1372502,orig:tiff-16": {
+   "files": 1,
+   "edges": 499,
+   "unique": 0
+  },
+  "id:001908,time:0,execs:1372510,orig:tiff-16": {
+   "files": 1,
+   "edges": 592,
+   "unique": 0
+  },
+  "id:001909,time:0,execs:1372518,orig:tiff-18": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  },
+  "id:001910,time:0,execs:1372526,orig:tiff-18": {
+   "files": 1,
+   "edges": 520,
+   "unique": 0
+  },
+  "id:001911,time:0,execs:1372534,orig:tiff-18": {
+   "files": 1,
+   "edges": 499,
+   "unique": 0
+  },
+  "id:001912,time:0,execs:1372542,orig:tiff-18": {
+   "files": 1,
+   "edges": 532,
+   "unique": 0
+  },
+  "id:001913,time:0,execs:1372550,orig:tiff-18": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  },
+  "id:001914,time:0,execs:1372558,orig:tiff-19": {
+   "files": 1,
+   "edges": 72,
+   "unique": 0
+  },
+  "id:001915,time:0,execs:1372566,orig:tiff-20": {
+   "files": 1,
+   "edges": 478,
+   "unique": 0
+  },
+  "id:001916,time:0,execs:1372574,orig:tiff-20": {
+   "files": 1,
+   "edges": 557,
+   "unique": 0
+  },
+  "id:001917,time:0,execs:1372582,orig:tiff-20": {
+   "files": 1,
+   "edges": 557,
+   "unique": 0
+  },
+  "id:001918,time:0,execs:1372590,orig:tiff-20": {
+   "files": 1,
+   "edges": 481,
+   "unique": 0
+  },
+  "id:001919,time:0,execs:1372598,orig:tiff-20": {
+   "files": 1,
+   "edges": 481,
+   "unique": 0
+  },
+  "id:001920,time:0,execs:1372606,orig:tiff-21": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  },
+  "id:001921,time:0,execs:1372614,orig:tiff-21": {
+   "files": 1,
+   "edges": 520,
+   "unique": 0
+  },
+  "id:001922,time:0,execs:1372622,orig:tiff-21": {
+   "files": 1,
+   "edges": 499,
+   "unique": 0
+  },
+  "id:001923,time:0,execs:1372630,orig:tiff-21": {
+   "files": 1,
+   "edges": 532,
+   "unique": 0
+  },
+  "id:001924,time:0,execs:1372638,orig:tiff-21": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  },
+  "id:001925,time:0,execs:1372646,orig:tiff-21": {
+   "files": 1,
+   "edges": 549,
+   "unique": 0
+  },
+  "id:001926,time:0,execs:1372654,orig:tiff-22": {
+   "files": 1,
+   "edges": 74,
+   "unique": 0
+  },
+  "id:001929,time:0,execs:1372678,orig:tiff-25": {
+   "files": 1,
+   "edges": 532,
+   "unique": 0
+  },
+  "id:001930,time:0,execs:1372686,orig:tiff-26": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  },
+  "id:001931,time:0,execs:1372694,orig:tiff-26": {
+   "files": 1,
+   "edges": 520,
+   "unique": 0
+  },
+  "id:001932,time:0,execs:1372702,orig:tiff-26": {
+   "files": 1,
+   "edges": 499,
+   "unique": 0
+  },
+  "id:001933,time:0,execs:1372710,orig:tiff-26": {
+   "files": 1,
+   "edges": 532,
+   "unique": 0
+  },
+  "id:001934,time:0,execs:1372718,orig:tiff-26": {
+   "files": 1,
+   "edges": 564,
+   "unique": 0
+  },
+  "id:001935,time:0,execs:1372726,orig:tiff-27": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  },
+  "id:001936,time:0,execs:1372734,orig:tiff-27": {
+   "files": 1,
+   "edges": 520,
+   "unique": 0
+  },
+  "id:001937,time:0,execs:1372742,orig:tiff-27": {
+   "files": 1,
+   "edges": 499,
+   "unique": 0
+  },
+  "id:001938,time:0,execs:1372750,orig:tiff-27": {
+   "files": 1,
+   "edges": 532,
+   "unique": 0
+  },
+  "id:001939,time:0,execs:1372758,orig:tiff-27": {
+   "files": 1,
+   "edges": 564,
+   "unique": 0
+  },
+  "id:001940,time:0,execs:1372766,orig:tiff-27": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  }
+ }
+}

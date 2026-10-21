@@ -7,7 +7,9 @@
 # Pools are campaigns whose seeds and generators every arm reuses (scripts/fuzz reuse)
 # Options: POOLS="<tag>:<pool campaign> ..." (default tiff:pilot-tiff-codernext-r1 jhead:lineup-codernext-r1),
 #   SCHEDS (default "random bandit"), REPS (2), SECS (3600), PLATEAU (20), BACKOFF (0),
-#   MODEL (server, default Qwen3-Coder-Next-FP8-bandit), HOURS (server hours, default 4),
+#   MODEL (server, default Qwen3-Coder-Next-FP8-bandit; G2F_VLLM_DIR its endpoint folder, default ~/exp-llm),
+#   HOURS (server hours, default 4). SCHEDS may include oracle: the arm gets the pool's generator ranking
+#   (experiments/analysis/lib/oracle_ranking.py on the pool campaign) as <campaign>/oracle_ranking.json.
 #   LABEL (appended to the scheduler in campaign names, e.g. LABEL=p5 -> bandit-wad-banditp5-r1)
 # Submit from the project root:  sbatch experiments/runners/run-bandit.sbatch
 #SBATCH --job-name=g2f-bandit-runner
@@ -21,17 +23,33 @@
 set -u
 X=/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp
 cd "$X" || exit 1
-export G2F_VLLM_DIR=$HOME/exp-llm G2F_VLLM_EXCLUDE=gpu049
+export G2F_VLLM_DIR=${G2F_VLLM_DIR:-$HOME/exp-llm} G2F_VLLM_EXCLUDE=gpu049
 POOLS=${POOLS:-tiff:pilot-tiff-codernext-r1 jhead:lineup-codernext-r1}
 SCHEDS=${SCHEDS:-random bandit}; REPS=${REPS:-2}; SECS=${SECS:-3600}
 PLATEAU=${PLATEAU:-20}; BACKOFF=${BACKOFF:-0}; LABEL=${LABEL:-}; MODEL=${MODEL:-Qwen3-Coder-Next-FP8-bandit}; HOURS=${HOURS:-4}
 LOG=$X/results/logs/bandit.log
 export G2F_GROUP=${GROUP:-bandit}
 log() { echo "$(date '+%F %T') $*" >> "$LOG"; }
+# Creates and runs one campaign (args: name, then the command that creates it). Logs scripts/fuzz's
+# "submitted"/"warning"/"fuzz:" lines; a failure to create or start it is logged with its exit status.
+start_campaign() {
+  local n=$1 out rc; shift
+  out=$("$@" 2>&1 >/dev/null && scripts/fuzz run "$n" "$SECS" 2>&1); rc=$?
+  grep -E 'submitted|warning|fuzz:' <<< "$out" | while read -r l; do log "$n: $l"; done
+  [ "$rc" = 0 ] || log "$n: FAILED to start (exit $rc): $(tail -2 <<< "$out" | tr '\n' ' ')"
+}
 
+# Creates an oracle arm: the pool's campaign plus the pool's generator ranking (args: pool, name)
+make_oracle() {
+  scripts/fuzz reuse "$1" "$2" >/dev/null &&
+    python3 experiments/analysis/lib/oracle_ranking.py "$(scripts/fuzz path "$1")"/*_output/default \
+      > "$(scripts/fuzz path "$2")/oracle_ranking.json"
+}
+
+STARTED=0   # a server this runner reused (e.g. one shared with other work) is never stopped by it
 j=$(squeue -h -u "$USER" -n "$MODEL" -o %i | head -1)
 if [ -z "$j" ]; then
-  j=$(scripts/vllm/serve "$MODEL" "$HOURS" | sed -n 's/.* as job \([0-9]*\) .*/\1/p')
+  j=$(scripts/vllm/serve "$MODEL" "$HOURS" | sed -n 's/.* as job \([0-9]*\) .*/\1/p'); STARTED=1
   log "server $MODEL: job $j submitted"
 else log "server $MODEL: reusing job $j"; fi
 f=$G2F_VLLM_DIR/$MODEL-$j.out
@@ -46,9 +64,10 @@ for p in $POOLS; do tag=${p%%:*}; pool=${p#*:}
     scripts/fuzz path "$n" >/dev/null 2>&1 && { log "campaign $n exists, skipped"; continue; }
     ( set -a; . "$G2F_VLLM_DIR/endpoints/$MODEL.env"; set +a
       export G2F_SCHEDULER=$s G2F_PLATEAU_SEC=$PLATEAU G2F_BACKOFF_SEC=$BACKOFF
-      scripts/fuzz reuse "$pool" "$n" >/dev/null && scripts/fuzz run "$n" "$SECS" 2>&1 | grep -E 'submitted|warning|fuzz:' ) |
-      while read -r l; do log "$n: $l"; done
+      if [[ $s == oracle* ]]; then start_campaign "$n" make_oracle "$pool" "$n"
+      else start_campaign "$n" scripts/fuzz reuse "$pool" "$n"; fi )
   done; done
 done
 while squeue -h -u "$USER" -o %j | grep -q '^g2f-bandit-.*-r[0-9]'; do sleep 60; done
-scancel "$j"; log "server $MODEL: stopped. all campaigns done"
+if [ "$STARTED" = 1 ]; then scancel "$j"; log "server $MODEL: stopped. all campaigns done"
+else log "server $MODEL: reused, left running. all campaigns done"; fi

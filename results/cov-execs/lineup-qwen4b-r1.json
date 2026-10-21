@@ -1,0 +1,64 @@
+{
+ "target": "/targets/jhead.afl",
+ "files": 547,
+ "total_edges": 336,
+ "stock_edges": null,
+ "new_edges": null,
+ "per_generator": {
+  "id:000000,time:0,execs:0,orig:jpg-1": {
+   "files": 1,
+   "edges": 128,
+   "unique": 0
+  },
+  "id:000001,time:0,execs:0,orig:jpg-2": {
+   "files": 1,
+   "edges": 128,
+   "unique": 0
+  },
+  "id:000002,time:0,execs:0,orig:jpg-2": {
+   "files": 1,
+   "edges": 128,
+   "unique": 0
+  },
+  "id:000003,time:0,execs:0,orig:jpg-2": {
+   "files": 1,
+   "edges": 128,
+   "unique": 0
+  },
+  "id:000004,time:0,execs:0,orig:jpg-3": {
+   "files": 1,
+   "edges": 129,
+   "unique": 0
+  },
+  "id:000005,time:0,execs:0,orig:jpg-4": {
+   "files": 1,
+   "edges": 129,
+   "unique": 0
+  },
+  "id:000006,time:0,execs:0,orig:jpg-5": {
+   "files": 1,
+   "edges": 37,
+   "unique": 0
+  },
+  "id:000007,time:0,execs:0,orig:jpg-5": {
+   "files": 1,
+   "edges": 37,
+   "unique": 0
+  },
+  "stock": {
+   "files": 537,
+   "edges": 335,
+   "unique": 195
+  },
+  "id:000009,time:0,execs:0,orig:xmp-1": {
+   "files": 1,
+   "edges": 78,
+   "unique": 0
+  },
+  "id:000010,time:0,execs:0,orig:xmp-2": {
+   "files": 1,
+   "edges": 78,
+   "unique": 0
+  }
+ }
+}

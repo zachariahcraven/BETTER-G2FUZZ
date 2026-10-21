@@ -1,0 +1,224 @@
+{
+ "target": "/targets/tiff_read_rgba_fuzzer.afl",
+ "files": 4086,
+ "total_edges": 3819,
+ "stock_edges": null,
+ "new_edges": null,
+ "per_generator": {
+  "stock": {
+   "files": 4044,
+   "edges": 3819,
+   "unique": 2871
+  },
+  "id:000001,time:0,execs:0,orig:tiff-12": {
+   "files": 1,
+   "edges": 305,
+   "unique": 0
+  },
+  "id:000002,time:0,execs:0,orig:tiff-13": {
+   "files": 1,
+   "edges": 560,
+   "unique": 0
+  },
+  "id:000003,time:0,execs:0,orig:tiff-13": {
+   "files": 1,
+   "edges": 537,
+   "unique": 0
+  },
+  "id:000004,time:0,execs:0,orig:tiff-13": {
+   "files": 1,
+   "edges": 592,
+   "unique": 0
+  },
+  "id:000005,time:0,execs:0,orig:tiff-13": {
+   "files": 1,
+   "edges": 537,
+   "unique": 0
+  },
+  "id:000006,time:0,execs:0,orig:tiff-16": {
+   "files": 1,
+   "edges": 522,
+   "unique": 0
+  },
+  "id:000007,time:0,execs:0,orig:tiff-16": {
+   "files": 1,
+   "edges": 524,
+   "unique": 0
+  },
+  "id:000008,time:0,execs:0,orig:tiff-16": {
+   "files": 1,
+   "edges": 457,
+   "unique": 0
+  },
+  "id:000009,time:0,execs:0,orig:tiff-16": {
+   "files": 1,
+   "edges": 541,
+   "unique": 0
+  },
+  "id:000010,time:0,execs:0,orig:tiff-16": {
+   "files": 1,
+   "edges": 546,
+   "unique": 0
+  },
+  "id:000011,time:0,execs:0,orig:tiff-16": {
+   "files": 1,
+   "edges": 541,
+   "unique": 0
+  },
+  "id:000012,time:0,execs:0,orig:tiff-18": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  },
+  "id:000013,time:0,execs:0,orig:tiff-1": {
+   "files": 1,
+   "edges": 560,
+   "unique": 0
+  },
+  "id:000014,time:0,execs:0,orig:tiff-1": {
+   "files": 1,
+   "edges": 537,
+   "unique": 0
+  },
+  "id:000015,time:0,execs:0,orig:tiff-1": {
+   "files": 1,
+   "edges": 592,
+   "unique": 0
+  },
+  "id:000016,time:0,execs:0,orig:tiff-21": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  },
+  "id:000017,time:0,execs:0,orig:tiff-21": {
+   "files": 1,
+   "edges": 539,
+   "unique": 0
+  },
+  "id:000018,time:0,execs:0,orig:tiff-23": {
+   "files": 1,
+   "edges": 586,
+   "unique": 0
+  },
+  "id:000019,time:0,execs:0,orig:tiff-24": {
+   "files": 1,
+   "edges": 539,
+   "unique": 0
+  },
+  "id:000020,time:0,execs:0,orig:tiff-26": {
+   "files": 1,
+   "edges": 539,
+   "unique": 0
+  },
+  "id:000021,time:0,execs:0,orig:tiff-26": {
+   "files": 1,
+   "edges": 521,
+   "unique": 0
+  },
+  "id:000022,time:0,execs:0,orig:tiff-2": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  },
+  "id:000023,time:0,execs:0,orig:tiff-31": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  },
+  "id:000024,time:0,execs:0,orig:tiff-32": {
+   "files": 1,
+   "edges": 592,
+   "unique": 0
+  },
+  "id:000025,time:0,execs:0,orig:tiff-33": {
+   "files": 1,
+   "edges": 521,
+   "unique": 0
+  },
+  "id:000026,time:0,execs:0,orig:tiff-3": {
+   "files": 1,
+   "edges": 500,
+   "unique": 0
+  },
+  "id:000027,time:0,execs:0,orig:tiff-3": {
+   "files": 1,
+   "edges": 500,
+   "unique": 0
+  },
+  "id:000028,time:0,execs:0,orig:tiff-3": {
+   "files": 1,
+   "edges": 423,
+   "unique": 0
+  },
+  "id:000029,time:0,execs:0,orig:tiff-3": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  },
+  "id:000030,time:0,execs:0,orig:tiff-3": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  },
+  "id:000031,time:0,execs:0,orig:tiff-3": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  },
+  "id:000032,time:0,execs:0,orig:tiff-4": {
+   "files": 1,
+   "edges": 296,
+   "unique": 0
+  },
+  "id:000033,time:0,execs:0,orig:tiff-4": {
+   "files": 1,
+   "edges": 303,
+   "unique": 0
+  },
+  "id:000034,time:0,execs:0,orig:tiff-4": {
+   "files": 1,
+   "edges": 298,
+   "unique": 0
+  },
+  "id:000035,time:0,execs:0,orig:tiff-5": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  },
+  "id:000036,time:0,execs:0,orig:tiff-5": {
+   "files": 1,
+   "edges": 520,
+   "unique": 0
+  },
+  "id:000037,time:0,execs:0,orig:tiff-5": {
+   "files": 1,
+   "edges": 500,
+   "unique": 0
+  },
+  "id:000038,time:0,execs:0,orig:tiff-5": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  },
+  "id:000039,time:0,execs:0,orig:tiff-5": {
+   "files": 1,
+   "edges": 533,
+   "unique": 0
+  },
+  "id:000040,time:0,execs:0,orig:tiff-6": {
+   "files": 1,
+   "edges": 535,
+   "unique": 0
+  },
+  "id:000041,time:0,execs:0,orig:tiff-8": {
+   "files": 1,
+   "edges": 558,
+   "unique": 0
+  },
+  "id:000042,time:0,execs:0,orig:tiff-9": {
+   "files": 1,
+   "edges": 518,
+   "unique": 0
+  }
+ }
+}

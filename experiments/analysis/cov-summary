@@ -14,7 +14,7 @@ def parse_campaign_name(name):
     b = re.match(r"bandit-([a-z]+)-(\w+)-r(\d+)$", name)
     if b:
         return b.group(1), "sched-" + b.group(2), int(b.group(3))
-    m = re.match(r"(lineup|tiff|png|xml|wad)(\d+h)?-(.+)-r(\d+)$", name)
+    m = re.match(r"(lineup|tiff|png|xml|wad|demo)([0-9a-z]*)-(.+)-r(\d+)$", name)
     if m:
         t = "jhead" if m.group(1) == "lineup" else m.group(1)
         return t + ("-" + m.group(2) if m.group(2) else ""), m.group(3), int(m.group(4))
@@ -22,12 +22,15 @@ def parse_campaign_name(name):
 
 
 def median(values):
-    """Return the median as an integer (even count: floor of mean of middle two)."""
+    """Return the true median (even count: mean of middle two; int when whole, else x.5)."""
     v = sorted(values)
     n = len(v)
     if n % 2:
         return v[n // 2]
-    return (v[n // 2 - 1] + v[n // 2]) // 2
+    s = v[n // 2 - 1] + v[n // 2]
+    if s % 2:
+        return s / 2
+    return s // 2
 
 
 def _ranks(values):
@@ -58,6 +61,8 @@ def main():
     parser = argparse.ArgumentParser(description="Summarize G2Fuzz coverage results.")
     parser.add_argument("--cov", default="results/cov", help="Directory of campaign JSON files")
     parser.add_argument("--out", default="results/tables/cov-results.csv", help="Output CSV path")
+    parser.add_argument("--exclude", default="experiments/inputs/exclusions.csv",
+                        help="campaigns left out of the Spearman lines (if the file exists)")
     args = parser.parse_args()
 
     campaigns = []
@@ -118,12 +123,19 @@ def main():
     for target, model, runs, m_seed, m_new, m_queue in table_rows:
         print(f"{target} {model} {runs} {m_seed} {m_new} {m_queue}")
 
-    # Spearman per target (exclude baseline and sched-*)
+    # Spearman per target over LLM model runs only: not baseline, sched-* (bandit rounds) or ctl-* (seed-only
+    # controls, no LLM in the run), and not the campaigns in the exclusions file (aborted runs; the CSV above
+    # still lists every campaign)
+    excluded = set()
+    if args.exclude and os.path.exists(args.exclude):
+        with open(args.exclude) as f:
+            excluded = {r["campaign"] for r in csv.DictReader(f)}
     for target in sorted({c["target"] for c in campaigns}):
         vs = [c for c in campaigns
               if c["target"] == target
               and c["model"] != "baseline"
-              and not c["model"].startswith("sched-")]
+              and not c["model"].startswith(("sched-", "ctl-"))
+              and c["campaign"] not in excluded]
         if len(vs) < 4:
             continue
         rho = spearman([v["seed_edges"] for v in vs], [v["queue_edges"] for v in vs])

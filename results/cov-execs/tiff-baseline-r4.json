@@ -1,0 +1,14 @@
+{
+ "target": "/targets/tiff_read_rgba_fuzzer.afl",
+ "files": 3845,
+ "total_edges": 3535,
+ "stock_edges": null,
+ "new_edges": null,
+ "per_generator": {
+  "stock": {
+   "files": 3845,
+   "edges": 3535,
+   "unique": 3535
+  }
+ }
+}

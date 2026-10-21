@@ -1,0 +1,83 @@
+experiment,metric,arm,reference,n_arm,n_ref,median_arm,median_ref,median_diff,ci_low,ci_high,U,p_exact,p_holm,A12,family_size,note
+bandit-jhead,coverage,bandit,random,2,2,586,578.5,7.5,-19,34,3,0.666667,0.666667,0.75,1,min attainable p = 0.333333
+bandit-tiff,coverage,bandit,random,2,2,3825,3738,87,-174,348,3,0.666667,0.666667,0.75,1,min attainable p = 0.333333
+bandit-wad,coverage,bandit,random,5,5,2364,2407,-43,-189,238,13,1,1,0.52,5,
+bandit-wad,coverage,bandito4,randomo4,5,5,2389,2266,123,-56,188,20,0.150794,0.603175,0.8,5,
+bandit-wad,coverage,banditp5,randomp5,5,5,2300,2391,-91,-229,17,4,0.0952381,0.47619,0.16,5,
+bandit-wad,coverage,oracleo4,bandito4,5,5,2387,2389,-2,-129,107,14,0.84127,1,0.56,5,
+bandit-wad,coverage,oracleo4,randomo4,5,5,2387,2266,121,-58,227,19,0.222222,0.666667,0.76,5,
+bandit-xml,coverage,bandit,random,5,5,4411,4384,27,-57,95,15,0.690476,1,0.6,5,
+bandit-xml,coverage,bandito4,randomo4,5,5,4449,4410,39,-15,103,18.5,0.246032,0.984127,0.74,5,
+bandit-xml,coverage,banditp5,randomp5,5,5,4422,4502,-80,-149,50,8,0.420635,1,0.32,5,
+bandit-xml,coverage,oracleo4,bandito4,5,5,4407,4449,-42,-142,8,4,0.0952381,0.47619,0.16,5,
+bandit-xml,coverage,oracleo4,randomo4,5,5,4407,4410,-3,-103,43,7.5,0.34127,1,0.3,5,
+demo,coverage,codernext,baseline,5,5,3223,3133,90,-245,493,17,0.420635,1,0.68,6,
+demo,coverage,codernext,ctl-llmseeds,5,5,3223,3306,-83,-418,388,13,1,1,0.52,6,
+demo,coverage,ctl-junk,baseline,5,5,3360,3133,227,11,378,23,0.031746,0.190476,0.92,6,
+demo,coverage,ctl-llmseeds,baseline,5,5,3306,3133,173,-43,344,21.5,0.0634921,0.31746,0.86,6,
+demo,coverage,ctl-llmseeds,ctl-junk,5,5,3306,3360,-54,-263,187,9,0.547619,1,0.36,6,
+demo,coverage,qwen4b,baseline,5,5,3067,3133,-66,-251,24,5,0.150794,0.603175,0.2,6,
+lineup,coverage,abl9b,baseline,3,5,494,509,-15,-65,49,6,0.785714,1,0.4,14,min attainable p = 0.0357143
+lineup,coverage,coder30b,baseline,3,5,501,509,-8,-72,39,6,0.785714,1,0.4,14,min attainable p = 0.0357143
+lineup,coverage,codernext,baseline,5,5,565,509,56,13,103,24,0.015873,0.206349,0.96,14,
+lineup,coverage,devstral24b,baseline,3,5,562,509,53,14,100,15,0.0357143,0.428571,1,14,min attainable p = 0.0357143
+lineup,coverage,dsv4flash,baseline,3,5,558,509,49,10,96,15,0.0357143,0.428571,1,14,min attainable p = 0.0357143
+lineup,coverage,gemma26b,baseline,3,5,503,509,-6,-45,72,8,1,1,0.533333,14,min attainable p = 0.0357143
+lineup,coverage,gemma31b,baseline,3,5,584,509,75,27,122,15,0.0357143,0.428571,1,14,min attainable p = 0.0357143
+lineup,coverage,oss120b,baseline,3,5,552,509,43,4,90,14.5,0.0535714,0.482143,0.966667,14,min attainable p = 0.0357143
+lineup,coverage,oss20b,baseline,3,5,554,509,45,6,92,14,0.0714286,0.571429,0.933333,14,min attainable p = 0.0357143
+lineup,coverage,qwen122b,baseline,3,5,512,509,3,-56,102,9,0.785714,1,0.6,14,min attainable p = 0.0357143
+lineup,coverage,qwen36,baseline,3,5,527,509,18,-78,65,8,1,1,0.533333,14,min attainable p = 0.0357143
+lineup,coverage,qwen36nt,baseline,5,5,568,509,59,20,106,25,0.00793651,0.111111,1,14,
+lineup,coverage,qwen38,baseline,3,5,505,509,-4,-128,58,7,1,1,0.466667,14,min attainable p = 0.0357143
+lineup,coverage,qwen4b,baseline,5,5,533,509,24,-188,71,13,1,1,0.52,14,
+png,coverage,codernext,baseline,5,5,1221,1178,43,2,102,23,0.031746,0.190476,0.92,9,
+png,coverage,codernext,ctl-llmseeds,5,5,1221,1253,-32,-77,14,4,0.0952381,0.47619,0.16,9,
+png,coverage,ctl-junk,baseline,5,5,1132,1178,-46,-86,13,7,0.309524,1,0.28,9,
+png,coverage,ctl-llmseeds,baseline,5,5,1253,1178,75,35,134,25,0.00793651,0.0714286,1,9,
+png,coverage,ctl-llmseeds,ctl-junk,5,5,1253,1132,121,68,142,25,0.00793651,0.0714286,1,9,
+png,coverage,gemma31b,baseline,3,5,1191,1178,13,-28,72,9,0.785714,1,0.6,9,min attainable p = 0.0357143
+png,coverage,qwen36nt,baseline,4,5,1230,1178,52,12,111,20,0.015873,0.111111,1,9,
+png,coverage,qwen38,baseline,3,5,1206,1178,28,-101,87,8,1,1,0.533333,9,min attainable p = 0.0357143
+png,coverage,qwen4b,baseline,4,5,1189.5,1178,11.5,-79,70.5,11,0.904762,1,0.55,9,
+tiff,coverage,codernext,baseline,5,5,3743,3636,107,-183,403,17,0.420635,1,0.68,9,
+tiff,coverage,codernext,ctl-llmseeds,5,5,3743,3820,-77,-339,55,6.5,0.246032,1,0.26,9,
+tiff,coverage,ctl-junk,baseline,5,5,3650,3636,14,-333,310,13,1,1,0.52,9,
+tiff,coverage,ctl-llmseeds,baseline,5,5,3820,3636,184,-67,480,20,0.150794,1,0.8,9,
+tiff,coverage,ctl-llmseeds,ctl-junk,5,5,3820,3650,170,-32,479,19.5,0.166667,1,0.78,9,
+tiff,coverage,gemma31b,baseline,3,5,3828,3636,192,-59,488,13,0.142857,1,0.866667,9,min attainable p = 0.0357143
+tiff,coverage,qwen36nt,baseline,5,5,3819,3636,183,-108,479,19,0.222222,1,0.76,9,
+tiff,coverage,qwen38,baseline,3,5,3826,3636,190,-83,486,11,0.392857,1,0.733333,9,min attainable p = 0.0357143
+tiff,coverage,qwen4b,baseline,5,5,3743,3636,107,-144,403,18,0.309524,1,0.72,9,
+wad,coverage,codernext,baseline,5,5,2269,2154,115,51,193,25,0.00793651,0.0714286,1,9,
+wad,coverage,codernext,ctl-llmseeds,5,5,2269,2271,-2,-147,59,12,1,1,0.48,9,
+wad,coverage,ctl-junk,baseline,5,5,2250,2154,96,46,174,25,0.00793651,0.0714286,1,9,
+wad,coverage,ctl-llmseeds,baseline,5,5,2271,2154,117,27,262,25,0.00793651,0.0714286,1,9,
+wad,coverage,ctl-llmseeds,ctl-junk,5,5,2271,2250,21,-49,166,14.5,0.730159,1,0.58,9,
+wad,coverage,gemma31b,baseline,5,5,2290,2154,136,73,349,25,0.00793651,0.0714286,1,9,
+wad,coverage,qwen36nt,baseline,5,5,2259,2154,105,55,324,25,0.00793651,0.0714286,1,9,
+wad,coverage,qwen38,baseline,5,5,2239,2154,85,35,169,25,0.00793651,0.0714286,1,9,
+wad,coverage,qwen4b,baseline,5,5,2261,2154,107,53,185,25,0.00793651,0.0714286,1,9,
+wad4h,coverage,codernext,baseline,5,5,2792,2256,536,376,664,25,0.00793651,0.0238095,1,3,
+wad4h,coverage,qwen36nt,baseline,5,5,2749,2256,493,370,621,25,0.00793651,0.0238095,1,3,
+wad4h,coverage,qwen4b,baseline,5,5,2695,2256,439,81,579,25,0.00793651,0.0238095,1,3,
+wad4ht,coverage,codernext,baseline,5,5,2693,2150,543,196,596,25,0.00793651,0.0238095,1,3,
+wad4ht,coverage,qwen36nt,baseline,5,5,2532,2150,382,35,552,24,0.015873,0.0238095,0.96,3,
+wad4ht,coverage,qwen4b,baseline,5,5,2639,2150,489,142,594,25,0.00793651,0.0238095,1,3,
+wadp,coverage,ctl-llmseeds,ctl-junk,5,5,2324,2310,14,-107,99,12,1,1,0.48,5,
+wadp,coverage,name-codernext,bare-codernext,5,5,2273,2212,61,10,267,23,0.031746,0.15873,0.92,5,
+wadp,coverage,name-qwen4b,bare-qwen4b,5,5,2305,2332,-27,-140,79,9,0.547619,1,0.36,5,
+wadp,coverage,spec-codernext,bare-codernext,5,5,2257,2212,45,6,231,23,0.031746,0.15873,0.92,5,
+wadp,coverage,spec-qwen4b,bare-qwen4b,5,5,2245,2332,-87,-183,39,6,0.222222,0.666667,0.24,5,
+xml,coverage,codernext,baseline,5,5,4590,2032,2558,1781,2671,25,0.00793651,0.0714286,1,9,
+xml,coverage,codernext,ctl-llmseeds,5,5,4590,4429,161,-616,232,18,0.309524,0.619048,0.72,9,
+xml,coverage,ctl-junk,baseline,5,5,2046,2032,14,-593,640,14,0.84127,0.84127,0.56,9,
+xml,coverage,ctl-llmseeds,baseline,5,5,4429,2032,2397,1790,2540,25,0.00793651,0.0714286,1,9,
+xml,coverage,ctl-llmseeds,ctl-junk,5,5,4429,2046,2383,1817,2515,25,0.00793651,0.0714286,1,9,
+xml,coverage,gemma31b,baseline,5,5,4143,2032,2111,1207,2351,25,0.00793651,0.0714286,1,9,
+xml,coverage,qwen36nt,baseline,5,5,3319,2032,1287,680,1903,25,0.00793651,0.0714286,1,9,
+xml,coverage,qwen38,baseline,5,5,4080,2032,2048,1262,2337,25,0.00793651,0.0714286,1,9,
+xml,coverage,qwen4b,baseline,5,5,3484,2032,1452,698,1670,25,0.00793651,0.0714286,1,9,
+xml4h,coverage,codernext,baseline,5,5,4784,2918,1866,1221,2057,25,0.00793651,0.0238095,1,3,
+xml4h,coverage,qwen36nt,baseline,5,5,4355,2918,1437,736,1711,25,0.00793651,0.0238095,1,3,
+xml4h,coverage,qwen4b,baseline,5,5,3890,2918,972,109,1163,25,0.00793651,0.0238095,1,3,

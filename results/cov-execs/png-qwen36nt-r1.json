@@ -1,0 +1,209 @@
+{
+ "target": "/targets/libpng_read_fuzzer.afl",
+ "files": 759,
+ "total_edges": 1224,
+ "stock_edges": null,
+ "new_edges": null,
+ "per_generator": {
+  "stock": {
+   "files": 720,
+   "edges": 1206,
+   "unique": 417
+  },
+  "id:000004,time:0,execs:0,orig:png-10": {
+   "files": 1,
+   "edges": 467,
+   "unique": 0
+  },
+  "id:000005,time:0,execs:0,orig:png-11": {
+   "files": 1,
+   "edges": 552,
+   "unique": 0
+  },
+  "id:000006,time:0,execs:0,orig:png-12": {
+   "files": 1,
+   "edges": 330,
+   "unique": 0
+  },
+  "id:000007,time:0,execs:0,orig:png-13": {
+   "files": 1,
+   "edges": 352,
+   "unique": 0
+  },
+  "id:000008,time:0,execs:0,orig:png-14": {
+   "files": 1,
+   "edges": 445,
+   "unique": 0
+  },
+  "id:000009,time:0,execs:0,orig:png-15": {
+   "files": 1,
+   "edges": 496,
+   "unique": 0
+  },
+  "id:000010,time:0,execs:0,orig:png-16": {
+   "files": 1,
+   "edges": 522,
+   "unique": 0
+  },
+  "id:000011,time:0,execs:0,orig:png-17": {
+   "files": 1,
+   "edges": 345,
+   "unique": 1
+  },
+  "id:000012,time:0,execs:0,orig:png-18": {
+   "files": 1,
+   "edges": 552,
+   "unique": 0
+  },
+  "id:000013,time:0,execs:0,orig:png-19": {
+   "files": 1,
+   "edges": 330,
+   "unique": 0
+  },
+  "id:000014,time:0,execs:0,orig:png-1": {
+   "files": 1,
+   "edges": 448,
+   "unique": 0
+  },
+  "id:000015,time:0,execs:0,orig:png-1": {
+   "files": 1,
+   "edges": 448,
+   "unique": 0
+  },
+  "id:000016,time:0,execs:0,orig:png-1": {
+   "files": 1,
+   "edges": 448,
+   "unique": 0
+  },
+  "id:000017,time:0,execs:0,orig:png-20": {
+   "files": 1,
+   "edges": 547,
+   "unique": 0
+  },
+  "id:000018,time:0,execs:0,orig:png-21": {
+   "files": 1,
+   "edges": 372,
+   "unique": 0
+  },
+  "id:000019,time:0,execs:0,orig:png-22": {
+   "files": 1,
+   "edges": 549,
+   "unique": 0
+  },
+  "id:000020,time:0,execs:0,orig:png-23": {
+   "files": 1,
+   "edges": 358,
+   "unique": 0
+  },
+  "id:000021,time:0,execs:0,orig:png-24": {
+   "files": 1,
+   "edges": 448,
+   "unique": 0
+  },
+  "id:000022,time:0,execs:0,orig:png-24": {
+   "files": 1,
+   "edges": 448,
+   "unique": 0
+  },
+  "id:000023,time:0,execs:0,orig:png-24": {
+   "files": 1,
+   "edges": 448,
+   "unique": 0
+  },
+  "id:000024,time:0,execs:0,orig:png-24": {
+   "files": 1,
+   "edges": 462,
+   "unique": 0
+  },
+  "id:000025,time:0,execs:0,orig:png-25": {
+   "files": 1,
+   "edges": 352,
+   "unique": 0
+  },
+  "id:000026,time:0,execs:0,orig:png-26": {
+   "files": 1,
+   "edges": 467,
+   "unique": 0
+  },
+  "id:000027,time:0,execs:0,orig:png-26": {
+   "files": 1,
+   "edges": 467,
+   "unique": 0
+  },
+  "id:000028,time:0,execs:0,orig:png-26": {
+   "files": 1,
+   "edges": 498,
+   "unique": 0
+  },
+  "id:000029,time:0,execs:0,orig:png-27": {
+   "files": 1,
+   "edges": 522,
+   "unique": 0
+  },
+  "id:000030,time:0,execs:0,orig:png-27": {
+   "files": 1,
+   "edges": 522,
+   "unique": 0
+  },
+  "id:000031,time:0,execs:0,orig:png-28": {
+   "files": 1,
+   "edges": 391,
+   "unique": 5
+  },
+  "id:000032,time:0,execs:0,orig:png-29": {
+   "files": 1,
+   "edges": 214,
+   "unique": 0
+  },
+  "id:000033,time:0,execs:0,orig:png-2": {
+   "files": 1,
+   "edges": 445,
+   "unique": 0
+  },
+  "id:000034,time:0,execs:0,orig:png-30": {
+   "files": 1,
+   "edges": 562,
+   "unique": 0
+  },
+  "id:000035,time:0,execs:0,orig:png-3": {
+   "files": 1,
+   "edges": 437,
+   "unique": 0
+  },
+  "id:000036,time:0,execs:0,orig:png-4": {
+   "files": 1,
+   "edges": 467,
+   "unique": 0
+  },
+  "id:000037,time:0,execs:0,orig:png-4": {
+   "files": 1,
+   "edges": 467,
+   "unique": 0
+  },
+  "id:000038,time:0,execs:0,orig:png-5": {
+   "files": 1,
+   "edges": 458,
+   "unique": 0
+  },
+  "id:000039,time:0,execs:0,orig:png-6": {
+   "files": 1,
+   "edges": 318,
+   "unique": 0
+  },
+  "id:000040,time:0,execs:0,orig:png-7": {
+   "files": 1,
+   "edges": 516,
+   "unique": 0
+  },
+  "id:000041,time:0,execs:0,orig:png-8": {
+   "files": 1,
+   "edges": 467,
+   "unique": 0
+  },
+  "id:000042,time:0,execs:0,orig:png-9": {
+   "files": 1,
+   "edges": 547,
+   "unique": 0
+  }
+ }
+}

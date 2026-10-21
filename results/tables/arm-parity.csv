@@ -1,0 +1,508 @@
+experiment,arm,reference,field,arm_values,ref_values,status
+bandit-jhead,bandit,random,env:G2F_SCHEDULER,bandit (n=2),random (n=2),allowed
+bandit-tiff,bandit,random,env:G2F_SCHEDULER,bandit (n=2),random (n=2),allowed
+bandit-wad,bandit,random,env:G2F_SCHEDULER,bandit (n=5),random (n=5),allowed
+bandit-wad,bandito4,randomo4,env:G2F_SCHEDULER,bandit (n=5),random (n=5),allowed
+bandit-wad,banditp5,randomp5,env:G2F_SCHEDULER,bandit (n=5),random (n=5),allowed
+bandit-wad,oracleo4,bandito4,env:G2F_ORACLE_RANKING,/eval/oracle_ranking.json (n=5),unset (n=5),allowed
+bandit-wad,oracleo4,bandito4,env:G2F_SCHEDULER,oracle (n=5),bandit (n=5),allowed
+bandit-wad,oracleo4,bandito4,oracle_ranking,d702b812fb6d (n=5),none (n=5),allowed
+bandit-wad,oracleo4,randomo4,env:G2F_ORACLE_RANKING,/eval/oracle_ranking.json (n=5),unset (n=5),allowed
+bandit-wad,oracleo4,randomo4,env:G2F_SCHEDULER,oracle (n=5),random (n=5),allowed
+bandit-wad,oracleo4,randomo4,oracle_ranking,d702b812fb6d (n=5),none (n=5),allowed
+bandit-xml,bandit,random,env:G2F_SCHEDULER,bandit (n=5),random (n=5),allowed
+bandit-xml,bandito4,randomo4,env:G2F_SCHEDULER,bandit (n=5),random (n=5),allowed
+bandit-xml,banditp5,randomp5,env:G2F_SCHEDULER,bandit (n=5),random (n=5),allowed
+bandit-xml,oracleo4,bandito4,env:G2F_ORACLE_RANKING,/eval/oracle_ranking.json (n=5),unset (n=5),allowed
+bandit-xml,oracleo4,bandito4,env:G2F_SCHEDULER,oracle (n=5),bandit (n=5),allowed
+bandit-xml,oracleo4,bandito4,oracle_ranking,ddf92eacc5a2 (n=5),none (n=5),allowed
+bandit-xml,oracleo4,randomo4,env:G2F_ORACLE_RANKING,/eval/oracle_ranking.json (n=5),unset (n=5),allowed
+bandit-xml,oracleo4,randomo4,env:G2F_SCHEDULER,oracle (n=5),random (n=5),allowed
+bandit-xml,oracleo4,randomo4,oracle_ranking,ddf92eacc5a2 (n=5),none (n=5),allowed
+demo,codernext,baseline,env:G2F_FORMAT_DESC_FILE,/eval/format_desc.txt (n=5),unset (n=5),allowed
+demo,codernext,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+demo,codernext,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+demo,codernext,baseline,format_desc,d1b875c352ab (n=5),none (n=5),allowed
+demo,codernext,baseline,model,Qwen3-Coder-Next-FP8-agent = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c (n=5),none (n=5),allowed
+demo,codernext,baseline,seedgen,llm (n=5),none (n=5),allowed
+demo,codernext,baseline,seeds,llm-generated (n=5),5ab27fb9fa06 (n=5),allowed
+demo,codernext,baseline,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 131072 --gpu-memory-utilization 0.90 --enable-auto-tool-choice --tool-call-parser qwen3_coder (n=5),none (n=5),allowed
+demo,codernext,ctl-llmseeds,env:G2F_FORMAT_DESC_FILE,/eval/format_desc.txt (n=5),unset (n=5),allowed
+demo,codernext,ctl-llmseeds,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+demo,codernext,ctl-llmseeds,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+demo,codernext,ctl-llmseeds,format_desc,d1b875c352ab (n=5),none (n=5),allowed
+demo,codernext,ctl-llmseeds,model,Qwen3-Coder-Next-FP8-agent = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c (n=5),none (n=5),allowed
+demo,codernext,ctl-llmseeds,seedgen,llm (n=5),none (n=5),allowed
+demo,codernext,ctl-llmseeds,seeds,llm-generated (n=5),58bc65cabd4a (n=5),allowed
+demo,codernext,ctl-llmseeds,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 131072 --gpu-memory-utilization 0.90 --enable-auto-tool-choice --tool-call-parser qwen3_coder (n=5),none (n=5),allowed
+demo,codernext,ctl-llmseeds,stock_seeds,/targets/seeds/doom_demo/* (n=5),none (n=5),allowed
+demo,ctl-junk,baseline,seeds,4fb67efcc630 (n=5),5ab27fb9fa06 (n=5),allowed
+demo,ctl-junk,baseline,stock_seeds,none (n=5),/targets/seeds/doom_demo/* (n=5),allowed
+demo,ctl-llmseeds,baseline,seeds,58bc65cabd4a (n=5),5ab27fb9fa06 (n=5),allowed
+demo,ctl-llmseeds,baseline,stock_seeds,none (n=5),/targets/seeds/doom_demo/* (n=5),allowed
+demo,ctl-llmseeds,ctl-junk,seeds,58bc65cabd4a (n=5),4fb67efcc630 (n=5),allowed
+demo,qwen4b,baseline,env:G2F_FORMAT_DESC_FILE,/eval/format_desc.txt (n=5),unset (n=5),allowed
+demo,qwen4b,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+demo,qwen4b,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+demo,qwen4b,baseline,format_desc,d1b875c352ab (n=5),none (n=5),allowed
+demo,qwen4b,baseline,model,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a (n=5),none (n=5),allowed
+demo,qwen4b,baseline,seedgen,llm (n=5),none (n=5),allowed
+demo,qwen4b,baseline,seeds,llm-generated (n=5),5ab27fb9fa06 (n=5),allowed
+demo,qwen4b,baseline,server,"0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 1 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 --default-chat-template-kwargs {""enable_thinking"":false} (n=5)",none (n=5),allowed
+lineup,abl9b,baseline,afl_cmd,afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3),afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3) | afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/jhead.afl @@ (n=2),UNEXPECTED
+lineup,abl9b,baseline,binds,none (n=3),/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),UNEXPECTED
+lineup,abl9b,baseline,env:G2F_PLATEAU_SEC,unset (n=3),999999999 (n=5),allowed
+lineup,abl9b,baseline,env:OPENAI_BASE_URL,llm (n=3),none (n=5),allowed
+lineup,abl9b,baseline,image,7adcd8f built 2026-10-09 18:14 (n=3),7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),UNEXPECTED
+lineup,abl9b,baseline,model,Huihui-Qwen3.5-9B-abliterated = huihui-ai/Huihui-Qwen3.5-9B-abliterated @ 05b9e7c9b978ba29bdb8f50a49c30e4b91183339 (n=3),none (n=5),allowed
+lineup,abl9b,baseline,seedgen,llm (n=3),none (n=5),allowed
+lineup,abl9b,baseline,seeds,llm-generated (n=3),9db75336907f (n=5),allowed
+lineup,abl9b,baseline,server,"0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 1 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 --default-chat-template-kwargs {""enable_thinking"":false} (n=3)",none (n=5),allowed
+lineup,abl9b,baseline,stock_seeds,none (n=3),/targets/seeds/jhead/* (n=2) | none (n=3),UNEXPECTED
+lineup,abl9b,baseline,target,missing (n=3),jhead (n=5),UNEXPECTED
+lineup,baseline,,afl_cmd,afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3) | afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/jhead.afl @@ (n=2),,UNEXPECTED
+lineup,baseline,,binds,/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),,UNEXPECTED
+lineup,baseline,,image,7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),,UNEXPECTED
+lineup,baseline,,stock_seeds,/targets/seeds/jhead/* (n=2) | none (n=3),,UNEXPECTED
+lineup,coder30b,baseline,afl_cmd,afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3),afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3) | afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/jhead.afl @@ (n=2),UNEXPECTED
+lineup,coder30b,baseline,binds,none (n=3),/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),UNEXPECTED
+lineup,coder30b,baseline,env:G2F_PLATEAU_SEC,unset (n=3),999999999 (n=5),allowed
+lineup,coder30b,baseline,env:OPENAI_BASE_URL,llm (n=3),none (n=5),allowed
+lineup,coder30b,baseline,image,7adcd8f built 2026-10-09 18:14 (n=3),7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),UNEXPECTED
+lineup,coder30b,baseline,model,Qwen3-Coder-30B-A3B-Instruct-FP8 = Qwen/Qwen3-Coder-30B-A3B-Instruct-FP8 @ dcaee4d4dfc5ee71ad501f01f530e5652438fde0 (n=3),none (n=5),allowed
+lineup,coder30b,baseline,seedgen,llm (n=3),none (n=5),allowed
+lineup,coder30b,baseline,seeds,llm-generated (n=3),9db75336907f (n=5),allowed
+lineup,coder30b,baseline,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 1 --max-model-len 32768 --gpu-memory-utilization 0.90 (n=3),none (n=5),allowed
+lineup,coder30b,baseline,stock_seeds,none (n=3),/targets/seeds/jhead/* (n=2) | none (n=3),UNEXPECTED
+lineup,coder30b,baseline,target,missing (n=3),jhead (n=5),UNEXPECTED
+lineup,codernext,,afl_cmd,afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3) | afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/jhead.afl @@ (n=2),,UNEXPECTED
+lineup,codernext,,binds,/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | none (n=3),,UNEXPECTED
+lineup,codernext,,image,7adcd8f built 2026-10-09 18:14 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),,UNEXPECTED
+lineup,codernext,,stock_seeds,/targets/seeds/jhead/* (n=2) | none (n=3),,UNEXPECTED
+lineup,codernext,,target,jhead (n=2) | missing (n=3),,UNEXPECTED
+lineup,codernext,baseline,binds,/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | none (n=3),/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),UNEXPECTED
+lineup,codernext,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+lineup,codernext,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+lineup,codernext,baseline,image,7adcd8f built 2026-10-09 18:14 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),UNEXPECTED
+lineup,codernext,baseline,model,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c (n=5),none (n=5),allowed
+lineup,codernext,baseline,seedgen,llm (n=5),none (n=5),allowed
+lineup,codernext,baseline,seeds,llm-generated (n=5),9db75336907f (n=5),allowed
+lineup,codernext,baseline,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 (n=5),none (n=5),allowed
+lineup,codernext,baseline,target,jhead (n=2) | missing (n=3),jhead (n=5),UNEXPECTED
+lineup,devstral24b,baseline,afl_cmd,afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3),afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3) | afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/jhead.afl @@ (n=2),UNEXPECTED
+lineup,devstral24b,baseline,binds,none (n=3),/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),UNEXPECTED
+lineup,devstral24b,baseline,env:G2F_PLATEAU_SEC,unset (n=3),999999999 (n=5),allowed
+lineup,devstral24b,baseline,env:OPENAI_BASE_URL,llm (n=3),none (n=5),allowed
+lineup,devstral24b,baseline,image,7adcd8f built 2026-10-09 18:14 (n=3),7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),UNEXPECTED
+lineup,devstral24b,baseline,model,Devstral-Small-2-24B-Instruct-2512 = mistralai/Devstral-Small-2-24B-Instruct-2512 @ 55c5b41e98c2dbd21b0c8afffc540dcfc9eb5128 (n=3),none (n=5),allowed
+lineup,devstral24b,baseline,seedgen,llm (n=3),none (n=5),allowed
+lineup,devstral24b,baseline,seeds,llm-generated (n=3),9db75336907f (n=5),allowed
+lineup,devstral24b,baseline,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 1 --max-model-len 32768 --gpu-memory-utilization 0.90 (n=3),none (n=5),allowed
+lineup,devstral24b,baseline,stock_seeds,none (n=3),/targets/seeds/jhead/* (n=2) | none (n=3),UNEXPECTED
+lineup,devstral24b,baseline,target,missing (n=3),jhead (n=5),UNEXPECTED
+lineup,dsv4flash,baseline,afl_cmd,afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3),afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3) | afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/jhead.afl @@ (n=2),UNEXPECTED
+lineup,dsv4flash,baseline,binds,none (n=3),/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),UNEXPECTED
+lineup,dsv4flash,baseline,env:G2F_PLATEAU_SEC,unset (n=3),999999999 (n=5),allowed
+lineup,dsv4flash,baseline,env:OPENAI_BASE_URL,llm (n=3),none (n=5),allowed
+lineup,dsv4flash,baseline,image,7adcd8f built 2026-10-09 18:14 (n=3),7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),UNEXPECTED
+lineup,dsv4flash,baseline,model,DeepSeek-V4-Flash-0731 = deepseek-ai/DeepSeek-V4-Flash-0731 @ 7872f01b1d1fe23eabc4c98b48bffcef5a386062 (n=3),none (n=5),allowed
+lineup,dsv4flash,baseline,seedgen,llm (n=3),none (n=5),allowed
+lineup,dsv4flash,baseline,seeds,llm-generated (n=3),9db75336907f (n=5),allowed
+lineup,dsv4flash,baseline,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 4 --max-model-len 32768 --gpu-memory-utilization 0.90 --tokenizer-mode deepseek_v4 --reasoning-parser deepseek_v4 --kv-cache-dtype fp8 --block-size 256 --gpu-memory-utilization 0.85 (n=3),none (n=5),allowed
+lineup,dsv4flash,baseline,stock_seeds,none (n=3),/targets/seeds/jhead/* (n=2) | none (n=3),UNEXPECTED
+lineup,dsv4flash,baseline,target,missing (n=3),jhead (n=5),UNEXPECTED
+lineup,gemma26b,baseline,afl_cmd,afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3),afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3) | afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/jhead.afl @@ (n=2),UNEXPECTED
+lineup,gemma26b,baseline,binds,none (n=3),/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),UNEXPECTED
+lineup,gemma26b,baseline,env:G2F_PLATEAU_SEC,unset (n=3),999999999 (n=5),allowed
+lineup,gemma26b,baseline,env:OPENAI_BASE_URL,llm (n=3),none (n=5),allowed
+lineup,gemma26b,baseline,image,7adcd8f built 2026-10-09 18:14 (n=3),7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),UNEXPECTED
+lineup,gemma26b,baseline,model,gemma-4-26B-A4B-it = google/gemma-4-26B-A4B-it @ 4d7ae4984b7db7de8f8457170b3f1a419ee76d52 (n=3),none (n=5),allowed
+lineup,gemma26b,baseline,seedgen,llm (n=3),none (n=5),allowed
+lineup,gemma26b,baseline,seeds,llm-generated (n=3),9db75336907f (n=5),allowed
+lineup,gemma26b,baseline,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 (n=3),none (n=5),allowed
+lineup,gemma26b,baseline,stock_seeds,none (n=3),/targets/seeds/jhead/* (n=2) | none (n=3),UNEXPECTED
+lineup,gemma26b,baseline,target,missing (n=3),jhead (n=5),UNEXPECTED
+lineup,gemma31b,baseline,afl_cmd,afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3),afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3) | afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/jhead.afl @@ (n=2),UNEXPECTED
+lineup,gemma31b,baseline,binds,none (n=3),/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),UNEXPECTED
+lineup,gemma31b,baseline,env:G2F_PLATEAU_SEC,unset (n=3),999999999 (n=5),allowed
+lineup,gemma31b,baseline,env:OPENAI_BASE_URL,llm (n=3),none (n=5),allowed
+lineup,gemma31b,baseline,image,7adcd8f built 2026-10-09 18:14 (n=3),7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),UNEXPECTED
+lineup,gemma31b,baseline,model,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475 (n=3),none (n=5),allowed
+lineup,gemma31b,baseline,seedgen,llm (n=3),none (n=5),allowed
+lineup,gemma31b,baseline,seeds,llm-generated (n=3),9db75336907f (n=5),allowed
+lineup,gemma31b,baseline,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 (n=3),none (n=5),allowed
+lineup,gemma31b,baseline,stock_seeds,none (n=3),/targets/seeds/jhead/* (n=2) | none (n=3),UNEXPECTED
+lineup,gemma31b,baseline,target,missing (n=3),jhead (n=5),UNEXPECTED
+lineup,oss120b,baseline,afl_cmd,afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3),afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3) | afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/jhead.afl @@ (n=2),UNEXPECTED
+lineup,oss120b,baseline,binds,none (n=3),/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),UNEXPECTED
+lineup,oss120b,baseline,env:G2F_PLATEAU_SEC,unset (n=3),999999999 (n=5),allowed
+lineup,oss120b,baseline,env:OPENAI_BASE_URL,llm (n=3),none (n=5),allowed
+lineup,oss120b,baseline,image,7adcd8f built 2026-10-09 18:14 (n=3),7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),UNEXPECTED
+lineup,oss120b,baseline,model,gpt-oss-120b = openai/gpt-oss-120b @ b5c939de8f754692c1647ca79fbf85e8c1e70f8a (n=3),none (n=5),allowed
+lineup,oss120b,baseline,seedgen,llm (n=3),none (n=5),allowed
+lineup,oss120b,baseline,seeds,llm-generated (n=3),9db75336907f (n=5),allowed
+lineup,oss120b,baseline,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 65536 --gpu-memory-utilization 0.90 (n=3),none (n=5),allowed
+lineup,oss120b,baseline,stock_seeds,none (n=3),/targets/seeds/jhead/* (n=2) | none (n=3),UNEXPECTED
+lineup,oss120b,baseline,target,missing (n=3),jhead (n=5),UNEXPECTED
+lineup,oss20b,baseline,afl_cmd,afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3),afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3) | afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/jhead.afl @@ (n=2),UNEXPECTED
+lineup,oss20b,baseline,binds,none (n=3),/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),UNEXPECTED
+lineup,oss20b,baseline,env:G2F_PLATEAU_SEC,unset (n=3),999999999 (n=5),allowed
+lineup,oss20b,baseline,env:OPENAI_BASE_URL,llm (n=3),none (n=5),allowed
+lineup,oss20b,baseline,image,7adcd8f built 2026-10-09 18:14 (n=3),7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),UNEXPECTED
+lineup,oss20b,baseline,model,gpt-oss-20b = openai/gpt-oss-20b @ 6cee5e81ee83917806bbde320786a8fb61efebee (n=3),none (n=5),allowed
+lineup,oss20b,baseline,seedgen,llm (n=3),none (n=5),allowed
+lineup,oss20b,baseline,seeds,llm-generated (n=3),9db75336907f (n=5),allowed
+lineup,oss20b,baseline,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 1 --max-model-len 65536 --gpu-memory-utilization 0.90 (n=3),none (n=5),allowed
+lineup,oss20b,baseline,stock_seeds,none (n=3),/targets/seeds/jhead/* (n=2) | none (n=3),UNEXPECTED
+lineup,oss20b,baseline,target,missing (n=3),jhead (n=5),UNEXPECTED
+lineup,qwen122b,baseline,afl_cmd,afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3),afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3) | afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/jhead.afl @@ (n=2),UNEXPECTED
+lineup,qwen122b,baseline,binds,none (n=3),/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),UNEXPECTED
+lineup,qwen122b,baseline,env:G2F_PLATEAU_SEC,unset (n=3),999999999 (n=5),allowed
+lineup,qwen122b,baseline,env:OPENAI_BASE_URL,llm (n=3),none (n=5),allowed
+lineup,qwen122b,baseline,image,7adcd8f built 2026-10-09 18:14 (n=3),7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),UNEXPECTED
+lineup,qwen122b,baseline,model,Qwen3.5-122B-A10B-FP8 = Qwen/Qwen3.5-122B-A10B-FP8 @ a099dee70ccfcd8d5dda56aaa0b60cb8ecadabc9 (n=3),none (n=5),allowed
+lineup,qwen122b,baseline,seedgen,llm (n=3),none (n=5),allowed
+lineup,qwen122b,baseline,seeds,llm-generated (n=3),9db75336907f (n=5),allowed
+lineup,qwen122b,baseline,server,"0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 --default-chat-template-kwargs {""enable_thinking"":false} --max-num-seqs 256 (n=3)",none (n=5),allowed
+lineup,qwen122b,baseline,stock_seeds,none (n=3),/targets/seeds/jhead/* (n=2) | none (n=3),UNEXPECTED
+lineup,qwen122b,baseline,target,missing (n=3),jhead (n=5),UNEXPECTED
+lineup,qwen36,baseline,afl_cmd,afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3),afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3) | afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/jhead.afl @@ (n=2),UNEXPECTED
+lineup,qwen36,baseline,binds,none (n=3),/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),UNEXPECTED
+lineup,qwen36,baseline,env:G2F_PLATEAU_SEC,unset (n=3),999999999 (n=5),allowed
+lineup,qwen36,baseline,env:OPENAI_BASE_URL,llm (n=3),none (n=5),allowed
+lineup,qwen36,baseline,image,7adcd8f built 2026-10-09 18:14 (n=3),7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),UNEXPECTED
+lineup,qwen36,baseline,model,Qwen3.6-35B-A3B-FP8 = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989 (n=3),none (n=5),allowed
+lineup,qwen36,baseline,seedgen,llm (n=3),none (n=5),allowed
+lineup,qwen36,baseline,seeds,llm-generated (n=3),9db75336907f (n=5),allowed
+lineup,qwen36,baseline,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 (n=3),none (n=5),allowed
+lineup,qwen36,baseline,stock_seeds,none (n=3),/targets/seeds/jhead/* (n=2) | none (n=3),UNEXPECTED
+lineup,qwen36,baseline,target,missing (n=3),jhead (n=5),UNEXPECTED
+lineup,qwen36nt,,afl_cmd,afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3) | afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/jhead.afl @@ (n=2),,UNEXPECTED
+lineup,qwen36nt,,binds,/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | none (n=3),,UNEXPECTED
+lineup,qwen36nt,,image,7adcd8f built 2026-10-09 18:14 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),,UNEXPECTED
+lineup,qwen36nt,,stock_seeds,/targets/seeds/jhead/* (n=2) | none (n=3),,UNEXPECTED
+lineup,qwen36nt,,target,jhead (n=2) | missing (n=3),,UNEXPECTED
+lineup,qwen36nt,baseline,binds,/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | none (n=3),/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),UNEXPECTED
+lineup,qwen36nt,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+lineup,qwen36nt,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+lineup,qwen36nt,baseline,image,7adcd8f built 2026-10-09 18:14 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),UNEXPECTED
+lineup,qwen36nt,baseline,model,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989 (n=5),none (n=5),allowed
+lineup,qwen36nt,baseline,seedgen,llm (n=5),none (n=5),allowed
+lineup,qwen36nt,baseline,seeds,llm-generated (n=5),9db75336907f (n=5),allowed
+lineup,qwen36nt,baseline,server,"0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 --default-chat-template-kwargs {""enable_thinking"":false} (n=5)",none (n=5),allowed
+lineup,qwen36nt,baseline,target,jhead (n=2) | missing (n=3),jhead (n=5),UNEXPECTED
+lineup,qwen38,baseline,afl_cmd,afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3),afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3) | afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/jhead.afl @@ (n=2),UNEXPECTED
+lineup,qwen38,baseline,binds,/AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),UNEXPECTED
+lineup,qwen38,baseline,env:G2F_PLATEAU_SEC,unset (n=3),999999999 (n=5),allowed
+lineup,qwen38,baseline,env:OPENAI_BASE_URL,llm (n=3),none (n=5),allowed
+lineup,qwen38,baseline,image,7adcd8f-dirty built 2026-10-13 18:53 (n=3),7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),UNEXPECTED
+lineup,qwen38,baseline,model,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a (n=3),none (n=5),allowed
+lineup,qwen38,baseline,seedgen,llm (n=3),none (n=5),allowed
+lineup,qwen38,baseline,seeds,llm-generated (n=3),9db75336907f (n=5),allowed
+lineup,qwen38,baseline,server,"0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 1 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 --default-chat-template-kwargs {""enable_thinking"":false} --max-num-seqs 64 (n=3)",none (n=5),allowed
+lineup,qwen38,baseline,stock_seeds,none (n=3),/targets/seeds/jhead/* (n=2) | none (n=3),UNEXPECTED
+lineup,qwen4b,,afl_cmd,afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/jhead.afl @@ (n=3) | afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/jhead.afl @@ (n=2),,UNEXPECTED
+lineup,qwen4b,,binds,/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | none (n=3),,UNEXPECTED
+lineup,qwen4b,,image,7adcd8f built 2026-10-09 18:14 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),,UNEXPECTED
+lineup,qwen4b,,stock_seeds,/targets/seeds/jhead/* (n=2) | none (n=3),,UNEXPECTED
+lineup,qwen4b,,target,jhead (n=2) | missing (n=3),,UNEXPECTED
+lineup,qwen4b,baseline,binds,/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | none (n=3),/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),UNEXPECTED
+lineup,qwen4b,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+lineup,qwen4b,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+lineup,qwen4b,baseline,image,7adcd8f built 2026-10-09 18:14 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),UNEXPECTED
+lineup,qwen4b,baseline,model,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a (n=5),none (n=5),allowed
+lineup,qwen4b,baseline,seedgen,llm (n=5),none (n=5),allowed
+lineup,qwen4b,baseline,seeds,llm-generated (n=5),9db75336907f (n=5),allowed
+lineup,qwen4b,baseline,server,"0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 1 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 --default-chat-template-kwargs {""enable_thinking"":false} (n=5)",none (n=5),allowed
+lineup,qwen4b,baseline,target,jhead (n=2) | missing (n=3),jhead (n=5),UNEXPECTED
+png,baseline,,afl_cmd,afl-fuzz -i initial_seeds -o libpng_read_fuzzer_output -c /targets/libpng_read_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/libpng_read_fuzzer.afl @@ (n=3) | afl-fuzz -i initial_seeds -o libpng_read_fuzzer_output -c /targets/libpng_read_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/libpng_read_fuzzer.afl @@ (n=2),,UNEXPECTED
+png,baseline,,binds,/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),,UNEXPECTED
+png,baseline,,image,7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),,UNEXPECTED
+png,baseline,,stock_seeds,/targets/seeds/libpng_read_fuzzer/* (n=2) | none (n=3),,UNEXPECTED
+png,codernext,,afl_cmd,afl-fuzz -i initial_seeds -o libpng_read_fuzzer_output -c /targets/libpng_read_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/libpng_read_fuzzer.afl @@ (n=3) | afl-fuzz -i initial_seeds -o libpng_read_fuzzer_output -c /targets/libpng_read_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/libpng_read_fuzzer.afl @@ (n=2),,UNEXPECTED
+png,codernext,,binds,/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),,UNEXPECTED
+png,codernext,,image,7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),,UNEXPECTED
+png,codernext,,stock_seeds,/targets/seeds/libpng_read_fuzzer/* (n=2) | none (n=3),,UNEXPECTED
+png,codernext,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+png,codernext,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+png,codernext,baseline,model,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c (n=5),none (n=5),allowed
+png,codernext,baseline,seedgen,llm (n=5),none (n=5),allowed
+png,codernext,baseline,seeds,llm-generated (n=5),7acb1eef1e18 (n=5),allowed
+png,codernext,baseline,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 (n=5),none (n=5),allowed
+png,codernext,ctl-llmseeds,afl_cmd,afl-fuzz -i initial_seeds -o libpng_read_fuzzer_output -c /targets/libpng_read_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/libpng_read_fuzzer.afl @@ (n=3) | afl-fuzz -i initial_seeds -o libpng_read_fuzzer_output -c /targets/libpng_read_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/libpng_read_fuzzer.afl @@ (n=2),afl-fuzz -i initial_seeds -o libpng_read_fuzzer_output -c /targets/libpng_read_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/libpng_read_fuzzer.afl @@ (n=5),UNEXPECTED
+png,codernext,ctl-llmseeds,binds,/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=5),UNEXPECTED
+png,codernext,ctl-llmseeds,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+png,codernext,ctl-llmseeds,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+png,codernext,ctl-llmseeds,image,7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),7adcd8f-dirty reorg built 2026-10-15 08:29 (n=5),UNEXPECTED
+png,codernext,ctl-llmseeds,model,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c (n=5),none (n=5),allowed
+png,codernext,ctl-llmseeds,seedgen,llm (n=5),none (n=5),allowed
+png,codernext,ctl-llmseeds,seeds,llm-generated (n=5),f8da641b67fb (n=5),allowed
+png,codernext,ctl-llmseeds,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 (n=5),none (n=5),allowed
+png,codernext,ctl-llmseeds,stock_seeds,/targets/seeds/libpng_read_fuzzer/* (n=2) | none (n=3),none (n=5),allowed
+png,ctl-junk,baseline,afl_cmd,afl-fuzz -i initial_seeds -o libpng_read_fuzzer_output -c /targets/libpng_read_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/libpng_read_fuzzer.afl @@ (n=5),afl-fuzz -i initial_seeds -o libpng_read_fuzzer_output -c /targets/libpng_read_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/libpng_read_fuzzer.afl @@ (n=3) | afl-fuzz -i initial_seeds -o libpng_read_fuzzer_output -c /targets/libpng_read_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/libpng_read_fuzzer.afl @@ (n=2),UNEXPECTED
+png,ctl-junk,baseline,binds,/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=5),/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),UNEXPECTED
+png,ctl-junk,baseline,image,7adcd8f-dirty reorg built 2026-10-15 08:29 (n=5),7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),UNEXPECTED
+png,ctl-junk,baseline,seeds,ae93a81cf288 (n=5),7acb1eef1e18 (n=5),allowed
+png,ctl-junk,baseline,stock_seeds,none (n=5),/targets/seeds/libpng_read_fuzzer/* (n=2) | none (n=3),allowed
+png,ctl-llmseeds,baseline,afl_cmd,afl-fuzz -i initial_seeds -o libpng_read_fuzzer_output -c /targets/libpng_read_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/libpng_read_fuzzer.afl @@ (n=5),afl-fuzz -i initial_seeds -o libpng_read_fuzzer_output -c /targets/libpng_read_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/libpng_read_fuzzer.afl @@ (n=3) | afl-fuzz -i initial_seeds -o libpng_read_fuzzer_output -c /targets/libpng_read_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/libpng_read_fuzzer.afl @@ (n=2),UNEXPECTED
+png,ctl-llmseeds,baseline,binds,/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=5),/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),UNEXPECTED
+png,ctl-llmseeds,baseline,image,7adcd8f-dirty reorg built 2026-10-15 08:29 (n=5),7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),UNEXPECTED
+png,ctl-llmseeds,baseline,seeds,f8da641b67fb (n=5),7acb1eef1e18 (n=5),allowed
+png,ctl-llmseeds,baseline,stock_seeds,none (n=5),/targets/seeds/libpng_read_fuzzer/* (n=2) | none (n=3),allowed
+png,ctl-llmseeds,ctl-junk,seeds,f8da641b67fb (n=5),ae93a81cf288 (n=5),allowed
+png,gemma31b,baseline,afl_cmd,afl-fuzz -i initial_seeds -o libpng_read_fuzzer_output -c /targets/libpng_read_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/libpng_read_fuzzer.afl @@ (n=3),afl-fuzz -i initial_seeds -o libpng_read_fuzzer_output -c /targets/libpng_read_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/libpng_read_fuzzer.afl @@ (n=3) | afl-fuzz -i initial_seeds -o libpng_read_fuzzer_output -c /targets/libpng_read_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/libpng_read_fuzzer.afl @@ (n=2),UNEXPECTED
+png,gemma31b,baseline,binds,/AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),UNEXPECTED
+png,gemma31b,baseline,env:G2F_PLATEAU_SEC,unset (n=3),999999999 (n=5),allowed
+png,gemma31b,baseline,env:OPENAI_BASE_URL,llm (n=3),none (n=5),allowed
+png,gemma31b,baseline,image,7adcd8f-dirty built 2026-10-13 18:53 (n=3),7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),UNEXPECTED
+png,gemma31b,baseline,model,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475 (n=3),none (n=5),allowed
+png,gemma31b,baseline,seedgen,llm (n=3),none (n=5),allowed
+png,gemma31b,baseline,seeds,llm-generated (n=3),7acb1eef1e18 (n=5),allowed
+png,gemma31b,baseline,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 (n=3),none (n=5),allowed
+png,gemma31b,baseline,stock_seeds,none (n=3),/targets/seeds/libpng_read_fuzzer/* (n=2) | none (n=3),UNEXPECTED
+png,qwen36nt,,afl_cmd,afl-fuzz -i initial_seeds -o libpng_read_fuzzer_output -c /targets/libpng_read_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/libpng_read_fuzzer.afl @@ (n=2) | afl-fuzz -i initial_seeds -o libpng_read_fuzzer_output -c /targets/libpng_read_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/libpng_read_fuzzer.afl @@ (n=2),,UNEXPECTED
+png,qwen36nt,,binds,/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=2),,UNEXPECTED
+png,qwen36nt,,image,7adcd8f-dirty built 2026-10-13 18:53 (n=2) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),,UNEXPECTED
+png,qwen36nt,,stock_seeds,/targets/seeds/libpng_read_fuzzer/* (n=2) | none (n=2),,UNEXPECTED
+png,qwen36nt,baseline,env:G2F_PLATEAU_SEC,unset (n=4),999999999 (n=5),allowed
+png,qwen36nt,baseline,env:OPENAI_BASE_URL,llm (n=4),none (n=5),allowed
+png,qwen36nt,baseline,model,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989 (n=4),none (n=5),allowed
+png,qwen36nt,baseline,seedgen,llm (n=4),none (n=5),allowed
+png,qwen36nt,baseline,seeds,llm-generated (n=4),7acb1eef1e18 (n=5),allowed
+png,qwen36nt,baseline,server,"0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 --default-chat-template-kwargs {""enable_thinking"":false} (n=4)",none (n=5),allowed
+png,qwen38,baseline,afl_cmd,afl-fuzz -i initial_seeds -o libpng_read_fuzzer_output -c /targets/libpng_read_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/libpng_read_fuzzer.afl @@ (n=3),afl-fuzz -i initial_seeds -o libpng_read_fuzzer_output -c /targets/libpng_read_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/libpng_read_fuzzer.afl @@ (n=3) | afl-fuzz -i initial_seeds -o libpng_read_fuzzer_output -c /targets/libpng_read_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/libpng_read_fuzzer.afl @@ (n=2),UNEXPECTED
+png,qwen38,baseline,binds,/AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),UNEXPECTED
+png,qwen38,baseline,env:G2F_PLATEAU_SEC,unset (n=3),999999999 (n=5),allowed
+png,qwen38,baseline,env:OPENAI_BASE_URL,llm (n=3),none (n=5),allowed
+png,qwen38,baseline,image,7adcd8f-dirty built 2026-10-13 18:53 (n=3),7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),UNEXPECTED
+png,qwen38,baseline,model,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a (n=3),none (n=5),allowed
+png,qwen38,baseline,seedgen,llm (n=3),none (n=5),allowed
+png,qwen38,baseline,seeds,llm-generated (n=3),7acb1eef1e18 (n=5),allowed
+png,qwen38,baseline,server,"0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 1 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 --default-chat-template-kwargs {""enable_thinking"":false} --max-num-seqs 64 (n=3)",none (n=5),allowed
+png,qwen38,baseline,stock_seeds,none (n=3),/targets/seeds/libpng_read_fuzzer/* (n=2) | none (n=3),UNEXPECTED
+png,qwen4b,,afl_cmd,afl-fuzz -i initial_seeds -o libpng_read_fuzzer_output -c /targets/libpng_read_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/libpng_read_fuzzer.afl @@ (n=2) | afl-fuzz -i initial_seeds -o libpng_read_fuzzer_output -c /targets/libpng_read_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/libpng_read_fuzzer.afl @@ (n=2),,UNEXPECTED
+png,qwen4b,,binds,/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=2),,UNEXPECTED
+png,qwen4b,,image,7adcd8f-dirty built 2026-10-13 18:53 (n=2) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),,UNEXPECTED
+png,qwen4b,,stock_seeds,/targets/seeds/libpng_read_fuzzer/* (n=2) | none (n=2),,UNEXPECTED
+png,qwen4b,baseline,env:G2F_PLATEAU_SEC,unset (n=4),999999999 (n=5),allowed
+png,qwen4b,baseline,env:OPENAI_BASE_URL,llm (n=4),none (n=5),allowed
+png,qwen4b,baseline,model,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a (n=4),none (n=5),allowed
+png,qwen4b,baseline,seedgen,llm (n=4),none (n=5),allowed
+png,qwen4b,baseline,seeds,llm-generated (n=4),7acb1eef1e18 (n=5),allowed
+png,qwen4b,baseline,server,"0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 1 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 --default-chat-template-kwargs {""enable_thinking"":false} (n=4)",none (n=5),allowed
+tiff,baseline,,afl_cmd,afl-fuzz -i initial_seeds -o tiff_read_rgba_fuzzer_output -c /targets/tiff_read_rgba_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/tiff_read_rgba_fuzzer.afl @@ (n=3) | afl-fuzz -i initial_seeds -o tiff_read_rgba_fuzzer_output -c /targets/tiff_read_rgba_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/tiff_read_rgba_fuzzer.afl @@ (n=2),,UNEXPECTED
+tiff,baseline,,binds,/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),,UNEXPECTED
+tiff,baseline,,image,7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),,UNEXPECTED
+tiff,baseline,,stock_seeds,/targets/seeds/tiff_read_rgba_fuzzer/* (n=2) | none (n=3),,UNEXPECTED
+tiff,codernext,,afl_cmd,afl-fuzz -i initial_seeds -o tiff_read_rgba_fuzzer_output -c /targets/tiff_read_rgba_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/tiff_read_rgba_fuzzer.afl @@ (n=3) | afl-fuzz -i initial_seeds -o tiff_read_rgba_fuzzer_output -c /targets/tiff_read_rgba_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/tiff_read_rgba_fuzzer.afl @@ (n=2),,UNEXPECTED
+tiff,codernext,,binds,/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),,UNEXPECTED
+tiff,codernext,,image,7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),,UNEXPECTED
+tiff,codernext,,stock_seeds,/targets/seeds/tiff_read_rgba_fuzzer/* (n=2) | none (n=3),,UNEXPECTED
+tiff,codernext,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+tiff,codernext,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+tiff,codernext,baseline,model,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c (n=5),none (n=5),allowed
+tiff,codernext,baseline,seedgen,llm (n=5),none (n=5),allowed
+tiff,codernext,baseline,seeds,llm-generated (n=5),95008db33c96 (n=5),allowed
+tiff,codernext,baseline,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 (n=5),none (n=5),allowed
+tiff,codernext,ctl-llmseeds,afl_cmd,afl-fuzz -i initial_seeds -o tiff_read_rgba_fuzzer_output -c /targets/tiff_read_rgba_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/tiff_read_rgba_fuzzer.afl @@ (n=3) | afl-fuzz -i initial_seeds -o tiff_read_rgba_fuzzer_output -c /targets/tiff_read_rgba_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/tiff_read_rgba_fuzzer.afl @@ (n=2),afl-fuzz -i initial_seeds -o tiff_read_rgba_fuzzer_output -c /targets/tiff_read_rgba_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/tiff_read_rgba_fuzzer.afl @@ (n=5),UNEXPECTED
+tiff,codernext,ctl-llmseeds,binds,/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=5),UNEXPECTED
+tiff,codernext,ctl-llmseeds,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+tiff,codernext,ctl-llmseeds,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+tiff,codernext,ctl-llmseeds,image,7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),7adcd8f-dirty reorg built 2026-10-15 08:29 (n=5),UNEXPECTED
+tiff,codernext,ctl-llmseeds,model,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c (n=5),none (n=5),allowed
+tiff,codernext,ctl-llmseeds,seedgen,llm (n=5),none (n=5),allowed
+tiff,codernext,ctl-llmseeds,seeds,llm-generated (n=5),dee2bb06280a (n=5),allowed
+tiff,codernext,ctl-llmseeds,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 (n=5),none (n=5),allowed
+tiff,codernext,ctl-llmseeds,stock_seeds,/targets/seeds/tiff_read_rgba_fuzzer/* (n=2) | none (n=3),none (n=5),allowed
+tiff,ctl-junk,baseline,afl_cmd,afl-fuzz -i initial_seeds -o tiff_read_rgba_fuzzer_output -c /targets/tiff_read_rgba_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/tiff_read_rgba_fuzzer.afl @@ (n=5),afl-fuzz -i initial_seeds -o tiff_read_rgba_fuzzer_output -c /targets/tiff_read_rgba_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/tiff_read_rgba_fuzzer.afl @@ (n=3) | afl-fuzz -i initial_seeds -o tiff_read_rgba_fuzzer_output -c /targets/tiff_read_rgba_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/tiff_read_rgba_fuzzer.afl @@ (n=2),UNEXPECTED
+tiff,ctl-junk,baseline,binds,/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=5),/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),UNEXPECTED
+tiff,ctl-junk,baseline,image,7adcd8f-dirty reorg built 2026-10-15 08:29 (n=5),7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),UNEXPECTED
+tiff,ctl-junk,baseline,seeds,23bc57d27849 (n=5),95008db33c96 (n=5),allowed
+tiff,ctl-junk,baseline,stock_seeds,none (n=5),/targets/seeds/tiff_read_rgba_fuzzer/* (n=2) | none (n=3),allowed
+tiff,ctl-llmseeds,baseline,afl_cmd,afl-fuzz -i initial_seeds -o tiff_read_rgba_fuzzer_output -c /targets/tiff_read_rgba_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/tiff_read_rgba_fuzzer.afl @@ (n=5),afl-fuzz -i initial_seeds -o tiff_read_rgba_fuzzer_output -c /targets/tiff_read_rgba_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/tiff_read_rgba_fuzzer.afl @@ (n=3) | afl-fuzz -i initial_seeds -o tiff_read_rgba_fuzzer_output -c /targets/tiff_read_rgba_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/tiff_read_rgba_fuzzer.afl @@ (n=2),UNEXPECTED
+tiff,ctl-llmseeds,baseline,binds,/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=5),/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),UNEXPECTED
+tiff,ctl-llmseeds,baseline,image,7adcd8f-dirty reorg built 2026-10-15 08:29 (n=5),7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),UNEXPECTED
+tiff,ctl-llmseeds,baseline,seeds,dee2bb06280a (n=5),95008db33c96 (n=5),allowed
+tiff,ctl-llmseeds,baseline,stock_seeds,none (n=5),/targets/seeds/tiff_read_rgba_fuzzer/* (n=2) | none (n=3),allowed
+tiff,ctl-llmseeds,ctl-junk,seeds,dee2bb06280a (n=5),23bc57d27849 (n=5),allowed
+tiff,gemma31b,baseline,afl_cmd,afl-fuzz -i initial_seeds -o tiff_read_rgba_fuzzer_output -c /targets/tiff_read_rgba_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/tiff_read_rgba_fuzzer.afl @@ (n=3),afl-fuzz -i initial_seeds -o tiff_read_rgba_fuzzer_output -c /targets/tiff_read_rgba_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/tiff_read_rgba_fuzzer.afl @@ (n=3) | afl-fuzz -i initial_seeds -o tiff_read_rgba_fuzzer_output -c /targets/tiff_read_rgba_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/tiff_read_rgba_fuzzer.afl @@ (n=2),UNEXPECTED
+tiff,gemma31b,baseline,binds,/AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),UNEXPECTED
+tiff,gemma31b,baseline,env:G2F_PLATEAU_SEC,unset (n=3),999999999 (n=5),allowed
+tiff,gemma31b,baseline,env:OPENAI_BASE_URL,llm (n=3),none (n=5),allowed
+tiff,gemma31b,baseline,image,7adcd8f-dirty built 2026-10-13 18:53 (n=3),7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),UNEXPECTED
+tiff,gemma31b,baseline,model,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475 (n=3),none (n=5),allowed
+tiff,gemma31b,baseline,seedgen,llm (n=3),none (n=5),allowed
+tiff,gemma31b,baseline,seeds,llm-generated (n=3),95008db33c96 (n=5),allowed
+tiff,gemma31b,baseline,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 (n=3),none (n=5),allowed
+tiff,gemma31b,baseline,stock_seeds,none (n=3),/targets/seeds/tiff_read_rgba_fuzzer/* (n=2) | none (n=3),UNEXPECTED
+tiff,qwen36nt,,afl_cmd,afl-fuzz -i initial_seeds -o tiff_read_rgba_fuzzer_output -c /targets/tiff_read_rgba_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/tiff_read_rgba_fuzzer.afl @@ (n=3) | afl-fuzz -i initial_seeds -o tiff_read_rgba_fuzzer_output -c /targets/tiff_read_rgba_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/tiff_read_rgba_fuzzer.afl @@ (n=2),,UNEXPECTED
+tiff,qwen36nt,,binds,/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),,UNEXPECTED
+tiff,qwen36nt,,image,7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),,UNEXPECTED
+tiff,qwen36nt,,stock_seeds,/targets/seeds/tiff_read_rgba_fuzzer/* (n=2) | none (n=3),,UNEXPECTED
+tiff,qwen36nt,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+tiff,qwen36nt,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+tiff,qwen36nt,baseline,model,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989 (n=5),none (n=5),allowed
+tiff,qwen36nt,baseline,seedgen,llm (n=5),none (n=5),allowed
+tiff,qwen36nt,baseline,seeds,llm-generated (n=5),95008db33c96 (n=5),allowed
+tiff,qwen36nt,baseline,server,"0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 --default-chat-template-kwargs {""enable_thinking"":false} (n=5)",none (n=5),allowed
+tiff,qwen38,baseline,afl_cmd,afl-fuzz -i initial_seeds -o tiff_read_rgba_fuzzer_output -c /targets/tiff_read_rgba_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/tiff_read_rgba_fuzzer.afl @@ (n=3),afl-fuzz -i initial_seeds -o tiff_read_rgba_fuzzer_output -c /targets/tiff_read_rgba_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/tiff_read_rgba_fuzzer.afl @@ (n=3) | afl-fuzz -i initial_seeds -o tiff_read_rgba_fuzzer_output -c /targets/tiff_read_rgba_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/tiff_read_rgba_fuzzer.afl @@ (n=2),UNEXPECTED
+tiff,qwen38,baseline,binds,/AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),UNEXPECTED
+tiff,qwen38,baseline,env:G2F_PLATEAU_SEC,unset (n=3),999999999 (n=5),allowed
+tiff,qwen38,baseline,env:OPENAI_BASE_URL,llm (n=3),none (n=5),allowed
+tiff,qwen38,baseline,image,7adcd8f-dirty built 2026-10-13 18:53 (n=3),7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),UNEXPECTED
+tiff,qwen38,baseline,model,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a (n=3),none (n=5),allowed
+tiff,qwen38,baseline,seedgen,llm (n=3),none (n=5),allowed
+tiff,qwen38,baseline,seeds,llm-generated (n=3),95008db33c96 (n=5),allowed
+tiff,qwen38,baseline,server,"0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 1 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 --default-chat-template-kwargs {""enable_thinking"":false} --max-num-seqs 64 (n=3)",none (n=5),allowed
+tiff,qwen38,baseline,stock_seeds,none (n=3),/targets/seeds/tiff_read_rgba_fuzzer/* (n=2) | none (n=3),UNEXPECTED
+tiff,qwen4b,,afl_cmd,afl-fuzz -i initial_seeds -o tiff_read_rgba_fuzzer_output -c /targets/tiff_read_rgba_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/ -- /targets/tiff_read_rgba_fuzzer.afl @@ (n=3) | afl-fuzz -i initial_seeds -o tiff_read_rgba_fuzzer_output -c /targets/tiff_read_rgba_fuzzer.cmp -m 1024 -V 3600 -k /AFLplusplus/g2fuzz/ -- /targets/tiff_read_rgba_fuzzer.afl @@ (n=2),,UNEXPECTED
+tiff,qwen4b,,binds,/AFLplusplus/g2fuzz<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/g2fuzz (n=2) | /AFLplusplus/generator_mutation.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/generator_mutation.py /AFLplusplus/program_gen.py<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_gen.py /AFLplusplus/program_to_format.json<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/program_to_format.json /AFLplusplus/py_utils<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/py_utils /targets<-/home/group/csci-591-automated-vulnerability-discovery/students/BETTER-G2FUZZ-exp/targets (n=3),,UNEXPECTED
+tiff,qwen4b,,image,7adcd8f-dirty built 2026-10-13 18:53 (n=3) | 7adcd8f-dirty reorg built 2026-10-15 08:29 (n=2),,UNEXPECTED
+tiff,qwen4b,,stock_seeds,/targets/seeds/tiff_read_rgba_fuzzer/* (n=2) | none (n=3),,UNEXPECTED
+tiff,qwen4b,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+tiff,qwen4b,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+tiff,qwen4b,baseline,model,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a (n=5),none (n=5),allowed
+tiff,qwen4b,baseline,seedgen,llm (n=5),none (n=5),allowed
+tiff,qwen4b,baseline,seeds,llm-generated (n=5),95008db33c96 (n=5),allowed
+tiff,qwen4b,baseline,server,"0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 1 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 --default-chat-template-kwargs {""enable_thinking"":false} (n=5)",none (n=5),allowed
+wad,codernext,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+wad,codernext,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+wad,codernext,baseline,model,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c (n=5),none (n=5),allowed
+wad,codernext,baseline,seedgen,llm (n=5),none (n=5),allowed
+wad,codernext,baseline,seeds,llm-generated (n=5),6292e73985be (n=5),allowed
+wad,codernext,baseline,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 (n=5),none (n=5),allowed
+wad,codernext,ctl-llmseeds,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+wad,codernext,ctl-llmseeds,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+wad,codernext,ctl-llmseeds,model,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c (n=5),none (n=5),allowed
+wad,codernext,ctl-llmseeds,seedgen,llm (n=5),none (n=5),allowed
+wad,codernext,ctl-llmseeds,seeds,llm-generated (n=5),96fd135866bc (n=5),allowed
+wad,codernext,ctl-llmseeds,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 (n=5),none (n=5),allowed
+wad,ctl-junk,baseline,seeds,10277485e515 (n=5),6292e73985be (n=5),allowed
+wad,ctl-llmseeds,baseline,seeds,96fd135866bc (n=5),6292e73985be (n=5),allowed
+wad,ctl-llmseeds,ctl-junk,seeds,96fd135866bc (n=5),10277485e515 (n=5),allowed
+wad,gemma31b,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+wad,gemma31b,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+wad,gemma31b,baseline,model,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475 (n=5),none (n=5),allowed
+wad,gemma31b,baseline,seedgen,llm (n=5),none (n=5),allowed
+wad,gemma31b,baseline,seeds,llm-generated (n=5),6292e73985be (n=5),allowed
+wad,gemma31b,baseline,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 (n=5),none (n=5),allowed
+wad,qwen36nt,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+wad,qwen36nt,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+wad,qwen36nt,baseline,model,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989 (n=5),none (n=5),allowed
+wad,qwen36nt,baseline,seedgen,llm (n=5),none (n=5),allowed
+wad,qwen36nt,baseline,seeds,llm-generated (n=5),6292e73985be (n=5),allowed
+wad,qwen36nt,baseline,server,"0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 --default-chat-template-kwargs {""enable_thinking"":false} (n=5)",none (n=5),allowed
+wad,qwen38,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+wad,qwen38,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+wad,qwen38,baseline,model,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a (n=5),none (n=5),allowed
+wad,qwen38,baseline,seedgen,llm (n=5),none (n=5),allowed
+wad,qwen38,baseline,seeds,llm-generated (n=5),6292e73985be (n=5),allowed
+wad,qwen38,baseline,server,"0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 1 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 --default-chat-template-kwargs {""enable_thinking"":false} --max-num-seqs 64 (n=5)",none (n=5),allowed
+wad,qwen4b,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+wad,qwen4b,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+wad,qwen4b,baseline,model,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a (n=5),none (n=5),allowed
+wad,qwen4b,baseline,seedgen,llm (n=5),none (n=5),allowed
+wad,qwen4b,baseline,seeds,llm-generated (n=5),6292e73985be (n=5),allowed
+wad,qwen4b,baseline,server,"0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 1 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 --default-chat-template-kwargs {""enable_thinking"":false} (n=5)",none (n=5),allowed
+wad4h,codernext,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+wad4h,codernext,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+wad4h,codernext,baseline,model,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c (n=5),none (n=5),allowed
+wad4h,codernext,baseline,seedgen,llm (n=5),none (n=5),allowed
+wad4h,codernext,baseline,seeds,llm-generated (n=5),6292e73985be (n=5),allowed
+wad4h,codernext,baseline,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 (n=5),none (n=5),allowed
+wad4h,qwen36nt,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+wad4h,qwen36nt,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+wad4h,qwen36nt,baseline,model,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989 (n=5),none (n=5),allowed
+wad4h,qwen36nt,baseline,seedgen,llm (n=5),none (n=5),allowed
+wad4h,qwen36nt,baseline,seeds,llm-generated (n=5),6292e73985be (n=5),allowed
+wad4h,qwen36nt,baseline,server,"0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 --default-chat-template-kwargs {""enable_thinking"":false} (n=5)",none (n=5),allowed
+wad4h,qwen4b,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+wad4h,qwen4b,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+wad4h,qwen4b,baseline,model,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a (n=5),none (n=5),allowed
+wad4h,qwen4b,baseline,seedgen,llm (n=5),none (n=5),allowed
+wad4h,qwen4b,baseline,seeds,llm-generated (n=5),6292e73985be (n=5),allowed
+wad4h,qwen4b,baseline,server,"0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 1 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 --default-chat-template-kwargs {""enable_thinking"":false} (n=5)",none (n=5),allowed
+wad4ht,codernext,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+wad4ht,codernext,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+wad4ht,codernext,baseline,model,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c (n=5),none (n=5),allowed
+wad4ht,codernext,baseline,seedgen,llm (n=5),none (n=5),allowed
+wad4ht,codernext,baseline,seeds,llm-generated (n=5),6292e73985be (n=5),allowed
+wad4ht,codernext,baseline,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 (n=5),none (n=5),allowed
+wad4ht,qwen36nt,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+wad4ht,qwen36nt,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+wad4ht,qwen36nt,baseline,model,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989 (n=5),none (n=5),allowed
+wad4ht,qwen36nt,baseline,seedgen,llm (n=5),none (n=5),allowed
+wad4ht,qwen36nt,baseline,seeds,llm-generated (n=5),6292e73985be (n=5),allowed
+wad4ht,qwen36nt,baseline,server,"0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 --default-chat-template-kwargs {""enable_thinking"":false} (n=5)",none (n=5),allowed
+wad4ht,qwen4b,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+wad4ht,qwen4b,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+wad4ht,qwen4b,baseline,model,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a (n=5),none (n=5),allowed
+wad4ht,qwen4b,baseline,seedgen,llm (n=5),none (n=5),allowed
+wad4ht,qwen4b,baseline,seeds,llm-generated (n=5),6292e73985be (n=5),allowed
+wad4ht,qwen4b,baseline,server,"0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 1 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 --default-chat-template-kwargs {""enable_thinking"":false} (n=5)",none (n=5),allowed
+wadp,ctl-llmseeds,ctl-junk,seeds,73fcac1fa564 (n=5),0518e34b530b (n=5),allowed
+wadp,name-codernext,bare-codernext,env:G2F_FORMAT_DESC_FILE,/eval/format_desc.txt (n=5),unset (n=5),allowed
+wadp,name-codernext,bare-codernext,format_desc,cf85aa905d87 (n=5),none (n=5),allowed
+wadp,name-qwen4b,bare-qwen4b,env:G2F_FORMAT_DESC_FILE,/eval/format_desc.txt (n=5),unset (n=5),allowed
+wadp,name-qwen4b,bare-qwen4b,format_desc,cf85aa905d87 (n=5),none (n=5),allowed
+wadp,spec-codernext,bare-codernext,env:G2F_FORMAT_DESC_FILE,/eval/format_desc.txt (n=5),unset (n=5),allowed
+wadp,spec-codernext,bare-codernext,format_desc,9251140ba8c8 (n=5),none (n=5),allowed
+wadp,spec-qwen4b,bare-qwen4b,env:G2F_FORMAT_DESC_FILE,/eval/format_desc.txt (n=5),unset (n=5),allowed
+wadp,spec-qwen4b,bare-qwen4b,format_desc,9251140ba8c8 (n=5),none (n=5),allowed
+xml,codernext,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+xml,codernext,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+xml,codernext,baseline,model,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c (n=5),none (n=5),allowed
+xml,codernext,baseline,seedgen,llm (n=5),none (n=5),allowed
+xml,codernext,baseline,seeds,llm-generated (n=5),417874d271fc (n=5),allowed
+xml,codernext,baseline,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 (n=5),none (n=5),allowed
+xml,codernext,ctl-llmseeds,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+xml,codernext,ctl-llmseeds,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+xml,codernext,ctl-llmseeds,model,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c (n=5),none (n=5),allowed
+xml,codernext,ctl-llmseeds,seedgen,llm (n=5),none (n=5),allowed
+xml,codernext,ctl-llmseeds,seeds,llm-generated (n=5),ea099043f16f (n=5),allowed
+xml,codernext,ctl-llmseeds,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 (n=5),none (n=5),allowed
+xml,ctl-junk,baseline,seeds,155d9b79b97d (n=5),417874d271fc (n=5),allowed
+xml,ctl-llmseeds,baseline,seeds,ea099043f16f (n=5),417874d271fc (n=5),allowed
+xml,ctl-llmseeds,ctl-junk,seeds,ea099043f16f (n=5),155d9b79b97d (n=5),allowed
+xml,gemma31b,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+xml,gemma31b,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+xml,gemma31b,baseline,model,gemma-4-31B-it = google/gemma-4-31B-it @ 842da3794eaa0b77d5f08bae87a17459d91ff475 (n=5),none (n=5),allowed
+xml,gemma31b,baseline,seedgen,llm (n=5),none (n=5),allowed
+xml,gemma31b,baseline,seeds,llm-generated (n=5),417874d271fc (n=5),allowed
+xml,gemma31b,baseline,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 (n=5),none (n=5),allowed
+xml,qwen36nt,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+xml,qwen36nt,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+xml,qwen36nt,baseline,model,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989 (n=5),none (n=5),allowed
+xml,qwen36nt,baseline,seedgen,llm (n=5),none (n=5),allowed
+xml,qwen36nt,baseline,seeds,llm-generated (n=5),417874d271fc (n=5),allowed
+xml,qwen36nt,baseline,server,"0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 --default-chat-template-kwargs {""enable_thinking"":false} (n=5)",none (n=5),allowed
+xml,qwen38,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+xml,qwen38,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+xml,qwen38,baseline,model,Qwen3.8-27B-FP8-nothink = Qwen/Qwen3.8-27B-FP8 @ 017b9c7af6b5689d5dd426a76e0bc077eb5ca20a (n=5),none (n=5),allowed
+xml,qwen38,baseline,seedgen,llm (n=5),none (n=5),allowed
+xml,qwen38,baseline,seeds,llm-generated (n=5),417874d271fc (n=5),allowed
+xml,qwen38,baseline,server,"0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 1 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 --default-chat-template-kwargs {""enable_thinking"":false} --max-num-seqs 64 (n=5)",none (n=5),allowed
+xml,qwen4b,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+xml,qwen4b,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+xml,qwen4b,baseline,model,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a (n=5),none (n=5),allowed
+xml,qwen4b,baseline,seedgen,llm (n=5),none (n=5),allowed
+xml,qwen4b,baseline,seeds,llm-generated (n=5),417874d271fc (n=5),allowed
+xml,qwen4b,baseline,server,"0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 1 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 --default-chat-template-kwargs {""enable_thinking"":false} (n=5)",none (n=5),allowed
+xml4h,codernext,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+xml4h,codernext,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+xml4h,codernext,baseline,model,Qwen3-Coder-Next-FP8 = Qwen/Qwen3-Coder-Next-FP8 @ da6e2ed27304dd39abadd9c82ef50e8de67bdd4c (n=5),none (n=5),allowed
+xml4h,codernext,baseline,seedgen,llm (n=5),none (n=5),allowed
+xml4h,codernext,baseline,seeds,llm-generated (n=5),417874d271fc (n=5),allowed
+xml4h,codernext,baseline,server,0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 (n=5),none (n=5),allowed
+xml4h,qwen36nt,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+xml4h,qwen36nt,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+xml4h,qwen36nt,baseline,model,Qwen3.6-35B-A3B-FP8-nothink = Qwen/Qwen3.6-35B-A3B-FP8 @ 95a723d08a9490559dae23d0cff1d9466213d989 (n=5),none (n=5),allowed
+xml4h,qwen36nt,baseline,seedgen,llm (n=5),none (n=5),allowed
+xml4h,qwen36nt,baseline,seeds,llm-generated (n=5),417874d271fc (n=5),allowed
+xml4h,qwen36nt,baseline,server,"0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 2 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 --default-chat-template-kwargs {""enable_thinking"":false} (n=5)",none (n=5),allowed
+xml4h,qwen4b,baseline,env:G2F_PLATEAU_SEC,unset (n=5),999999999 (n=5),allowed
+xml4h,qwen4b,baseline,env:OPENAI_BASE_URL,llm (n=5),none (n=5),allowed
+xml4h,qwen4b,baseline,model,Qwen3.5-4B = Qwen/Qwen3.5-4B @ 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a (n=5),none (n=5),allowed
+xml4h,qwen4b,baseline,seedgen,llm (n=5),none (n=5),allowed
+xml4h,qwen4b,baseline,seeds,llm-generated (n=5),417874d271fc (n=5),allowed
+xml4h,qwen4b,baseline,server,"0.31.0 (/home/group/csci-591-automated-vulnerability-discovery/students/shared-models/containers/vllm-v0.31.0.sif) ; --tensor-parallel-size 1 --max-model-len 32768 --gpu-memory-utilization 0.90 --reasoning-parser qwen3 --default-chat-template-kwargs {""enable_thinking"":false} (n=5)",none (n=5),allowed

@@ -1,0 +1,14 @@
+{
+ "target": "/targets/jhead.afl",
+ "files": 1290,
+ "total_edges": 509,
+ "stock_edges": null,
+ "new_edges": null,
+ "per_generator": {
+  "stock": {
+   "files": 1290,
+   "edges": 509,
+   "unique": 509
+  }
+ }
+}

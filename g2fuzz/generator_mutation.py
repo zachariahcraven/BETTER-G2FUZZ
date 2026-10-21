@@ -222,7 +222,7 @@ def mutation_based_on_predefined_mutators(model, tmp_path, seeds_path, generator
         {"role": "system", "content": "You are an advanced Language Model assistant that can generate, execute, and evaluate code. Please use Markdown syntax to represent code blocks."},
     ]
     init = copy.deepcopy(prompt_init)
-    init = init.replace("<FROMAT>", file_format)
+    init = init.replace("<FROMAT>", format_text(file_format))
     init = init.replace("<TARGET_GENERATOR>", target_generator_code)
     target_generator_log.append({"role": "user", "content": init})
     # print(target_generator_log[-1]["content"])
@@ -262,6 +262,16 @@ def mutation_based_on_predefined_mutators(model, tmp_path, seeds_path, generator
     else:
         scheduler.record_mutation(output_path, cur_mutator, None)
         return None
+
+def run_step(model, tmp_path, seeds_path, generators, output_path, mutation_log, relationship, mutation_pattern, cur_mutator):
+    try:
+        if cur_mutator == "pattern":
+            return mutation_based_on_pattern(model, tmp_path, seeds_path, generators, output_path, mutation_log, relationship, mutation_pattern)
+        else:
+            return mutation_based_on_predefined_mutators(model, tmp_path, seeds_path, generators, output_path, mutation_log, cur_mutator)
+    except BaseException:
+        scheduler.record_mutation(output_path, cur_mutator, None)
+        raise
 
 if __name__ == "__main__":
     
@@ -334,7 +344,4 @@ if __name__ == "__main__":
     cur_mutator = scheduler.pick_mutator(mutators, output_path)
     print("cur_mutator:", cur_mutator)
 
-    if cur_mutator == "pattern":
-        mutation_based_on_pattern(model, tmp_path, seeds_path, generators, output_path, mutation_log, relationship, mutation_pattern)
-    else:
-        mutation_based_on_predefined_mutators(model, tmp_path, seeds_path, generators, output_path, mutation_log, cur_mutator)
+    run_step(model, tmp_path, seeds_path, generators, output_path, mutation_log, relationship, mutation_pattern if cur_mutator == "pattern" else None, cur_mutator)

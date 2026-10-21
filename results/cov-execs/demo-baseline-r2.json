@@ -1,0 +1,14 @@
+{
+ "target": "/targets/doom_demo.afl",
+ "files": 1523,
+ "total_edges": 3202,
+ "stock_edges": null,
+ "new_edges": null,
+ "per_generator": {
+  "stock": {
+   "files": 1523,
+   "edges": 3202,
+   "unique": 3202
+  }
+ }
+}

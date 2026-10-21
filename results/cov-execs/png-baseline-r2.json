@@ -1,0 +1,14 @@
+{
+ "target": "/targets/libpng_read_fuzzer.afl",
+ "files": 882,
+ "total_edges": 1218,
+ "stock_edges": null,
+ "new_edges": null,
+ "per_generator": {
+  "stock": {
+   "files": 882,
+   "edges": 1218,
+   "unique": 1218
+  }
+ }
+}

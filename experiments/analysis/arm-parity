@@ -1,0 +1,344 @@
+#!/usr/bin/env python3
+"""experiments/analysis/arm-parity: do the arms of each comparison differ only in their factor?"""
+import argparse
+import csv
+import hashlib
+import os
+import re
+import sys
+from collections import Counter
+
+def get_h12(data):
+    if isinstance(data, str):
+        data = data.encode('utf-8')
+    return hashlib.sha256(data).hexdigest()[:12]
+
+def parse_campaign_name(name):
+    # bandit-<tgt>-<arm>-r<N>
+    m = re.match(r'^bandit-([^/-]+)-(.+)-r\d+$', name)
+    if m:
+        return f"bandit-{m.group(1)}", m.group(2)
+    
+    # experiment-arm-r<N>
+    # experiment = text before the FIRST "-", arm = everything between that "-" and the final `-r<N>`
+    m = re.match(r'^([^-]+)-(.+)-r\d+$', name)
+    if m:
+        return m.group(1), m.group(2)
+    
+    return None, None
+
+def extract_config(campaign_dir, experiment_env_keys):
+    cfg = {}
+    
+    # 1. target
+    target_file = os.path.join(campaign_dir, "target.txt")
+    if os.path.exists(target_file):
+        with open(target_file) as f:
+            cfg['target'] = f.read().strip()
+    else:
+        cfg['target'] = 'missing'
+    
+    # 2. image
+    image_file = os.path.join(campaign_dir, "image-version.txt")
+    if os.path.exists(image_file):
+        with open(image_file) as f:
+            cfg['image'] = f.readline().strip()
+    else:
+        cfg['image'] = 'missing'
+        
+    # 3. afl_cmd, 4. seedgen, 5. stock_seeds
+    run_sh = os.path.join(campaign_dir, "run.sh")
+    if os.path.exists(run_sh):
+        with open(run_sh) as f:
+            content = f.read()
+        # afl_cmd
+        m = re.search(r'afl-fuzz .*? @@', content, re.DOTALL)
+        if m:
+            cfg['afl_cmd'] = ' '.join(m.group(0).split())
+        else:
+            cfg['afl_cmd'] = 'missing'
+        # seedgen
+        cfg['seedgen'] = 'llm' if 'program_gen.py' in content else 'none'
+        # stock_seeds
+        stocks = re.findall(r'cp (/targets/seeds/\S+)', content)
+        cfg['stock_seeds'] = ' '.join(stocks) if stocks else 'none'
+    else:
+        cfg['afl_cmd'] = 'missing'
+        cfg['seedgen'] = 'none'
+        cfg['stock_seeds'] = 'none'
+        
+    # 6. env:<KEY>, 7. binds
+    job_sbatch = os.path.join(campaign_dir, "job.sbatch")
+    if os.path.exists(job_sbatch):
+        with open(job_sbatch) as f:
+            content = f.read()
+        # binds
+        binds = []
+        for m in re.findall(r'--bind\s+("[^"]+"|\S+)', content):
+            val = m.strip('"')
+            if ':' in val:
+                parts = val.split(':')
+                src = parts[0]
+                dst = parts[1]
+                if dst.startswith('/targets') or dst.startswith('/AFLplusplus'):
+                    binds.append(f"{dst}<-{src}")
+        cfg['binds'] = ' '.join(sorted(binds)) if binds else 'none'
+        
+        # env
+        env_vals = {}
+        for m in re.findall(r'--env\s+("[^"]+"|\S+)', content):
+            pairs = m.strip('"').split('\\,')
+            for pair in pairs:
+                if '=' in pair:
+                    k, v = pair.split('=', 1)
+                    env_vals[k] = v
+        
+        for key in experiment_env_keys:
+            val = env_vals.get(key, 'unset')
+            if key == 'OPENAI_BASE_URL':
+                if val != 'unset' and 'no-llm.invalid' in val:
+                    val = 'none'
+                elif val != 'unset':
+                    val = 'llm'
+            cfg[f'env:{key}'] = val
+    else:
+        cfg['binds'] = 'none'
+        for key in experiment_env_keys:
+            cfg[f'env:{key}'] = 'unset'
+
+    # 8. model, 9. server
+    llm_file = os.path.join(campaign_dir, "llm-version.txt")
+    if os.path.exists(llm_file):
+        model, server_parts = 'none', []
+        with open(llm_file) as f:
+            for line in f:
+                if line.startswith('model:'):
+                    model = line[len('model:'):].strip()
+                elif line.startswith('vllm:'):
+                    server_parts.append(line[len('vllm:'):].strip())
+                elif line.startswith('settings:'):
+                    server_parts.append(line[len('settings:'):].strip())
+        cfg['model'] = model
+        cfg['server'] = ' ; '.join(server_parts) if server_parts else 'none'
+    else:
+        cfg['model'] = 'none'
+        cfg['server'] = 'none'
+        
+    # 10. format_desc, 11. oracle_ranking
+    fd_file = os.path.join(campaign_dir, "format_desc.txt")
+    if os.path.exists(fd_file):
+        with open(fd_file, 'rb') as f:
+            cfg['format_desc'] = get_h12(f.read())
+    else:
+        cfg['format_desc'] = 'none'
+
+    or_file = os.path.join(campaign_dir, "oracle_ranking.json")
+    if os.path.exists(or_file):
+        with open(or_file, 'rb') as f:
+            cfg['oracle_ranking'] = get_h12(f.read())
+    else:
+        cfg['oracle_ranking'] = 'none'
+    
+    # 12. seeds
+    if cfg['seedgen'] == 'llm':
+        cfg['seeds'] = 'llm-generated'
+    else:
+        seeds_dir = os.path.join(campaign_dir, "initial_seeds")
+        if os.path.exists(seeds_dir) and os.path.isdir(seeds_dir):
+            lines = []
+            for fn in sorted(os.listdir(seeds_dir)):
+                fp = os.path.join(seeds_dir, fn)
+                if os.path.isfile(fp):
+                    # Use full sha256 for individual files
+                    with open(fp, 'rb') as f:
+                        file_hash = hashlib.sha256(f.read()).hexdigest()
+                    lines.append(f"{fn}:{file_hash}\n")
+            cfg['seeds'] = get_h12(''.join(lines))
+        else:
+            cfg['seeds'] = 'missing'
+            
+    return cfg
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--campaigns', default='results/campaigns')
+    parser.add_argument('--cov', default='results/tables/cov-results.csv')
+    parser.add_argument('--stats', default='results/tables/stats.csv')
+    parser.add_argument('--exclude', default='experiments/inputs/exclusions.csv')
+    parser.add_argument('--out', default='results/tables/arm-parity.csv')
+    args = parser.parse_args()
+
+    excludes = set()
+    if os.path.exists(args.exclude):
+        with open(args.exclude) as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                excludes.add(row['campaign'])
+
+    cov_campaigns = []
+    with open(args.cov) as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            c = row['campaign']
+            if c not in excludes:
+                cov_campaigns.append(c)
+    cov_campaigns = sorted(list(set(cov_campaigns)))
+
+    campaign_data = {} # campaign -> (exp, arm, folder)
+    exp_to_env_keys = {} # exp -> set of keys
+    
+    for c in cov_campaigns:
+        # Find folder: <campaigns>/*/<campaign>
+        matches = []
+        try:
+            for group in os.listdir(args.campaigns):
+                group_path = os.path.join(args.campaigns, group)
+                if os.path.isdir(group_path):
+                    campaign_path = os.path.join(group_path, c)
+                    if os.path.isdir(campaign_path):
+                        matches.append(campaign_path)
+        except Exception: pass
+        
+        if len(matches) != 1:
+            sys.stderr.write(f"Campaign {c} folder error: found {len(matches)}\n")
+            sys.exit(2)
+        
+        folder = matches[0]
+        exp, arm = parse_campaign_name(c)
+        if not exp:
+            sys.stderr.write(f"Campaign {c} name format error\n")
+            sys.exit(2)
+        
+        campaign_data[c] = (exp, arm, folder)
+        
+        # Collect env keys from sbatch
+        sbatch = os.path.join(folder, "job.sbatch")
+        if os.path.exists(sbatch):
+            with open(sbatch) as f:
+                content = f.read()
+            for m in re.findall(r'--env\s+("[^"]+"|\S+)', content):
+                pairs = m.strip('"').split('\\,')
+                for pair in pairs:
+                    if '=' in pair:
+                        exp_to_env_keys.setdefault(exp, set()).add(pair.split('=', 1)[0])
+
+    comparisons = set()
+    with open(args.stats) as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            comparisons.add((row['experiment'], row['arm'], row['reference']))
+    
+    # Verify arms in stats have campaigns
+    arm_to_campaigns = {}
+    for c, (exp, arm, folder) in campaign_data.items():
+        arm_to_campaigns.setdefault((exp, arm), []).append(folder)
+    
+    for exp, arm, ref in comparisons:
+        if (exp, arm) not in arm_to_campaigns:
+            sys.stderr.write(f"Arm {arm} in experiment {exp} has no campaigns\n")
+            sys.exit(2)
+        if ref and (exp, ref) not in arm_to_campaigns:
+            sys.stderr.write(f"Reference arm {ref} in experiment {exp} has no campaigns\n")
+            sys.exit(2)
+
+    # Extract configs for all relevant arms
+    arm_configs = {} # (exp, arm) -> [configs]
+    for (exp, arm), folders in arm_to_campaigns.items():
+        env_keys = exp_to_env_keys.get(exp, set())
+        arm_configs[(exp, arm)] = [extract_config(f, env_keys) for f in folders]
+
+    # All possible fields for an experiment
+    def get_all_fields(exp):
+        fields = {'target', 'image', 'afl_cmd', 'seedgen', 'stock_seeds', 'binds', 'model', 'server', 'format_desc', 'oracle_ranking', 'seeds'}
+        for key in exp_to_env_keys.get(exp, set()):
+            fields.add(f'env:{key}')
+        return fields
+
+    def get_values_str(configs, field):
+        counts = Counter(c[field] for c in configs)
+        sorted_vals = sorted(counts.items())
+        return ' | '.join(f"{v} (n={c})" for v, c in sorted_vals)
+
+    results = []
+    exp_summary = {} # exp -> [allowed, unexpected]
+
+    # Process by experiment
+    all_exps = sorted(list({exp for exp, arm, ref in comparisons}))
+    for exp in all_exps:
+        exp_comps = sorted([comp for comp in comparisons if comp[0] == exp])
+        fields = get_all_fields(exp)
+        
+        # Check A: Within Arm
+        arms_in_exp = set()
+        for _, arm, ref in exp_comps:
+            arms_in_exp.add(arm)
+            if ref: arms_in_exp.add(ref)
+            
+        for arm in sorted(list(arms_in_exp)):
+            configs = arm_configs[(exp, arm)]
+            for field in sorted(list(fields)):
+                vals = {c[field] for c in configs}
+                if len(vals) > 1:
+                    status = 'UNEXPECTED'
+                    if field == 'server' or (field == 'seeds' and arm.startswith('ctl-')):
+                        status = 'allowed'
+                    results.append((exp, arm, '', field, get_values_str(configs, field), '', status))
+
+        # Check B: Between Arms
+        for arm, ref in [(c[1], c[2]) for c in exp_comps]:
+            if not ref: continue
+            configs_arm = arm_configs[(exp, arm)]
+            configs_ref = arm_configs[(exp, ref)]
+            
+            for field in sorted(list(fields)):
+                vals_arm = {c[field] for c in configs_arm}
+                vals_ref = {c[field] for c in configs_ref}
+                if vals_arm != vals_ref:
+                    status = 'UNEXPECTED'
+                    # Allowed rules
+                    allowed_set = set()
+                    # Rule 1: LLM treatment
+                    arm_model = {c['model'] for c in configs_arm}
+                    ref_model = {c['model'] for c in configs_ref}
+                    arm_gen = {c['seedgen'] for c in configs_arm}
+                    ref_gen = {c['seedgen'] for c in configs_ref}
+                    if arm_model != ref_model or arm_gen != ref_gen:
+                        allowed_set.update({'model', 'server', 'seedgen', 'seeds', 'env:OPENAI_BASE_URL', 'env:G2F_PLATEAU_SEC', 'format_desc', 'env:G2F_FORMAT_DESC_FILE'})
+                    # Rule 2: Control arms
+                    if arm.startswith('ctl-') or ref.startswith('ctl-'):
+                        allowed_set.update({'seeds', 'stock_seeds'})
+                    # Rule 3: Bandit
+                    if exp.startswith('bandit-'):
+                        allowed_set.update({'env:G2F_SCHEDULER', 'env:G2F_ORACLE_RANKING', 'oracle_ranking', 'env:G2F_PLATEAU_SEC', 'env:G2F_BACKOFF_SEC'})
+                    # Rule 4: WADP
+                    if exp == 'wadp':
+                        allowed_set.update({'format_desc', 'env:G2F_FORMAT_DESC_FILE'})
+                    
+                    if field in allowed_set:
+                        status = 'allowed'
+                    
+                    results.append((exp, arm, ref, field, get_values_str(configs_arm, field), get_values_str(configs_ref, field), status))
+
+        # Summary
+        exp_res = [r for r in results if r[0] == exp]
+        allowed = sum(1 for r in exp_res if r[-1] == 'allowed')
+        unexpected = sum(1 for r in exp_res if r[-1] == 'UNEXPECTED')
+        exp_summary[exp] = (len(exp_comps), allowed, unexpected)
+
+    # Output
+    results.sort(key=lambda x: (x[0], x[1], x[2], x[3]))
+    with open(args.out, 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(['experiment', 'arm', 'reference', 'field', 'arm_values', 'ref_values', 'status'])
+        writer.writerows(results)
+    
+    has_unexpected = False
+    for exp in all_exps:
+        n, a, u = exp_summary[exp]
+        print(f"{exp}: {n} comparisons, {a} allowed, {u} UNEXPECTED")
+        if u > 0: has_unexpected = True
+        
+    sys.exit(1 if has_unexpected else 0)
+
+if __name__ == '__main__':
+    main()

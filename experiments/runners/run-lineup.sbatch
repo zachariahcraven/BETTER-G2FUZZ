@@ -13,8 +13,9 @@
 # Submit from the project root:  sbatch experiments/runners/run-lineup.sbatch
 # Stop everything:  scancel -u $USER   (campaigns copy their output back first)
 # Resubmitting is safe: it reuses running servers and skips campaigns (and models) already done.
-# Run one runner at a time: a runner stops the servers it started once its own campaigns end, even
-# if another runner reused them and has not started its campaigns yet (2026-10-14: Gemma lost that way).
+# A runner stops only the servers it started itself (once its own campaigns end); servers it reused keep
+# running. Still prefer one runner per server: a runner that started a server stops it even if another runner
+# reused it meanwhile (2026-10-14: Gemma lost that way). Start shared servers by hand to avoid that.
 #SBATCH --job-name=g2f-lineup-runner
 #SBATCH --partition=fairshare
 #SBATCH --account=group-csci-591-automated-vulnerability-discovery
@@ -34,9 +35,17 @@ TARGETS=${TARGETS:-jhead}; ONLY=${ONLY:-}
 # TAG: run tag after the prefix (e.g. TAG=4h -> xml4h-codernext-r1), for runs kept apart from the 1 h lineup
 TAG=${TAG:-}
 export G2F_GROUP=${GROUP:-lineup-1h}
-declare -A PREFIX=([jhead]=lineup [tiff_read_rgba_fuzzer]=tiff [libpng_read_fuzzer]=png [xml_fuzzer]=xml [doom_wad]=wad)
+declare -A PREFIX=([jhead]=lineup [tiff_read_rgba_fuzzer]=tiff [libpng_read_fuzzer]=png [xml_fuzzer]=xml [doom_wad]=wad [doom_demo]=demo)
 LOG=$X/results/logs/lineup.log
 log() { echo "$(date '+%F %T') [$LANE] $*" >> "$LOG"; }
+# Creates and runs one campaign (args: name, then the command that creates it). Logs scripts/fuzz's
+# "submitted"/"warning"/"fuzz:" lines; a failure to create or start it is logged with its exit status.
+start_campaign() {
+  local n=$1 out rc; shift
+  out=$("$@" 2>&1 >/dev/null && scripts/fuzz run "$n" "$SECS" 2>&1); rc=$?
+  grep -E 'submitted|warning|fuzz:' <<< "$out" | while read -r l; do log "$n: $l"; done
+  [ "$rc" = 0 ] || log "$n: FAILED to start (exit $rc): $(tail -2 <<< "$out" | tr '\n' ' ')"
+}
 
 declare -A ALIAS=(
   [gpt-oss-20b]=oss20b [gpt-oss-120b]=oss120b [Qwen3.6-35B-A3B-FP8]=qwen36
@@ -64,7 +73,7 @@ wait_ready() {
 
 # Runs one group of models that share the lane's GPUs.
 run_group() {
-  local m j a r n t fin g; declare -A JOB=()
+  local m j a r n t fin g; declare -A JOB=() STARTED=()
   for m in "$@"; do
     [ -z "$ONLY" ] || [[ " $ONLY " == *" ${ALIAS[$m]} "* ]] || continue
     # Skip models whose campaigns all exist, so no server starts for nothing.
@@ -81,7 +90,7 @@ run_group() {
     j=$(if [ -n "$g" ]; then export G2F_VLLM_ACCOUNT=group-csci-591-automated-vulnerability-discovery \
           G2F_VLLM_PARTITION=gpufairshare G2F_VLLM_GRES=gpu:h100:$g; fi
         scripts/vllm/serve "$m" "$HOURS" | sed -n 's/.* as job \([0-9]*\) .*/\1/p')
-    [ -n "$j" ] && JOB[$m]=$j && log "server $m: job $j submitted" || log "server $m: submit FAILED"
+    [ -n "$j" ] && JOB[$m]=$j && STARTED[$m]=1 && log "server $m: job $j submitted" || log "server $m: submit FAILED"
   done
   for m in "${!JOB[@]}"; do
     if ! wait_ready "$m" "${JOB[$m]}"; then log "server $m: FAILED to start (see $G2F_VLLM_DIR/$m-${JOB[$m]}.out)"; scancel "${JOB[$m]}"; continue; fi
@@ -91,12 +100,16 @@ run_group() {
       n=${PREFIX[$t]}$TAG-$a-r$r
       scripts/fuzz path "$n" >/dev/null 2>&1 && { log "campaign $n exists, skipped"; continue; }
       ( set -a; . "$G2F_VLLM_DIR/endpoints/$m.env"; set +a; export G2F_TARGET=$t
-        scripts/fuzz new "$n" >/dev/null && scripts/fuzz run "$n" "$SECS" 2>&1 | grep -E "submitted|warning|fuzz:" ) | while read -r l; do log "$n: $l"; done
+        start_campaign "$n" scripts/fuzz new "$n" )
     done; done
   done
   # Wait for this group's campaigns, then stop its servers.
   while squeue -h -u "$USER" -o %j | grep -qE "^g2f-($(IFS='|'; echo "${PREFIX[*]}"))$TAG-($(for m in "${!JOB[@]}"; do printf '%s|' "${ALIAS[$m]}"; done)NONE)-r"; do sleep 60; done
-  for m in "${!JOB[@]}"; do scancel "${JOB[$m]}"; log "server $m: stopped"; done
+  # stop only servers this runner started; reused ones (another runner's, or started by hand) keep running
+  for m in "${!JOB[@]}"; do
+    if [ -n "${STARTED[$m]:-}" ]; then scancel "${JOB[$m]}"; log "server $m: stopped"
+    else log "server $m: reused, left running"; fi
+  done
 }
 
 LANES=${LANES:-h100 h100b h100c base}
@@ -114,7 +127,7 @@ LANE=base; lane $LANE && (
     n=${PREFIX[$t]}$TAG-baseline-r$r
     scripts/fuzz path "$n" >/dev/null 2>&1 && { log "campaign $n exists, skipped"; continue; }
     ( export G2F_TARGET=$t G2F_NO_LLM=1
-      scripts/fuzz new "$n" >/dev/null && scripts/fuzz run "$n" "$SECS" 2>&1 | grep -E "submitted|warning|fuzz:" ) | while read -r l; do log "$n: $l"; done
+      start_campaign "$n" scripts/fuzz new "$n" )
   done; done
   log "lane done" ) &
 wait

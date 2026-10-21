@@ -347,7 +347,7 @@ def analyze_wad_validity(eval_dir, out_dir):
     except Exception:
         return
 
-    # Discover campaigns: wad-<model>-r<N>
+    # Discover campaigns: wad-<model>-r<N>, and the prompt test's wadp-<arm>-<model>-r<N> (key "wadp-<arm>-<model>")
     campaigns = {}  # model -> [full paths]
     for group in sorted(groups):
         if group == "archive":
@@ -360,15 +360,17 @@ def analyze_wad_validity(eval_dir, out_dir):
         except OSError:
             continue
         for e in entries:
-            if not e.startswith("wad-"):
+            if not e.startswith(("wad-", "wadp-")):
                 continue
             full = os.path.join(group_path, e)
             if not os.path.isdir(full):
                 continue
-            rest = e[4:]  # strip "wad-"
+            rest = e.split("-", 1)[1]  # strip "wad-" / "wadp-"
             if "-r" not in rest:
                 continue
             model = rest.rsplit("-r", 1)[0]
+            if e.startswith("wadp-"):
+                model = "wadp-" + model
             if model == "baseline":
                 continue
             campaigns.setdefault(model, []).append(full)

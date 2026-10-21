@@ -1,0 +1,8 @@
+
+6. Additional SubIFD support files:
+   - subifd_support.tiff - Pyramidal TIFF with SubIFD hierarchy
+   - subifd_explicit.tiff - Explicit SubIFD references between pyramid levels
+
+Note: SubIFD (Sub Image File Directory) support enables hierarchical
+organization of image data, commonly used for multi-resolution layers
+in pyramidal TIFFs. This feature is implemented using the tifffile library.

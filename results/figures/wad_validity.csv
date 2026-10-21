@@ -6,3 +6,11 @@ gemma31b,182,112,0
 qwen36nt,270,158,0
 qwen38,250,79,0
 qwen4b,202,1,0
+wadp-bare-codernext,460,408,0
+wadp-bare-qwen4b,343,0,0
+wadp-ctl-junk,390,390,0
+wadp-ctl-llmseeds,390,390,185
+wadp-name-codernext,483,408,0
+wadp-name-qwen4b,181,2,0
+wadp-spec-codernext,341,341,141
+wadp-spec-qwen4b,274,257,8

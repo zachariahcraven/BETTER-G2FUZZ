@@ -1,0 +1,118 @@
+#!/usr/bin/env python3
+"""Doom crash sites with their root-cause class (plan A3).
+
+A crash site is (kind, top frame), as in experiments/analysis/stats. Each site gets the class of the rule in
+experiments/inputs/doom-rootcause-rules.csv whose top_frame matches exactly and whose kind matches ('*' = any);
+the rules were assigned by reading the source line of each top frame (doomgeneric dcb7a8db) and reviewed by a
+second model. A site no rule covers is an error (exit 2): nothing is dropped silently.
+
+Writes results/tables/doom-rootcauses.csv (one row per site) and results/tables/doom-rootcause-summary.csv
+(per experiment, arm and class: runs, distinct sites pooled over the runs, crash files).
+Run from the workspace root: experiments/analysis/doom-rootcauses
+"""
+import argparse, csv, os, re, sys
+from collections import defaultdict
+
+ap = argparse.ArgumentParser()
+ap.add_argument("--crashes", default="results/tables/crashes.csv")
+ap.add_argument("--cov", default="results/tables/cov-results.csv")
+ap.add_argument("--rules", default="experiments/inputs/doom-rootcause-rules.csv")
+ap.add_argument("--exclude", default="experiments/inputs/exclusions.csv")
+ap.add_argument("--out", default="results/tables/doom-rootcauses.csv")
+ap.add_argument("--summary", default="results/tables/doom-rootcause-summary.csv")
+a = ap.parse_args()
+
+
+def die(msg):
+    print("doom-rootcauses: " + msg, file=sys.stderr)
+    sys.exit(2)
+
+
+def experiment_arm(name):
+    """Same rule as experiments/analysis/stats."""
+    m = re.match(r"^bandit-([^-]+)-(.+)-r(\d+)$", name)
+    if m:
+        return "bandit-" + m.group(1), m.group(2)
+    m = re.match(r"^([^-]+)-(.+)-r(\d+)$", name)
+    if m:
+        return m.group(1), m.group(2)
+    die("unrecognized campaign name %r" % name)
+
+
+def is_doom(exp):
+    return exp.startswith(("wad", "demo")) or exp in ("bandit-wad", "bandit-demo")
+
+
+excluded = set()
+if os.path.exists(a.exclude):
+    excluded = {r["campaign"] for r in csv.DictReader(open(a.exclude))}
+rules = list(csv.DictReader(open(a.rules)))
+
+runs = defaultdict(set)                    # (exp, arm) -> campaigns with coverage rows (= finished runs)
+for r in csv.DictReader(open(a.cov)):
+    if r["campaign"] in excluded:
+        continue
+    e, arm = experiment_arm(r["campaign"])
+    if is_doom(e):
+        runs[(e, arm)].add(r["campaign"])
+
+sites = {}                                 # (kind, top) -> {"files": n, "campaigns": set, "exps": set}
+per_arm = defaultdict(lambda: defaultdict(set))    # (exp, arm) -> class -> set of sites
+files_arm = defaultdict(lambda: defaultdict(int))
+for r in csv.DictReader(open(a.crashes)):
+    name = r["campaign"]
+    if name in excluded or r["kind"] in ("no-repro", "hang"):
+        continue
+    e, arm = experiment_arm(name)
+    if not is_doom(e):
+        continue
+    if name not in runs[(e, arm)]:
+        die("%s has crash rows but no coverage row" % name)
+    top = r["frames"].split(" | ")[0]
+    key = (r["kind"], top)
+    s = sites.setdefault(key, {"files": 0, "campaigns": set(), "exps": set()})
+    s["files"] += 1
+    s["campaigns"].add(name)
+    s["exps"].add("%s:%s" % (e, arm))
+
+cls = {}
+for key in sites:
+    kind, top = key
+    hit = [ru for ru in rules if ru["top_frame"] == top and ru["kind"] in ("*", kind)]
+    if not hit:
+        die("no rule for site kind=%r top=%r" % key)
+    if len({(h["class"], h["confidence"]) for h in hit}) > 1:
+        die("conflicting rules for site %r" % (key,))
+    cls[key] = hit[0]
+
+for key, s in sites.items():
+    for c in s["campaigns"]:
+        e, arm = experiment_arm(c)
+        per_arm[(e, arm)][cls[key]["class"]].add(key)
+
+with open(a.out, "w", newline="") as f:
+    w = csv.writer(f, lineterminator="\n")
+    w.writerow(["kind", "top_frame", "class", "confidence", "crash_files", "campaigns", "arms", "basis"])
+    for key in sorted(sites, key=lambda k: (cls[k]["class"], -len(sites[k]["campaigns"]), k)):
+        s = sites[key]
+        w.writerow([key[0], key[1], cls[key]["class"], cls[key]["confidence"], s["files"], len(s["campaigns"]),
+                    " ".join(sorted(s["exps"])), cls[key]["basis"]])
+
+classes = sorted({r["class"] for r in cls.values()})
+for r in csv.DictReader(open(a.crashes)):
+    name = r["campaign"]
+    if name in excluded or r["kind"] in ("no-repro", "hang"):
+        continue
+    e, arm = experiment_arm(name)
+    if is_doom(e):
+        files_arm[(e, arm)][cls[(r["kind"], r["frames"].split(" | ")[0])]["class"]] += 1
+with open(a.summary, "w", newline="") as f:
+    w = csv.writer(f, lineterminator="\n")
+    w.writerow(["experiment", "arm", "runs", "class", "distinct_sites", "crash_files"])
+    for (e, arm) in sorted(runs):
+        for c in classes:
+            w.writerow([e, arm, len(runs[(e, arm)]), c, len(per_arm[(e, arm)][c]), files_arm[(e, arm)][c]])
+print("doom-rootcauses: %d sites, %d classes -> %s, %s" % (len(sites), len(classes), a.out, a.summary))
+for c in classes:
+    ks = [k for k in sites if cls[k]["class"] == c]
+    print("  %-17s %3d sites %6d files" % (c, len(ks), sum(sites[k]["files"] for k in ks)))

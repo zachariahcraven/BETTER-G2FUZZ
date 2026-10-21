@@ -6,18 +6,18 @@ Reads `scripts/fuzz results <campaign>` for every results/campaigns/*/{lineup,ti
 """
 import csv, glob, os, re, statistics, subprocess
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))   # experiments/analysis/<this> -> workspace root
 os.chdir(ROOT)
 FIELDS = ["run_time", "execs_done", "execs_per_sec", "corpus_count", "edges_found",
           "total_edges", "saved_crashes", "generators", "llmGen-M steps"]
 
 rows = []
-TARGET = {"lineup": "jhead", "tiff": "tiff", "png": "png", "xml": "xml", "wad": "wad"}
+TARGET = {"lineup": "jhead", "tiff": "tiff", "png": "png", "xml": "xml", "wad": "wad", "demo": "demo"}
 for d in sorted(glob.glob("results/campaigns/*/*-*-r*")):
     if "/archive/" in d:
         continue
     name = os.path.basename(d)
-    m = re.match(r"(lineup|tiff|png|xml|wad)(\d+h)?-(.+)-r(\d+)$", name)   # optional run tag, e.g. xml4h
+    m = re.match(r"(lineup|tiff|png|xml|wad|demo)([0-9a-z]*)-(.+)-r(\d+)$", name)   # optional run tag, e.g. xml4h
     if not m:
         continue
     out = subprocess.run(["scripts/fuzz", "results", name], stdout=subprocess.PIPE,

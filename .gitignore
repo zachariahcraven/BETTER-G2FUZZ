@@ -70,3 +70,6 @@ targets/bin/
 *.sif
 *.sif.version
 g2fuzz-amd64.tar*
+
+# Doom savegames: fuzzed demos can press the save-game button; replays run from here write them
+.savegame/

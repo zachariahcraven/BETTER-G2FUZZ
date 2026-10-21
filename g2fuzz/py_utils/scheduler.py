@@ -178,13 +178,49 @@ def _bandit_pick(candidates, out, rng, kind, compute_arm):
 
 def pick_generator(candidates, out, rng=None):
     """Pick a generator from *candidates* using the configured scheduler mode."""
-    if _mode() == 'bandit':
+    mode = _mode()
+    if mode == 'bandit':
         cred = credit(out)
         rel = _load_json(os.path.join(out, 'mutation_log', 'relationship.json'), {})
         if rel is None:
             rel = {}
         return _bandit_pick(candidates, out, rng, 'generator',
                             lambda c: _generator_arm(c, cred, rel))
+    elif mode == 'oracle':
+        ranking_path = os.environ.get('G2F_ORACLE_RANKING')
+        if not ranking_path:
+            raise RuntimeError("G2F_ORACLE_RANKING environment variable is unset")
+        
+        ranking = _load_json(ranking_path)
+        if ranking is None:
+            raise RuntimeError("Ranking file %s is missing or unreadable" % ranking_path)
+        if not isinstance(ranking, list):
+            raise RuntimeError("Ranking file %s does not contain a JSON list" % ranking_path)
+        
+        best_cand = None
+        best_pos = len(ranking) + 1
+        
+        for c in candidates:
+            try:
+                pos = ranking.index(c)
+                if pos < best_pos:
+                    best_pos = pos
+                    best_cand = c
+            except ValueError:
+                continue
+        
+        ranked = best_cand is not None
+        choice = best_cand if ranked else _rng_choice(rng, candidates)
+        
+        _log(out, {
+            'time': time.time(),
+            'kind': 'generator',
+            'mode': 'oracle',
+            'choice': choice,
+            'ranked': ranked
+        })
+        return choice
+
     return _rng_choice(rng, candidates)
 
 

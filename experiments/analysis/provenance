@@ -1,0 +1,163 @@
+#!/usr/bin/env python3
+"""experiments/analysis/provenance: independent re-derivation of sampled published numbers (see the task spec)."""
+
+import argparse
+import csv
+import os
+import random
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--n", type=int, default=20)
+    parser.add_argument("--seed", type=int, default=591)
+    parser.add_argument("--campaigns", required=True)
+    parser.add_argument("--cov", required=True)
+    parser.add_argument("--crashes", required=True)
+    parser.add_argument("--exclusions", required=True)
+    parser.add_argument("--targets", required=True)
+    parser.add_argument("--out", required=True)
+    args = parser.parse_args()
+
+    # 1. Sample
+    try:
+        exclusions = set()
+        with open(args.exclusions, "r") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                exclusions.add(row["campaign"])
+
+        cov_rows = []
+        with open(args.cov, "r") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if row["campaign"] not in exclusions:
+                    cov_rows.append(row)
+        
+        cov_rows.sort(key=lambda x: x["campaign"])
+        sampled = random.Random(args.seed).sample(cov_rows, min(len(cov_rows), args.n))
+    except Exception as e:
+        print(f"Error reading input files: {e}", file=sys.stderr)
+        sys.exit(2)
+
+    # Load crashes for lookup
+    published_crashes = {}
+    try:
+        with open(args.crashes, "r") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                camp = row["campaign"]
+                published_crashes[camp] = published_crashes.get(camp, 0) + 1
+    except Exception as e:
+        print(f"Error reading crashes file: {e}", file=sys.stderr)
+        sys.exit(2)
+
+    results = []
+    q_matches = 0
+    c_matches = 0
+
+    for row in sampled:
+        camp_name = row["campaign"]
+        pub_q_edges = int(row["queue_edges"])
+        
+        # 2. Find campaign folder
+        # Structure: <campaigns>/*/<campaign>
+        camp_path = None
+        for group in sorted(Path(args.campaigns).iterdir()):   # <campaigns>/*/<campaign> (names are unique)
+            if (group / camp_name).is_dir():
+                camp_path = group / camp_name
+                break
+        
+        if not camp_path:
+            print(f"Campaign folder not found: {camp_name}", file=sys.stderr)
+            sys.exit(2)
+
+        # Target binary name: <campaign folder>/*_output (strip "_output")
+        output_dir = None
+        for d in camp_path.iterdir():
+            if d.is_dir() and d.name.endswith("_output"):
+                output_dir = d
+                break
+        
+        if not output_dir:
+            print(f"Output directory not found in {camp_path}", file=sys.stderr)
+            sys.exit(2)
+            
+        bin_name = output_dir.name[:-7] # strip _output
+        bin_path = Path(args.targets) / f"{bin_name}.afl"
+        
+        env = os.environ.copy()
+        if bin_name in ["doom_demo", "doom_wad"]:
+            env["G2F_DOOM_IWAD"] = str(Path(args.targets) / "freedoom2.wad")
+
+        # a. queue_edges
+        queue_dir = output_dir / "default" / "queue"
+        rederived_edges = set()
+        
+        if queue_dir.exists() and queue_dir.is_dir():
+            for qfile in queue_dir.iterdir():
+                if not qfile.is_file():   # e.g. AFL++'s queue/.state directory: not an input
+                    continue
+                with tempfile.NamedTemporaryFile(delete=False) as tmp:
+                    tmp_name = tmp.name
+                try:
+                    res = subprocess.run(
+                        ["afl-showmap", "-q", "-t", "1000", "-o", tmp_name, "--", str(bin_path), str(qfile)],
+                        capture_output=True, text=True, env=env
+                    )
+                    # afl-showmap exit status is not an error
+                    if not os.path.exists(tmp_name):
+                        raise RuntimeError(f"Map file not created for {qfile}")
+                    with open(tmp_name, "r") as mf:
+                        for line in mf:
+                            if ":" in line:
+                                rederived_edges.add(line.split(":")[0].strip())
+                            else:
+                                raise RuntimeError(f"Unparseable map line in {tmp_name}")
+                finally:
+                    if os.path.exists(tmp_name):
+                        os.remove(tmp_name)
+        
+        red_q_count = len(rederived_edges)
+        q_match = "yes" if red_q_count == pub_q_edges else "no"
+        if q_match == "yes": q_matches += 1
+
+        # b. crash_files
+        crash_dir = output_dir / "default" / "crashes"
+        red_c_count = 0
+        if crash_dir.exists() and crash_dir.is_dir():
+            red_c_count = sum(1 for f in crash_dir.iterdir() if f.name.startswith("id:"))
+        
+        pub_c_count = published_crashes.get(camp_name, 0)
+        c_match = "yes" if red_c_count == pub_c_count else "no"
+        if c_match == "yes": c_matches += 1
+
+        results.append({
+            "campaign": camp_name,
+            "published_queue_edges": pub_q_edges,
+            "rederived_queue_edges": red_q_count,
+            "queue_match": q_match,
+            "published_crash_rows": pub_c_count,
+            "crash_files": red_c_count,
+            "crash_match": c_match
+        })
+
+    # 3. Output
+    try:
+        with open(args.out, "w", newline="") as f:
+            fieldnames = ["campaign", "published_queue_edges", "rederived_queue_edges", "queue_match", 
+                          "published_crash_rows", "crash_files", "crash_match"]
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(results)
+    except Exception as e:
+        print(f"Error writing output: {e}", file=sys.stderr)
+        sys.exit(2)
+
+    print(f"provenance: {q_matches}/{len(sampled)} queue_edges match, {c_matches}/{len(sampled)} crash counts match")
+
+if __name__ == "__main__":
+    main()

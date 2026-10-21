@@ -1,0 +1,13 @@
+Floating-Point PNG Support Information
+======================================
+
+This PNG file indicates floating-point support capability through metadata.
+Standard PNG specification does not include floating-point sample support.
+
+Experimental or extended implementations support this feature:
+- PNG-F (floating-point PNG)
+- Radiance-style HDR extensions
+- 16-bit or 32-bit floating-point samples for HDR imaging
+
+To view floating-point PNG files, specialized software is required.
+Libraries like imageio (with PNG-F support) or libpng with floating-point APIs can handle these files.

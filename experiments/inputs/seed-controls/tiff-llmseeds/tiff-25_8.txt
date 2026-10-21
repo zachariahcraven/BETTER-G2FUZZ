@@ -1,0 +1,1 @@
+6. **CCITT Group 3/4 fax compression**: Optimized for bilevel (1-bit) images, widely used in document imaging and fax applications; Group 4 supports bidirectional encoding for better compression.

@@ -1,0 +1,18 @@
+Generated TIFF files with different bit depths:
+1. bit_depth_1bit.tiff - 1-bit per pixel (black and white)
+2. bit_depth_8bit.tiff - 8-bit per pixel (256 grayscale levels)
+3. bit_depth_16bit.tiff - 16-bit per pixel (65536 grayscale levels)
+4. bit_depth_32bit_int.tiff - 32-bit integer (simulated as float32)
+5. bit_depth_32bit_float.tiff - 32-bit floating point
+6. bit_depth_64bit_float_simulated.tiff - 64-bit floating point (simulated as float32)
+7. bit_depth_8bit_with_private_tags.tiff - 8-bit grayscale with custom private tags
+
+Note: PIL library has limitations for 32-bit integer and 64-bit float.
+For true 32-bit integer and 64-bit float support, the tifffile library is recommended.
+
+Custom Private Tags Feature:
+The 7th TIFF file includes vendor-specific private tags (tag numbers ≥ 32768):
+- Tag 50000: Application Name (ASCII string)
+- Tag 50001: Timestamp (unsigned long)
+- Tag 50002: User Data (binary data)
+These private tags enable extensibility for specialized workflows like medical imaging.

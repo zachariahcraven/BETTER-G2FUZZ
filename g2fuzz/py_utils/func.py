@@ -277,8 +277,37 @@ def reask_for_feature(dialog, extract_res, MAX_TRY, model, temperature):
         print("* Can not finish this task. Here are the unsloved problem:", res)
         return None, raw_llm
 
+def format_text(token):
+    # Optional format description for LLM prompts (G2F_FORMAT_DESC_FILE).
+    #
+    # Returns the raw token unchanged when G2F_FORMAT_DESC_FILE is unset (or empty),
+    # so every prompt stays byte-identical to the original. When it is set and
+    # non-empty, returns the stripped file content instead (the token is ignored).
+    # The file is re-read on every call (no caching); a missing, unreadable or
+    # empty-after-stripping file raises RuntimeError naming the path.
+    #
+    # Every place the format token is substituted into an LLM prompt uses this:
+    #   py_utils/func.py:         messages_for_feature, messages_for_feature_reask,
+    #                             messages_for_code_gen       (<TARGET>)
+    #                             messages_for_generator_mutation (<FROMAT>)
+    #   generator_mutation.py:    mutation_based_on_predefined_mutators (<FROMAT>)
+    # Generator/seed FILE NAMES, split('-'), startswith() filters, mv_files prefixes
+    # and relationship keys keep using the raw token and must NOT go through this.
+    desc_file = os.environ.get("G2F_FORMAT_DESC_FILE")
+    if not desc_file:
+        return token
+    try:
+        with open(desc_file, "r") as f:
+            text = f.read()
+    except OSError:
+        raise RuntimeError("G2F_FORMAT_DESC_FILE is not readable: %s" % desc_file)
+    text = text.strip()
+    if not text:
+        raise RuntimeError("G2F_FORMAT_DESC_FILE is empty after stripping: %s" % desc_file)
+    return text
+
 def messages_for_feature(TARGET):
-    prompt = feature_prompt.replace("<TARGET>", TARGET)
+    prompt = feature_prompt.replace("<TARGET>", format_text(TARGET))
 
     messages = copy.deepcopy(messages_feature)
     messages[-1]["content"] = prompt
@@ -286,7 +315,7 @@ def messages_for_feature(TARGET):
     return messages
 
 def messages_for_feature_reask(TARGET, known_features):
-    prompt = feature_prompt_reask.replace("<TARGET>", TARGET)
+    prompt = feature_prompt_reask.replace("<TARGET>", format_text(TARGET))
     prompt = prompt.replace("<KNOWN_FEATURES>", known_features)
 
     messages = copy.deepcopy(messages_feature)
@@ -298,7 +327,7 @@ def messages_for_feature_reask(TARGET, known_features):
     return messages
 
 def messages_for_code_gen(TARGET, TARGET_FEATURES):
-    prompt = code_gen_prompt.replace("<TARGET>", TARGET)
+    prompt = code_gen_prompt.replace("<TARGET>", format_text(TARGET))
     prompt = prompt.replace("<TARGET_FEATURES>", TARGET_FEATURES)
 
     messages = copy.deepcopy(messages_code_gen)
@@ -328,7 +357,7 @@ Please use Markdown syntax to represent code blocks. Please ensure that there is
 """
 
 def messages_for_generator_mutation(file_format, feature, feature_description, target_generator_code):
-    prompt = generator_mutation_prompt.replace("<FROMAT>", file_format)
+    prompt = generator_mutation_prompt.replace("<FROMAT>", format_text(file_format))
     prompt = prompt.replace("<NEW_FEATURE>", feature)
     prompt = prompt.replace("<FEATURE_DES>", feature_description)
     prompt = prompt.replace("<TARGET_GENERATOR>", target_generator_code)

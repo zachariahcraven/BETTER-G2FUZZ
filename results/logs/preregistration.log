@@ -1,0 +1,22 @@
+2026-10-15 18:30:11 PREREG experiments/recipes/gaps.sh sha256=36afef26409fac381af1616eaa949c30079411532c801dcd5b90a8c478e5dee4 (C2 topup, C3 wad4ht, C4 xml12h)
+2026-10-15 18:30:11 LAUNCH gaps.sh topup-base
+2026-10-15 18:30:11 LAUNCH gaps.sh wad4ht-base
+2026-10-15 18:30:11 LAUNCH gaps.sh xml12h-base
+2026-10-15 18:34:20 NOTE lineup.log 18:30:11-12 'FAILED to start (exit 1)' lines for the gaps.sh *-base launches are FALSE alarms: scripts/fuzz run exited 1 after a successful submission (cmd_run's final && chain); fixed 18:36 (return 0). All 16 campaigns were submitted (jobs 667557-667574) and are running.
+2026-10-15 18:59:56 PREREG experiments/recipes/seed-controls-tiffpng.sh sha256=bad96ed285aa8c3e078ae88972ecc1168552b6f673784d0aa3eeae98ab2f6bbf (C1)
+2026-10-15 18:59:58 LAUNCH seed-controls-tiffpng.sh
+2026-10-15 19:30:33 PREREG experiments/recipes/wad-prompt.sh sha256=2f6da1687f90abe8d91792919e461b2a5ec09239b08ca3aaac31f3513ab24eeb (wad-prompt; bandit.sh = round5/B4)
+2026-10-15 19:30:33 PREREG experiments/recipes/demo.sh sha256=2c743d48d3dbb700341cee0aa515ca60cf2d8dfe2ddebaf2c91d796f3641f08e (demo; bandit.sh = round5/B4)
+2026-10-15 19:30:33 PREREG experiments/recipes/bandit.sh sha256=23c5deda0b3ab4fb81684e5ee255edaa0b6ab9d7a7f100c2a2782e5740055c7d (bandit; bandit.sh = round5/B4)
+2026-10-15 19:30:34 LAUNCH demo.sh llm
+2026-10-15 19:50:25 LAUNCH wad-prompt.sh codernext
+2026-10-15 20:27:16 LAUNCH bandit.sh round5
+2026-10-15 21:33:44 LAUNCH demo.sh controls (sets from demo-codernext-r1 via make-controls.py demo)
+2026-10-15 23:25:59 FOLLOW-UP experiments/recipes/wad-prompt.sh controls (pre-registered rule; DEVIATION line in recipe) sha256=1b2a0c6c684ed6e347bfc4f958d2e504328368c6362a6a52232ea315c20ceda5
+2026-10-15 23:26:00 LAUNCH wad-prompt.sh controls
+2026-10-16 01:21:11 STEP ADDED experiments/recipes/demo.sh 'model' (the header's later LLM arms, same settings as codernext arm) sha256=65a808255de3cae1bf7f5db21c8685b75e6782b891c636b663ecd5dcae34f027
+2026-10-16 01:25:57 LAUNCH gaps.sh wad4ht-llm (servers started by hand, 6 h: Coder-Next 700077, Qwen3.6-nothink 700079, Qwen3.5-4B 700078)
+2026-10-16 01:25:57 LAUNCH gaps.sh topup-llm SUBSET ONLY='codernext qwen36nt qwen4b' (the lineup servers for qwen38 and gemma31b are not up; their top-ups follow when they are; same command otherwise)
+2026-10-16 01:25:59 LAUNCH wad-prompt.sh qwen4b
+2026-10-16 01:26:00 LAUNCH demo.sh model qwen4b
+2026-10-16 08:00:49 EXCLUSION+RERUN (user decision 2026-10-16 01:40, pre-registered rule 'campaign shorter than SECS'): wad4ht-baseline-r5 -> r6, png-qwen36nt-r2 -> r6, png-qwen4b-r1 -> r6; list experiments/inputs/exclusions.csv

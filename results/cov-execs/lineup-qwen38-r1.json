@@ -1,0 +1,139 @@
+{
+ "target": "/targets/jhead.afl",
+ "files": 844,
+ "total_edges": 396,
+ "stock_edges": null,
+ "new_edges": null,
+ "per_generator": {
+  "id:000000,time:0,execs:0,orig:jpg-1": {
+   "files": 1,
+   "edges": 128,
+   "unique": 0
+  },
+  "id:000001,time:0,execs:0,orig:jpg-1": {
+   "files": 1,
+   "edges": 128,
+   "unique": 0
+  },
+  "id:000002,time:0,execs:0,orig:jpg-1": {
+   "files": 1,
+   "edges": 128,
+   "unique": 0
+  },
+  "id:000003,time:0,execs:0,orig:jpg-1": {
+   "files": 1,
+   "edges": 128,
+   "unique": 0
+  },
+  "id:000004,time:0,execs:0,orig:jpg-2": {
+   "files": 1,
+   "edges": 129,
+   "unique": 0
+  },
+  "id:000005,time:0,execs:0,orig:jpg-3": {
+   "files": 1,
+   "edges": 128,
+   "unique": 0
+  },
+  "id:000006,time:0,execs:0,orig:jpg-4": {
+   "files": 1,
+   "edges": 128,
+   "unique": 0
+  },
+  "id:000007,time:0,execs:0,orig:jpg-5": {
+   "files": 1,
+   "edges": 149,
+   "unique": 0
+  },
+  "id:000008,time:0,execs:0,orig:jpg-6": {
+   "files": 1,
+   "edges": 128,
+   "unique": 0
+  },
+  "id:000009,time:0,execs:0,orig:jpg-6": {
+   "files": 1,
+   "edges": 128,
+   "unique": 0
+  },
+  "id:000010,time:0,execs:0,orig:jpg-7": {
+   "files": 1,
+   "edges": 129,
+   "unique": 0
+  },
+  "id:000011,time:0,execs:0,orig:jpg-7": {
+   "files": 1,
+   "edges": 129,
+   "unique": 0
+  },
+  "id:000012,time:0,execs:0,orig:jpg-7": {
+   "files": 1,
+   "edges": 129,
+   "unique": 0
+  },
+  "id:000013,time:0,execs:0,orig:jpg-8": {
+   "files": 1,
+   "edges": 129,
+   "unique": 0
+  },
+  "stock": {
+   "files": 819,
+   "edges": 395,
+   "unique": 231
+  },
+  "id:000015,time:0,execs:0,orig:xmp-1": {
+   "files": 1,
+   "edges": 78,
+   "unique": 0
+  },
+  "id:000016,time:0,execs:0,orig:xmp-2": {
+   "files": 1,
+   "edges": 78,
+   "unique": 0
+  },
+  "id:000017,time:0,execs:0,orig:xmp-3": {
+   "files": 1,
+   "edges": 78,
+   "unique": 0
+  },
+  "id:000018,time:0,execs:0,orig:xmp-4": {
+   "files": 1,
+   "edges": 78,
+   "unique": 0
+  },
+  "id:000019,time:0,execs:0,orig:xmp-5": {
+   "files": 1,
+   "edges": 78,
+   "unique": 0
+  },
+  "id:000020,time:0,execs:0,orig:xmp-6": {
+   "files": 1,
+   "edges": 78,
+   "unique": 0
+  },
+  "id:000021,time:0,execs:0,orig:xmp-6": {
+   "files": 1,
+   "edges": 66,
+   "unique": 0
+  },
+  "id:000022,time:0,execs:0,orig:xmp-7": {
+   "files": 1,
+   "edges": 56,
+   "unique": 0
+  },
+  "id:000023,time:0,execs:0,orig:xmp-7": {
+   "files": 1,
+   "edges": 78,
+   "unique": 0
+  },
+  "id:000024,time:0,execs:0,orig:xmp-7": {
+   "files": 1,
+   "edges": 78,
+   "unique": 0
+  },
+  "id:000025,time:0,execs:0,orig:xmp-8": {
+   "files": 1,
+   "edges": 78,
+   "unique": 0
+  }
+ }
+}

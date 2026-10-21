@@ -27,7 +27,7 @@ PALETTE = [
     "tab:cyan",
 ]
 
-CAMPAIGN_RE = re.compile(r"^(lineup|tiff|png|xml|wad)(\d+h)?-(.+)-r(\d+)$")   # optional run tag, e.g. xml4h
+CAMPAIGN_RE = re.compile(r"^(lineup|tiff|png|xml|wad|demo)([0-9a-z]*)-(.+)-r(\d+)$")   # optional run tag, e.g. xml4h
 BANDIT_RE = re.compile(r"^bandit-(.+)-r(\d+)$")
 
 
@@ -141,8 +141,20 @@ def compute_series(rows):
     return series
 
 
+def load_exclusions(path="experiments/inputs/exclusions.csv"):
+    """Campaigns excluded from all analyses (experiments/inputs/exclusions.csv: campaign,reason)."""
+    if not os.path.exists(path):
+        return {}
+    with open(path) as f:
+        ex = {r["campaign"]: r["reason"] for r in csv.DictReader(f)}
+    for c, why in sorted(ex.items()):
+        print("excluded %s: %s" % (c, why), file=sys.stderr)
+    return ex
+
+
 def load_campaigns(campaigns_dir):
     campaigns = []
+    excluded = load_exclusions()
     try:
         groups = sorted(os.listdir(campaigns_dir))
     except OSError:
@@ -160,6 +172,8 @@ def load_campaigns(campaigns_dir):
             continue
 
         for name in entries:
+            if name in excluded:
+                continue
             campaign_path = os.path.join(group_path, name)
             if not os.path.isdir(campaign_path):
                 continue

@@ -9,10 +9,10 @@ the credit. Shows how unevenly generators pay off, i.e. what a bandit could gain
 """
 import csv, glob, os, re, statistics
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))   # experiments/analysis/<this> -> workspace root
 os.chdir(ROOT)
 GEN = re.compile(r"orig:([A-Za-z0-9]+-\d+)_\d+")
-TARGET = {"lineup": "jhead", "tiff": "tiff", "png": "png", "xml": "xml", "wad": "wad"}
+TARGET = {"lineup": "jhead", "tiff": "tiff", "png": "png", "xml": "xml", "wad": "wad", "demo": "demo"}
 
 def parse(name):
     m = re.match(r"id:(\d+)", name)
@@ -25,7 +25,7 @@ rows, per_model = [], {}
 for d in sorted(glob.glob("results/campaigns/*/*-*-r*")):
     if "/archive/" in d:
         continue
-    m = re.match(r"(lineup|tiff|png|xml|wad)(\d+h)?-(.+)-r(\d+)$", os.path.basename(d))   # optional run tag
+    m = re.match(r"(lineup|tiff|png|xml|wad|demo)([0-9a-z]*)-(.+)-r(\d+)$", os.path.basename(d))   # optional run tag
     out = glob.glob(os.path.join(d, "*_output", "default"))
     if not m or not out or not os.path.isdir(os.path.join(out[0], "queue")):
         continue   # not a lineup campaign, or not fuzzing yet

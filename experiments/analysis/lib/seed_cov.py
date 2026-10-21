@@ -48,6 +48,7 @@ def run_afl_showmap(target, input_dir, output_dir, timeout_ms):
     in the first input's map and skew the per-generator numbers. A crashing or hanging input still
     writes the edges it reached, so afl-showmap's exit status is not an error here.
     """
+    timeouts = []
     for name in sorted(os.listdir(input_dir)):
         path = os.path.join(input_dir, name)
         if not os.path.isfile(path):
@@ -59,23 +60,25 @@ def run_afl_showmap(target, input_dir, output_dir, timeout_ms):
         except FileNotFoundError:
             raise RuntimeError("afl-showmap not found on PATH")
         except subprocess.TimeoutExpired:
-            pass
+            timeouts.append(name)
+    return timeouts
 
 
 def parse_map_file(map_path):
-    """Parse an afl-showmap map file and return set of edge IDs."""
+    """Parse an afl-showmap map file and return set of edge IDs.
+
+    Raises ValueError if any non-empty line is not of the form '<edge id>:<count>'.
+    """
     edges = set()
-    if not os.path.exists(map_path):
-        return edges
-    try:
-        with open(map_path, "r") as f:
-            for line in f:
-                line = line.strip()
-                if line and ":" in line:
-                    edge_id = int(line.split(":")[0])
-                    edges.add(edge_id)
-    except Exception:
-        pass
+    with open(map_path, "r") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            parts = line.split(":")
+            if len(parts) != 2 or not parts[0].isdigit() or not parts[1].isdigit():
+                raise ValueError(f"unparseable line: {line!r}")
+            edges.add(int(parts[0]))
     return edges
 
 
@@ -105,13 +108,20 @@ def main():
             # Run afl-showmap on seed directory
             seed_map_dir = os.path.join(temp_dir, "seed_maps")
             os.makedirs(seed_map_dir)
-            run_afl_showmap(args.target, args.seed_dir, seed_map_dir, args.timeout)
+            seed_timeouts = run_afl_showmap(args.target, args.seed_dir, seed_map_dir, args.timeout)
+            failures = [(n, "timeout") for n in seed_timeouts]
 
             # Collect edges from each seed file
             seed_edges = {}
             for seed_file in seed_files:
                 map_path = os.path.join(seed_map_dir, seed_file)
-                seed_edges[seed_file] = parse_map_file(map_path)
+                if not os.path.exists(map_path):
+                    failures.append((seed_file, "no map file produced"))
+                    continue
+                try:
+                    seed_edges[seed_file] = parse_map_file(map_path)
+                except ValueError as e:
+                    failures.append((seed_file, str(e)))
 
             # Calculate total edges
             all_edges = set()
@@ -129,19 +139,32 @@ def main():
 
                 stock_seed_files = [f for f in os.listdir(args.stock)
                                     if os.path.isfile(os.path.join(args.stock, f))]
+                if not stock_seed_files:
+                    raise ValueError("Stock directory is empty")
 
-                if stock_seed_files:
-                    stock_map_dir = os.path.join(temp_dir, "stock_maps")
-                    os.makedirs(stock_map_dir)
-                    run_afl_showmap(args.target, args.stock, stock_map_dir, args.timeout)
+                stock_map_dir = os.path.join(temp_dir, "stock_maps")
+                os.makedirs(stock_map_dir)
+                stock_timeouts = run_afl_showmap(args.target, args.stock, stock_map_dir, args.timeout)
+                failures.extend([(n, "timeout") for n in stock_timeouts])
 
-                    stock_edges_set = set()
-                    for seed_file in stock_seed_files:
-                        map_path = os.path.join(stock_map_dir, seed_file)
+                stock_edges_set = set()
+                for seed_file in stock_seed_files:
+                    map_path = os.path.join(stock_map_dir, seed_file)
+                    if not os.path.exists(map_path):
+                        failures.append((seed_file, "no map file produced"))
+                        continue
+                    try:
                         stock_edges_set.update(parse_map_file(map_path))
+                    except ValueError as e:
+                        failures.append((seed_file, str(e)))
 
-                    stock_edges = len(stock_edges_set)
-                    new_edges = total_edges - stock_edges
+                stock_edges = len(stock_edges_set)
+                new_edges = total_edges - stock_edges
+
+            if failures:
+                for name, reason in failures:
+                    print(f"seed_cov: {name}: {reason}", file=sys.stderr)
+                sys.exit(2)
 
             # Group by generator
             generators = {}

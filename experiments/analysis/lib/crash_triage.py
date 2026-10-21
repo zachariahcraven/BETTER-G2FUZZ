@@ -15,10 +15,10 @@ from collections import defaultdict
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 os.chdir(ROOT)
 TARGET = {"lineup": "jhead", "tiff": "tiff_read_rgba_fuzzer", "png": "libpng_read_fuzzer",
-          "xml": "xml_fuzzer", "wad": "doom_wad"}
-NAME = re.compile(r"(lineup|tiff|png|xml|wad)(\d+h)?-(.+)-r(\d+)$")   # optional run tag, e.g. wad4h
-BANDIT = re.compile(r"bandit-(jhead|tiff|png|xml|wad)-(\w+)-r(\d+)$")   # scheduler runs: model sched-<sched>
-TAG = {"jhead": "lineup", "tiff": "tiff", "png": "png", "xml": "xml", "wad": "wad"}
+          "xml": "xml_fuzzer", "wad": "doom_wad", "demo": "doom_demo"}
+NAME = re.compile(r"(lineup|tiff|png|xml|wad|demo)([0-9a-z]*)-(.+)-r(\d+)$")   # optional run tag, e.g. wad4h
+BANDIT = re.compile(r"bandit-(jhead|tiff|png|xml|wad|demo)-(\w+)-r(\d+)$")   # scheduler runs: model sched-<sched>
+TAG = {"jhead": "lineup", "tiff": "tiff", "png": "png", "xml": "xml", "wad": "wad", "demo": "demo"}
 ENV = dict(os.environ,
            ASAN_OPTIONS="detect_leaks=0:allocator_may_return_null=1:max_allocation_size_mb=1024:symbolize=1",
            ASAN_SYMBOLIZER_PATH="/usr/lib/llvm-16/bin/llvm-symbolizer",
@@ -65,8 +65,10 @@ cache_path = "results/cache/triage-cache.json"
 cache = json.load(open(cache_path)) if os.path.exists(cache_path) else {}
 # entries from before the exit-255 fix: replay them again
 cache = {k: v for k, v in cache.items() if v[0] != "signal-127"}
+explicit = set(sys.argv[1:])
 names = sys.argv[1:] or sorted(os.path.basename(d) for d in glob.glob("results/campaigns/*/*-*-r*") if "/archive/" not in d)
 rows = []
+bad_explicit = False
 for name in names:
     m = NAME.match(name)
     b = BANDIT.match(name)
@@ -75,6 +77,9 @@ for name in names:
     elif m:
         prefix, model, rep = m.group(1), m.group(3), m.group(4)
     else:
+        print(f"crash_triage: skipped {name} (unrecognized campaign name)", file=sys.stderr)
+        if name in explicit:
+            bad_explicit = True
         continue
     target = TARGET[prefix]
     if m and not b and m.group(2):
@@ -115,3 +120,5 @@ for target in sorted(files):
     for (kind, frames), models in sorted(bugs[target].items(), key=lambda kv: -len(kv[1])):
         print("  %-22s %-70s found by: %s" % (kind, frames[:70], ", ".join(sorted(models))))
 print("\nper-crash rows: results/tables/crashes.csv")
+if bad_explicit:
+    sys.exit(1)

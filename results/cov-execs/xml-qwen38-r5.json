@@ -1,0 +1,209 @@
+{
+ "target": "/targets/xml_fuzzer.afl",
+ "files": 6873,
+ "total_edges": 3634,
+ "stock_edges": null,
+ "new_edges": null,
+ "per_generator": {
+  "stock": {
+   "files": 6834,
+   "edges": 3634,
+   "unique": 1904
+  },
+  "id:000001,time:0,execs:0,orig:xml-10": {
+   "files": 1,
+   "edges": 666,
+   "unique": 0
+  },
+  "id:000002,time:0,execs:0,orig:xml-11": {
+   "files": 1,
+   "edges": 664,
+   "unique": 0
+  },
+  "id:000003,time:0,execs:0,orig:xml-12": {
+   "files": 1,
+   "edges": 796,
+   "unique": 0
+  },
+  "id:000004,time:0,execs:0,orig:xml-13": {
+   "files": 1,
+   "edges": 910,
+   "unique": 0
+  },
+  "id:000005,time:0,execs:0,orig:xml-14": {
+   "files": 1,
+   "edges": 688,
+   "unique": 0
+  },
+  "id:000006,time:0,execs:0,orig:xml-15": {
+   "files": 1,
+   "edges": 1114,
+   "unique": 0
+  },
+  "id:000007,time:0,execs:0,orig:xml-16": {
+   "files": 1,
+   "edges": 633,
+   "unique": 0
+  },
+  "id:000008,time:0,execs:0,orig:xml-17": {
+   "files": 1,
+   "edges": 610,
+   "unique": 0
+  },
+  "id:000009,time:0,execs:0,orig:xml-18": {
+   "files": 1,
+   "edges": 760,
+   "unique": 0
+  },
+  "id:000010,time:0,execs:0,orig:xml-19": {
+   "files": 1,
+   "edges": 900,
+   "unique": 0
+  },
+  "id:000011,time:0,execs:0,orig:xml-1": {
+   "files": 1,
+   "edges": 778,
+   "unique": 0
+  },
+  "id:000012,time:0,execs:0,orig:xml-20": {
+   "files": 1,
+   "edges": 1114,
+   "unique": 0
+  },
+  "id:000013,time:0,execs:0,orig:xml-21": {
+   "files": 1,
+   "edges": 1114,
+   "unique": 0
+  },
+  "id:000014,time:0,execs:0,orig:xml-21": {
+   "files": 1,
+   "edges": 950,
+   "unique": 0
+  },
+  "id:000015,time:0,execs:0,orig:xml-22": {
+   "files": 1,
+   "edges": 633,
+   "unique": 0
+  },
+  "id:000016,time:0,execs:0,orig:xml-23": {
+   "files": 1,
+   "edges": 738,
+   "unique": 0
+  },
+  "id:000017,time:0,execs:0,orig:xml-24": {
+   "files": 1,
+   "edges": 660,
+   "unique": 0
+  },
+  "id:000018,time:0,execs:0,orig:xml-24": {
+   "files": 1,
+   "edges": 888,
+   "unique": 0
+  },
+  "id:000019,time:0,execs:0,orig:xml-25": {
+   "files": 1,
+   "edges": 827,
+   "unique": 0
+  },
+  "id:000020,time:0,execs:0,orig:xml-25": {
+   "files": 1,
+   "edges": 827,
+   "unique": 0
+  },
+  "id:000021,time:0,execs:0,orig:xml-25": {
+   "files": 1,
+   "edges": 752,
+   "unique": 0
+  },
+  "id:000022,time:0,execs:0,orig:xml-26": {
+   "files": 1,
+   "edges": 664,
+   "unique": 0
+  },
+  "id:000023,time:0,execs:0,orig:xml-27": {
+   "files": 1,
+   "edges": 664,
+   "unique": 0
+  },
+  "id:000024,time:0,execs:0,orig:xml-28": {
+   "files": 1,
+   "edges": 664,
+   "unique": 0
+  },
+  "id:000025,time:0,execs:0,orig:xml-29": {
+   "files": 1,
+   "edges": 953,
+   "unique": 0
+  },
+  "id:000026,time:0,execs:0,orig:xml-29": {
+   "files": 1,
+   "edges": 925,
+   "unique": 0
+  },
+  "id:000027,time:0,execs:0,orig:xml-29": {
+   "files": 1,
+   "edges": 920,
+   "unique": 0
+  },
+  "id:000028,time:0,execs:0,orig:xml-2": {
+   "files": 1,
+   "edges": 660,
+   "unique": 0
+  },
+  "id:000029,time:0,execs:0,orig:xml-30": {
+   "files": 1,
+   "edges": 1114,
+   "unique": 0
+  },
+  "id:000030,time:0,execs:0,orig:xml-30": {
+   "files": 1,
+   "edges": 829,
+   "unique": 0
+  },
+  "id:000031,time:0,execs:0,orig:xml-30": {
+   "files": 1,
+   "edges": 342,
+   "unique": 0
+  },
+  "id:000032,time:0,execs:0,orig:xml-3": {
+   "files": 1,
+   "edges": 762,
+   "unique": 0
+  },
+  "id:000033,time:0,execs:0,orig:xml-4": {
+   "files": 1,
+   "edges": 758,
+   "unique": 0
+  },
+  "id:000034,time:0,execs:0,orig:xml-5": {
+   "files": 1,
+   "edges": 742,
+   "unique": 0
+  },
+  "id:000035,time:0,execs:0,orig:xml-6": {
+   "files": 1,
+   "edges": 862,
+   "unique": 0
+  },
+  "id:000036,time:0,execs:0,orig:xml-7": {
+   "files": 1,
+   "edges": 736,
+   "unique": 0
+  },
+  "id:000037,time:0,execs:0,orig:xml-8": {
+   "files": 1,
+   "edges": 887,
+   "unique": 0
+  },
+  "id:000038,time:0,execs:0,orig:xml-8": {
+   "files": 1,
+   "edges": 661,
+   "unique": 0
+  },
+  "id:000039,time:0,execs:0,orig:xml-9": {
+   "files": 1,
+   "edges": 641,
+   "unique": 0
+  }
+ }
+}

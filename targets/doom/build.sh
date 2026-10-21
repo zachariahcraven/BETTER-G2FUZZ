@@ -1,6 +1,7 @@
 #!/bin/bash
-# doom_wad: our harness g2f_doom.c on doomgeneric (commit dcb7a8db, GPL-2.0), freedoom2.wad as the IWAD
-#   -> OUT/doom_wad.{afl,cmp,asan}, OUT/freedoom2.wad, OUT/seeds/doom_wad/
+# doom_wad and doom_demo: our harnesses g2f_doom.c (fuzzed add-on WAD) and g2f_demo.c (fuzzed demo)
+# on doomgeneric (commit dcb7a8db, GPL-2.0), freedoom2.wad as the IWAD
+#   -> OUT/doom_{wad,demo}.{afl,cmp,asan}, OUT/freedoom2.wad, OUT/seeds/{doom_wad,doom_demo}/
 # Runs inside the g2fuzz image (the Dockerfile calls it). Usage: build.sh OUT
 set -euo pipefail
 HERE=$(cd "$(dirname "$0")" && pwd); mkdir -p "$1"; OUT=$(cd "$1" && pwd)
@@ -20,15 +21,22 @@ SRC="dummy am_map doomdef doomstat dstrings d_event d_items d_iwad d_loop d_main
   i_input i_video doomgeneric"
 CFLAGS="-O1 -g -fno-omit-frame-pointer -w -DNORMALUNIX -DLINUX -DSNDSERV -D_DEFAULT_SOURCE -I$D"
 for v in afl cmp asan; do
-  echo "building doom_wad.$v"
+  echo "building doom_wad.$v and doom_demo.$v"
   ( unset AFL_LLVM_CMPLOG AFL_USE_ASAN
     if [ $v = cmp ]; then export AFL_LLVM_CMPLOG=1; fi
     if [ $v = asan ]; then export AFL_USE_ASAN=1; fi
     mkdir -p "$W/$v"
     for f in $SRC; do echo "afl-clang-fast $CFLAGS -c $D/$f.c -o $W/$v/$f.o"; done |
       xargs -P "$(nproc)" -I{} sh -c '{} || exit 255'
+    mkdir -p "$W/$v/harness"
     afl-clang-fast $CFLAGS -c "$HERE/g2f_doom.c" -o "$W/$v/g2f_doom.o"
-    afl-clang-fast $CFLAGS "$W/$v"/*.o -lm -o "$OUT/doom_wad.$v" )
+    afl-clang-fast $CFLAGS -c "$HERE/g2f_demo.c" -o "$W/$v/harness/g2f_demo.o"
+    # The engine objects are shared; each harness brings its own main() and platform layer. Link order sets
+    # AFL++'s edge ids, so each binary keeps the exact link it had when its campaigns ran: doom_wad as before
+    # doom_demo existed (g2f_doom.o sorted among the engine objects), doom_demo = engine objects + g2f_demo.o.
+    afl-clang-fast $CFLAGS "$W/$v"/*.o -lm -o "$OUT/doom_wad.$v"
+    afl-clang-fast $CFLAGS $(ls "$W/$v"/*.o | grep -v '/g2f_doom\.o$') "$W/$v/harness/g2f_demo.o" -lm -o "$OUT/doom_demo.$v" )
 done
 cp "$HERE/freedoom2.wad" "$OUT/freedoom2.wad"
 mkdir -p "$OUT/seeds/doom_wad" && cp "$HERE"/seeds/* "$OUT/seeds/doom_wad/"
+mkdir -p "$OUT/seeds/doom_demo" && cp "$HERE"/demo-seeds/* "$OUT/seeds/doom_demo/"

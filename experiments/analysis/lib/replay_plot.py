@@ -23,14 +23,28 @@ def parse_args():
     return p.parse_args()
 
 
+def load_exclusions(path="experiments/inputs/exclusions.csv"):
+    """Campaigns excluded from all analyses (experiments/inputs/exclusions.csv: campaign,reason)."""
+    if not os.path.exists(path):
+        return {}
+    with open(path) as f:
+        ex = {r["campaign"]: r["reason"] for r in csv.DictReader(f)}
+    for c, why in sorted(ex.items()):
+        print("excluded %s: %s" % (c, why), file=sys.stderr)
+    return ex
+
+
 def load_data(path):
     """Return {target: {model: [queue_edges, ...]}} after filtering."""
     if not os.path.exists(path):
         print("Error: %s not found" % path, file=sys.stderr)
         sys.exit(0)
     groups = {}
+    excluded = load_exclusions()
     with open(path) as f:
         for row in csv.DictReader(f):
+            if row.get("campaign") in excluded:
+                continue
             model = row.get("model", "")
             if model.startswith("sched-"):
                 continue

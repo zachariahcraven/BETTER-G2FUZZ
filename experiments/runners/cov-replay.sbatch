@@ -29,16 +29,18 @@ one() {
     png*|bandit-png-*) t=libpng_read_fuzzer ;;
     xml*|bandit-xml-*) t=xml_fuzzer ;;
     wad*|bandit-wad-*) t=doom_wad ;;
+    demo*|bandit-demo-*) t=doom_demo ;;
     *) return 0 ;;
   esac
   local q; q=$(ls -d "$d"/*_output/default/queue)
-  apptainer exec -B /home/group "$X/g2fuzz.sif" bash -c "
+  # G2F_TARGETS=<folder>: replaces the image's /targets (e.g. a folder that adds doom_demo before the image has it)
+  apptainer exec -B /home/group ${G2F_TARGETS:+-B "$G2F_TARGETS:/targets"} "$X/g2fuzz.sif" bash -c "
     python3 experiments/analysis/lib/seed_cov.py /targets/$t.afl $d/initial_seeds --stock /targets/seeds/$t > /tmp/cs-\$\$.json &&
     python3 experiments/analysis/lib/seed_cov.py /targets/$t.afl $q > /tmp/cq-\$\$.json &&
     python3 -c 'import json,sys; json.dump({\"seeds\": json.load(open(sys.argv[1])), \"queue\": json.load(open(sys.argv[2]))}, open(sys.argv[3], \"w\"))' \
       /tmp/cs-\$\$.json /tmp/cq-\$\$.json results/cov/$n.json; rm -f /tmp/cs-\$\$.json /tmp/cq-\$\$.json" \
     && echo "done $n" || echo "FAILED $n"
 }
-export -f one; export X
+export -f one; export X G2F_TARGETS
 ls -d results/campaigns/*/*-r[0-9]* | grep -v '^results/campaigns/archive/' | xargs -P 32 -I{} bash -c 'one {}'
 echo "all done $(date)"

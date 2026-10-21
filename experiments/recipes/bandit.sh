@@ -16,5 +16,20 @@ case "${1:-}" in
   round4)  # 2026-10-14 22:20: Doom, random only, G2Fuzz's default 300 s plateau (dose-response control)
     POOLS='wad:auto20-wad-codernext-r1' SCHEDS=random REPS=5 SECS=3600 PLATEAU=300 BACKOFF=60 LABEL=p300 HOURS=3 \
       sbatch --export=ALL $B ;;
-  *) echo "usage: $0 round1 | round2 | round3 | round4"; exit 1 ;;
+  round5)  # CEILING EXPERIMENT (plan B4), PRE-REGISTERED 2026-10-15 before it started.
+    # Question: can ANY generator scheduler beat random at this LLM-step rate? oracle = always the pool's best
+    #   generators (ranking from the POOL campaign's own final queue via experiments/analysis/lib/oracle_ranking.py,
+    #   never from the evaluated runs), vs bandit vs random. If oracle ties random, scheduling cannot matter here.
+    # Arms differ only in G2F_SCHEDULER (oracle | bandit | random); same pool, server, plateau 5 s, backoff 0,
+    #   14400 s, 5 reps, all arms of a pool started together. Server: Qwen3-Coder-Next-FP8-agent (2xH100, 128k
+    #   context, user decision 2026-10-15 18:40), reused and never stopped by the runner.
+    # Doom pool with a fixed afl-fuzz -t 100 for all its arms (earlier rounds used AFL++'s automatic timeout);
+    #   XML pool unchanged (automatic -t, as its pool campaign).
+    # Primary metric: replayed coverage at 4 h; test: experiments/analysis/stats rule 4 (oracle vs random,
+    #   bandit vs random, oracle vs bandit). Secondary: decisions per run and picks on the top generators (B2 table).
+    # Exclusion: infrastructure failures only, same rule for every arm.
+    COMMON="SCHEDS='oracle bandit random' REPS=5 SECS=14400 PLATEAU=5 BACKOFF=0 LABEL=o4 HOURS=13 MODEL=Qwen3-Coder-Next-FP8-agent G2F_VLLM_DIR=$HOME/llm-jobs"
+    eval "POOLS='xml:xml-codernext-r1' $COMMON sbatch --export=ALL $B"
+    eval "POOLS='wad:auto20-wad-codernext-r1' G2F_TIMEOUT_MS=100 $COMMON sbatch --export=ALL $B" ;;
+  *) echo "usage: $0 round1 | round2 | round3 | round4 | round5"; exit 1 ;;
 esac

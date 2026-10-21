@@ -1,0 +1,14 @@
+{
+ "target": "/targets/doom_wad.afl",
+ "files": 1303,
+ "total_edges": 2348,
+ "stock_edges": null,
+ "new_edges": null,
+ "per_generator": {
+  "stock": {
+   "files": 1303,
+   "edges": 2348,
+   "unique": 2348
+  }
+ }
+}

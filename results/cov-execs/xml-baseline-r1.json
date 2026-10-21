@@ -1,0 +1,14 @@
+{
+ "target": "/targets/xml_fuzzer.afl",
+ "files": 6067,
+ "total_edges": 2639,
+ "stock_edges": null,
+ "new_edges": null,
+ "per_generator": {
+  "stock": {
+   "files": 6067,
+   "edges": 2639,
+   "unique": 2639
+  }
+ }
+}

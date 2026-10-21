@@ -1,0 +1,179 @@
+{
+ "target": "/targets/libpng_read_fuzzer.afl",
+ "files": 801,
+ "total_edges": 1155,
+ "stock_edges": null,
+ "new_edges": null,
+ "per_generator": {
+  "stock": {
+   "files": 768,
+   "edges": 1153,
+   "unique": 498
+  },
+  "id:000004,time:0,execs:0,orig:png-10": {
+   "files": 1,
+   "edges": 439,
+   "unique": 1
+  },
+  "id:000005,time:0,execs:0,orig:png-11": {
+   "files": 1,
+   "edges": 491,
+   "unique": 0
+  },
+  "id:000006,time:0,execs:0,orig:png-12": {
+   "files": 1,
+   "edges": 467,
+   "unique": 0
+  },
+  "id:000007,time:0,execs:0,orig:png-13": {
+   "files": 1,
+   "edges": 497,
+   "unique": 0
+  },
+  "id:000008,time:0,execs:0,orig:png-14": {
+   "files": 1,
+   "edges": 445,
+   "unique": 0
+  },
+  "id:000009,time:0,execs:0,orig:png-15": {
+   "files": 1,
+   "edges": 497,
+   "unique": 0
+  },
+  "id:000010,time:0,execs:0,orig:png-16": {
+   "files": 1,
+   "edges": 466,
+   "unique": 0
+  },
+  "id:000011,time:0,execs:0,orig:png-17": {
+   "files": 1,
+   "edges": 472,
+   "unique": 0
+  },
+  "id:000012,time:0,execs:0,orig:png-18": {
+   "files": 1,
+   "edges": 469,
+   "unique": 0
+  },
+  "id:000013,time:0,execs:0,orig:png-19": {
+   "files": 1,
+   "edges": 445,
+   "unique": 0
+  },
+  "id:000014,time:0,execs:0,orig:png-1": {
+   "files": 1,
+   "edges": 466,
+   "unique": 0
+  },
+  "id:000015,time:0,execs:0,orig:png-20": {
+   "files": 1,
+   "edges": 445,
+   "unique": 0
+  },
+  "id:000016,time:0,execs:0,orig:png-21": {
+   "files": 1,
+   "edges": 466,
+   "unique": 0
+  },
+  "id:000017,time:0,execs:0,orig:png-22": {
+   "files": 1,
+   "edges": 466,
+   "unique": 0
+  },
+  "id:000018,time:0,execs:0,orig:png-23": {
+   "files": 1,
+   "edges": 466,
+   "unique": 0
+  },
+  "id:000019,time:0,execs:0,orig:png-24": {
+   "files": 1,
+   "edges": 478,
+   "unique": 0
+  },
+  "id:000020,time:0,execs:0,orig:png-24": {
+   "files": 1,
+   "edges": 493,
+   "unique": 0
+  },
+  "id:000021,time:0,execs:0,orig:png-25": {
+   "files": 1,
+   "edges": 491,
+   "unique": 0
+  },
+  "id:000022,time:0,execs:0,orig:png-2": {
+   "files": 1,
+   "edges": 445,
+   "unique": 0
+  },
+  "id:000023,time:0,execs:0,orig:png-3": {
+   "files": 1,
+   "edges": 463,
+   "unique": 0
+  },
+  "id:000024,time:0,execs:0,orig:png-3": {
+   "files": 1,
+   "edges": 496,
+   "unique": 0
+  },
+  "id:000025,time:0,execs:0,orig:png-3": {
+   "files": 1,
+   "edges": 474,
+   "unique": 0
+  },
+  "id:000026,time:0,execs:0,orig:png-3": {
+   "files": 1,
+   "edges": 474,
+   "unique": 0
+  },
+  "id:000027,time:0,execs:0,orig:png-3": {
+   "files": 1,
+   "edges": 474,
+   "unique": 0
+  },
+  "id:000028,time:0,execs:0,orig:png-3": {
+   "files": 1,
+   "edges": 463,
+   "unique": 0
+  },
+  "id:000029,time:0,execs:0,orig:png-3": {
+   "files": 1,
+   "edges": 456,
+   "unique": 0
+  },
+  "id:000030,time:0,execs:0,orig:png-3": {
+   "files": 1,
+   "edges": 474,
+   "unique": 0
+  },
+  "id:000031,time:0,execs:0,orig:png-4": {
+   "files": 1,
+   "edges": 427,
+   "unique": 0
+  },
+  "id:000032,time:0,execs:0,orig:png-5": {
+   "files": 1,
+   "edges": 466,
+   "unique": 0
+  },
+  "id:000033,time:0,execs:0,orig:png-6": {
+   "files": 1,
+   "edges": 491,
+   "unique": 0
+  },
+  "id:000034,time:0,execs:0,orig:png-7": {
+   "files": 1,
+   "edges": 468,
+   "unique": 0
+  },
+  "id:000035,time:0,execs:0,orig:png-8": {
+   "files": 1,
+   "edges": 467,
+   "unique": 0
+  },
+  "id:000036,time:0,execs:0,orig:png-9": {
+   "files": 1,
+   "edges": 463,
+   "unique": 0
+  }
+ }
+}

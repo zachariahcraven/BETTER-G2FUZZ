@@ -1,0 +1,174 @@
+{
+ "target": "/targets/doom_demo.afl",
+ "files": 1472,
+ "total_edges": 3590,
+ "stock_edges": null,
+ "new_edges": null,
+ "per_generator": {
+  "stock": {
+   "files": 1440,
+   "edges": 3589,
+   "unique": 1026
+  },
+  "id:000004,time:0,execs:0,orig:lmp-10": {
+   "files": 1,
+   "edges": 1911,
+   "unique": 0
+  },
+  "id:000005,time:0,execs:0,orig:lmp-11": {
+   "files": 1,
+   "edges": 2293,
+   "unique": 0
+  },
+  "id:000006,time:0,execs:0,orig:lmp-12": {
+   "files": 1,
+   "edges": 2050,
+   "unique": 0
+  },
+  "id:000007,time:0,execs:0,orig:lmp-13": {
+   "files": 1,
+   "edges": 2293,
+   "unique": 0
+  },
+  "id:000008,time:0,execs:0,orig:lmp-14": {
+   "files": 1,
+   "edges": 2244,
+   "unique": 0
+  },
+  "id:000009,time:0,execs:0,orig:lmp-15": {
+   "files": 1,
+   "edges": 1911,
+   "unique": 0
+  },
+  "id:000010,time:0,execs:0,orig:lmp-16": {
+   "files": 1,
+   "edges": 1851,
+   "unique": 0
+  },
+  "id:000011,time:0,execs:0,orig:lmp-17": {
+   "files": 1,
+   "edges": 1851,
+   "unique": 0
+  },
+  "id:000012,time:0,execs:0,orig:lmp-18": {
+   "files": 1,
+   "edges": 2436,
+   "unique": 0
+  },
+  "id:000013,time:0,execs:0,orig:lmp-19": {
+   "files": 1,
+   "edges": 2436,
+   "unique": 0
+  },
+  "id:000014,time:0,execs:0,orig:lmp-1": {
+   "files": 1,
+   "edges": 1947,
+   "unique": 0
+  },
+  "id:000015,time:0,execs:0,orig:lmp-20": {
+   "files": 1,
+   "edges": 1894,
+   "unique": 0
+  },
+  "id:000016,time:0,execs:0,orig:lmp-21": {
+   "files": 1,
+   "edges": 2079,
+   "unique": 0
+  },
+  "id:000017,time:0,execs:0,orig:lmp-22": {
+   "files": 1,
+   "edges": 1875,
+   "unique": 0
+  },
+  "id:000018,time:0,execs:0,orig:lmp-23": {
+   "files": 1,
+   "edges": 1866,
+   "unique": 0
+  },
+  "id:000019,time:0,execs:0,orig:lmp-24": {
+   "files": 1,
+   "edges": 1875,
+   "unique": 0
+  },
+  "id:000020,time:0,execs:0,orig:lmp-25": {
+   "files": 1,
+   "edges": 1838,
+   "unique": 0
+  },
+  "id:000021,time:0,execs:0,orig:lmp-26": {
+   "files": 1,
+   "edges": 2079,
+   "unique": 0
+  },
+  "id:000022,time:0,execs:0,orig:lmp-27": {
+   "files": 1,
+   "edges": 1949,
+   "unique": 0
+  },
+  "id:000023,time:0,execs:0,orig:lmp-28": {
+   "files": 1,
+   "edges": 2066,
+   "unique": 0
+  },
+  "id:000024,time:0,execs:0,orig:lmp-29": {
+   "files": 1,
+   "edges": 2081,
+   "unique": 0
+  },
+  "id:000025,time:0,execs:0,orig:lmp-2": {
+   "files": 1,
+   "edges": 1851,
+   "unique": 0
+  },
+  "id:000026,time:0,execs:0,orig:lmp-30": {
+   "files": 1,
+   "edges": 2226,
+   "unique": 0
+  },
+  "id:000027,time:0,execs:0,orig:lmp-31": {
+   "files": 1,
+   "edges": 2436,
+   "unique": 0
+  },
+  "id:000028,time:0,execs:0,orig:lmp-32": {
+   "files": 1,
+   "edges": 2085,
+   "unique": 0
+  },
+  "id:000029,time:0,execs:0,orig:lmp-3": {
+   "files": 1,
+   "edges": 2079,
+   "unique": 0
+  },
+  "id:000030,time:0,execs:0,orig:lmp-4": {
+   "files": 1,
+   "edges": 1875,
+   "unique": 0
+  },
+  "id:000031,time:0,execs:0,orig:lmp-5": {
+   "files": 1,
+   "edges": 1862,
+   "unique": 0
+  },
+  "id:000032,time:0,execs:0,orig:lmp-6": {
+   "files": 1,
+   "edges": 1780,
+   "unique": 0
+  },
+  "id:000033,time:0,execs:0,orig:lmp-7": {
+   "files": 1,
+   "edges": 2050,
+   "unique": 0
+  },
+  "id:000034,time:0,execs:0,orig:lmp-8": {
+   "files": 1,
+   "edges": 2132,
+   "unique": 0
+  },
+  "id:000035,time:0,execs:0,orig:lmp-9": {
+   "files": 1,
+   "edges": 1867,
+   "unique": 0
+  }
+ }
+}

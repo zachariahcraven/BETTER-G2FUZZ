@@ -1,0 +1,4 @@
+campaign,reason
+wad4ht-baseline-r5,"AFL++ aborted after 1:43 of 4:00: a Doom crash input wild-wrote the coverage map (edges 9116 of 9113); rerun as wad4ht-baseline-r6"
+png-qwen36nt-r2,"AFL++ aborted in the dry run: generated seed png-30_1.png timed out; never fuzzed; rerun as png-qwen36nt-r6"
+png-qwen4b-r1,"AFL++ aborted in the dry run: generated seed png-8_1.png timed out; never fuzzed; rerun as png-qwen4b-r6"

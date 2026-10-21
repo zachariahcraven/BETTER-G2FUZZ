@@ -16,7 +16,7 @@ union() {   # target -> edges of its stock seeds, one run per file
 }
 
 # every target: three builds, real instrumentation, stock seeds that run cleanly, deterministic coverage
-for t in jhead:50 tiff_read_rgba_fuzzer:50 libpng_read_fuzzer:50 xml_fuzzer:300 doom_wad:500; do
+for t in jhead:50 tiff_read_rgba_fuzzer:50 libpng_read_fuzzer:50 xml_fuzzer:300 doom_wad:500 doom_demo:1500; do
   n=${t%%:*}; floor=${t#*:}
   for v in afl cmp asan; do check "box test -x /targets/$n.$v" "$n.$v exists and is executable"; done
   s=$(box bash -c "ls -d /targets/seeds/$n/* | head -1")
@@ -89,8 +89,17 @@ check "box bash -c 'nm /targets/doom_wad.afl | grep -qE \" T P_SetupLevel\$\" &&
 m1=$(box bash -c "afl-showmap -q -o '$T/a' -t 10000 -- /targets/doom_wad.afl '$T/map01.wad' >/dev/null 2>&1; afl-showmap -q -o '$T/b' -t 10000 -- /targets/doom_wad.afl '$T/map02_as_map01.wad' >/dev/null 2>&1; diff -q '$T/a' '$T/b' >/dev/null && echo same || echo different")
 check "[ '$m1' = different ]" "doom_wad: two different maps give different coverage"
 
+# doom_demo: a stock demo plays its 105 tics and moves the player; zeroing its tick bytes changes what is played
+d1=$(box bash -c "ls /targets/seeds/doom_demo/*demo1.lmp")
+dbg=$(box env G2F_DOOM_DEBUG=1 timeout 20 /targets/doom_demo.afl "$d1" 2>&1 | grep '^g2f_demo:')
+check "echo '$dbg' | grep -q 'tics 105 of 105'" "doom_demo: a stock demo plays 105 tics ($dbg)"
+box python3 -c "import sys; d=open(sys.argv[1],'rb').read(); open(sys.argv[2],'wb').write(d[:13]+bytes(len(d)-14)+d[-1:])" "$d1" "$T/zero.lmp"
+dz=$(box env G2F_DOOM_DEBUG=1 timeout 20 /targets/doom_demo.afl "$T/zero.lmp" 2>&1 | grep '^g2f_demo:')
+check "[ \"\$(echo '$dbg' | grep -o 'pos [-0-9,]*')\" != \"\$(echo '$dz' | grep -o 'pos [-0-9,]*')\" ]" "doom_demo: the tick bytes drive the player (stock vs zeroed: different end position)"
+check "box bash -c 'nm /targets/doom_demo.afl | grep -qE \" T G_Ticker\$\" && nm /targets/doom_demo.afl | grep -qE \" T P_MovePlayer\$\"'" "doom_demo.afl contains Doom's game logic (G_Ticker, P_MovePlayer)"
+
 # speed: 30 s of AFL++ each on XML and Doom
-for t in xml_fuzzer:300 doom_wad:20; do
+for t in xml_fuzzer:300 doom_wad:20 doom_demo:20; do
   n=${t%%:*}; floor=${t#*:}; mkdir -p "$T/in-$n"; box bash -c "cp /targets/seeds/$n/* '$T/in-$n/'"
   box bash -c "cd '$T' && AFL_NO_UI=1 AFL_NO_AFFINITY=1 AFL_SKIP_CPUFREQ=1 AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1 \
     timeout 150 afl-fuzz -i in-$n -o out-$n -t 10000 -V 30 -- /targets/$n.afl @@ > fuzz-$n.log 2>&1"

@@ -1,0 +1,18 @@
+Generated TIFF files with different bit depths:
+1. bit_depth_1bit.tiff - 1-bit per pixel (black and white)
+2. bit_depth_8bit.tiff - 8-bit per pixel (256 grayscale levels)
+3. bit_depth_16bit.tiff - 16-bit per pixel (65536 grayscale levels)
+4. bit_depth_32bit_int.tiff - 32-bit integer (simulated as float32)
+5. bit_depth_32bit_float.tiff - 32-bit floating point
+6. bit_depth_64bit_float_simulated.tiff - 64-bit floating point (simulated as float32)
+
+Generated TIFF files with Photometric interpretation flexibility:
+1. photometric_minisblack.tiff - RGB photometric interpretation (standard)
+2. photometric_miniswhite.tiff - Grayscale MinIsWhite photometric interpretation
+3. photometric_palette.tiff - Palette (indexed color) photometric interpretation
+4. photometric_cmyk.tiff - CMYK photometric interpretation
+5. photometric_ycbcr.tiff - YCbCr photometric interpretation (tagged)
+
+Note: PIL library has limitations for 32-bit integer and 64-bit float.
+For true 32-bit integer and 64-bit float support, the tifffile library is recommended.
+Photometric interpretation is specified using TIFF tags (tag 262).

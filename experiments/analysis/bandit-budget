@@ -1,0 +1,215 @@
+#!/usr/bin/env python3
+"""experiments/analysis/bandit-budget: decision budget of the scheduler experiments (see the task spec)."""
+import os
+import sys
+import csv
+import json
+import argparse
+import statistics
+import re
+
+# Import credit() from g2fuzz/py_utils/scheduler.py
+script_dir = os.path.dirname(os.path.abspath(__file__))
+py_utils_path = None
+curr = script_dir
+while curr != os.path.dirname(curr):
+    potential = os.path.join(curr, "g2fuzz", "py_utils")
+    if os.path.isdir(potential):
+        py_utils_path = os.path.abspath(potential)
+        break
+    curr = os.path.dirname(curr)
+
+if py_utils_path:
+    sys.path.insert(0, py_utils_path)
+
+try:
+    from scheduler import credit
+except ImportError as e:
+    print(f"Error importing credit: {e}", file=sys.stderr)
+    sys.exit(2)
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--campaigns", default="results/campaigns/bandit")
+    parser.add_argument("--out", default="results/tables/bandit-budget.csv")
+    args = parser.parse_args()
+
+    campaigns_dir = args.campaigns
+    output_path = args.out
+
+    results = []
+    
+    if not os.path.exists(campaigns_dir):
+        return
+
+    # Regex to match bandit-<tgt>-<arm>-r<N>
+    pattern = re.compile(r"^bandit-([^-]+)-([^-]+)-r(\d+)$")
+
+    for camp_name in sorted(os.listdir(campaigns_dir)):
+        match = pattern.match(camp_name)
+        if not match:
+            continue
+        
+        tgt, arm, rep = match.groups()
+        camp_path = os.path.join(campaigns_dir, camp_name)
+        
+        # Check if finished via Slurm logs
+        jobid_file = os.path.join(camp_path, "slurm.jobid")
+        is_finished = False
+        if os.path.exists(jobid_file):
+            with open(jobid_file, 'r') as f:
+                jid = f.read().strip()
+            slurm_out = os.path.join(camp_path, f"slurm-{jid}.out")
+            if os.path.exists(slurm_out):
+                with open(slurm_out, 'r') as f:
+                    if any(line.startswith("job.sbatch: output copied back") for line in f):
+                        is_finished = True
+        
+        if not is_finished:
+            print(f"unfinished: {camp_name}", file=sys.stderr)
+            continue
+
+        # Target output directory: matches <campaign>/*_output/default
+        out_dir = None
+        for item in os.listdir(camp_path):
+            if item.endswith("_output"):
+                potential_out = os.path.join(camp_path, item, "default")
+                if os.path.isdir(potential_out):
+                    out_dir = potential_out
+                    break
+        
+        if out_dir is None:
+            continue
+
+        # 1. Steps
+        steps = 0
+        fuzz_log = os.path.join(camp_path, "fuzz.log")
+        if os.path.exists(fuzz_log):
+            with open(fuzz_log, 'r') as f:
+                steps = sum(1 for line in f if "==== Gen-M start" in line)
+
+        # 2. Step Seconds Median
+        step_seconds_median = ""
+        energy_log = os.path.join(out_dir, "gen_seeds_energy_log")
+        if os.path.exists(energy_log):
+            costs = []
+            with open(energy_log, 'r') as f:
+                for line in f:
+                    if line.startswith("cost_time:"):
+                        costs.append(int(line.split(":")[1].strip()))
+            
+            if costs:
+                durations = []
+                prev = 0
+                for c in costs:
+                    durations.append((c - prev) / 1000.0)
+                    prev = c
+                step_seconds_median = "%.6g" % statistics.median(durations)
+
+        # 3. Mutations and Failed
+        mutations_count = 0
+        failed_count = 0
+        sched_json = os.path.join(out_dir, "mutation_log", "scheduler.json")
+        mutation_records = []
+        if os.path.exists(sched_json):
+            with open(sched_json, 'r') as f:
+                data = json.load(f)
+                mutation_records = data.get("mutations", [])
+                mutations_count = len(mutation_records)
+                failed_count = sum(1 for m in mutation_records if m.get("child") is None)
+
+        # 4. Picks
+        picks = []
+        mutate_log = os.path.join(out_dir, "mutate_log")
+        if os.path.exists(mutate_log):
+            with open(mutate_log, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if line.endswith(".py") and "/generators/" in line:
+                        # Keep the .py extension to match credit() keys
+                        name = os.path.basename(line)
+                        picks.append(name)
+
+        # 5. Generators End
+        gens_dir = os.path.join(out_dir, "generators")
+        generators_end = 0
+        if os.path.exists(gens_dir):
+            generators_end = len([f for f in os.listdir(gens_dir) if os.path.isfile(os.path.join(gens_dir, f))])
+
+        # 6. Top 5 Share
+        top5_share = ""
+        if picks:
+            credits = credit(out_dir)
+            # Sort by finds desc, then name asc
+            sorted_gens = sorted(credits.items(), key=lambda x: (-x[1].get("finds", 0), x[0]))
+            top5 = {name for name, val in sorted_gens[:5]}
+            hits = sum(1 for p in picks if p in top5)
+            top5_share = "%.6g" % (hits / len(picks))
+
+        # 7. Top 5 Random Expected
+        top5_random_expected = ""
+        if picks:
+            # c_k = generators_end - (successful mutations at or after pick k)
+            # Successful mutation: child is not null
+            successes = [m for m in mutation_records if m.get("child") is not None]
+            
+            expected_shares = []
+            for k in range(len(picks)):
+                # Successes at or after k
+                num_success_after_k = sum(1 for m in mutation_records[k:] if m.get("child") is not None)
+                # c_k is the number of generators that existed at pick k
+                ck = generators_end - num_success_after_k
+                if ck > 0:
+                    expected_shares.append(min(5, ck) / ck)
+                else:
+                    expected_shares.append(1.0)
+            
+            if expected_shares:
+                top5_random_expected = "%.6g" % statistics.mean(expected_shares)
+
+        results.append({
+            "campaign": camp_name,
+            "target": tgt,
+            "arm": arm,
+            "rep": rep,
+            "steps": steps,
+            "step_seconds_median": step_seconds_median,
+            "mutations": mutations_count,
+            "failed": failed_count,
+            "picks": len(picks),
+            "generators_end": generators_end,
+            "top5_share": top5_share,
+            "top5_random_expected": top5_random_expected
+        })
+
+    # Sort by campaign
+    results.sort(key=lambda x: x["campaign"])
+
+    # Write CSV
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    fieldnames = ["campaign", "target", "arm", "rep", "steps", "step_seconds_median", 
+                  "mutations", "failed", "picks", "generators_end", "top5_share", "top5_random_expected"]
+    with open(output_path, 'w', newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(results)
+
+    # Print medians per (target, arm)
+    summary = {}
+    for r in results:
+        key = (r["target"], r["arm"])
+        if key not in summary:
+            summary[key] = {"steps": [], "picks": [], "top5_share": []}
+        summary[key]["steps"].append(r["steps"])
+        summary[key]["picks"].append(r["picks"])
+        if r["top5_share"]:
+            summary[key]["top5_share"].append(float(r["top5_share"]))
+
+    for (tgt, arm), vals in summary.items():
+        m_steps = statistics.median(vals["steps"]) if vals["steps"] else 0
+        m_picks = statistics.median(vals["picks"]) if vals["picks"] else 0
+        m_share = statistics.median(vals["top5_share"]) if vals["top5_share"] else 0
+        print(f"{tgt}, {arm}: steps={m_steps}, picks={m_picks}, top5_share={m_share:.6g}")
+
+if __name__ == "__main__":
+    main()

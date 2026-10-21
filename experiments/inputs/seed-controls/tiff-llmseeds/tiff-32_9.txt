@@ -1,0 +1,1 @@
+14. **Floating-point sample format support**: Explicit support for 32-bit and 64-bit IEEE 754 floating-point samples (SampleFormat = 3), used in scientific, medical, and remote sensing imagery.

@@ -1,0 +1,3 @@
+6. **CCITT Group 3/4 fax compression**: Optimized for bilevel (1-bit) images, widely used in document imaging and fax applications; Group 4 supports bidirectional encoding for better compression.
+
+12. **Colorimetric information (ICC profiles)**: Supports embedding of ICC color profiles via the *ProfileSequence* and *ProfileDescription* tags for color-managed workflows.  

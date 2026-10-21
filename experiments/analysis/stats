@@ -1,0 +1,354 @@
+#!/usr/bin/env python3
+"""experiments/analysis/stats: statistics for every reported comparison (see the task spec)."""
+
+import argparse
+import csv
+import itertools
+import math
+import os
+import random
+import sys
+from collections import defaultdict
+
+def parse_campaign(name):
+    # Pattern 1: bandit-<tgt>-<arm>-r<N>
+    if name.startswith("bandit-"):
+        parts = name.split("-")
+        # Expect: bandit, tgt, ..., arm, rN
+        if len(parts) >= 4 and parts[-1].startswith("r") and parts[-1][1:].isdigit():
+            tgt = parts[1]
+            arm = "-".join(parts[2:-1])
+            return f"bandit-{tgt}", arm
+
+    # Pattern 2: <prefix>-<arm>-r<N>
+    first_dash = name.find("-")
+    if first_dash == -1:
+        print(f"Error: Unparseable campaign name {name}", file=sys.stderr)
+        sys.exit(2)
+    
+    prefix = name[:first_dash]
+    last_dash = name.rfind("-")
+    if last_dash == -1 or last_dash <= first_dash:
+        print(f"Error: Unparseable campaign name {name}", file=sys.stderr)
+        sys.exit(2)
+        
+    suffix = name[last_dash+1:]
+    if not (suffix.startswith("r") and suffix[1:].isdigit()):
+        print(f"Error: Unparseable campaign name {name}", file=sys.stderr)
+        sys.exit(2)
+        
+    arm = name[first_dash+1 : last_dash]
+    return prefix, arm
+
+def get_median(data):
+    if not data: return 0.0
+    s = sorted(data)
+    n = len(s)
+    if n % 2 == 1:
+        return float(s[n // 2])
+    else:
+        return (s[n // 2 - 1] + s[n // 2]) / 2.0
+
+def calculate_u(x, y):
+    u = 0.0
+    for xi in x:
+        for yj in y:
+            if xi > yj:
+                u += 1.0
+            elif xi == yj:
+                u += 0.5
+    return u
+
+def get_p_exact(x, y):
+    nx, ny = len(x), len(y)
+    pooled = x + y
+    u_obs = calculate_u(x, y)
+    mu = nx * ny / 2.0
+    diff_obs = abs(u_obs - mu)
+    
+    hits = 0
+    total = 0
+    idx_set = set()
+    for indices in itertools.combinations(range(nx + ny), nx):
+        idx_set = set(indices)
+        group_x = [pooled[i] for i in indices]
+        group_y = [pooled[i] for i in range(nx + ny) if i not in idx_set]
+        
+        u_perm = calculate_u(group_x, group_y)
+        if abs(u_perm - mu) >= diff_obs - 1e-9:
+            hits += 1
+        total += 1
+    return hits / total
+
+def get_min_attainable_p(nx, ny):
+    # The smallest possible p-value occurs with complete separation.
+    # There are 2 such cases (X all > Y or Y all > X) out of comb(nx+ny, nx) total splits.
+    return 2.0 / math.comb(nx + ny, nx)
+
+def get_bootstrap_ci(x, y):
+    rng = random.Random(0)
+    diffs = []
+    for _ in range(10000):
+        resample_x = [rng.choice(x) for _ in range(len(x))]
+        resample_y = [rng.choice(y) for _ in range(len(y))]
+        diffs.append(get_median(resample_x) - get_median(resample_y))
+    
+    diffs.sort()
+    low = diffs[int(0.025 * 10000)]
+    high = diffs[int(0.975 * 10000) - 1]
+    return low, high
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--cov", default="results/tables/cov-results.csv")
+    parser.add_argument("--crashes", default="results/tables/crashes.csv")
+    parser.add_argument("--out", default="results/tables/stats.csv")
+    parser.add_argument("--exclude", default=None)
+    parser.add_argument("--campaigns", default="results/campaigns")
+    args = parser.parse_args()
+
+    # Handle exclusions
+    excl_path = args.exclude
+    if excl_path is None:
+        default_excl = "experiments/inputs/exclusions.csv"
+        if os.path.exists(default_excl):
+            excl_path = default_excl
+
+    exclusions = {}
+    if excl_path:
+        if not os.path.exists(excl_path):
+            print(f"Error: Exclusions file {excl_path} not found", file=sys.stderr)
+            sys.exit(2)
+        with open(excl_path, "r") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                exclusions[row["campaign"]] = row["reason"]
+
+    # Load coverage
+    all_campaigns = set()
+    
+    if not os.path.exists(args.cov):
+        print(f"Error: Coverage file {args.cov} not found", file=sys.stderr)
+        sys.exit(2)
+        
+    cov_rows = []
+    with open(args.cov, "r") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            camp = row["campaign"]
+            all_campaigns.add(camp)
+            # Validate campaign name immediately
+            parse_campaign(camp)
+            if camp not in exclusions:
+                cov_rows.append(row)
+
+    # Load crashes
+    crash_sites_data = defaultdict(set) # camp -> set of (kind, top_frame)
+    if not os.path.exists(args.crashes):
+        print(f"Error: Crashes file {args.crashes} not found", file=sys.stderr)
+        sys.exit(2)
+
+    with open(args.crashes, "r") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            camp = row["campaign"]
+            if camp in exclusions:   # excluded campaigns are removed before any other check (spec)
+                continue
+            if camp not in all_campaigns:
+                print(f"Error: Campaign {camp} in crashes.csv but missing from cov-results.csv", file=sys.stderr)
+                sys.exit(2)
+            kind = row["kind"]
+            if kind in ("no-repro", "hang"):
+                continue
+            
+            # Top frame is text before first " | "
+            frames = row["frames"].split(" | ")
+            top_frame = frames[0] if frames else ""
+            crash_sites_data[camp].add((kind, top_frame))
+
+    # Validate exclusions: every excluded campaign must have existed in at least one input or have a folder
+    for camp, reason in exclusions.items():
+        if camp not in all_campaigns:
+            # Check if any folder in campaigns/ ends with the campaign name
+            found_folder = False
+            if os.path.exists(args.campaigns):
+                for entry in os.listdir(args.campaigns):
+                    path = os.path.join(args.campaigns, entry, camp)
+                    if os.path.isdir(path):
+                        found_folder = True
+                        break
+            if not found_folder:
+                print(f"Error: Unknown excluded campaign {camp}", file=sys.stderr)
+                sys.exit(2)
+        print(f"excluded {camp}: {reason}", file=sys.stderr)
+
+    # Metric aggregation
+    metrics_values = defaultdict(lambda: defaultdict(list)) # (exp, arm) -> {metric: [vals]}
+    
+    for row in cov_rows:
+        camp = row["campaign"]
+        exp, arm = parse_campaign(camp)
+        # Coverage is for everyone
+        metrics_values[(exp, arm)]["coverage"].append(int(row["queue_edges"]))
+        
+        # Crash sites only for wad* or demo*
+        if exp.startswith("wad") or exp.startswith("demo") or exp == "bandit-wad" or exp == "bandit-demo":
+            count = len(crash_sites_data[camp])
+            metrics_values[(exp, arm)]["crash_sites"].append(count)
+
+    # Identify all experiments and their arms
+    exp_arms = defaultdict(set)
+    for (exp, arm) in metrics_values:
+        exp_arms[exp].add(arm)
+
+    # Define comparisons
+    comparisons = [] # (exp, metric, arm, ref)
+    for exp, arms in exp_arms.items():
+        # Find which metrics are available for this exp
+        available_metrics = set()
+        for arm in arms:
+            available_metrics.update(metrics_values[(exp, arm)].keys())
+        
+        for metric in available_metrics:
+            # 1. Baseline
+            if "baseline" in arms:
+                for arm in sorted(arms):
+                    if arm != "baseline":
+                        comparisons.append((exp, metric, arm, "baseline"))
+            
+            # 2. ctl-llmseeds vs ctl-junk
+            if "ctl-llmseeds" in arms and "ctl-junk" in arms:
+                comparisons.append((exp, metric, "ctl-llmseeds", "ctl-junk"))
+            
+            # 3. codernext vs ctl-llmseeds
+            if "codernext" in arms and "ctl-llmseeds" in arms:
+                comparisons.append((exp, metric, "codernext", "ctl-llmseeds"))
+            
+            # 4. Bandit
+            if exp.startswith("bandit-"):
+                labels = set()
+                for arm in arms:
+                    for prefix in ("bandit", "random", "oracle"):
+                        if arm.startswith(prefix):
+                            labels.add(arm[len(prefix):])
+                
+                for L in sorted(labels):
+                    b, r, o = f"bandit{L}", f"random{L}", f"oracle{L}"
+                    if b in arms and r in arms:
+                        comparisons.append((exp, metric, b, r))
+                    if o in arms and r in arms:
+                        comparisons.append((exp, metric, o, r))
+                    if o in arms and b in arms:
+                        comparisons.append((exp, metric, o, b))
+
+            # 5. Prompt experiments
+            # For every model <m> with an arm 'bare-<m>'
+            models = [arm[len("bare-"):] for arm in arms if arm.startswith("bare-")]
+            for m in models:
+                bare = f"bare-{m}"
+                name = f"name-{m}"
+                spec = f"spec-{m}"
+                if name in arms:
+                    comparisons.append((exp, metric, name, bare))
+                if spec in arms:
+                    comparisons.append((exp, metric, spec, bare))
+
+    # Sort comparisons for deterministic output: experiment, metric, arm, reference
+    comparisons = sorted(list(set(comparisons)), key=lambda x: (x[0], x[1], x[2], x[3]))
+
+    results = []
+    families = defaultdict(list) # (exp, metric) -> [p_exact]
+
+    for exp, metric, arm, ref in comparisons:
+        x = metrics_values[(exp, arm)].get(metric, [])
+        y = metrics_values[(exp, ref)].get(metric, [])
+        nx, ny = len(x), len(y)
+        
+        med_x = get_median(x)
+        med_y = get_median(y)
+        med_diff = med_x - med_y
+        
+        row = {
+            "experiment": exp, "metric": metric, "arm": arm, "reference": ref,
+            "n_arm": nx, "n_ref": ny, "median_arm": med_x, "median_ref": med_y,
+            "median_diff": med_diff, "ci_low": "", "ci_high": "", "U": "",
+            "p_exact": "", "p_holm": "", "A12": "", "family_size": "", "note": ""
+        }
+
+        if nx < 2 or ny < 2:
+            row["note"] = "n too small"
+        else:
+            u = calculate_u(x, y)
+            p_exact = get_p_exact(x, y)
+            a12 = u / (nx * ny)
+            low, high = get_bootstrap_ci(x, y)
+            
+            row["U"] = u
+            row["p_exact"] = p_exact
+            row["A12"] = a12
+            row["ci_low"] = low
+            row["ci_high"] = high
+            
+            if nx < 4 or ny < 4:
+                row["note"] = f"min attainable p = {get_min_attainable_p(nx, ny):.6g}"
+            
+            families[(exp, metric)].append(p_exact)
+            # Store index to update p_holm later
+            row["_family_key"] = (exp, metric)
+            row["_p_val"] = p_exact
+
+        results.append(row)
+
+    # Holm-Bonferroni
+    for fam_key, ps in families.items():
+        m = len(ps)
+        sorted_ps = sorted(ps)
+        # Adjusted p_i = max_{j<=i} min(1, (m-j)*p_j)
+        adjusted = []
+        current_max = 0.0
+        for j, p in enumerate(sorted_ps):
+            current_max = max(current_max, min(1.0, (m - j) * p))
+            adjusted.append(current_max)
+        
+        # Map back to original rows
+        # Since multiple rows might have same p_exact, we must be careful.
+        # But we can just track how many of each p we've processed.
+        p_to_adj = defaultdict(list)
+        for p, adj in zip(sorted_ps, adjusted):
+            p_to_adj[p].append(adj)
+        
+        for row in results:
+            if row.get("_family_key") == fam_key:
+                p_val = row["_p_val"]
+                row["p_holm"] = p_to_adj[p_val].pop(0)
+                row["family_size"] = m
+
+    # Final formatting and output
+    cols = ["experiment","metric","arm","reference","n_arm","n_ref","median_arm","median_ref","median_diff","ci_low","ci_high","U","p_exact","p_holm","A12","family_size","note"]
+    
+    os.makedirs(os.path.dirname(args.out), exist_ok=True)
+    with open(args.out, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(cols)
+        for r in results:
+            line = []
+            for c in cols:
+                val = r[c]
+                if val == "":
+                    line.append("")
+                elif isinstance(val, (int, float)):
+                    if float(val) == int(val):
+                        line.append(str(int(val)))
+                    else:
+                        line.append("%.6g" % val)
+                else:
+                    line.append(str(val))
+            writer.writerow(line)
+
+    # Summary to stdout
+    for fam_key in sorted(families.keys()):
+        exp, met = fam_key
+        print(f"Family {exp}/{met}: {len(families[fam_key])} comparisons")
+
+if __name__ == "__main__":
+    main()

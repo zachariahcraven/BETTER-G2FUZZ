@@ -1,0 +1,224 @@
+{
+ "target": "/targets/doom_demo.afl",
+ "files": 1132,
+ "total_edges": 3223,
+ "stock_edges": null,
+ "new_edges": null,
+ "per_generator": {
+  "stock": {
+   "files": 1090,
+   "edges": 3189,
+   "unique": 575
+  },
+  "id:000004,time:0,execs:0,orig:lmp-10": {
+   "files": 1,
+   "edges": 1909,
+   "unique": 0
+  },
+  "id:000005,time:0,execs:0,orig:lmp-11": {
+   "files": 1,
+   "edges": 1879,
+   "unique": 0
+  },
+  "id:000006,time:0,execs:0,orig:lmp-12": {
+   "files": 1,
+   "edges": 1930,
+   "unique": 0
+  },
+  "id:000007,time:0,execs:0,orig:lmp-13": {
+   "files": 1,
+   "edges": 1834,
+   "unique": 0
+  },
+  "id:000008,time:0,execs:0,orig:lmp-14": {
+   "files": 1,
+   "edges": 2059,
+   "unique": 0
+  },
+  "id:000009,time:0,execs:0,orig:lmp-15": {
+   "files": 1,
+   "edges": 2252,
+   "unique": 0
+  },
+  "id:000010,time:0,execs:0,orig:lmp-16": {
+   "files": 1,
+   "edges": 2089,
+   "unique": 0
+  },
+  "id:000011,time:0,execs:0,orig:lmp-17": {
+   "files": 1,
+   "edges": 1909,
+   "unique": 0
+  },
+  "id:000012,time:0,execs:0,orig:lmp-18": {
+   "files": 1,
+   "edges": 2327,
+   "unique": 0
+  },
+  "id:000013,time:0,execs:0,orig:lmp-19": {
+   "files": 1,
+   "edges": 2390,
+   "unique": 15
+  },
+  "id:000014,time:0,execs:0,orig:lmp-1": {
+   "files": 1,
+   "edges": 1979,
+   "unique": 0
+  },
+  "id:000015,time:0,execs:0,orig:lmp-20": {
+   "files": 1,
+   "edges": 1889,
+   "unique": 0
+  },
+  "id:000016,time:0,execs:0,orig:lmp-21": {
+   "files": 1,
+   "edges": 2263,
+   "unique": 0
+  },
+  "id:000017,time:0,execs:0,orig:lmp-22": {
+   "files": 1,
+   "edges": 1814,
+   "unique": 0
+  },
+  "id:000018,time:0,execs:0,orig:lmp-23": {
+   "files": 1,
+   "edges": 1945,
+   "unique": 0
+  },
+  "id:000019,time:0,execs:0,orig:lmp-24": {
+   "files": 1,
+   "edges": 1826,
+   "unique": 0
+  },
+  "id:000020,time:0,execs:0,orig:lmp-25": {
+   "files": 1,
+   "edges": 1930,
+   "unique": 0
+  },
+  "id:000021,time:0,execs:0,orig:lmp-26": {
+   "files": 1,
+   "edges": 1847,
+   "unique": 0
+  },
+  "id:000022,time:0,execs:0,orig:lmp-27": {
+   "files": 1,
+   "edges": 1860,
+   "unique": 0
+  },
+  "id:000023,time:0,execs:0,orig:lmp-28": {
+   "files": 1,
+   "edges": 1847,
+   "unique": 0
+  },
+  "id:000024,time:0,execs:0,orig:lmp-29": {
+   "files": 1,
+   "edges": 1826,
+   "unique": 0
+  },
+  "id:000025,time:0,execs:0,orig:lmp-2": {
+   "files": 1,
+   "edges": 1847,
+   "unique": 0
+  },
+  "id:000026,time:0,execs:0,orig:lmp-30": {
+   "files": 1,
+   "edges": 1847,
+   "unique": 0
+  },
+  "id:000027,time:0,execs:0,orig:lmp-31": {
+   "files": 1,
+   "edges": 1945,
+   "unique": 0
+  },
+  "id:000028,time:0,execs:0,orig:lmp-32": {
+   "files": 1,
+   "edges": 1744,
+   "unique": 0
+  },
+  "id:000029,time:0,execs:0,orig:lmp-33": {
+   "files": 1,
+   "edges": 2089,
+   "unique": 0
+  },
+  "id:000030,time:0,execs:0,orig:lmp-34": {
+   "files": 1,
+   "edges": 1672,
+   "unique": 0
+  },
+  "id:000031,time:0,execs:0,orig:lmp-35": {
+   "files": 1,
+   "edges": 1758,
+   "unique": 0
+  },
+  "id:000032,time:0,execs:0,orig:lmp-36": {
+   "files": 1,
+   "edges": 1876,
+   "unique": 0
+  },
+  "id:000033,time:0,execs:0,orig:lmp-37": {
+   "files": 1,
+   "edges": 2330,
+   "unique": 0
+  },
+  "id:000034,time:0,execs:0,orig:lmp-38": {
+   "files": 1,
+   "edges": 1843,
+   "unique": 0
+  },
+  "id:000035,time:0,execs:0,orig:lmp-39": {
+   "files": 1,
+   "edges": 2368,
+   "unique": 3
+  },
+  "id:000036,time:0,execs:0,orig:lmp-3": {
+   "files": 1,
+   "edges": 1846,
+   "unique": 0
+  },
+  "id:000037,time:0,execs:0,orig:lmp-40": {
+   "files": 1,
+   "edges": 1930,
+   "unique": 0
+  },
+  "id:000038,time:0,execs:0,orig:lmp-40": {
+   "files": 1,
+   "edges": 2029,
+   "unique": 0
+  },
+  "id:000039,time:0,execs:0,orig:lmp-41": {
+   "files": 1,
+   "edges": 1909,
+   "unique": 0
+  },
+  "id:000040,time:0,execs:0,orig:lmp-4": {
+   "files": 1,
+   "edges": 1826,
+   "unique": 0
+  },
+  "id:000041,time:0,execs:0,orig:lmp-5": {
+   "files": 1,
+   "edges": 1843,
+   "unique": 0
+  },
+  "id:000042,time:0,execs:0,orig:lmp-6": {
+   "files": 1,
+   "edges": 2059,
+   "unique": 0
+  },
+  "id:000043,time:0,execs:0,orig:lmp-7": {
+   "files": 1,
+   "edges": 1930,
+   "unique": 0
+  },
+  "id:000044,time:0,execs:0,orig:lmp-8": {
+   "files": 1,
+   "edges": 1860,
+   "unique": 0
+  },
+  "id:000045,time:0,execs:0,orig:lmp-9": {
+   "files": 1,
+   "edges": 1744,
+   "unique": 0
+  }
+ }
+}

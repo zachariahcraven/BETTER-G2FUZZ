@@ -1,0 +1,419 @@
+{
+ "target": "/targets/xml_fuzzer.afl",
+ "files": 7329,
+ "total_edges": 4369,
+ "stock_edges": null,
+ "new_edges": null,
+ "per_generator": {
+  "stock": {
+   "files": 7248,
+   "edges": 4368,
+   "unique": 2400
+  },
+  "id:000001,time:0,execs:0,orig:xml-10": {
+   "files": 1,
+   "edges": 582,
+   "unique": 0
+  },
+  "id:000002,time:0,execs:0,orig:xml-11": {
+   "files": 1,
+   "edges": 707,
+   "unique": 0
+  },
+  "id:000003,time:0,execs:0,orig:xml-12": {
+   "files": 1,
+   "edges": 655,
+   "unique": 0
+  },
+  "id:000004,time:0,execs:0,orig:xml-13": {
+   "files": 1,
+   "edges": 745,
+   "unique": 0
+  },
+  "id:000005,time:0,execs:0,orig:xml-14": {
+   "files": 1,
+   "edges": 758,
+   "unique": 0
+  },
+  "id:000006,time:0,execs:0,orig:xml-15": {
+   "files": 1,
+   "edges": 373,
+   "unique": 0
+  },
+  "id:000007,time:0,execs:0,orig:xml-15": {
+   "files": 1,
+   "edges": 871,
+   "unique": 0
+  },
+  "id:000008,time:0,execs:0,orig:xml-16": {
+   "files": 1,
+   "edges": 906,
+   "unique": 0
+  },
+  "id:000009,time:0,execs:0,orig:xml-16": {
+   "files": 1,
+   "edges": 913,
+   "unique": 0
+  },
+  "id:000010,time:0,execs:0,orig:xml-17": {
+   "files": 1,
+   "edges": 937,
+   "unique": 0
+  },
+  "id:000011,time:0,execs:0,orig:xml-17": {
+   "files": 1,
+   "edges": 916,
+   "unique": 0
+  },
+  "id:000012,time:0,execs:0,orig:xml-18": {
+   "files": 1,
+   "edges": 728,
+   "unique": 0
+  },
+  "id:000013,time:0,execs:0,orig:xml-19": {
+   "files": 1,
+   "edges": 699,
+   "unique": 0
+  },
+  "id:000014,time:0,execs:0,orig:xml-1": {
+   "files": 1,
+   "edges": 770,
+   "unique": 0
+  },
+  "id:000015,time:0,execs:0,orig:xml-20": {
+   "files": 1,
+   "edges": 919,
+   "unique": 0
+  },
+  "id:000016,time:0,execs:0,orig:xml-21": {
+   "files": 1,
+   "edges": 582,
+   "unique": 0
+  },
+  "id:000017,time:0,execs:0,orig:xml-21": {
+   "files": 1,
+   "edges": 591,
+   "unique": 0
+  },
+  "id:000018,time:0,execs:0,orig:xml-22": {
+   "files": 1,
+   "edges": 1158,
+   "unique": 0
+  },
+  "id:000019,time:0,execs:0,orig:xml-22": {
+   "files": 1,
+   "edges": 913,
+   "unique": 0
+  },
+  "id:000020,time:0,execs:0,orig:xml-23": {
+   "files": 1,
+   "edges": 909,
+   "unique": 0
+  },
+  "id:000021,time:0,execs:0,orig:xml-24": {
+   "files": 1,
+   "edges": 811,
+   "unique": 0
+  },
+  "id:000022,time:0,execs:0,orig:xml-25": {
+   "files": 1,
+   "edges": 373,
+   "unique": 0
+  },
+  "id:000023,time:0,execs:0,orig:xml-25": {
+   "files": 1,
+   "edges": 871,
+   "unique": 0
+  },
+  "id:000024,time:0,execs:0,orig:xml-25": {
+   "files": 1,
+   "edges": 883,
+   "unique": 0
+  },
+  "id:000025,time:0,execs:0,orig:xml-25": {
+   "files": 1,
+   "edges": 374,
+   "unique": 0
+  },
+  "id:000026,time:0,execs:0,orig:xml-26": {
+   "files": 1,
+   "edges": 913,
+   "unique": 0
+  },
+  "id:000027,time:0,execs:0,orig:xml-27": {
+   "files": 1,
+   "edges": 940,
+   "unique": 0
+  },
+  "id:000028,time:0,execs:0,orig:xml-28": {
+   "files": 1,
+   "edges": 699,
+   "unique": 0
+  },
+  "id:000029,time:0,execs:0,orig:xml-28": {
+   "files": 1,
+   "edges": 496,
+   "unique": 0
+  },
+  "id:000030,time:0,execs:0,orig:xml-29": {
+   "files": 1,
+   "edges": 807,
+   "unique": 0
+  },
+  "id:000031,time:0,execs:0,orig:xml-2": {
+   "files": 1,
+   "edges": 765,
+   "unique": 0
+  },
+  "id:000032,time:0,execs:0,orig:xml-30": {
+   "files": 1,
+   "edges": 834,
+   "unique": 0
+  },
+  "id:000033,time:0,execs:0,orig:xml-31": {
+   "files": 1,
+   "edges": 789,
+   "unique": 0
+  },
+  "id:000034,time:0,execs:0,orig:xml-32": {
+   "files": 1,
+   "edges": 938,
+   "unique": 0
+  },
+  "id:000035,time:0,execs:0,orig:xml-32": {
+   "files": 1,
+   "edges": 920,
+   "unique": 0
+  },
+  "id:000036,time:0,execs:0,orig:xml-33": {
+   "files": 1,
+   "edges": 792,
+   "unique": 0
+  },
+  "id:000037,time:0,execs:0,orig:xml-34": {
+   "files": 1,
+   "edges": 373,
+   "unique": 0
+  },
+  "id:000038,time:0,execs:0,orig:xml-34": {
+   "files": 1,
+   "edges": 871,
+   "unique": 0
+  },
+  "id:000039,time:0,execs:0,orig:xml-34": {
+   "files": 1,
+   "edges": 778,
+   "unique": 0
+  },
+  "id:000040,time:0,execs:0,orig:xml-35": {
+   "files": 1,
+   "edges": 752,
+   "unique": 0
+  },
+  "id:000041,time:0,execs:0,orig:xml-36": {
+   "files": 1,
+   "edges": 755,
+   "unique": 0
+  },
+  "id:000042,time:0,execs:0,orig:xml-37": {
+   "files": 1,
+   "edges": 727,
+   "unique": 0
+  },
+  "id:000043,time:0,execs:0,orig:xml-37": {
+   "files": 1,
+   "edges": 727,
+   "unique": 0
+  },
+  "id:000044,time:0,execs:0,orig:xml-38": {
+   "files": 1,
+   "edges": 655,
+   "unique": 0
+  },
+  "id:000045,time:0,execs:0,orig:xml-38": {
+   "files": 1,
+   "edges": 600,
+   "unique": 0
+  },
+  "id:000046,time:0,execs:0,orig:xml-39": {
+   "files": 1,
+   "edges": 1205,
+   "unique": 0
+  },
+  "id:000047,time:0,execs:0,orig:xml-39": {
+   "files": 1,
+   "edges": 958,
+   "unique": 0
+  },
+  "id:000048,time:0,execs:0,orig:xml-3": {
+   "files": 1,
+   "edges": 774,
+   "unique": 0
+  },
+  "id:000049,time:0,execs:0,orig:xml-40": {
+   "files": 1,
+   "edges": 937,
+   "unique": 0
+  },
+  "id:000050,time:0,execs:0,orig:xml-41": {
+   "files": 1,
+   "edges": 373,
+   "unique": 0
+  },
+  "id:000051,time:0,execs:0,orig:xml-41": {
+   "files": 1,
+   "edges": 871,
+   "unique": 0
+  },
+  "id:000052,time:0,execs:0,orig:xml-41": {
+   "files": 1,
+   "edges": 784,
+   "unique": 0
+  },
+  "id:000053,time:0,execs:0,orig:xml-42": {
+   "files": 1,
+   "edges": 1009,
+   "unique": 0
+  },
+  "id:000054,time:0,execs:0,orig:xml-42": {
+   "files": 1,
+   "edges": 921,
+   "unique": 0
+  },
+  "id:000055,time:0,execs:0,orig:xml-43": {
+   "files": 1,
+   "edges": 765,
+   "unique": 0
+  },
+  "id:000056,time:0,execs:0,orig:xml-44": {
+   "files": 1,
+   "edges": 901,
+   "unique": 0
+  },
+  "id:000057,time:0,execs:0,orig:xml-45": {
+   "files": 1,
+   "edges": 699,
+   "unique": 0
+  },
+  "id:000058,time:0,execs:0,orig:xml-45": {
+   "files": 1,
+   "edges": 496,
+   "unique": 0
+  },
+  "id:000059,time:0,execs:0,orig:xml-45": {
+   "files": 1,
+   "edges": 936,
+   "unique": 0
+  },
+  "id:000060,time:0,execs:0,orig:xml-46": {
+   "files": 1,
+   "edges": 655,
+   "unique": 0
+  },
+  "id:000061,time:0,execs:0,orig:xml-46": {
+   "files": 1,
+   "edges": 917,
+   "unique": 0
+  },
+  "id:000062,time:0,execs:0,orig:xml-46": {
+   "files": 1,
+   "edges": 806,
+   "unique": 0
+  },
+  "id:000063,time:0,execs:0,orig:xml-47": {
+   "files": 1,
+   "edges": 657,
+   "unique": 0
+  },
+  "id:000064,time:0,execs:0,orig:xml-47": {
+   "files": 1,
+   "edges": 707,
+   "unique": 0
+  },
+  "id:000065,time:0,execs:0,orig:xml-47": {
+   "files": 1,
+   "edges": 929,
+   "unique": 0
+  },
+  "id:000066,time:0,execs:0,orig:xml-47": {
+   "files": 1,
+   "edges": 646,
+   "unique": 0
+  },
+  "id:000067,time:0,execs:0,orig:xml-48": {
+   "files": 1,
+   "edges": 763,
+   "unique": 0
+  },
+  "id:000068,time:0,execs:0,orig:xml-49": {
+   "files": 1,
+   "edges": 781,
+   "unique": 0
+  },
+  "id:000069,time:0,execs:0,orig:xml-4": {
+   "files": 1,
+   "edges": 906,
+   "unique": 0
+  },
+  "id:000070,time:0,execs:0,orig:xml-50": {
+   "files": 1,
+   "edges": 582,
+   "unique": 0
+  },
+  "id:000071,time:0,execs:0,orig:xml-50": {
+   "files": 1,
+   "edges": 591,
+   "unique": 0
+  },
+  "id:000072,time:0,execs:0,orig:xml-50": {
+   "files": 1,
+   "edges": 627,
+   "unique": 0
+  },
+  "id:000073,time:0,execs:0,orig:xml-51": {
+   "files": 1,
+   "edges": 774,
+   "unique": 0
+  },
+  "id:000074,time:0,execs:0,orig:xml-5": {
+   "files": 1,
+   "edges": 760,
+   "unique": 0
+  },
+  "id:000075,time:0,execs:0,orig:xml-6": {
+   "files": 1,
+   "edges": 690,
+   "unique": 0
+  },
+  "id:000076,time:0,execs:0,orig:xml-7": {
+   "files": 1,
+   "edges": 657,
+   "unique": 0
+  },
+  "id:000077,time:0,execs:0,orig:xml-7": {
+   "files": 1,
+   "edges": 707,
+   "unique": 0
+  },
+  "id:000078,time:0,execs:0,orig:xml-8": {
+   "files": 1,
+   "edges": 884,
+   "unique": 0
+  },
+  "id:000079,time:0,execs:0,orig:xml-8": {
+   "files": 1,
+   "edges": 887,
+   "unique": 0
+  },
+  "id:000080,time:0,execs:0,orig:xml-8": {
+   "files": 1,
+   "edges": 652,
+   "unique": 0
+  },
+  "id:000081,time:0,execs:0,orig:xml-9": {
+   "files": 1,
+   "edges": 756,
+   "unique": 0
+  }
+ }
+}

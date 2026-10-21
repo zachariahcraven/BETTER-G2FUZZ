@@ -29,10 +29,13 @@
 #   G2F_SEEDS [/targets/seeds/<target>, in the image]  starting seeds for baselines (G2F_NO_LLM=1) and
 #     the stock seeds added to generated ones; a folder on this machine is bound into the container
 #   G2F_CPUSET  Docker only: cores for this run, e.g. 3 (one per parallel run, so they don't share)
-#   G2F_SCHEDULER [random]  how LLM steps pick the generator and mutation type: random | bandit
+#   G2F_SCHEDULER [random]  how LLM steps pick the generator and mutation type: random | bandit | oracle
+#     (oracle reads <campaign>/oracle_ranking.json; see experiments/runners/run-bandit.sbatch)
 #   G2F_PLATEAU_SEC [300] G2F_BACKOFF_SEC [60]  LLM step after this long without finds (+ per step)
 #   G2F_MAX_SEED_KB [1024]  generated seed files larger than this are dropped
 #   G2F_NO_LLM=1  baseline: plain AFL++ on the stock seeds, no seed generation and no LLM steps
+#   G2F_FORMAT_DESC_FILE  `new` copies this text into the campaign (format_desc.txt); its LLM prompts then
+#     describe the format with it instead of the bare format name (g2fuzz/py_utils/func.py format_text)
 #   G2F_TIMEOUT_MS  fixed afl-fuzz -t (default: AFL++ picks one from the starting seeds, so it
 #     differs between campaigns: 20 vs 40 ms on Doom, where ~8 ms runs then time out under load)
 # Overlay (Slurm): this checkout's g2fuzz/ replaces the image's /AFLplusplus/g2fuzz, so Python changes
@@ -143,6 +146,10 @@ prepare() {
     [ -n "${!v:-}" ] && test_env+="$v=${!v},"
   done
   [ "$TEST" = 1 ] && test_env="G2F_PLATEAU_SEC=10,G2F_BACKOFF_SEC=0,${G2F_SCHEDULER:+G2F_SCHEDULER=$G2F_SCHEDULER,}"
+  # the campaign's own copy of the format description (made by `new`), never the caller's file
+  [ -s "$D/format_desc.txt" ] && test_env+="G2F_FORMAT_DESC_FILE=/eval/format_desc.txt,"
+  # the oracle scheduler's generator ranking (written into the campaign by run-bandit.sbatch)
+  [ -s "$D/oracle_ranking.json" ] && test_env+="G2F_ORACLE_RANKING=/eval/oracle_ranking.json,"
   ov=(--bind "$REPO/g2fuzz:/AFLplusplus/g2fuzz:ro")
   [ -n "${G2F_TARGETS:-}" ] && ov+=(--bind "$(cd "$G2F_TARGETS" && pwd):/targets:ro")
   [ -n "$SEEDS_HOST" ] && ov+=(--bind "$SEEDS_HOST:/g2f-seeds:ro")
@@ -188,13 +195,16 @@ cmd_new() {
   case "$NEW_NAME" in ''|[.-]*|*[!A-Za-z0-9_.-]*) die "bad name '$NEW_NAME': use letters, digits, . _ -" ;; esac
   case "$GROUP" in ''|[.-]*|*[!A-Za-z0-9_.-]*) die "bad G2F_GROUP '$GROUP': use letters, digits, . _ -" ;; esac
   local d="$CAMPAIGNS/$GROUP/$NEW_NAME" e
+  if [ -n "${G2F_FORMAT_DESC_FILE:-}" ] && [ ! -s "$G2F_FORMAT_DESC_FILE" ]; then
+    die "G2F_FORMAT_DESC_FILE $G2F_FORMAT_DESC_FILE is missing or empty"; fi
   e="$(campaign_dir "$NEW_NAME")"
   [ -z "$e" ] || die "${e#$REPO/} already exists; pick a new name"
   mkdir -p "$d"
   cp "$REPO/g2fuzz/program_to_format.json" "$d/"
   printf '{"model": ["%s"]}\n' "$MODEL" > "$d/model_setting.json"
   echo "$TARGET" > "$d/target.txt"
-  echo "created ${d#$REPO/} (target $TARGET, model $MODEL)"
+  [ -n "${G2F_FORMAT_DESC_FILE:-}" ] && cp "$G2F_FORMAT_DESC_FILE" "$d/format_desc.txt"
+  echo "created ${d#$REPO/} (target $TARGET, model $MODEL${G2F_FORMAT_DESC_FILE:+, format description from $G2F_FORMAT_DESC_FILE})"
 }
 
 cmd_reuse() {
@@ -298,7 +308,7 @@ mkdir -p initial_seeds && cp $SEEDS/* initial_seeds/ && find $OUT/default/gen_se
     [ "$end_s" -gt 0 ] && [ "$end_s" -lt $(( $(date +%s) + secs + seedgen * 1800 )) ] &&
       echo "warning: the LLM server stops at $LLM_END, before this run ends, and LLM steps fail after that." \
            "Stop the run, start a longer server (llm stop, llm start <hours>), then run it again."
-    return
+    return 0   # submitted; the optional warning above must not turn into a failure exit status
   fi
   docker rm -v "g2f-$name" >/dev/null 2>&1 || true
   # -v /eval/$OUT: an anonymous volume on the VM's own disk, removed with the container

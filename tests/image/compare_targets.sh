@@ -13,7 +13,7 @@
 # doom_wad identical on every input that is stable in both builds (~20% of Doom crash inputs are flaky).
 ROOT=$(cd "$(dirname "$0")/../.." && pwd)
 OLD=$(cd "${1:?usage: compare_targets.sh OLD_DIR [per-target] [targets]}" && pwd); N=${2:-40}; K=${K:-5}
-ONLY=${3:-jhead tiff_read_rgba_fuzzer libpng_read_fuzzer xml_fuzzer doom_wad}
+ONLY=${3:-jhead tiff_read_rgba_fuzzer libpng_read_fuzzer xml_fuzzer doom_wad doom_demo}
 SIF=${SIF:-$ROOT/g2fuzz.sif}
 T=$(mktemp -d -p "$HOME"); trap 'rm -rf "$T"' EXIT
 fails=0
@@ -45,7 +45,7 @@ while read -r in; do
 done < "$list"
 EOF
 
-for t in jhead:lineup tiff_read_rgba_fuzzer:tiff libpng_read_fuzzer:png xml_fuzzer:xml doom_wad:wad; do
+for t in jhead:lineup tiff_read_rgba_fuzzer:tiff libpng_read_fuzzer:png xml_fuzzer:xml doom_wad:wad doom_demo:demo; do
   n=${t%%:*}; p=${t#*:}; case " $ONLY " in *" $n "*) ;; *) continue ;; esac
   { files $p ${n}_output/default/queue | pick "$N"; box bash -c "ls -d /targets/seeds/$n/*"; } > "$T/$n.in"
   files $p ${n}_output/default/crashes | pick "$N" > "$T/$n.crash"
