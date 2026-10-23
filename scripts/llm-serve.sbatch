@@ -1,8 +1,8 @@
 #!/bin/bash
-# Serves gpt-oss:120b with Ollama on one H100, for G2Fuzz jobs on Tempest (docs/TEMPEST.md).
+# Serves gpt-oss:120b with Ollama on one H100, for G2Fuzz jobs on Tempest (README.md, Tempest setup).
 # Start it with `scripts/fuzz llm start [hours]`; runs then find it by themselves.
 # Its log, llm-serve-<jobid>.out, goes to ~/llm. Stop: `scripts/fuzz llm stop`.
-# Needs ~/llm/ollama.sif and the model in ~/llm/models (one-time setup in TEMPEST.md).
+# Needs ~/llm/ollama.sif and the model in ~/llm/models (one-time setup: README.md, Tempest setup step 8).
 #SBATCH -J llm-serve
 #SBATCH -p gpufairshare
 #SBATCH --gres=gpu:h100:1
