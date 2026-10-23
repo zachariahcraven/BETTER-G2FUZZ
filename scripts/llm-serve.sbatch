@@ -1,27 +1,29 @@
 #!/bin/bash
-# Serves gpt-oss:120b with Ollama on one H100, for G2Fuzz jobs on Tempest (README.md, Tempest setup).
-# Start it with `scripts/fuzz llm start [hours]`; runs then find it by themselves.
-# Its log, llm-serve-<jobid>.out, goes to ~/llm. Stop: `scripts/fuzz llm stop`.
-# Needs ~/llm/ollama.sif and the model in ~/llm/models (one-time setup: README.md, Tempest setup step 8).
+# Serves Qwen3.8-27B-FP8 (thinking off) with vLLM on one GPU, for G2Fuzz jobs on Tempest (README.md, Tempest setup).
+# Start it with `scripts/fuzz llm start [hours] [a40|h100]`; runs then find it by themselves. Stop: `scripts/fuzz llm stop`.
+# Its log, llm-serve-<jobid>.out, goes to ~/llm. Model weights and the vLLM image are shared: students/shared-models.
+# Thinking off: G2Fuzz gives up on an LLM call after 300 s, and a thinking model's long answers hit that.
 #SBATCH -J llm-serve
-#SBATCH -p gpufairshare
-#SBATCH --gres=gpu:h100:1
+#SBATCH -p gpupriority
+#SBATCH --gres=gpu:a40:1
 #SBATCH -c 8
-#SBATCH --mem 96G
+#SBATCH --mem 64G
 #SBATCH -t 02:00:00
 #SBATCH -o llm-serve-%j.out
+MODELS=/home/group/csci-591-automated-vulnerability-discovery/students/shared-models
+MODEL=Qwen3.8-27B-FP8 NAME=Qwen3.8-27B-FP8-nothink
+SIF=$MODELS/containers/vllm-v0.31.0.sif
+PORT=$((20000 + SLURM_JOB_ID % 20000))   # scripts/fuzz computes the same port from the job ID
 LLM_DIR="${LLM_DIR:-$HOME/llm}"
 cd "$LLM_DIR" || exit 1
-hostname > server-host
-nvidia-smi --query-gpu=name,memory.total --format=csv,noheader
-# CONTEXT_LENGTH: Ollama's default is too short for G2Fuzz prompts. KEEP_ALIVE=-1 keeps the model
-# on the GPU (loading takes ~3.5 min). Settings and versions used: VERSIONS.txt
-apptainer exec --nv --cleanenv \
-  --env OLLAMA_MODELS="$LLM_DIR/models",OLLAMA_HOST=0.0.0.0:11434,OLLAMA_CONTEXT_LENGTH=32768,OLLAMA_KEEP_ALIVE=-1,OLLAMA_NUM_PARALLEL=4 \
-  ollama.sif ollama serve &
-pid=$!
-# Load the model now, so the first G2Fuzz call doesn't wait for it
-until curl -s -o /dev/null localhost:11434/api/tags; do sleep 5; done
-curl -s localhost:11434/api/generate -d '{"model": "gpt-oss:120b", "prompt": "", "keep_alive": -1}' >/dev/null \
-  && echo "llm-serve: gpt-oss:120b loaded on $(hostname) at $(date)"
-wait $pid
+# Versions for the write-up: model revision, vLLM, GPU
+{ echo "job $SLURM_JOB_ID on $(hostname), $(date '+%F %T')"
+  echo "model: $NAME = Qwen/$MODEL @ $(head -1 "$MODELS/$MODEL/.cache/huggingface/download/config.json.metadata" 2>/dev/null)"
+  echo "vllm: $SIF"; nvidia-smi --query-gpu=name,memory.total --format=csv,noheader; echo; } | tee -a VERSIONS.txt
+# Offline: no usage stats, no Hugging Face lookups. patches/ stubs out torchcodec, which crashes this vLLM image at
+# import (text models don't need it). --max-num-seqs: Qwen3.8's hybrid attention needs a cap.
+export VLLM_NO_USAGE_STATS=1 DO_NOT_TRACK=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
+apptainer exec --nv -B "$MODELS":/models -B "$MODELS/containers/patches":/patches --env PYTHONPATH=/patches "$SIF" \
+  vllm serve /models/$MODEL --served-model-name $NAME --host 0.0.0.0 --port $PORT \
+    --max-model-len 32768 --gpu-memory-utilization 0.90 --max-num-seqs 64 \
+    --reasoning-parser qwen3 --default-chat-template-kwargs '{"enable_thinking":false}'

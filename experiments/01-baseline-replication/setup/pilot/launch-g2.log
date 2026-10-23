@@ -1,0 +1,6 @@
+submitted Slurm job 869306 (fuzz 900s, limit 165 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch pilotA-g2432-jhead
+submitted Slurm job 869307 (fuzz 900s, limit 165 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch pilotA-g2503-jhead
+submitted Slurm job 869308 (fuzz 900s, limit 165 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch pilotA-g2432-mp42aac
+submitted Slurm job 869309 (fuzz 900s, limit 165 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch pilotA-g2503-mp42aac
+submitted Slurm job 869310 (fuzz 900s, limit 165 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch pilotA-g2432-libpng
+submitted Slurm job 869311 (fuzz 900s, limit 165 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch pilotA-g2503-libpng

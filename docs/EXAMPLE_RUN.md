@@ -2,6 +2,8 @@
 
 A real run from 2026-10-21: target jhead, model `gpt-oss:120b`, 900 s with `--test`, in the shared copy.
 Everything below is the actual output (`llm status` now also names the server's owner). About 30 minutes end to end.
+Since 2026-10-23 the team server is Qwen3.8 on one A40 (README.md, Tempest setup step 8): the commands are the same,
+`new` says `model Qwen3.8-27B-FP8-nothink`, and a ready server shows `ready: Qwen3.8-27B-FP8-nothink on <node>`.
 
 Before you start: [Tempest setup](../README.md#tempest-setup) steps 1–6 are done. Campaign folders are shared, so
 use your own name: the commands below say `$USER-example`; the output shows this run's name, `example` (that folder
@@ -17,14 +19,14 @@ cd /home/group/csci-591-automated-vulnerability-discovery/students/WORKING-BETTE
 ## 1. Check the team's model server
 
 One server per experiment, shared by everyone's runs. `scripts/fuzz llm status` says whether one is up. Start one
-only if there's none (it needs the one-time setup in [step 8](../README.md#tempest-setup)). Two ways, same model:
+only if there's none ([step 8](../README.md#tempest-setup)). Two ways, same model:
 
-| | Command | GPUs | Start | LLM call time |
-| --- | --- | --- | --- | --- |
-| **Fast, assured** | `scripts/fuzz llm start 3 a40` | 2× A40, `gpupriority`, class priority account | right away (this run) | median 13.5 s, max 41 s |
-| **Queued** | `scripts/fuzz llm start 3` | 1× H100, `gpufairshare` | can wait hours or days | median 8 s, max 41 s (Oct 3 tests) |
+| | Command | GPU | Start |
+| --- | --- | --- | --- |
+| **Fast, assured** | `scripts/fuzz llm start 3` | 1× A40, `gpupriority`, class priority account | right away |
+| **Queued** | `scripts/fuzz llm start 3 h100` | 1× H100, `gpufairshare` | can wait hours or days |
 
-On 2026-10-21 every H100 was busy and Slurm estimated a 1.5-day wait, so this run used the A40s:
+This run used the gpt-oss server of the time, on 2 A40s (`llm start 3 a40` then; now plain `llm start 3`):
 
 ```console
 $ scripts/fuzz llm start 3 a40

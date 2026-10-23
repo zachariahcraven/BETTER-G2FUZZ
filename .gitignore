@@ -52,6 +52,7 @@ eval/
 initial_seeds/
 core
 core.*
+experiments/**/campaigns/
 
 # ---- Editors / OS ----
 .DS_Store
