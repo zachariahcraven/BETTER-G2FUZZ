@@ -53,6 +53,8 @@ initial_seeds/
 core
 core.*
 experiments/**/campaigns/
+experiments/**/analysis/logs/
+experiments/**/results/coverage/edges/
 
 # ---- Editors / OS ----
 .DS_Store

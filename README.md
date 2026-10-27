@@ -6,6 +6,83 @@ Montana State University. Goal: replace G2Fuzz's random generator selection with
 G2FUZZ has an LLM write Python generators for an input format, fuzzes their output with AFL++ 4.32c, and has the
 LLM mutate the generators when coverage stalls.
 
+## How it fits together
+
+**Where things live on Tempest.** The repo is one shared checkout; the targets and the model weights are shared folders
+next to it; the LLM server and every campaign are Slurm jobs (thick border).
+
+```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 200}}}%%
+flowchart TB
+  subgraph repo["This repo: code and scripts"]
+    code["afl/ + g2fuzz/<br/>the fuzzer's code"]
+    image["g2fuzz.sif<br/>container image built from the code"]
+    launch["experiments/STUDY/launch/<br/>scripts that start a study's campaigns"]
+    fuzzsh["scripts/fuzz<br/>new, reuse, run, status, llm"]
+  end
+  subgraph shared["Shared folders next to the repo"]
+    targets["g2f-targets/<br/>the paper's target programs + seeds"]
+    models["shared-models/<br/>Qwen3.8 model weights"]
+  end
+  server["LLM server (Slurm GPU job)<br/>one per experiment, started with scripts/fuzz llm start"]
+  job["Campaign (Slurm job)<br/>2 CPUs, 8 GB, hours to a day"]
+  subgraph study["This repo: experiments/STUDY/"]
+    folder["campaigns/NAME/<br/>one folder per campaign (or eval/NAME/)"]
+    analysis["analysis/ and results/<br/>coverage, bugs, statistics, report"]
+  end
+  code -.->|"built into"| image
+  launch ==>|"calls"| fuzzsh
+  fuzzsh ==>|"run: submits"| job
+  image -->|"runs inside"| job
+  targets -->|"mounted read-only"| job
+  models -->|"loaded by"| server
+  server -->|"answers LLM calls (G2FUZZ arm)"| job
+  job -->|"writes its output to"| folder
+  folder -->|"read in place, once per study"| analysis
+  classDef slurm stroke-width:3px
+  class server,job slurm
+```
+
+Thick arrows start or submit something. Thin arrows are data used at run time. The dotted arrow is a one-time build
+(`scripts/tempest-image`, run from a Mac).
+
+**One campaign, then the study's analysis.** Dashed boxes run only in the G2FUZZ arm; the AFL++ arm starts from the
+stock seeds and never calls the LLM. The analysis runs once over all campaigns of a study, not per campaign.
+
+```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 240, "minNodeWidth": 60}}}%%
+flowchart TB
+  start(["scripts/fuzz run NAME"]) --> arm{"which arm?"}
+  arm -->|"G2FUZZ"| seedgen
+  arm -->|"AFL++ cmplog (--afl)"| stock
+  subgraph campaign["One campaign = one Slurm job"]
+    seedgen["Step 1: seed generation<br/>the LLM writes generator programs,<br/>their output becomes seeds"]
+    stock["Stock seeds only"]
+    fuzz["Step 2: AFL++ fuzzes the target<br/>for the campaign's time budget"]
+    step["Step 3: LLM step<br/>the LLM mutates one generator,<br/>its new files join the queue"]
+    out["Campaign folder<br/>queue/, crashes/, stats, logs"]
+    seedgen --> fuzz
+    stock --> fuzz
+    fuzz -->|"no new coverage for 5 min"| step
+    step -->|"resume"| fuzz
+    fuzz -->|"time is up"| out
+  end
+  subgraph analysis["Per study, all campaigns"]
+    cov["Coverage<br/>replay every queue on one common binary"]
+    crash["Bugs<br/>rerun every crash on the sanitizer build"]
+    stats["Statistics and report<br/>results/REPORT.md"]
+    cov --> stats
+    crash --> stats
+  end
+  out -->|"queue/"| cov
+  out -->|"crashes/"| crash
+  classDef g2 stroke-dasharray:6 3,stroke-width:2px
+  class seedgen,step g2
+```
+
+Unlabelled arrows mean "then". `scripts/fuzz reuse` copies another campaign's seeds and skips step 1. Which generator
+step 3 mutates is chosen at random today; replacing that choice with a scheduler is this project's change.
+
 ## Quick start (Tempest)
 First time only: [Tempest setup](#tempest-setup) steps 1–6. Then:
 
@@ -135,7 +212,7 @@ Don't switch its branch: that changes the code for everyone. Settings are automa
 | --- | --- |
 | `G2F_ACCOUNT` | `group-csci-591-automated-vulnerability-discovery` (never another group's account) |
 | `G2F_PARTITION` | `fairshare` |
-| `G2F_CPUS`, `G2F_MEM` | `2`, `4G` per job |
+| `G2F_CPUS`, `G2F_MEM` | `2`, `8G` per job |
 | `G2F_BASE_URL`, `G2F_KEY` | the team's running `llm` server (step 8) |
 
 **7. Get the image (maintainer only).** It's already in the shared copy. Tempest can't build Docker images, so one
@@ -153,7 +230,7 @@ anyone's campaigns run. The image holds the code: `git pull` on Tempest alone ch
 
 **8. The model server: one per experiment.** One person starts it; everyone's runs find it. It serves
 `Qwen3.8-27B-FP8-nothink` with vLLM from the shared `students/shared-models` folder, so there's nothing to download.
-Thinking is off: G2Fuzz gives up on an LLM call after 300 s. Qwen won our model bake-off against `gpt-oss:120b` and
+Thinking is off: our build gives up on an LLM call after 300 s (`G2F_LLM_TIMEOUT`; upstream G2Fuzz has no limit of its own and uses the OpenAI SDK's 600 s). Qwen won our model bake-off against `gpt-oss:120b` and
 `llama3:70b`: the only one to finish seed generation in every run (20–40 min), and the most coverage after it on
 mp42aac and pdftotext (about even with gpt-oss on jhead).
 
@@ -166,7 +243,7 @@ mp42aac and pdftotext (about even with gpt-oss on jhead).
 
 `start` refuses while a team server is up. Start it for longer than the experiment's runs (`run` warns if it would
 stop first) and stop it when done. Speed: an A40 has no native FP8, so calls take ~2.5× longer than on an A100/H100
-(median ~50 s); a long generator rewrite can pass G2Fuzz's 300 s limit, and G2Fuzz then retries it. `~/llm/VERSIONS.txt` records the model revision and GPU for the write-up.
+(median ~50 s); a long generator rewrite can pass our 300 s limit, and the call is then retried. `~/llm/VERSIONS.txt` records the model revision and GPU for the write-up.
 
 ### The setting files
 Upstream asks you to set up three files by hand; `scripts/fuzz new` does it for each campaign in `eval/<campaign>/`:
@@ -256,10 +333,10 @@ Debugging the pipeline? The raw commands `scripts/fuzz` runs: [docs/BY_HAND.md](
 
 ## Day to day
 
-**Alias and tab completion (zsh):**
+**Alias (zsh):**
 
 ```bash
-printf '%s\n' "alias fuzz='$PWD/scripts/fuzz'" "source '$PWD/scripts/fuzz-completion.zsh'" >> ~/.zshrc && source ~/.zshrc
+printf '%s\n' "alias fuzz='$PWD/scripts/fuzz'" >> ~/.zshrc && source ~/.zshrc
 ```
 
 **Change the code,** then rebuild the image (local: `docker build`, Tempest: `scripts/tempest-image`) and start a

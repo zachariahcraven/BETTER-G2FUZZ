@@ -2,7 +2,7 @@
 # Serves Qwen3.8-27B-FP8 (thinking off) with vLLM on one GPU, for G2Fuzz jobs on Tempest (README.md, Tempest setup).
 # Start it with `scripts/fuzz llm start [hours] [a40|h100]`; runs then find it by themselves. Stop: `scripts/fuzz llm stop`.
 # Its log, llm-serve-<jobid>.out, goes to ~/llm. Model weights and the vLLM image are shared: students/shared-models.
-# Thinking off: G2Fuzz gives up on an LLM call after 300 s, and a thinking model's long answers hit that.
+# Thinking off: our G2Fuzz build gives up on an LLM call after 300 s (G2F_LLM_TIMEOUT), and a thinking model's long answers hit that.
 #SBATCH -J llm-serve
 #SBATCH -p gpupriority
 #SBATCH --gres=gpu:a40:1

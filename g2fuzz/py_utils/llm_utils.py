@@ -1,4 +1,4 @@
-from openai import OpenAI, APIConnectionError, APITimeoutError, InternalServerError, RateLimitError
+from openai import OpenAI
 import os
 import json
 import time
@@ -8,48 +8,38 @@ with open('openai_key.txt', 'r') as file:
 
 OPENAI_KEY = key
 
-# G2F: one shared client with a longer timeout, plus retries with backoff, so a transient
-# server error (e.g. CatChat "stream timeout") doesn't crash seed generation.
+# G2F: one client with a per-call timeout and the SDK's own retries (connection errors, 408/409/429/5xx,
+# exponential backoff), so a transient server error doesn't crash seed generation. Upstream sets neither
+# (SDK defaults: 600 s, 2 retries). One JSON line per call goes to llm_calls.jsonl for scripts/fuzz and the analysis.
 LLM_TIMEOUT = float(os.environ.get("G2F_LLM_TIMEOUT", 300))
-LLM_ATTEMPTS = int(os.environ.get("G2F_LLM_RETRIES", 6))
+LLM_RETRIES = int(os.environ.get("G2F_LLM_RETRIES", 5))
 LLM_LOG = os.environ.get("G2F_LLM_LOG", "llm_calls.jsonl")
-RETRYABLE = (APIConnectionError, APITimeoutError, InternalServerError, RateLimitError)
 
-client = OpenAI(api_key=OPENAI_KEY, timeout=LLM_TIMEOUT, max_retries=0)
-
-def log_call(model, start, status, attempt):
-    """Append one line per LLM request: timestamp, model, latency, outcome."""
-    try:
-        with open(LLM_LOG, 'a') as f:
-            f.write(json.dumps({"ts": round(start, 3), "model": model, "secs": round(time.time() - start, 2),
-                                "status": status, "attempt": attempt}) + "\n")
-    except OSError:
-        pass
-
-def chat(model, messages, temperature):
-    for attempt in range(1, LLM_ATTEMPTS + 1):
-        start = time.time()
-        try:
-            response = client.chat.completions.create(
-                model=model,
-                messages=messages,
-                temperature=temperature
-            )
-            log_call(model, start, "ok", attempt)
-            return response.choices[0].message.content
-        except RETRYABLE as e:
-            log_call(model, start, type(e).__name__, attempt)
-            if attempt == LLM_ATTEMPTS:
-                raise
-            wait = min(2 ** attempt, 60)
-            print(f"LLM {type(e).__name__} (attempt {attempt}/{LLM_ATTEMPTS}), retrying in {wait}s")
-            time.sleep(wait)
-
-def llm(model, prompt, temperature):
-    return chat(model, [{"role": "user", "content": prompt}], temperature)
+client = OpenAI(api_key=OPENAI_KEY, timeout=LLM_TIMEOUT, max_retries=LLM_RETRIES)
 
 def llm_messages(model, messages, temperature):
-    return chat(model, messages, temperature)
+    start = time.time()
+    status = "ok"
+    try:
+        response = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            temperature=temperature
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        status = type(e).__name__
+        raise
+    finally:
+        try:
+            with open(LLM_LOG, 'a') as f:
+                f.write(json.dumps({"ts": round(start, 3), "model": model,
+                                    "secs": round(time.time() - start, 2), "status": status}) + "\n")
+        except OSError:
+            pass
+
+def llm(model, prompt, temperature):
+    return llm_messages(model, [{"role": "user", "content": prompt}], temperature)
 
 if __name__ == "__main__":
     prompt = """
