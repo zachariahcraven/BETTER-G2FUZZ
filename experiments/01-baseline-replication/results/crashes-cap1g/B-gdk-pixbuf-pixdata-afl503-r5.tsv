@@ -1,0 +1,19 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:05,src:000011,time:61148,execs:39836,op:havoc,rep:12	05	no-crash			
+id:000001,sig:05,src:000011,time:62679,execs:40926,op:havoc,rep:5	05	no-crash			
+id:000002,sig:05,src:000011,time:65099,execs:42902,op:havoc,rep:11	05	no-crash			
+id:000003,sig:05,src:000011,time:68110,execs:45223,op:havoc,rep:16	05	no-crash			
+id:000004,sig:05,src:000011,time:69064,execs:46015,op:havoc,rep:16	05	no-crash			
+id:000005,sig:05,src:000021,time:93631,execs:67557,op:havoc,rep:1	05	no-crash			
+id:000006,sig:11,src:000023,time:118799,execs:80335,op:trim,rep:1	11	asan	heap-buffer-overflow	05d67b2282	gdk_pixbuf_from_pixdata gdk-pixdata.c:479 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000007,sig:11,src:000024,time:146381,execs:101284,op:trim,rep:1	11	asan	heap-buffer-overflow	4a9bdccbef	gdk_pixbuf_from_pixdata gdk-pixdata.c:506 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000008,sig:05,src:000075,time:165685,execs:119015,op:havoc,rep:2	05	no-crash			
+id:000009,sig:05,src:000163,time:188458,execs:140347,op:trim,rep:2	05	no-crash			
+id:000010,sig:05,src:000192,time:194669,execs:145515,op:havoc,rep:14	05	asan	allocation-size-too-big	c4abdfa3c3	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gif_get_lzw io-gif.c:854
+id:000011,sig:05,src:000192,time:223198,execs:167183,op:havoc,rep:5	05	no-crash			
+id:000012,sig:05,src:000192,time:244081,execs:183151,op:havoc,rep:16	05	asan	allocation-size-too-big	c4abdfa3c3	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gif_get_lzw io-gif.c:854
+id:000013,sig:05,src:000349,time:280927,execs:212856,op:quick,pos:47245,val:+3	05	asan	allocation-size-too-big	abd3b450c1	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-ico.c:479
+id:000014,sig:05,src:000392,time:304551,execs:229674,op:quick,pos:120,val:+2	05	no-crash			
+id:000015,sig:05,src:000392,time:313024,execs:233653,op:int32,pos:122,val:be:+32767	05	no-crash			
+id:000016,sig:11,src:000464,time:344433,execs:256638,op:havoc,rep:7	11	asan	heap-buffer-overflow	3d961589f0	gdk_pixbuf_from_pixdata gdk-pixdata.c:472 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000017,sig:11,src:000464,time:346135,execs:257432,op:havoc,rep:4	11	asan	heap-buffer-overflow	3d961589f0	gdk_pixbuf_from_pixdata gdk-pixdata.c:472 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152

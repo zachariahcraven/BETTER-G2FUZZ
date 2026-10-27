@@ -1,0 +1,23 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:11,src:000942,time:488321,execs:612780,op:havoc,rep:2	11	asan	SEGV	7b28ca2526	free imginfo.asan+0xd311b) <- jp2_box_destroy jp2_cod.c:212 <- jp2_box_get jp2_cod.c:319
+id:000001,sig:11,src:000974,time:500298,execs:637303,op:colorization,rep:2	11	asan	SEGV	7b28ca2526	free imginfo.asan+0xd311b) <- jp2_box_destroy jp2_cod.c:212 <- jp2_box_get jp2_cod.c:319
+id:000002,sig:11,src:001007,time:1352133,execs:1468659,op:havoc,rep:4	11	asan	SEGV	7b28ca2526	free imginfo.asan+0xd311b) <- jp2_box_destroy jp2_cod.c:212 <- jp2_box_get jp2_cod.c:319
+id:000003,sig:11,src:001025,time:4491735,execs:6353593,op:its,rep:1	11	asan	SEGV	7b28ca2526	free imginfo.asan+0xd311b) <- jp2_box_destroy jp2_cod.c:212 <- jp2_box_get jp2_cod.c:319
+id:000004,sig:06,src:001704,time:10877507,execs:16501890,op:havoc,rep:1	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000005,sig:06,src:001704,time:12828177,execs:19677080,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000006,sig:06,src:001735,time:20506979,execs:31235846,op:havoc,rep:3	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000007,sig:06,src:001930,time:23446564,execs:35892857,op:colorization,rep:4	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000008,sig:06,src:001941,time:25400048,execs:38590742,op:its,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000009,sig:06,src:001941,time:25506770,execs:38718011,op:havoc,rep:8	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000010,sig:06,src:001941,time:26028296,execs:39353069,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000011,sig:06,src:001961,time:28737588,execs:42314275,op:colorization,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000012,sig:06,src:001961,time:28738391,execs:42314588,op:colorization,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000013,sig:06,src:001703,time:29573363,execs:43548280,op:havoc,rep:1	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000014,sig:06,src:001718,time:36059057,execs:50281166,op:havoc,rep:4	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000015,sig:06,src:001794,time:36255979,execs:50619234,op:havoc,rep:5	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000016,sig:06,src:001820,time:37199995,execs:51949276,op:havoc,rep:1	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000017,sig:06,src:001941,time:40766288,execs:57118556,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000018,sig:06,src:001734,time:42900360,execs:60509121,op:havoc,rep:3	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000019,sig:11,src:002040,time:53308298,execs:76260925,op:havoc,rep:4	11	asan	SEGV	7b28ca2526	free imginfo.asan+0xd311b) <- jp2_box_destroy jp2_cod.c:212 <- jp2_box_get jp2_cod.c:319
+id:000020,sig:06,src:001930,time:54270054,execs:77920414,op:havoc,rep:8	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000021,sig:06,src:001993,time:84400034,execs:130276347,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)

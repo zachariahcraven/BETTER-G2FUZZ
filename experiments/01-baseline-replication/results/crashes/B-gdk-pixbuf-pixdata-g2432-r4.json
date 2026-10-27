@@ -1,0 +1,34 @@
+{
+ "campaign": "B-gdk-pixbuf-pixdata-g2432-r4",
+ "program": "gdk-pixbuf-pixdata",
+ "arm": "g2432",
+ "rep": 4,
+ "crash_files": 9,
+ "outcomes": {
+  "no-crash": 6,
+  "asan": 3
+ },
+ "unique_bugs": 3,
+ "unique_bugs_fn": 2,
+ "buckets_fn": [
+  "SEGV | DecodeHeader <- gdk_pixbuf__ico_image_load_increment <- gdk_pixbuf_loader_write",
+  "heap-buffer-overflow | gdk_pixbuf_from_pixdata <- try_load <- pixdata_image_load_increment"
+ ],
+ "buckets": [
+  {
+   "bucket": "9f18212c7d",
+   "key": "SEGV | DecodeHeader io-ico.c:322 <- gdk_pixbuf__ico_image_load_increment io-ico.c:905 <- gdk_pixbuf_loader_write gdk-pixbuf-loader.c:523",
+   "count": 1
+  },
+  {
+   "bucket": "05d67b2282",
+   "key": "heap-buffer-overflow | gdk_pixbuf_from_pixdata gdk-pixdata.c:479 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152",
+   "count": 1
+  },
+  {
+   "bucket": "3d961589f0",
+   "key": "heap-buffer-overflow | gdk_pixbuf_from_pixdata gdk-pixdata.c:472 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152",
+   "count": 1
+  }
+ ]
+}

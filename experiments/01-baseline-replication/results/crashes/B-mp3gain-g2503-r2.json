@@ -1,0 +1,72 @@
+{
+ "campaign": "B-mp3gain-g2503-r2",
+ "program": "mp3gain",
+ "arm": "g2503",
+ "rep": 2,
+ "crash_files": 85,
+ "outcomes": {
+  "asan": 85
+ },
+ "unique_bugs": 10,
+ "unique_bugs_fn": 6,
+ "buckets_fn": [
+  "SEGV | libc.so.6+0xc49a8 <- copy_mp <- decodeMP3",
+  "SEGV | libc.so.6+0xc4aa3 <- copy_mp <- decodeMP3",
+  "global-buffer-overflow | III_dequantize_sample <- do_layer3 <- decodeMP3",
+  "global-buffer-overflow | III_i_stereo <- do_layer3 <- decodeMP3",
+  "heap-buffer-overflow | ReadMP3APETag <- ReadMP3GainAPETag <- main",
+  "stack-buffer-overflow | sprintf <- WriteMP3GainAPETag <- WriteMP3GainTag"
+ ],
+ "buckets": [
+  {
+   "bucket": "85d2326158",
+   "key": "global-buffer-overflow | III_dequantize_sample layer3.c:904 <- do_layer3 layer3.c:1630 <- decodeMP3 interface.c:643",
+   "count": 50
+  },
+  {
+   "bucket": "ec1f182061",
+   "key": "global-buffer-overflow | III_dequantize_sample layer3.c:904 <- do_layer3 layer3.c:1646 <- decodeMP3 interface.c:643",
+   "count": 17
+  },
+  {
+   "bucket": "41d5778298",
+   "key": "global-buffer-overflow | III_dequantize_sample layer3.c <- do_layer3 layer3.c:1646 <- decodeMP3 interface.c:643",
+   "count": 5
+  },
+  {
+   "bucket": "e98042e5fa",
+   "key": "global-buffer-overflow | III_i_stereo layer3.c:1169 <- do_layer3 layer3.c:1661 <- decodeMP3 interface.c:643",
+   "count": 4
+  },
+  {
+   "bucket": "c8b98749fc",
+   "key": "stack-buffer-overflow | sprintf mp3gain.asan+0x4dcf3) <- WriteMP3GainAPETag apetag.c:578 <- WriteMP3GainTag mp3gain.c:1123",
+   "count": 3
+  },
+  {
+   "bucket": "fcaa370abd",
+   "key": "global-buffer-overflow | III_dequantize_sample layer3.c:903 <- do_layer3 layer3.c:1646 <- decodeMP3 interface.c:643",
+   "count": 2
+  },
+  {
+   "bucket": "3c80fcd2c8",
+   "key": "global-buffer-overflow | III_dequantize_sample layer3.c:855 <- do_layer3 layer3.c:1646 <- decodeMP3 interface.c:643",
+   "count": 1
+  },
+  {
+   "bucket": "6d434b1c20",
+   "key": "SEGV | libc.so.6+0xc49a8 <- copy_mp interface.c:188 <- decodeMP3 interface.c:573",
+   "count": 1
+  },
+  {
+   "bucket": "b9c1ba2dd8",
+   "key": "SEGV | libc.so.6+0xc4aa3 <- copy_mp interface.c:188 <- decodeMP3 interface.c:538",
+   "count": 1
+  },
+  {
+   "bucket": "22bb3cf8ab",
+   "key": "heap-buffer-overflow | ReadMP3APETag apetag.c:230 <- ReadMP3GainAPETag apetag.c:371 <- main mp3gain.c:1778",
+   "count": 1
+  }
+ ]
+}

@@ -1,0 +1,35 @@
+{
+ "campaign": "B-pdftotext-afl432-r4",
+ "program": "pdftotext",
+ "arm": "afl432",
+ "rep": 4,
+ "crash_files": 45,
+ "outcomes": {
+  "asan": 40,
+  "no-crash": 5
+ },
+ "unique_bugs": 3,
+ "unique_bugs_fn": 3,
+ "buckets_fn": [
+  "ABRT | pthread_kill <- gsignal <- abort",
+  "SEGV | TextPage::findGaps(GList*, <- TextPage::split(GList*, <- TextPage::splitChars(GList*)",
+  "stack-overflow | Object::copy(Object*) <- XRef::fetch(int, <- Object::arrayGet(int,"
+ ],
+ "buckets": [
+  {
+   "bucket": "fdb798c62f",
+   "key": "ABRT | pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)",
+   "count": 32
+  },
+  {
+   "bucket": "c665cfeebd",
+   "key": "SEGV | TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610",
+   "count": 7
+  },
+  {
+   "bucket": "34508bbc53",
+   "key": "stack-overflow | Object::copy(Object*) Object.cc:80 <- XRef::fetch(int, int, <- Object::arrayGet(int, Object*)",
+   "count": 1
+  }
+ ]
+}

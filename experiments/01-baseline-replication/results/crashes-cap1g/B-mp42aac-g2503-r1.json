@@ -1,0 +1,53 @@
+{
+ "campaign": "B-mp42aac-g2503-r1",
+ "program": "mp42aac",
+ "arm": "g2503",
+ "rep": 1,
+ "crash_files": 212,
+ "outcomes": {
+  "asan": 197,
+  "no-crash": 15
+ },
+ "unique_bugs": 6,
+ "unique_bugs_fn": 6,
+ "buckets_fn": [
+  "SEGV | AP4_DataBuffer::SetData(unsigned <- AP4_AvccAtom::AP4_AvccAtom(unsigned <- AP4_AvccAtom::Create(unsigned",
+  "allocation-size-too-big | operator <- AP4_Array<AP4_CttsTableEntry>::EnsureCapacity(unsigned <- AP4_Array<AP4_CttsTableEntry>::SetItemCount(unsigned",
+  "allocation-size-too-big | operator <- AP4_Array<AP4_ElstEntry>::EnsureCapacity(unsigned <- AP4_ElstAtom::AP4_ElstAtom(unsigned",
+  "allocation-size-too-big | operator <- AP4_Array<AP4_TrunAtom::Entry>::EnsureCapacity(unsigned <- AP4_Array<AP4_TrunAtom::Entry>::SetItemCount(unsigned",
+  "allocation-size-too-big | operator <- AP4_DataBuffer::ReallocateBuffer(unsigned <- AP4_DataBuffer::SetDataSize(unsigned",
+  "allocation-size-too-big | operator <- AP4_StcoAtom::AP4_StcoAtom(unsigned <- AP4_StcoAtom::Create(unsigned"
+ ],
+ "buckets": [
+  {
+   "bucket": "914d59ad3b",
+   "key": "allocation-size-too-big | operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)",
+   "count": 92
+  },
+  {
+   "bucket": "c836389a01",
+   "key": "allocation-size-too-big | operator new(unsigned <- AP4_Array<AP4_ElstEntry>::EnsureCapacity(unsigned int) <- AP4_ElstAtom::AP4_ElstAtom(unsigned int,",
+   "count": 69
+  },
+  {
+   "bucket": "645c0e838c",
+   "key": "allocation-size-too-big | operator new(unsigned <- AP4_Array<AP4_TrunAtom::Entry>::EnsureCapacity(unsigned int) <- AP4_Array<AP4_TrunAtom::Entry>::SetItemCount(unsigned int)",
+   "count": 29
+  },
+  {
+   "bucket": "3593294196",
+   "key": "allocation-size-too-big | operator new(unsigned <- AP4_Array<AP4_CttsTableEntry>::EnsureCapacity(unsigned int) <- AP4_Array<AP4_CttsTableEntry>::SetItemCount(unsigned int)",
+   "count": 5
+  },
+  {
+   "bucket": "2afd73fac7",
+   "key": "allocation-size-too-big | operator new[](unsigned <- AP4_StcoAtom::AP4_StcoAtom(unsigned int, <- AP4_StcoAtom::Create(unsigned int,",
+   "count": 1
+  },
+  {
+   "bucket": "16d2635201",
+   "key": "SEGV | AP4_DataBuffer::SetData(unsigned char <- AP4_AvccAtom::AP4_AvccAtom(unsigned int, <- AP4_AvccAtom::Create(unsigned int,",
+   "count": 1
+  }
+ ]
+}

@@ -1,0 +1,217 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:06,src:000031,time:1205,execs:2507,op:havoc,rep:4	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000001,sig:06,src:000031,time:1673,execs:3256,op:havoc,rep:2	06	asan	allocation-size-too-big	c836389a01	operator new(unsigned <- AP4_Array<AP4_ElstEntry>::EnsureCapacity(unsigned int) <- AP4_ElstAtom::AP4_ElstAtom(unsigned int,
+id:000002,sig:06,src:000031,time:3418,execs:4393,op:havoc,rep:4	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000003,sig:06,src:000031,time:3839,execs:5009,op:havoc,rep:2	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000004,sig:06,src:000031,time:5466,execs:7472,op:havoc,rep:4	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000005,sig:06,src:000107,time:36630,execs:43231,op:quick,pos:31595,val:+2	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000006,sig:06,src:000160,time:78250,execs:95778,op:havoc,rep:2	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000007,sig:06,src:000282,time:85488,execs:106337,op:quick,pos:31595,val:+3	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000008,sig:06,src:000168,time:91289,execs:111877,op:havoc,rep:12	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000009,sig:06,src:000191,time:105936,execs:137534,op:havoc,rep:8	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000010,sig:06,src:000249,time:126787,execs:173453,op:havoc,rep:2	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000011,sig:06,src:000301,time:131602,execs:181527,op:quick,pos:31595,val:+2	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000012,sig:06,src:000261,time:138877,execs:187629,op:quick,pos:31595,val:+5	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000013,sig:06,src:000265,time:146251,execs:193773,op:quick,pos:31595,val:+4	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000014,sig:06,src:000291,time:154231,execs:203222,op:havoc,rep:4	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000015,sig:06,src:000292,time:156759,execs:207848,op:havoc,rep:4	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000016,sig:06,src:000293,time:159406,execs:212571,op:havoc,rep:16	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000017,sig:06,src:000345,time:172022,execs:235668,op:havoc,rep:3	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000018,sig:06,src:000346,time:173493,execs:238202,op:havoc,rep:14	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000019,sig:06,src:000353,time:181459,execs:249808,op:havoc,rep:11	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000020,sig:06,src:000294,time:183460,execs:253131,op:havoc,rep:3	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000021,sig:06,src:000305,time:187560,execs:260395,op:havoc,rep:1	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000022,sig:06,src:000353,time:190381,execs:262869,op:havoc,rep:12	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000023,sig:06,src:000353,time:192132,execs:264897,op:havoc,rep:13	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000024,sig:06,src:000353,time:192813,execs:265723,op:havoc,rep:11	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000025,sig:06,src:000353,time:193494,execs:266404,op:havoc,rep:15	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000026,sig:06,src:000353,time:197196,execs:270872,op:havoc,rep:15	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000027,sig:06,src:000353,time:200193,execs:274406,op:havoc,rep:9	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000028,sig:06,src:000360,time:210066,execs:289481,op:havoc,rep:6	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000029,sig:06,src:000376,time:223409,execs:313335,op:havoc,rep:15	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000030,sig:06,src:000377,time:224734,execs:315592,op:havoc,rep:4	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000031,sig:06,src:000377,time:229346,execs:323298,op:havoc,rep:10	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000032,sig:06,src:000164,time:233242,execs:329773,op:havoc,rep:2	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000033,sig:06,src:000376,time:235044,execs:332794,op:havoc,rep:3	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000034,sig:06,src:000141,time:247770,execs:349319,op:havoc,rep:13	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000035,sig:06,src:000365,time:250840,execs:354713,op:havoc,rep:15	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000036,sig:06,src:000239,time:265802,execs:378710,op:havoc,rep:2	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000037,sig:06,src:000363,time:265990,execs:378927,op:havoc,rep:16	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000038,sig:06,src:000171,time:299189,execs:435568,op:havoc,rep:7	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000039,sig:06,src:000280,time:299262,execs:435659,op:havoc,rep:2	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000040,sig:06,src:000147,time:300472,execs:437951,op:havoc,rep:6	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000041,sig:06,src:000173,time:303170,execs:440975,op:havoc,rep:3	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000042,sig:06,src:000335,time:312052,execs:456582,op:havoc,rep:2	06	asan	allocation-size-too-big	c836389a01	operator new(unsigned <- AP4_Array<AP4_ElstEntry>::EnsureCapacity(unsigned int) <- AP4_ElstAtom::AP4_ElstAtom(unsigned int,
+id:000043,sig:06,src:000369,time:315844,execs:463439,op:havoc,rep:1	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000044,sig:06,src:000262,time:359294,execs:539366,op:havoc,rep:4	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000045,sig:06,src:000359,time:378182,execs:569928,op:havoc,rep:14	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000046,sig:06,src:000433,time:398274,execs:587311,op:inf,rep:2	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000047,sig:06,src:000433,time:398285,execs:587315,op:inf,rep:2	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000048,sig:06,src:000457,time:471845,execs:681834,op:quick,pos:31192,val:+1	06	asan	allocation-size-too-big	c836389a01	operator new(unsigned <- AP4_Array<AP4_ElstEntry>::EnsureCapacity(unsigned int) <- AP4_ElstAtom::AP4_ElstAtom(unsigned int,
+id:000049,sig:06,src:000457,time:473565,execs:682513,op:quick,pos:31595,val:+1	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000050,sig:06,src:000435,time:532662,execs:756250,op:havoc,rep:1	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000051,sig:06,src:000165,time:559522,execs:799655,op:havoc,rep:10	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000052,sig:06,src:000179,time:630049,execs:891274,op:havoc,rep:13	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000053,sig:06,src:000506,time:644820,execs:915421,op:havoc,rep:3	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000054,sig:06,src:000496,time:668414,execs:950693,op:havoc,rep:7	06	no-crash			
+id:000055,sig:06,src:000507,time:678692,execs:966845,op:havoc,rep:5	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000056,sig:06,src:000518,time:716739,execs:984436,op:inf,rep:1	06	no-crash			
+id:000057,sig:06,src:000458,time:742999,execs:1009957,op:havoc,rep:12	06	asan	allocation-size-too-big	c836389a01	operator new(unsigned <- AP4_Array<AP4_ElstEntry>::EnsureCapacity(unsigned int) <- AP4_ElstAtom::AP4_ElstAtom(unsigned int,
+id:000058,sig:06,src:000489,time:764586,execs:1045813,op:havoc,rep:13	06	no-crash			
+id:000059,sig:06,src:000182,time:789491,execs:1082532,op:havoc,rep:2	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000060,sig:06,src:000526,time:849827,execs:1179224,op:havoc,rep:1	06	no-crash			
+id:000061,sig:06,src:000550,time:870490,execs:1210603,op:havoc,rep:2	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000062,sig:06,src:000558,time:883962,execs:1227039,op:quick,pos:8694,val:+3	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000063,sig:06,src:000350,time:896306,execs:1241411,op:havoc,rep:1	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000064,sig:06,src:000497,time:921112,execs:1278278,op:havoc,rep:3	06	no-crash			
+id:000065,sig:06,src:000522,time:930694,execs:1293197,op:havoc,rep:13	06	no-crash			
+id:000066,sig:06,src:000560,time:947618,execs:1316432,op:havoc,rep:8	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000067,sig:06,src:000589,time:983903,execs:1367680,op:colorization,rep:7	06	no-crash			
+id:000068,sig:06,src:000594,time:987126,execs:1372555,op:colorization,rep:3	06	no-crash			
+id:000069,sig:06,src:000594,time:987154,execs:1372589,op:colorization,rep:3	06	no-crash			
+id:000070,sig:06,src:000606,time:1008474,execs:1402176,op:colorization,rep:9	06	no-crash			
+id:000071,sig:06,src:000630,time:1052186,execs:1461067,op:havoc,rep:10	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000072,sig:06,src:000633,time:1062592,execs:1473508,op:havoc,rep:11	06	no-crash			
+id:000073,sig:06,src:000633,time:1067679,execs:1478526,op:havoc,rep:6	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000074,sig:06,src:000634,time:1079463,execs:1490065,op:havoc,rep:16	06	no-crash			
+id:000075,sig:06,src:000635,time:1086214,execs:1496146,op:havoc,rep:4	06	no-crash			
+id:000076,sig:06,src:000656,time:1112982,execs:1532563,op:havoc,rep:15	06	no-crash			
+id:000077,sig:06,src:000667,time:1120157,execs:1542332,op:havoc,rep:4	06	no-crash			
+id:000078,sig:06,src:000710,time:1216843,execs:1667551,op:colorization,rep:2	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000079,sig:06,src:000713,time:1240234,execs:1699389,op:quick,pos:31479,val:+2	06	asan	allocation-size-too-big	3593294196	operator new(unsigned <- AP4_Array<AP4_CttsTableEntry>::EnsureCapacity(unsigned int) <- AP4_Array<AP4_CttsTableEntry>::SetItemCount(unsigned int)
+id:000080,sig:06,src:000713,time:1240470,execs:1699506,op:quick,pos:31595,val:+2	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000081,sig:06,src:000720,time:1261832,execs:1731378,op:colorization,rep:4	06	no-crash			
+id:000082,sig:06,src:000741,time:1401402,execs:1903252,op:colorization,rep:1	06	no-crash			
+id:000083,sig:06,src:000712,time:1427216,execs:1936667,op:havoc,rep:10	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000084,sig:06,src:000665,time:1477480,execs:1993755,op:havoc,rep:16	06	no-crash			
+id:000085,sig:06,src:000674,time:1513296,execs:2038327,op:havoc,rep:2	06	asan	allocation-size-too-big	2afd73fac7	operator new[](unsigned <- AP4_StcoAtom::AP4_StcoAtom(unsigned int, <- AP4_StcoAtom::Create(unsigned int,
+id:000086,sig:06,src:000655,time:1534136,execs:2067474,op:havoc,rep:7	06	no-crash			
+id:000087,sig:06,src:000620,time:1618058,execs:2182071,op:havoc,rep:2	06	no-crash			
+id:000088,sig:06,src:000746,time:1626812,execs:2194073,op:havoc,rep:1	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000089,sig:06,src:000581,time:1645283,execs:2225069,op:colorization,rep:1	06	no-crash			
+id:000090,sig:06,src:000599,time:1664823,execs:2255996,op:havoc,rep:8	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000091,sig:06,src:000772,time:1665934,execs:2258136,op:colorization,rep:1	06	no-crash			
+id:000092,sig:06,src:000788,time:1717621,execs:2326891,op:havoc,rep:3	06	no-crash			
+id:000093,sig:06,src:000561,time:1721258,execs:2333581,op:havoc,rep:1	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000094,sig:06,src:000776,time:1751140,execs:2374767,op:havoc,rep:14	06	asan	allocation-size-too-big	c836389a01	operator new(unsigned <- AP4_Array<AP4_ElstEntry>::EnsureCapacity(unsigned int) <- AP4_ElstAtom::AP4_ElstAtom(unsigned int,
+id:000095,sig:06,src:000744,time:1767634,execs:2392476,op:havoc,rep:4	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000096,sig:06,src:000729,time:1787950,execs:2425195,op:havoc,rep:6	06	no-crash			
+id:000097,sig:06,src:000557,time:1812495,execs:2460479,op:havoc,rep:8	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000098,sig:06,src:000800,time:1831374,execs:2487687,op:trim,rep:8	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000099,sig:06,src:000806,time:1856860,execs:2523165,op:colorization,rep:2	06	no-crash			
+id:000100,sig:06,src:000808,time:1864588,execs:2532791,op:havoc,rep:12	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000101,sig:06,src:000783,time:1913181,execs:2606001,op:havoc,rep:7	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000102,sig:06,src:000813,time:1915405,execs:2609338,op:colorization,rep:2	06	no-crash			
+id:000103,sig:06,src:000808,time:1919497,execs:2615113,op:havoc,rep:5	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000104,sig:06,src:000830,time:1952256,execs:2668660,op:colorization,rep:3	06	no-crash			
+id:000105,sig:06,src:000832,time:1954728,execs:2671831,op:colorization,rep:14	06	no-crash			
+id:000106,sig:06,src:000837,time:1968684,execs:2693485,op:colorization,rep:2	06	no-crash			
+id:000107,sig:06,src:000838,time:1971848,execs:2698762,op:colorization,rep:2	06	no-crash			
+id:000108,sig:06,src:000839,time:1975184,execs:2703935,op:colorization,rep:2	06	no-crash			
+id:000109,sig:06,src:000840,time:1978395,execs:2709105,op:colorization,rep:9	06	no-crash			
+id:000110,sig:06,src:000841,time:1981567,execs:2713485,op:colorization,rep:3	06	no-crash			
+id:000111,sig:06,src:000841,time:1983409,execs:2715473,op:havoc,rep:8	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000112,sig:06,src:000853,time:1999932,execs:2742488,op:colorization,rep:1	06	no-crash			
+id:000113,sig:06,src:000854,time:2003269,execs:2747648,op:colorization,rep:2	06	no-crash			
+id:000114,sig:06,src:000855,time:2006353,execs:2752884,op:colorization,rep:4	06	no-crash			
+id:000115,sig:06,src:000864,time:2022148,execs:2777934,op:colorization,rep:3	06	no-crash			
+id:000116,sig:06,src:000865,time:2024450,execs:2780971,op:colorization,rep:1	06	no-crash			
+id:000117,sig:06,src:000867,time:2038492,execs:2803030,op:colorization,rep:1	06	no-crash			
+id:000118,sig:06,src:000868,time:2041504,execs:2807490,op:colorization,rep:3	06	no-crash			
+id:000119,sig:06,src:000822,time:2057002,execs:2833543,op:havoc,rep:6	06	no-crash			
+id:000120,sig:06,src:000872,time:2068955,execs:2854322,op:colorization,rep:4	06	no-crash			
+id:000121,sig:06,src:000874,time:2084049,execs:2880836,op:colorization,rep:2	06	no-crash			
+id:000122,sig:06,src:000879,time:2114648,execs:2930115,op:colorization,rep:5	06	no-crash			
+id:000123,sig:06,src:000799,time:2137216,execs:2965583,op:havoc,rep:11	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000124,sig:06,src:000889,time:2177142,execs:3006916,op:havoc,rep:12	06	asan	allocation-size-too-big	c836389a01	operator new(unsigned <- AP4_Array<AP4_ElstEntry>::EnsureCapacity(unsigned int) <- AP4_ElstAtom::AP4_ElstAtom(unsigned int,
+id:000125,sig:06,src:000787,time:2195380,execs:3038105,op:havoc,rep:16	06	asan	allocation-size-too-big	c836389a01	operator new(unsigned <- AP4_Array<AP4_ElstEntry>::EnsureCapacity(unsigned int) <- AP4_ElstAtom::AP4_ElstAtom(unsigned int,
+id:000126,sig:06,src:000911,time:2226918,execs:3090235,op:colorization,rep:4	06	no-crash			
+id:000127,sig:06,src:000918,time:2230610,execs:3094990,op:colorization,rep:3	06	no-crash			
+id:000128,sig:06,src:000793,time:2282137,execs:3169239,op:havoc,rep:9	06	no-crash			
+id:000129,sig:06,src:000929,time:2313803,execs:3216960,op:colorization,rep:8	06	no-crash			
+id:000130,sig:06,src:000901,time:2321994,execs:3227267,op:havoc,rep:2	06	asan	allocation-size-too-big	c836389a01	operator new(unsigned <- AP4_Array<AP4_ElstEntry>::EnsureCapacity(unsigned int) <- AP4_ElstAtom::AP4_ElstAtom(unsigned int,
+id:000131,sig:06,src:000887,time:2367977,execs:3281727,op:havoc,rep:1	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000132,sig:06,src:000928,time:2458240,execs:3416689,op:havoc,rep:3	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000133,sig:06,src:000943,time:2466894,execs:3428292,op:trim,rep:2	06	no-crash			
+id:000134,sig:06,src:000960,time:2480178,execs:3446360,op:trim,rep:6	06	timeout			
+id:000135,sig:06,src:000963,time:2485715,execs:3451242,op:colorization,rep:1	06	no-crash			
+id:000136,sig:06,src:000965,time:2489075,execs:3454472,op:colorization,rep:2	06	no-crash			
+id:000137,sig:06,src:000966,time:2492401,execs:3457669,op:colorization,rep:3	06	no-crash			
+id:000138,sig:06,src:000970,time:2514110,execs:3487886,op:havoc,rep:13	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000139,sig:06,src:000971,time:2517974,execs:3492202,op:colorization,rep:13	06	timeout			
+id:000140,sig:06,src:000835,time:2522189,execs:3499177,op:colorization,rep:4	06	no-crash			
+id:000141,sig:06,src:000975,time:2550143,execs:3542030,op:colorization,rep:7	06	no-crash			
+id:000142,sig:06,src:000964,time:2562316,execs:3557467,op:havoc,rep:12	06	asan	allocation-size-too-big	c836389a01	operator new(unsigned <- AP4_Array<AP4_ElstEntry>::EnsureCapacity(unsigned int) <- AP4_ElstAtom::AP4_ElstAtom(unsigned int,
+id:000143,sig:06,src:000971,time:2591816,execs:3595680,op:havoc,rep:14	06	no-crash			
+id:000144,sig:06,src:000992,time:2644439,execs:3677622,op:colorization,rep:3	06	no-crash			
+id:000145,sig:06,src:000994,time:2648391,execs:3683647,op:colorization,rep:11	06	no-crash			
+id:000146,sig:06,src:000996,time:2685391,execs:3738312,op:colorization,rep:12	06	no-crash			
+id:000147,sig:06,src:000941,time:2702588,execs:3766895,op:trim,rep:1	06	no-crash			
+id:000148,sig:06,src:001004,time:2796381,execs:3908551,op:colorization,rep:2	06	no-crash			
+id:000149,sig:06,src:001005,time:2802449,execs:3915498,op:colorization,rep:2	06	no-crash			
+id:000150,sig:06,src:001013,time:2823947,execs:3950139,op:colorization,rep:3	06	no-crash			
+id:000151,sig:06,src:000684,time:2851898,execs:3988982,op:havoc,rep:14	06	no-crash			
+id:000152,sig:06,src:000989,time:2877442,execs:4029431,op:trim,rep:6	06	no-crash			
+id:000153,sig:06,src:001054,time:3000718,execs:4213619,op:colorization,rep:2	06	no-crash			
+id:000154,sig:06,src:001033,time:3078088,execs:4325241,op:havoc,rep:4	06	asan	allocation-size-too-big	e4b0bb78e8	operator new[](unsigned <- AP4_HdlrAtom::AP4_HdlrAtom(unsigned int, <- AP4_HdlrAtom::Create(unsigned int,
+id:000155,sig:06,src:001103,time:3163763,execs:4442350,op:colorization,rep:3	06	no-crash			
+id:000156,sig:06,src:001106,time:3167575,execs:4446464,op:colorization,rep:11	06	no-crash			
+id:000157,sig:06,src:001080,time:3268569,execs:4588538,op:trim,rep:2	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000158,sig:06,src:001148,time:3277821,execs:4601041,op:colorization,rep:11	06	no-crash			
+id:000159,sig:06,src:000714,time:3282072,execs:4605422,op:havoc,rep:7	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000160,sig:06,src:001164,time:3333955,execs:4679930,op:colorization,rep:7	06	no-crash			
+id:000161,sig:06,src:001170,time:3353007,execs:4706037,op:colorization,rep:1	06	no-crash			
+id:000162,sig:06,src:001182,time:3425385,execs:4813936,op:colorization,rep:4	06	no-crash			
+id:000163,sig:06,src:001209,time:3681030,execs:5182756,op:colorization,rep:2	06	no-crash			
+id:000164,sig:06,src:001131,time:3717406,execs:5233254,op:havoc,rep:7	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000165,sig:06,src:001040,time:3724960,execs:5244377,op:trim,rep:1	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000166,sig:06,src:000794,time:3805270,execs:5357551,op:havoc,rep:5	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000167,sig:06,src:001198,time:3852782,execs:5427050,op:havoc,rep:2	06	asan	allocation-size-too-big	c836389a01	operator new(unsigned <- AP4_Array<AP4_ElstEntry>::EnsureCapacity(unsigned int) <- AP4_ElstAtom::AP4_ElstAtom(unsigned int,
+id:000168,sig:06,src:001286,time:4106505,execs:5724582,op:colorization,rep:2	06	no-crash			
+id:000169,sig:06,src:001302,time:4254764,execs:5905160,op:colorization,rep:5	06	no-crash			
+id:000170,sig:06,src:001303,time:4256255,execs:5907113,op:colorization,rep:1	06	no-crash			
+id:000171,sig:06,src:001322,time:4422577,execs:6058179,op:trim,rep:1	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000172,sig:06,src:000727,time:4445878,execs:6084593,op:havoc,rep:2	06	no-crash			
+id:000173,sig:06,src:001326,time:4467163,execs:6109696,op:colorization,rep:2	06	no-crash			
+id:000174,sig:06,src:001321,time:4564559,execs:6243193,op:havoc,rep:4	06	no-crash			
+id:000175,sig:06,src:001356,time:4690719,execs:6395915,op:colorization,rep:1	06	no-crash			
+id:000176,sig:06,src:001382,time:4861509,execs:6601983,op:colorization,rep:9	06	no-crash			
+id:000177,sig:06,src:001388,time:4909886,execs:6657348,op:havoc,rep:8	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000178,sig:06,src:001401,time:5012172,execs:6783626,op:colorization,rep:8	06	no-crash			
+id:000179,sig:06,src:001409,time:5040825,execs:6816240,op:colorization,rep:3	06	no-crash			
+id:000180,sig:06,src:001471,time:5232263,execs:7014544,op:trim,rep:6	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000181,sig:06,src:001412,time:5367018,execs:7157824,op:havoc,rep:3	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000182,sig:06,src:001446,time:5381618,execs:7175732,op:havoc,rep:11	06	no-crash			
+id:000183,sig:06,src:001504,time:5576783,execs:7379749,op:colorization,rep:1	06	no-crash			
+id:000184,sig:06,src:001552,time:5885123,execs:7709614,op:colorization,rep:2	06	no-crash			
+id:000185,sig:06,src:001565,time:6001562,execs:7849848,op:havoc,rep:4	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000186,sig:06,src:001569,time:6095345,execs:7959129,op:colorization,rep:5	06	no-crash			
+id:000187,sig:06,src:001610,time:6379072,execs:8241957,op:colorization,rep:11	06	no-crash			
+id:000188,sig:06,src:001626,time:6530540,execs:8414075,op:colorization,rep:4	06	no-crash			
+id:000189,sig:06,src:001608,time:6588671,execs:8481875,op:havoc,rep:5	06	no-crash			
+id:000190,sig:06,src:001631,time:6591026,execs:8484148,op:colorization,rep:6	06	no-crash			
+id:000191,sig:06,src:001671,time:7710817,execs:9718039,op:havoc,rep:4	06	no-crash			
+id:000192,sig:06,src:000785,time:8523794,execs:10553252,op:havoc,rep:6	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000193,sig:06,src:001703,time:8994702,execs:11072470,op:havoc,rep:7	06	asan	allocation-size-too-big	c836389a01	operator new(unsigned <- AP4_Array<AP4_ElstEntry>::EnsureCapacity(unsigned int) <- AP4_ElstAtom::AP4_ElstAtom(unsigned int,
+id:000194,sig:06,src:001708,time:9439259,execs:11539394,op:havoc,rep:8	06	asan	allocation-size-too-big	c836389a01	operator new(unsigned <- AP4_Array<AP4_ElstEntry>::EnsureCapacity(unsigned int) <- AP4_ElstAtom::AP4_ElstAtom(unsigned int,
+id:000195,sig:06,src:000710,time:9456510,execs:11557378,op:havoc,rep:4	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000196,sig:06,src:001658,time:9722944,execs:11852859,op:havoc,rep:13	06	no-crash			
+id:000197,sig:06,src:000801,time:9967877,execs:12106882,op:havoc,rep:14	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000198,sig:06,src:001740,time:10405721,execs:12598441,op:colorization,rep:8	06	no-crash			
+id:000199,sig:06,src:001744,time:10409540,execs:12603905,op:havoc,rep:7	06	no-crash			
+id:000200,sig:06,src:001760,time:10780780,execs:13020379,op:colorization,rep:7	06	no-crash			
+id:000201,sig:06,src:001767,time:11263177,execs:13602732,op:colorization,rep:4	06	no-crash			
+id:000202,sig:06,src:001564,time:11382351,execs:13744643,op:havoc,rep:1	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000203,sig:06,src:000407,time:11861921,execs:14315454,op:havoc,rep:1	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000204,sig:06,src:001781,time:12175962,execs:14702464,op:havoc,rep:1	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000205,sig:06,src:001823,time:13480201,execs:16036172,op:colorization,rep:8	06	no-crash			
+id:000206,sig:06,src:001834,time:13740442,execs:16311531,op:colorization,rep:1	06	no-crash			
+id:000207,sig:06,src:001729,time:14564439,execs:17241200,op:havoc,rep:16	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000208,sig:06,src:001857,time:15845916,execs:18743576,op:colorization,rep:6	06	no-crash			
+id:000209,sig:06,src:001868,time:16883969,execs:19982842,op:colorization,rep:1	06	no-crash			
+id:000210,sig:06,src:001639,time:18172079,execs:21502162,op:havoc,rep:5	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000211,sig:06,src:001876,time:18247134,execs:21592984,op:colorization,rep:15	06	no-crash			
+id:000212,sig:06,src:001898,time:19926145,execs:23631900,op:colorization,rep:2	06	no-crash			
+id:000213,sig:06,src:001907,time:20255090,execs:24000232,op:colorization,rep:1	06	no-crash			
+id:000214,sig:06,src:001866,time:20484644,execs:24262884,op:havoc,rep:11	06	asan	allocation-size-too-big	914d59ad3b	operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)
+id:000215,sig:06,src:001901,time:21373289,execs:25333624,op:havoc,rep:5	06	no-crash			

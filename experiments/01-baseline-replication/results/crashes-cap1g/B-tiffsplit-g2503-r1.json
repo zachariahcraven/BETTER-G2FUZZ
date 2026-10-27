@@ -1,0 +1,76 @@
+{
+ "campaign": "B-tiffsplit-g2503-r1",
+ "program": "tiffsplit",
+ "arm": "g2503",
+ "rep": 1,
+ "crash_files": 161,
+ "outcomes": {
+  "asan": 159,
+  "no-crash": 2
+ },
+ "unique_bugs": 10,
+ "unique_bugs_fn": 9,
+ "buckets_fn": [
+  "FPE | TIFFStartTile <- TIFFFillTile <- JPEGFixupTestSubsampling",
+  "SEGV | memcpy <- _TIFFmemcpy <- TIFFReadRawStrip1",
+  "allocation-size-too-big | _TIFFCheckRealloc <- _TIFFCheckMalloc <- TIFFFetchNormalTag",
+  "allocation-size-too-big | _TIFFCheckRealloc <- _TIFFCheckMalloc <- TIFFFetchRationalArray",
+  "allocation-size-too-big | cpStrips <- tiffcp <- main",
+  "allocation-size-too-big | cpTiles <- tiffcp <- main",
+  "heap-buffer-overflow | checkInkNamesString <- _TIFFVSetField <- TIFFSetField",
+  "stack-buffer-overflow | _TIFFVGetField <- TIFFVGetField <- TIFFGetField",
+  "stack-use-after-return | _TIFFVGetField <- TIFFVGetField <- TIFFGetField"
+ ],
+ "buckets": [
+  {
+   "bucket": "0ca7fd554c",
+   "key": "stack-use-after-return | _TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960",
+   "count": 113
+  },
+  {
+   "bucket": "56738101cf",
+   "key": "SEGV | memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208",
+   "count": 17
+  },
+  {
+   "bucket": "178ea79b46",
+   "key": "stack-buffer-overflow | _TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960",
+   "count": 10
+  },
+  {
+   "bucket": "54ee9fe316",
+   "key": "heap-buffer-overflow | checkInkNamesString tif_dir.c:120 <- _TIFFVSetField tif_dir.c:389 <- TIFFSetField tif_dir.c:658",
+   "count": 8
+  },
+  {
+   "bucket": "bc7fea039c",
+   "key": "allocation-size-too-big | _TIFFCheckRealloc tif_aux.c:47 <- _TIFFCheckMalloc tif_aux.c:61 <- TIFFFetchNormalTag tif_dirread.c:1652",
+   "count": 5
+  },
+  {
+   "bucket": "61640e73f6",
+   "key": "allocation-size-too-big | _TIFFCheckRealloc tif_aux.c:47 <- _TIFFCheckMalloc tif_aux.c:61 <- TIFFFetchRationalArray tif_dirread.c:1491",
+   "count": 2
+  },
+  {
+   "bucket": "18f6df4396",
+   "key": "allocation-size-too-big | cpStrips tiffsplit.c:234 <- tiffcp tiffsplit.c:227 <- main tiffsplit.c:89",
+   "count": 1
+  },
+  {
+   "bucket": "c9268df224",
+   "key": "allocation-size-too-big | cpTiles tiffsplit.c:267 <- tiffcp tiffsplit.c:225 <- main tiffsplit.c:89",
+   "count": 1
+  },
+  {
+   "bucket": "4d7806a818",
+   "key": "FPE | TIFFStartTile tif_read.c:670 <- TIFFFillTile tif_read.c:580 <- JPEGFixupTestSubsampling tif_jpeg.c:1761",
+   "count": 1
+  },
+  {
+   "bucket": "a95f1b760c",
+   "key": "FPE | TIFFStartTile tif_read.c:673 <- TIFFFillTile tif_read.c:580 <- JPEGFixupTestSubsampling tif_jpeg.c:1761",
+   "count": 1
+  }
+ ]
+}

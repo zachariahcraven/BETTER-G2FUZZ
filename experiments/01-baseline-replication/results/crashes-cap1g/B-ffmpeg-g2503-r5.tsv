@@ -1,0 +1,7 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:08,src:000105,time:6813719,execs:124529,op:trim,rep:16	08	asan	FPE	e051e0bd7d	mov_write_stsz_tag movenc.c:195 <- mov_write_stbl_tag movenc.c:2422 <- mov_write_minf_tag movenc.c:2666
+id:000001,sig:08,src:000105,time:6813913,execs:124544,op:trim,rep:16	08	asan	FPE	e051e0bd7d	mov_write_stsz_tag movenc.c:195 <- mov_write_stbl_tag movenc.c:2422 <- mov_write_minf_tag movenc.c:2666
+id:000002,sig:08,src:001901,time:19780376,execs:989678,op:trim,rep:5	08	asan	FPE	e051e0bd7d	mov_write_stsz_tag movenc.c:195 <- mov_write_stbl_tag movenc.c:2422 <- mov_write_minf_tag movenc.c:2666
+id:000003,sig:08,src:001901,time:19782095,execs:990082,op:havoc,rep:3	08	asan	FPE	e051e0bd7d	mov_write_stsz_tag movenc.c:195 <- mov_write_stbl_tag movenc.c:2422 <- mov_write_minf_tag movenc.c:2666
+id:000004,sig:08,src:001904,time:19787855,execs:992321,op:trim,rep:2	08	asan	FPE	e051e0bd7d	mov_write_stsz_tag movenc.c:195 <- mov_write_stbl_tag movenc.c:2422 <- mov_write_minf_tag movenc.c:2666
+id:000005,sig:08,src:001907,time:19804363,execs:997733,op:trim,rep:2	08	asan	FPE	e051e0bd7d	mov_write_stsz_tag movenc.c:195 <- mov_write_stbl_tag movenc.c:2422 <- mov_write_minf_tag movenc.c:2666

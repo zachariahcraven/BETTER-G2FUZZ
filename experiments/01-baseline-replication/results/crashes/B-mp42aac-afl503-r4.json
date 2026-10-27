@@ -1,0 +1,25 @@
+{
+ "campaign": "B-mp42aac-afl503-r4",
+ "program": "mp42aac",
+ "arm": "afl503",
+ "rep": 4,
+ "crash_files": 246,
+ "outcomes": {
+  "no-crash": 120,
+  "timeout": 105,
+  "signal:9": 18,
+  "asan": 3
+ },
+ "unique_bugs": 1,
+ "unique_bugs_fn": 1,
+ "buckets_fn": [
+  "out | operator <- AP4_RtpAtom::AP4_RtpAtom(unsigned <- AP4_RtpAtom::Create(unsigned"
+ ],
+ "buckets": [
+  {
+   "bucket": "c73c655546",
+   "key": "out | operator new[](unsigned <- AP4_RtpAtom::AP4_RtpAtom(unsigned int, <- AP4_RtpAtom::Create(unsigned int,",
+   "count": 3
+  }
+ ]
+}

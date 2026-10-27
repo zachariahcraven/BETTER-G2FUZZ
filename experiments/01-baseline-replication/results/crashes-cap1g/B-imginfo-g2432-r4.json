@@ -1,0 +1,28 @@
+{
+ "campaign": "B-imginfo-g2432-r4",
+ "program": "imginfo",
+ "arm": "g2432",
+ "rep": 4,
+ "crash_files": 4,
+ "outcomes": {
+  "asan": 4
+ },
+ "unique_bugs": 2,
+ "unique_bugs_fn": 2,
+ "buckets_fn": [
+  "SEGV | free <- jp2_box_destroy <- jp2_box_get",
+  "SEGV | free <- jp2_cdef_destroy <- jp2_box_destroy"
+ ],
+ "buckets": [
+  {
+   "bucket": "fde7652561",
+   "key": "SEGV | free imginfo.asan+0xd311b) <- jp2_cdef_destroy jp2_cod.c:230 <- jp2_box_destroy jp2_cod.c:212",
+   "count": 3
+  },
+  {
+   "bucket": "7b28ca2526",
+   "key": "SEGV | free imginfo.asan+0xd311b) <- jp2_box_destroy jp2_cod.c:212 <- jp2_box_get jp2_cod.c:319",
+   "count": 1
+  }
+ ]
+}

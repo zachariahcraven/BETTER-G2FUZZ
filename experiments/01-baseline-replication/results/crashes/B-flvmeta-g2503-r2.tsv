@@ -1,0 +1,44 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:11,src:000109,time:432,execs:1019,op:havoc,rep:4	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000001,sig:11,src:000109,time:1399,execs:2361,op:havoc,rep:8	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000002,sig:11,src:000109,time:1859,execs:2895,op:havoc,rep:13	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000003,sig:11,src:000109,time:2117,execs:3208,op:havoc,rep:14	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000004,sig:11,src:000109,time:5484,execs:10995,op:havoc,rep:11	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000005,sig:11,src:000109,time:6619,execs:12394,op:havoc,rep:10	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000006,sig:11,src:000132,time:8525,execs:16345,op:havoc,rep:2	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000007,sig:11,src:000134,time:8850,execs:16746,op:havoc,rep:15	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000008,sig:11,src:000148,time:10234,execs:19985,op:colorization,rep:3	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000009,sig:11,src:000165,time:13879,execs:27776,op:its,rep:2	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000010,sig:11,src:000166,time:14105,execs:27965,op:colorization,rep:3	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000011,sig:11,src:000166,time:15183,execs:29090,op:havoc,rep:8	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000012,sig:11,src:000166,time:16355,execs:29537,op:havoc,rep:6	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000013,sig:11,src:000166,time:17427,execs:30520,op:havoc,rep:4	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000014,sig:11,src:000166,time:24958,execs:37626,op:havoc,rep:3	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000015,sig:11,src:000166,time:25822,execs:38126,op:havoc,rep:15	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000016,sig:11,src:000166,time:30153,execs:41905,op:havoc,rep:4	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000017,sig:11,src:000166,time:35019,execs:45949,op:havoc,rep:14	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000018,sig:11,src:000166,time:38962,execs:48909,op:havoc,rep:8	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000019,sig:11,src:000166,time:46985,execs:56201,op:havoc,rep:9	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000020,sig:11,src:000166,time:51408,execs:60154,op:havoc,rep:7	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000021,sig:11,src:000166,time:53817,execs:62867,op:havoc,rep:14	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000022,sig:11,src:000166,time:65839,execs:73698,op:havoc,rep:4	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000023,sig:11,src:000166,time:69824,execs:77338,op:havoc,rep:11	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000024,sig:11,src:000206,time:78045,execs:90476,op:havoc,rep:3	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000025,sig:11,src:000208,time:78468,execs:91042,op:havoc,rep:2	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000026,sig:11,src:000209,time:78925,execs:91608,op:havoc,rep:3	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000027,sig:11,src:000211,time:87777,execs:106522,op:havoc,rep:6	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000028,sig:11,src:000211,time:89335,execs:107188,op:havoc,rep:8	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000029,sig:11,src:000211,time:92900,execs:108724,op:havoc,rep:3	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000030,sig:11,src:000211,time:94133,execs:109421,op:havoc,rep:5	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000031,sig:11,src:000211,time:97784,execs:111233,op:havoc,rep:7	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000032,sig:11,src:000245,time:142902,execs:161422,op:havoc,rep:5	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000033,sig:11,src:000242,time:154348,execs:174652,op:havoc,rep:5	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000034,sig:11,src:000170,time:161749,execs:186505,op:havoc,rep:4	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000035,sig:11,src:000261,time:175613,execs:207002,op:havoc,rep:4	11	asan	SEGV	f2bf07f054	libc.so.6+0xe0d54 <- strftime_l libc.so.6+0xe2deb) <- xml_amf_data_dump dump_xml.c:151
+id:000036,sig:11,src:000251,time:197067,execs:230355,op:havoc,rep:2	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000037,sig:11,src:000269,time:294857,execs:365437,op:trim,rep:3	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000038,sig:11,src:000115,time:328690,execs:403403,op:havoc,rep:14	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000039,sig:11,src:000297,time:519106,execs:642156,op:havoc,rep:1	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000040,sig:11,src:000362,time:741569,execs:992623,op:havoc,rep:1	11	asan	SEGV	f2bf07f054	libc.so.6+0xe0d54 <- strftime_l libc.so.6+0xe2deb) <- xml_amf_data_dump dump_xml.c:151
+id:000041,sig:11,src:000337,time:828231,execs:1161861,op:trim,rep:14	11	asan	SEGV	b4a8067c06	strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506
+id:000042,sig:11,src:000345,time:857722,execs:1216557,op:havoc,rep:15	11	asan	SEGV	f2bf07f054	libc.so.6+0xe0d54 <- strftime_l libc.so.6+0xe2deb) <- xml_amf_data_dump dump_xml.c:151

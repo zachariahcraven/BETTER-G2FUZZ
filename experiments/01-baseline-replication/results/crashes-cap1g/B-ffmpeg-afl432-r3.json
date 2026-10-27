@@ -1,0 +1,28 @@
+{
+ "campaign": "B-ffmpeg-afl432-r3",
+ "program": "ffmpeg",
+ "arm": "afl432",
+ "rep": 3,
+ "crash_files": 7,
+ "outcomes": {
+  "asan": 7
+ },
+ "unique_bugs": 2,
+ "unique_bugs_fn": 2,
+ "buckets_fn": [
+  "FPE | gdv_read_header <- avformat_open_input <- open_input_file",
+  "FPE | mov_write_stsz_tag <- mov_write_stbl_tag <- mov_write_minf_tag"
+ ],
+ "buckets": [
+  {
+   "bucket": "22dc810c55",
+   "key": "FPE | gdv_read_header gdv.c:107 <- avformat_open_input utils.c:631 <- open_input_file ffmpeg_opt.c:1069",
+   "count": 6
+  },
+  {
+   "bucket": "e051e0bd7d",
+   "key": "FPE | mov_write_stsz_tag movenc.c:195 <- mov_write_stbl_tag movenc.c:2422 <- mov_write_minf_tag movenc.c:2666",
+   "count": 1
+  }
+ ]
+}

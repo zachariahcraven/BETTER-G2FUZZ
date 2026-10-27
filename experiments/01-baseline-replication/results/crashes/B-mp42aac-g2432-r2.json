@@ -1,0 +1,37 @@
+{
+ "campaign": "B-mp42aac-g2432-r2",
+ "program": "mp42aac",
+ "arm": "g2432",
+ "rep": 2,
+ "crash_files": 178,
+ "outcomes": {
+  "timeout": 110,
+  "no-crash": 61,
+  "signal:9": 4,
+  "asan": 3
+ },
+ "unique_bugs": 3,
+ "unique_bugs_fn": 3,
+ "buckets_fn": [
+  "SEGV | AP4_DataBuffer::SetData(unsigned <- AP4_AvccAtom::AP4_AvccAtom(unsigned <- AP4_AvccAtom::Create(unsigned",
+  "heap-buffer-overflow | AP4_AvccAtom::AP4_AvccAtom(unsigned <- AP4_AvccAtom::Create(unsigned <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&,",
+  "heap-buffer-overflow | AP4_AvccAtom::Create(unsigned <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&, <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&,"
+ ],
+ "buckets": [
+  {
+   "bucket": "16d2635201",
+   "key": "SEGV | AP4_DataBuffer::SetData(unsigned char <- AP4_AvccAtom::AP4_AvccAtom(unsigned int, <- AP4_AvccAtom::Create(unsigned int,",
+   "count": 1
+  },
+  {
+   "bucket": "73d9467774",
+   "key": "heap-buffer-overflow | AP4_AvccAtom::AP4_AvccAtom(unsigned int, <- AP4_AvccAtom::Create(unsigned int, <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&, unsigned",
+   "count": 1
+  },
+  {
+   "bucket": "4d2cc1af97",
+   "key": "heap-buffer-overflow | AP4_AvccAtom::Create(unsigned int, <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&, unsigned <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&, unsigned",
+   "count": 1
+  }
+ ]
+}

@@ -1,0 +1,47 @@
+{
+ "campaign": "B-tiffsplit-g2503-r3",
+ "program": "tiffsplit",
+ "arm": "g2503",
+ "rep": 3,
+ "crash_files": 193,
+ "outcomes": {
+  "asan": 192,
+  "no-crash": 1
+ },
+ "unique_bugs": 5,
+ "unique_bugs_fn": 5,
+ "buckets_fn": [
+  "SEGV | memcpy <- _TIFFmemcpy <- TIFFReadRawStrip1",
+  "SEGV | memcpy <- _TIFFmemcpy <- TIFFReadRawTile1",
+  "stack-buffer-overflow | _TIFFVGetField <- TIFFVGetField <- TIFFGetField",
+  "stack-buffer-overflow | checkInkNamesString <- _TIFFVSetField <- TIFFSetField",
+  "stack-use-after-return | _TIFFVGetField <- TIFFVGetField <- TIFFGetField"
+ ],
+ "buckets": [
+  {
+   "bucket": "0ca7fd554c",
+   "key": "stack-use-after-return | _TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960",
+   "count": 149
+  },
+  {
+   "bucket": "56738101cf",
+   "key": "SEGV | memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208",
+   "count": 33
+  },
+  {
+   "bucket": "178ea79b46",
+   "key": "stack-buffer-overflow | _TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960",
+   "count": 6
+  },
+  {
+   "bucket": "a309920604",
+   "key": "SEGV | memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawTile1 tif_read.c:451",
+   "count": 3
+  },
+  {
+   "bucket": "e04c9275f7",
+   "key": "stack-buffer-overflow | checkInkNamesString tif_dir.c:120 <- _TIFFVSetField tif_dir.c:389 <- TIFFSetField tif_dir.c:658",
+   "count": 1
+  }
+ ]
+}

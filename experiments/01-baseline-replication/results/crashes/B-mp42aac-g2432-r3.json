@@ -1,0 +1,37 @@
+{
+ "campaign": "B-mp42aac-g2432-r3",
+ "program": "mp42aac",
+ "arm": "g2432",
+ "rep": 3,
+ "crash_files": 318,
+ "outcomes": {
+  "timeout": 163,
+  "no-crash": 61,
+  "signal:9": 22,
+  "asan": 72
+ },
+ "unique_bugs": 3,
+ "unique_bugs_fn": 3,
+ "buckets_fn": [
+  "ABRT | pthread_kill <- gsignal <- abort",
+  "SEGV | AP4_DataBuffer::SetData(unsigned <- AP4_AvccAtom::AP4_AvccAtom(unsigned <- AP4_AvccAtom::Create(unsigned",
+  "heap-buffer-overflow | AP4_AvccAtom::Create(unsigned <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&, <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&,"
+ ],
+ "buckets": [
+  {
+   "bucket": "fdb798c62f",
+   "key": "ABRT | pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)",
+   "count": 69
+  },
+  {
+   "bucket": "4d2cc1af97",
+   "key": "heap-buffer-overflow | AP4_AvccAtom::Create(unsigned int, <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&, unsigned <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&, unsigned",
+   "count": 2
+  },
+  {
+   "bucket": "16d2635201",
+   "key": "SEGV | AP4_DataBuffer::SetData(unsigned char <- AP4_AvccAtom::AP4_AvccAtom(unsigned int, <- AP4_AvccAtom::Create(unsigned int,",
+   "count": 1
+  }
+ ]
+}

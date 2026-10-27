@@ -1,0 +1,16 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:05,src:000003,time:2455,execs:2436,op:havoc,rep:8	05	no-crash			
+id:000001,sig:05,src:000003,time:3479,execs:3410,op:havoc,rep:8	05	no-crash			
+id:000002,sig:05,src:000003,time:4892,execs:4844,op:havoc,rep:7	05	no-crash			
+id:000003,sig:05,src:000012,time:17407,execs:16141,op:flip1,pos:47241	05	asan	allocation-size-too-big	abd3b450c1	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-ico.c:479
+id:000004,sig:11,src:000012,time:17630,execs:16157,op:flip1,pos:47242	11	asan	heap-buffer-overflow	a0c233833d	OneLine32 io-ico.c:596 <- OneLine io-ico.c:807 <- gdk_pixbuf__ico_image_load_increment io-ico.c:898
+id:000005,sig:05,src:000012,time:23196,execs:18983,op:arith16,pos:47241,val:-20	05	no-crash			
+id:000006,sig:05,src:000011,time:34799,execs:26347,op:havoc,rep:3	05	no-crash			
+id:000007,sig:05,src:000011,time:35405,execs:26679,op:havoc,rep:4	05	no-crash			
+id:000008,sig:05,src:000011,time:63395,execs:48809,op:havoc,rep:8	05	asan	allocation-size-too-big	c4abdfa3c3	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gif_get_lzw io-gif.c:854
+id:000009,sig:05,src:000022,time:135451,execs:101578,op:int32,pos:122,val:be:+32767	05	no-crash			
+id:000010,sig:05,src:000521,time:263549,execs:204339,op:havoc,rep:4	05	no-crash			
+id:000011,sig:11,src:000023,time:909136,execs:276495,op:inf,rep:1	11	asan	heap-buffer-overflow	05d67b2282	gdk_pixbuf_from_pixdata gdk-pixdata.c:479 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000012,sig:11,src:000624,time:1012124,execs:349366,op:quick,pos:14,val:+2	11	asan	heap-buffer-overflow	3d961589f0	gdk_pixbuf_from_pixdata gdk-pixdata.c:472 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000013,sig:11,src:002258,time:12803494,execs:6996994,op:havoc,rep:6	11	asan	heap-buffer-overflow	3d961589f0	gdk_pixbuf_from_pixdata gdk-pixdata.c:472 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000014,sig:11,src:000671,time:25135417,execs:14441693,op:havoc,rep:2	11	asan	heap-buffer-overflow	3d961589f0	gdk_pixbuf_from_pixdata gdk-pixdata.c:472 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152

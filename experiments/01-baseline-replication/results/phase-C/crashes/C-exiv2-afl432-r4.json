@@ -1,0 +1,78 @@
+{
+ "campaign": "C-exiv2-afl432-r4",
+ "program": "exiv2",
+ "arm": "afl432",
+ "rep": 4,
+ "crash_files": 118,
+ "outcomes": {
+  "no-crash": 62,
+  "timeout": 3,
+  "asan": 53
+ },
+ "unique_bugs": 10,
+ "unique_bugs_fn": 10,
+ "buckets_fn": [
+  "ABRT | pthread_kill <- gsignal <- abort",
+  "heap-buffer-overflow | Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&, <- Exiv2::Cr2Image::printStructure(std::ostream&,",
+  "heap-buffer-overflow | Exiv2::Internal::PngChunk::parseTXTChunk(Exiv2::DataBuf <- Exiv2::Internal::PngChunk::decodeTXTChunk(Exiv2::Image*, <- Exiv2::PngImage::readMetadata()",
+  "heap-buffer-overflow | Exiv2::Internal::PngChunk::readRawProfile(Exiv2::DataBuf <- Exiv2::Internal::PngChunk::parseChunkContent(Exiv2::Image*, <- Exiv2::Internal::PngChunk::decodeTXTChunk(Exiv2::Image*,",
+  "heap-buffer-overflow | Exiv2::Internal::binaryToString[abi:cxx11](unsigned <- Exiv2::IptcData::printStructure(std::ostream&, <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&,",
+  "heap-buffer-overflow | Exiv2::IptcData::printStructure(std::ostream&, <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&,",
+  "heap-buffer-overflow | Exiv2::Jp2Image::readMetadata() <- Action::Print::printSummary() <- Action::Print::run(std::__cxx11::basic_string<char,",
+  "heap-buffer-overflow | Exiv2::RafImage::readMetadata() <- Action::Print::printSummary() <- Action::Print::run(std::__cxx11::basic_string<char,",
+  "heap-buffer-overflow | Exiv2::ul2Data(unsigned <- long <- Exiv2::ValueType<unsigned",
+  "heap-buffer-overflow | std::char_traits<char>::length(char <- std::__cxx11::basic_string<char, <- Exiv2::Internal::PngChunk::parseTXTChunk(Exiv2::DataBuf"
+ ],
+ "buckets": [
+  {
+   "bucket": "fdb798c62f",
+   "key": "ABRT | pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)",
+   "count": 19
+  },
+  {
+   "bucket": "433d63a9e3",
+   "key": "heap-buffer-overflow | std::char_traits<char>::length(char const*) <- std::__cxx11::basic_string<char, std: <- Exiv2::Internal::PngChunk::parseTXTChunk(Exiv2::DataBuf const&,",
+   "count": 15
+  },
+  {
+   "bucket": "9593e6727e",
+   "key": "heap-buffer-overflow | Exiv2::Internal::PngChunk::readRawProfile(Exiv2::DataBuf const&, <- Exiv2::Internal::PngChunk::parseChunkContent(Exiv2::Image*, unsigned <- Exiv2::Internal::PngChunk::decodeTXTChunk(Exiv2::Image*, Exiv2:",
+   "count": 7
+  },
+  {
+   "bucket": "213c534b40",
+   "key": "heap-buffer-overflow | Exiv2::IptcData::printStructure(std::ostream&, unsigned <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, std: <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&, std:",
+   "count": 4
+  },
+  {
+   "bucket": "32df00fa03",
+   "key": "heap-buffer-overflow | Exiv2::Internal::binaryToString[abi:cxx11](unsigned char <- Exiv2::IptcData::printStructure(std::ostream&, unsigned <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, std:",
+   "count": 2
+  },
+  {
+   "bucket": "971c2cd594",
+   "key": "heap-buffer-overflow | Exiv2::Jp2Image::readMetadata() jp2image.cpp:277 <- Action::Print::printSummary() actions.cpp:289 <- Action::Print::run(std::__cxx11::basic_string<char, std:",
+   "count": 2
+  },
+  {
+   "bucket": "37c67b1dce",
+   "key": "heap-buffer-overflow | Exiv2::Internal::PngChunk::parseTXTChunk(Exiv2::DataBuf const&, <- Exiv2::Internal::PngChunk::decodeTXTChunk(Exiv2::Image*, Exiv2: <- Exiv2::PngImage::readMetadata() pngimage.cpp",
+   "count": 1
+  },
+  {
+   "bucket": "eec2d498c2",
+   "key": "heap-buffer-overflow | Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, std: <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&, std: <- Exiv2::Cr2Image::printStructure(std::ostream&, Exiv2:",
+   "count": 1
+  },
+  {
+   "bucket": "bd620f81f4",
+   "key": "heap-buffer-overflow | Exiv2::RafImage::readMetadata() rafimage.cpp:307 <- Action::Print::printSummary() actions.cpp:289 <- Action::Print::run(std::__cxx11::basic_string<char, std:",
+   "count": 1
+  },
+  {
+   "bucket": "12b328a6d3",
+   "key": "heap-buffer-overflow | Exiv2::ul2Data(unsigned char*, <- long Exiv2: <- Exiv2::ValueType<unsigned int>:",
+   "count": 1
+  }
+ ]
+}

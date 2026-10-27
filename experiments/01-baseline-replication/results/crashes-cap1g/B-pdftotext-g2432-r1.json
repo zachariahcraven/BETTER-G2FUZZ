@@ -1,0 +1,58 @@
+{
+ "campaign": "B-pdftotext-g2432-r1",
+ "program": "pdftotext",
+ "arm": "g2432",
+ "rep": 1,
+ "crash_files": 53,
+ "outcomes": {
+  "asan": 53
+ },
+ "unique_bugs": 7,
+ "unique_bugs_fn": 7,
+ "buckets_fn": [
+  "ABRT | pthread_kill <- gsignal <- abort",
+  "SEGV | TextPage::findGaps(GList*, <- TextPage::split(GList*, <- TextPage::splitChars(GList*)",
+  "allocation-size-too-big | grealloc <- greallocn <- XRef::constructXRef()",
+  "allocation-size-too-big | malloc <- gmalloc <- gmallocn",
+  "stack-overflow | XRef::fetch(int, <- AcroForm::scanField(Object*) <- AcroForm::scanField(Object*)",
+  "stack-overflow | _IO_default_xsputn <- libc.so.6+0x76fcb <- libc.so.6+0x77624",
+  "stack-overflow | malloc <- gmalloc <- copyString"
+ ],
+ "buckets": [
+  {
+   "bucket": "fdb798c62f",
+   "key": "ABRT | pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)",
+   "count": 39
+  },
+  {
+   "bucket": "304034d0fc",
+   "key": "allocation-size-too-big | malloc pdftotext.asan+0x1d73de) <- gmalloc gmem.cc:140 <- gmallocn gmem.cc:206",
+   "count": 5
+  },
+  {
+   "bucket": "c665cfeebd",
+   "key": "SEGV | TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610",
+   "count": 4
+  },
+  {
+   "bucket": "104c8e91c6",
+   "key": "stack-overflow | XRef::fetch(int, int, <- AcroForm::scanField(Object*) AcroForm.cc:244 <- AcroForm::scanField(Object*) AcroForm.cc:271",
+   "count": 2
+  },
+  {
+   "bucket": "85b2c81bbe",
+   "key": "allocation-size-too-big | grealloc gmem.cc:185 <- greallocn gmem.cc:222 <- XRef::constructXRef() XRef.cc:931",
+   "count": 1
+  },
+  {
+   "bucket": "cacfe878bb",
+   "key": "stack-overflow | malloc pdftotext.asan+0x1d743e) <- gmalloc gmem.cc:140 <- copyString gmem.cc:311",
+   "count": 1
+  },
+  {
+   "bucket": "21bac5836a",
+   "key": "stack-overflow | _IO_default_xsputn libc.so.6+0x8de23) <- libc.so.6+0x76fcb <- libc.so.6+0x77624",
+   "count": 1
+  }
+ ]
+}

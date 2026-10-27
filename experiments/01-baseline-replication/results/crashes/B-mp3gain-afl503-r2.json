@@ -1,0 +1,63 @@
+{
+ "campaign": "B-mp3gain-afl503-r2",
+ "program": "mp3gain",
+ "arm": "afl503",
+ "rep": 2,
+ "crash_files": 98,
+ "outcomes": {
+  "asan": 98
+ },
+ "unique_bugs": 8,
+ "unique_bugs_fn": 7,
+ "buckets_fn": [
+  "SEGV | memcpy <- copy_mp <- decodeMP3",
+  "global-buffer-overflow | III_dequantize_sample <- do_layer3 <- decodeMP3",
+  "global-buffer-overflow | III_i_stereo <- do_layer3 <- decodeMP3",
+  "heap-buffer-overflow | ReadMP3APETag <- ReadMP3GainAPETag <- main",
+  "memcpy-param-overlap | set_pointer <- do_layer3 <- decodeMP3",
+  "stack-buffer-overflow | ExtractI4 <- GetVbrTag <- check_vbr_header",
+  "stack-buffer-overflow | filterYule <- AnalyzeSamples <- main"
+ ],
+ "buckets": [
+  {
+   "bucket": "ec1f182061",
+   "key": "global-buffer-overflow | III_dequantize_sample layer3.c:904 <- do_layer3 layer3.c:1646 <- decodeMP3 interface.c:643",
+   "count": 47
+  },
+  {
+   "bucket": "85d2326158",
+   "key": "global-buffer-overflow | III_dequantize_sample layer3.c:904 <- do_layer3 layer3.c:1630 <- decodeMP3 interface.c:643",
+   "count": 29
+  },
+  {
+   "bucket": "5576a8cfe2",
+   "key": "stack-buffer-overflow | ExtractI4 interface.c:204 <- GetVbrTag interface.c:278 <- check_vbr_header interface.c:364",
+   "count": 7
+  },
+  {
+   "bucket": "e98042e5fa",
+   "key": "global-buffer-overflow | III_i_stereo layer3.c:1169 <- do_layer3 layer3.c:1661 <- decodeMP3 interface.c:643",
+   "count": 5
+  },
+  {
+   "bucket": "5db4d19076",
+   "key": "memcpy-param-overlap | set_pointer common.c:328 <- do_layer3 layer3.c:1582 <- decodeMP3 interface.c:643",
+   "count": 5
+  },
+  {
+   "bucket": "bd3b7a7584",
+   "key": "stack-buffer-overflow | filterYule gain_analysis.c:195 <- AnalyzeSamples gain_analysis.c:344 <- main mp3gain.c:2281",
+   "count": 3
+  },
+  {
+   "bucket": "67031bfad7",
+   "key": "heap-buffer-overflow | ReadMP3APETag apetag.c:234 <- ReadMP3GainAPETag apetag.c:371 <- main mp3gain.c:1778",
+   "count": 1
+  },
+  {
+   "bucket": "d0d7db6ff1",
+   "key": "SEGV | memcpy libc.so.6+0xc4853) <- copy_mp interface.c:188 <- decodeMP3 interface.c:573",
+   "count": 1
+  }
+ ]
+}

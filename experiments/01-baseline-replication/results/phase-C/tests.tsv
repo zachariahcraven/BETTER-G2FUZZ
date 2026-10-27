@@ -1,0 +1,16 @@
+program	comparison	metric	n	med_first	med_second	A12	p_exact	direction
+exiv2	G2FUZZ vs AFL++ (4.32c)	edges_final	5+5	6995	5792	0.8	0.1508	first
+exiv2	G2FUZZ vs AFL++ (4.32c)	unique_bugs	5+5	12	10	0.68	0.373	first
+exiv2	G2FUZZ vs AFL++ (4.32c)	unique_bugs_cap	5+5	22	20	0.58	0.7302	first
+gdk-pixbuf-pixdata	G2FUZZ vs AFL++ (4.32c)	edges_final	5+5	2184	2111	0.92	0.0317	first
+gdk-pixbuf-pixdata	G2FUZZ vs AFL++ (4.32c)	unique_bugs	5+5	14	5	0.6	0.6508	first
+gdk-pixbuf-pixdata	G2FUZZ vs AFL++ (4.32c)	unique_bugs_cap	5+5	22	7	0.64	0.5079	first
+imginfo	G2FUZZ vs AFL++ (4.32c)	edges_final	5+5	2024	2019	0.68	0.4206	first
+imginfo	G2FUZZ vs AFL++ (4.32c)	unique_bugs	5+5	3	2	0.64	0.6825	first
+imginfo	G2FUZZ vs AFL++ (4.32c)	unique_bugs_cap	5+5	3	2	0.64	0.6825	first
+jhead	G2FUZZ vs AFL++ (4.32c)	edges_final	5+5	508	501	0.76	0.2222	first
+jhead	G2FUZZ vs AFL++ (4.32c)	unique_bugs	5+5	35	13	0.96	0.0159	first
+jhead	G2FUZZ vs AFL++ (4.32c)	unique_bugs_cap	5+5	35	13	0.96	0.0159	first
+mp3gain	G2FUZZ vs AFL++ (4.32c)	edges_final	5+5	871	871	0.54	0.8651	first
+mp3gain	G2FUZZ vs AFL++ (4.32c)	unique_bugs	5+5	9	8	0.62	0.619	first
+mp3gain	G2FUZZ vs AFL++ (4.32c)	unique_bugs_cap	5+5	9	8	0.62	0.619	first

@@ -1,0 +1,35 @@
+{
+ "campaign": "B-tiffsplit-g2432-r5",
+ "program": "tiffsplit",
+ "arm": "g2432",
+ "rep": 5,
+ "crash_files": 158,
+ "outcomes": {
+  "asan": 151,
+  "no-crash": 7
+ },
+ "unique_bugs": 3,
+ "unique_bugs_fn": 3,
+ "buckets_fn": [
+  "SEGV | memcpy <- _TIFFmemcpy <- TIFFReadRawStrip1",
+  "stack-buffer-overflow | _TIFFVGetField <- TIFFVGetField <- TIFFGetField",
+  "stack-use-after-return | _TIFFVGetField <- TIFFVGetField <- TIFFGetField"
+ ],
+ "buckets": [
+  {
+   "bucket": "0ca7fd554c",
+   "key": "stack-use-after-return | _TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960",
+   "count": 105
+  },
+  {
+   "bucket": "56738101cf",
+   "key": "SEGV | memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208",
+   "count": 40
+  },
+  {
+   "bucket": "178ea79b46",
+   "key": "stack-buffer-overflow | _TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960",
+   "count": 6
+  }
+ ]
+}

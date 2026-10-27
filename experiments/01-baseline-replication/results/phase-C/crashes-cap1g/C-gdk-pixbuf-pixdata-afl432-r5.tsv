@@ -1,0 +1,11 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:05,src:000003,time:2583,execs:2685,op:havoc,rep:4	05	no-crash			
+id:000001,sig:05,src:000011,time:680276,execs:87089,op:havoc,rep:7	05	no-crash			
+id:000002,sig:05,src:000022,time:694514,execs:97453,op:quick,pos:124,val:+5	05	no-crash			
+id:000003,sig:05,src:000022,time:696773,execs:98460,op:flip1,pos:120	05	no-crash			
+id:000004,sig:11,src:000022,time:711112,execs:105131,op:int32,pos:94,val:+2147483647	11	asan	SEGV	9f18212c7d	DecodeHeader io-ico.c:322 <- gdk_pixbuf__ico_image_load_increment io-ico.c:905 <- gdk_pixbuf_loader_write gdk-pixbuf-loader.c:523
+id:000005,sig:05,src:000022,time:711827,execs:105292,op:int32,pos:122,val:be:+32767	05	no-crash			
+id:000006,sig:11,src:000465,time:727726,execs:113764,op:flip1,pos:14071	11	asan	heap-buffer-overflow	a0c233833d	OneLine32 io-ico.c:596 <- OneLine io-ico.c:807 <- gdk_pixbuf__ico_image_load_increment io-ico.c:898
+id:000007,sig:11,src:000023,time:797435,execs:154666,op:inf,rep:6	11	asan	heap-buffer-overflow	05d67b2282	gdk_pixbuf_from_pixdata gdk-pixdata.c:479 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000008,sig:11,src:000023,time:845162,execs:176513,op:havoc,rep:14	11	asan	heap-buffer-overflow	05d67b2282	gdk_pixbuf_from_pixdata gdk-pixdata.c:479 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000009,sig:11,src:000578,time:35729875,execs:16298565,op:havoc,rep:15	11	asan	heap-buffer-overflow	05d67b2282	gdk_pixbuf_from_pixdata gdk-pixdata.c:479 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152

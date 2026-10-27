@@ -1,0 +1,25 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:06,src:000006,time:76601,execs:26417,op:havoc,rep:5	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000001,sig:06,src:000017,time:188682,execs:69125,op:havoc,rep:1	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000002,sig:06,src:000022,time:255217,execs:88926,op:havoc,rep:3	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000003,sig:06,src:000022,time:265886,execs:92255,op:havoc,rep:8	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000004,sig:06,src:000023,time:383057,execs:124322,op:int16,pos:318,val:-128	06	asan	allocation-size-too-big	304034d0fc	malloc pdftotext.asan+0x1d73de) <- gmalloc gmem.cc:140 <- gmallocn gmem.cc:206
+id:000005,sig:06,src:000023,time:396351,execs:127847,op:int32,pos:308,val:+127	06	asan	allocation-size-too-big	304034d0fc	malloc pdftotext.asan+0x1d73de) <- gmalloc gmem.cc:140 <- gmallocn gmem.cc:206
+id:000006,sig:06,src:000023,time:543259,execs:180130,op:havoc,rep:8	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000007,sig:06,src:000024,time:622374,execs:205967,op:colorization,rep:6	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000008,sig:06,src:000026,time:711262,execs:232430,op:havoc,rep:14	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000009,sig:06,src:000039,time:1053934,execs:326490,op:havoc,rep:6	06	asan	allocation-size-too-big	304034d0fc	malloc pdftotext.asan+0x1d73de) <- gmalloc gmem.cc:140 <- gmallocn gmem.cc:206
+id:000010,sig:06,src:000040,time:1183718,execs:363263,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000011,sig:11,src:000051,time:1379508,execs:418452,op:colorization,rep:2	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000012,sig:11,src:000051,time:1402893,execs:424603,op:colorization,rep:2	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000013,sig:06,src:003046,time:5996069,execs:1931554,op:colorization,rep:6	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000014,sig:06,src:003317,time:6093302,execs:1957111,op:colorization,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000015,sig:06,src:003031,time:14719655,execs:4409116,op:colorization,rep:4	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000016,sig:11,src:003033,time:14777912,execs:4425875,op:colorization,rep:1	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000017,sig:11,src:003064,time:15020354,execs:4502597,op:colorization,rep:9	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000018,sig:06,src:003065,time:15075293,execs:4518432,op:colorization,rep:3	06	asan	allocation-size-too-big	304034d0fc	malloc pdftotext.asan+0x1d73de) <- gmalloc gmem.cc:140 <- gmallocn gmem.cc:206
+id:000019,sig:06,src:003065,time:15087235,execs:4521738,op:colorization,rep:3	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000020,sig:11,src:003936,time:17636905,execs:5237980,op:colorization,rep:4	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000021,sig:11,src:003936,time:17638911,execs:5238629,op:colorization,rep:4	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000022,sig:11,src:003936,time:17645749,execs:5240977,op:colorization,rep:4	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000023,sig:06,src:004728,time:21477088,execs:6520016,op:havoc,rep:11	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)

@@ -1,0 +1,150 @@
+{
+ "campaign": "B-gdk-pixbuf-pixdata-g2503-r2",
+ "program": "gdk-pixbuf-pixdata",
+ "arm": "g2503",
+ "rep": 2,
+ "crash_files": 142,
+ "outcomes": {
+  "asan": 56,
+  "no-crash": 85,
+  "signal:5": 1
+ },
+ "unique_bugs": 23,
+ "unique_bugs_fn": 17,
+ "buckets_fn": [
+  "SEGV | gdk_pixbuf__qtif_image_load_increment <- gdk_pixbuf_loader_load_module <- gdk_pixbuf_loader_close",
+  "SEGV | pixops_scale_nearest <- _pixops_scale_real <- _pixops_scale",
+  "allocation-size-too-big | malloc <- g_malloc <- make_weights",
+  "allocation-size-too-big | malloc <- g_malloc <- pixops_process",
+  "allocation-size-too-big | malloc <- gdk_pixbuf_new <- DecodeHeader",
+  "allocation-size-too-big | malloc <- gdk_pixbuf_new <- gdk_pixbuf__pcx_load_increment",
+  "allocation-size-too-big | malloc <- gdk_pixbuf_new <- gif_get_lzw",
+  "allocation-size-too-big | malloc <- get_contiguous_pixbuf <- fill_in_context",
+  "heap-buffer-overflow | DoCompressed <- gdk_pixbuf__bmp_image_load_increment <- gdk_pixbuf_loader_load_module",
+  "heap-buffer-overflow | DoCompressed <- gdk_pixbuf__bmp_image_load_increment <- generic_load_incrementally",
+  "heap-buffer-overflow | gdk_pixbuf_from_pixdata <- try_load <- pixdata_image_load_increment",
+  "heap-buffer-overflow | pcx_increment_load_data_2 <- gdk_pixbuf__pcx_load_increment <- gdk_pixbuf_loader_load_module",
+  "heap-buffer-overflow | pcx_increment_load_data_2 <- gdk_pixbuf__pcx_load_increment <- generic_load_incrementally",
+  "heap-buffer-overflow | pcx_increment_load_data_24 <- gdk_pixbuf__pcx_load_increment <- generic_load_incrementally",
+  "heap-buffer-overflow | pcx_increment_load_data_8 <- gdk_pixbuf__pcx_load_increment <- generic_load_incrementally",
+  "heap-buffer-overflow | read_pixel_1 <- pcx_increment_load_data_1 <- gdk_pixbuf__pcx_load_increment",
+  "heap-buffer-overflow | read_pixel_4 <- pcx_increment_load_data_4 <- gdk_pixbuf__pcx_load_increment"
+ ],
+ "buckets": [
+  {
+   "bucket": "c4abdfa3c3",
+   "key": "allocation-size-too-big | malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gif_get_lzw io-gif.c:854",
+   "count": 8
+  },
+  {
+   "bucket": "1d8fbc906d",
+   "key": "allocation-size-too-big | malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-bmp.c",
+   "count": 7
+  },
+  {
+   "bucket": "255dca9438",
+   "key": "SEGV | gdk_pixbuf__qtif_image_load_increment io-qtif.c:437 <- gdk_pixbuf_loader_load_module gdk-pixbuf-loader.c:445 <- gdk_pixbuf_loader_close gdk-pixbuf-loader.c:810",
+   "count": 6
+  },
+  {
+   "bucket": "a70a0032f8",
+   "key": "allocation-size-too-big | malloc gdk-pixbuf-pixdata.asan+0xd218e) <- get_contiguous_pixbuf io-tga.c:254 <- fill_in_context io-tga.c:335",
+   "count": 4
+  },
+  {
+   "bucket": "7e236214ac",
+   "key": "heap-buffer-overflow | pcx_increment_load_data_2 io-pcx.c:375 <- gdk_pixbuf__pcx_load_increment io-pcx.c:678 <- gdk_pixbuf_loader_load_module gdk-pixbuf-loader.c:445",
+   "count": 4
+  },
+  {
+   "bucket": "346d3b2824",
+   "key": "heap-buffer-overflow | read_pixel_4 io-pcx.c:271 <- pcx_increment_load_data_4 io-pcx.c:410 <- gdk_pixbuf__pcx_load_increment io-pcx.c:681",
+   "count": 4
+  },
+  {
+   "bucket": "abd3b450c1",
+   "key": "allocation-size-too-big | malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-ico.c:479",
+   "count": 4
+  },
+  {
+   "bucket": "3d961589f0",
+   "key": "heap-buffer-overflow | gdk_pixbuf_from_pixdata gdk-pixdata.c:472 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152",
+   "count": 2
+  },
+  {
+   "bucket": "41c2f3bf2b",
+   "key": "heap-buffer-overflow | read_pixel_1 io-pcx.c <- pcx_increment_load_data_1 io-pcx.c:336 <- gdk_pixbuf__pcx_load_increment io-pcx.c:675",
+   "count": 2
+  },
+  {
+   "bucket": "1b6571651a",
+   "key": "heap-buffer-overflow | DoCompressed io-bmp.c:1060 <- gdk_pixbuf__bmp_image_load_increment io-bmp.c:1251 <- gdk_pixbuf_loader_load_module gdk-pixbuf-loader.c:445",
+   "count": 2
+  },
+  {
+   "bucket": "ecdcf33b3a",
+   "key": "heap-buffer-overflow | DoCompressed io-bmp.c:1109 <- gdk_pixbuf__bmp_image_load_increment io-bmp.c:1251 <- generic_load_incrementally gdk-pixbuf-io.c:998",
+   "count": 1
+  },
+  {
+   "bucket": "05d67b2282",
+   "key": "heap-buffer-overflow | gdk_pixbuf_from_pixdata gdk-pixdata.c:479 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152",
+   "count": 1
+  },
+  {
+   "bucket": "4a9bdccbef",
+   "key": "heap-buffer-overflow | gdk_pixbuf_from_pixdata gdk-pixdata.c:506 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152",
+   "count": 1
+  },
+  {
+   "bucket": "a8948e8d48",
+   "key": "heap-buffer-overflow | pcx_increment_load_data_24 io-pcx.c:528 <- gdk_pixbuf__pcx_load_increment io-pcx.c:687 <- generic_load_incrementally gdk-pixbuf-io.c:998",
+   "count": 1
+  },
+  {
+   "bucket": "9666d456ee",
+   "key": "heap-buffer-overflow | pcx_increment_load_data_2 io-pcx.c:375 <- gdk_pixbuf__pcx_load_increment io-pcx.c:678 <- generic_load_incrementally gdk-pixbuf-io.c:998",
+   "count": 1
+  },
+  {
+   "bucket": "90a09119ea",
+   "key": "heap-buffer-overflow | pcx_increment_load_data_8 io-pcx.c:450 <- gdk_pixbuf__pcx_load_increment io-pcx.c:684 <- generic_load_incrementally gdk-pixbuf-io.c:998",
+   "count": 1
+  },
+  {
+   "bucket": "021fa9965e",
+   "key": "allocation-size-too-big | malloc gdk-pixbuf-pixdata.asan+0xd218e) <- g_malloc libglib-2.0.so.0+0x5e788) <- pixops_process pixops.c:1271",
+   "count": 1
+  },
+  {
+   "bucket": "a0be9c4565",
+   "key": "allocation-size-too-big | malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__pcx_load_increment io-pcx.c:637",
+   "count": 1
+  },
+  {
+   "bucket": "65d88aca7f",
+   "key": "SEGV | pixops_scale_nearest pixops.c:332 <- _pixops_scale_real pixops.c:2191 <- _pixops_scale pixops.c:2269",
+   "count": 1
+  },
+  {
+   "bucket": "498f839b9b",
+   "key": "allocation-size-too-big | malloc gdk-pixbuf-pixdata.asan+0xd218e) <- g_malloc libglib-2.0.so.0+0x5e788) <- make_weights pixops.c:1581",
+   "count": 1
+  },
+  {
+   "bucket": "8f2d334d66",
+   "key": "heap-buffer-overflow | read_pixel_1 io-pcx.c <- pcx_increment_load_data_1 io-pcx.c:332 <- gdk_pixbuf__pcx_load_increment io-pcx.c:675",
+   "count": 1
+  },
+  {
+   "bucket": "617d00a57a",
+   "key": "heap-buffer-overflow | DoCompressed io-bmp.c:1131 <- gdk_pixbuf__bmp_image_load_increment io-bmp.c:1251 <- generic_load_incrementally gdk-pixbuf-io.c:998",
+   "count": 1
+  },
+  {
+   "bucket": "a831aded06",
+   "key": "heap-buffer-overflow | read_pixel_1 io-pcx.c <- pcx_increment_load_data_1 io-pcx.c:326 <- gdk_pixbuf__pcx_load_increment io-pcx.c:675",
+   "count": 1
+  }
+ ]
+}

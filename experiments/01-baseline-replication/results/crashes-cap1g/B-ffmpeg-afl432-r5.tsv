@@ -1,0 +1,2 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:08,src:000012,time:1606920,execs:204046,op:ext_AO,pos:0	08	asan	FPE	22dc810c55	gdv_read_header gdv.c:107 <- avformat_open_input utils.c:631 <- open_input_file ffmpeg_opt.c:1069

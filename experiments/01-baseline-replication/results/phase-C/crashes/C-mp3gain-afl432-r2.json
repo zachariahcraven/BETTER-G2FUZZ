@@ -1,0 +1,72 @@
+{
+ "campaign": "C-mp3gain-afl432-r2",
+ "program": "mp3gain",
+ "arm": "afl432",
+ "rep": 2,
+ "crash_files": 111,
+ "outcomes": {
+  "asan": 111
+ },
+ "unique_bugs": 10,
+ "unique_bugs_fn": 6,
+ "buckets_fn": [
+  "global-buffer-overflow | III_dequantize_sample <- do_layer3 <- decodeMP3",
+  "global-buffer-overflow | III_i_stereo <- do_layer3 <- decodeMP3",
+  "heap-buffer-overflow | ReadMP3APETag <- ReadMP3GainAPETag <- main",
+  "stack-buffer-overflow | GetVbrTag <- check_vbr_header <- decodeMP3",
+  "stack-buffer-overflow | filterYule <- AnalyzeSamples <- main",
+  "stack-buffer-overflow | sprintf <- WriteMP3GainAPETag <- WriteMP3GainTag"
+ ],
+ "buckets": [
+  {
+   "bucket": "85d2326158",
+   "key": "global-buffer-overflow | III_dequantize_sample layer3.c:904 <- do_layer3 layer3.c:1630 <- decodeMP3 interface.c:643",
+   "count": 31
+  },
+  {
+   "bucket": "e98042e5fa",
+   "key": "global-buffer-overflow | III_i_stereo layer3.c:1169 <- do_layer3 layer3.c:1661 <- decodeMP3 interface.c:643",
+   "count": 21
+  },
+  {
+   "bucket": "3c80fcd2c8",
+   "key": "global-buffer-overflow | III_dequantize_sample layer3.c:855 <- do_layer3 layer3.c:1646 <- decodeMP3 interface.c:643",
+   "count": 21
+  },
+  {
+   "bucket": "ec1f182061",
+   "key": "global-buffer-overflow | III_dequantize_sample layer3.c:904 <- do_layer3 layer3.c:1646 <- decodeMP3 interface.c:643",
+   "count": 20
+  },
+  {
+   "bucket": "bd3b7a7584",
+   "key": "stack-buffer-overflow | filterYule gain_analysis.c:195 <- AnalyzeSamples gain_analysis.c:344 <- main mp3gain.c:2281",
+   "count": 12
+  },
+  {
+   "bucket": "8098cf256a",
+   "key": "stack-buffer-overflow | GetVbrTag interface.c:286 <- check_vbr_header interface.c:364 <- decodeMP3 interface.c:482",
+   "count": 2
+  },
+  {
+   "bucket": "c8b98749fc",
+   "key": "stack-buffer-overflow | sprintf mp3gain.asan+0x4dcf3) <- WriteMP3GainAPETag apetag.c:578 <- WriteMP3GainTag mp3gain.c:1123",
+   "count": 1
+  },
+  {
+   "bucket": "576e552dbe",
+   "key": "stack-buffer-overflow | sprintf mp3gain.asan+0x4dcf3) <- WriteMP3GainAPETag apetag.c:564 <- WriteMP3GainTag mp3gain.c:1123",
+   "count": 1
+  },
+  {
+   "bucket": "aea70b60f4",
+   "key": "heap-buffer-overflow | ReadMP3APETag apetag.c:238 <- ReadMP3GainAPETag apetag.c:371 <- main mp3gain.c:1778",
+   "count": 1
+  },
+  {
+   "bucket": "016a4f5947",
+   "key": "global-buffer-overflow | III_dequantize_sample layer3.c:903 <- do_layer3 layer3.c:1630 <- decodeMP3 interface.c:643",
+   "count": 1
+  }
+ ]
+}

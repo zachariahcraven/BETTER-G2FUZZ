@@ -1,0 +1,227 @@
+{
+ "campaign": "C-exiv2-afl432-r3",
+ "program": "exiv2",
+ "arm": "afl432",
+ "rep": 3,
+ "crash_files": 604,
+ "outcomes": {
+  "asan": 594,
+  "timeout": 1,
+  "no-crash": 9
+ },
+ "unique_bugs": 35,
+ "unique_bugs_fn": 34,
+ "buckets_fn": [
+  "ABRT | pthread_kill <- gsignal <- abort",
+  "SEGV | libc.so.6+0xc4988 <- (anonymous <- Exiv2::PreviewManager::getPreviewImage(Exiv2::PreviewProperties",
+  "SEGV | libc.so.6+0xc498d <- (anonymous <- Exiv2::PreviewManager::getPreviewImage(Exiv2::PreviewProperties",
+  "SEGV | libc.so.6+0xc4990 <- (anonymous <- Exiv2::PreviewManager::getPreviewImage(Exiv2::PreviewProperties",
+  "SEGV | libc.so.6+0xc4996 <- (anonymous <- Exiv2::PreviewManager::getPreviewImage(Exiv2::PreviewProperties",
+  "SEGV | libc.so.6+0xc49a8 <- (anonymous <- Exiv2::PreviewManager::getPreviewImage(Exiv2::PreviewProperties",
+  "SEGV | libc.so.6+0xc4a0c <- (anonymous <- Exiv2::PreviewManager::getPreviewImage(Exiv2::PreviewProperties",
+  "SEGV | libc.so.6+0xc4aa3 <- (anonymous <- Exiv2::PreviewManager::getPreviewImage(Exiv2::PreviewProperties",
+  "SEGV | libc.so.6+0xc4b13 <- (anonymous <- Exiv2::PreviewManager::getPreviewImage(Exiv2::PreviewProperties",
+  "SEGV | memcpy <- (anonymous <- Exiv2::PreviewManager::getPreviewImage(Exiv2::PreviewProperties",
+  "SEGV | memcpy <- Exiv2::MemIo::read(unsigned <- Exiv2::isTgaType(Exiv2::BasicIo&,",
+  "allocation-size-too-big | operator <- Exiv2::DataBuf::DataBuf(long) <- (anonymous",
+  "allocation-size-too-big | operator <- Exiv2::DataBuf::DataBuf(long) <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&,",
+  "allocation-size-too-big | operator <- Exiv2::DataBuf::DataBuf(long) <- Exiv2::JpegBase::readMetadata()",
+  "allocation-size-too-big | operator <- Exiv2::DataBuf::DataBuf(long) <- Exiv2::MrwImage::readMetadata()",
+  "allocation-size-too-big | operator <- Exiv2::DataBuf::DataBuf(long) <- Exiv2::PgfImage::readMetadata()",
+  "allocation-size-too-big | operator <- Exiv2::DataBuf::DataBuf(long) <- Exiv2::PsdImage::readResourceBlock(unsigned",
+  "allocation-size-too-big | operator <- Exiv2::DataBuf::DataBuf(long) <- Exiv2::RafImage::readMetadata()",
+  "allocation-size-too-big | operator <- Exiv2::DataBuf::DataBuf(long) <- Exiv2::WebPImage::decodeChunks(unsigned",
+  "allocation-size-too-big | operator <- Exiv2::DataBuf::alloc(long) <- Exiv2::Internal::PngChunk::readRawProfile(Exiv2::DataBuf",
+  "allocation-size-too-big | operator <- Exiv2::DataBuf::alloc(long) <- Exiv2::zlibToDataBuf(unsigned",
+  "heap-buffer-overflow | (anonymous <- Exiv2::PreviewManager::getPreviewImage(Exiv2::PreviewProperties <- Exiv2::Rw2Image::readMetadata()",
+  "heap-buffer-overflow | Exiv2::Image::byteSwap4(Exiv2::DataBuf&, <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&,",
+  "heap-buffer-overflow | Exiv2::Internal::PngChunk::parseTXTChunk(Exiv2::DataBuf <- Exiv2::Internal::PngChunk::decodeTXTChunk(Exiv2::Image*, <- Exiv2::PngImage::readMetadata()",
+  "heap-buffer-overflow | Exiv2::Internal::PngChunk::readRawProfile(Exiv2::DataBuf <- Exiv2::Internal::PngChunk::parseChunkContent(Exiv2::Image*, <- Exiv2::Internal::PngChunk::decodeTXTChunk(Exiv2::Image*,",
+  "heap-buffer-overflow | Exiv2::RafImage::readMetadata() <- Action::Print::printSummary() <- Action::Print::run(std::__cxx11::basic_string<char,",
+  "heap-buffer-overflow | Exiv2::getLong(unsigned <- Exiv2::Internal::PngChunk::decodeIHDRChunk(Exiv2::DataBuf <- Exiv2::PngImage::readMetadata()",
+  "heap-buffer-overflow | Exiv2::l2Data(unsigned <- Exiv2::r2Data(unsigned <- long",
+  "heap-buffer-overflow | Exiv2::s2Data(unsigned <- long <- Exiv2::ValueType<short>::copy(unsigned",
+  "heap-buffer-overflow | Exiv2::ul2Data(unsigned <- Exiv2::ur2Data(unsigned <- long",
+  "heap-buffer-overflow | StrtolFixAndCheck(void*, <- atol <- Exiv2::Internal::PngChunk::readRawProfile(Exiv2::DataBuf",
+  "heap-buffer-overflow | std::char_traits<char>::length(char <- std::__cxx11::basic_string<char, <- Exiv2::Internal::PngChunk::parseTXTChunk(Exiv2::DataBuf",
+  "memcpy-param-overlap | (anonymous <- Exiv2::PreviewManager::getPreviewImage(Exiv2::PreviewProperties <- Exiv2::Rw2Image::readMetadata()",
+  "stack-buffer-overflow | MemcmpInterceptorCommon(void*, <- bcmp <- Exiv2::WebPImage::getHeaderOffset(unsigned"
+ ],
+ "buckets": [
+  {
+   "bucket": "0763717d24",
+   "key": "heap-buffer-overflow | (anonymous namespace): <- Exiv2::PreviewManager::getPreviewImage(Exiv2::PreviewProperties const&) <- Exiv2::Rw2Image::readMetadata() rw2image.cpp:154",
+   "count": 289
+  },
+  {
+   "bucket": "2e7ee87291",
+   "key": "SEGV | libc.so.6+0xc498d <- (anonymous namespace): <- Exiv2::PreviewManager::getPreviewImage(Exiv2::PreviewProperties const&)",
+   "count": 68
+  },
+  {
+   "bucket": "fdb798c62f",
+   "key": "ABRT | pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)",
+   "count": 55
+  },
+  {
+   "bucket": "ad0042bddc",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::DataBuf::DataBuf(long) types.hpp:204 <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, std:",
+   "count": 37
+  },
+  {
+   "bucket": "e27b7a0966",
+   "key": "SEGV | libc.so.6+0xc4aa3 <- (anonymous namespace): <- Exiv2::PreviewManager::getPreviewImage(Exiv2::PreviewProperties const&)",
+   "count": 17
+  },
+  {
+   "bucket": "108cba5aab",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::DataBuf::DataBuf(long) types.hpp:204 <- (anonymous namespace):",
+   "count": 14
+  },
+  {
+   "bucket": "0fa57a1070",
+   "key": "SEGV | libc.so.6+0xc4988 <- (anonymous namespace): <- Exiv2::PreviewManager::getPreviewImage(Exiv2::PreviewProperties const&)",
+   "count": 13
+  },
+  {
+   "bucket": "74c46d0bee",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::DataBuf::DataBuf(long) types.hpp:204 <- Exiv2::JpegBase::readMetadata() jpgimage.cpp:483",
+   "count": 10
+  },
+  {
+   "bucket": "77b3d96395",
+   "key": "SEGV | libc.so.6+0xc4996 <- (anonymous namespace): <- Exiv2::PreviewManager::getPreviewImage(Exiv2::PreviewProperties const&)",
+   "count": 9
+  },
+  {
+   "bucket": "34e7e32607",
+   "key": "SEGV | libc.so.6+0xc4a0c <- (anonymous namespace): <- Exiv2::PreviewManager::getPreviewImage(Exiv2::PreviewProperties const&)",
+   "count": 9
+  },
+  {
+   "bucket": "9593e6727e",
+   "key": "heap-buffer-overflow | Exiv2::Internal::PngChunk::readRawProfile(Exiv2::DataBuf const&, <- Exiv2::Internal::PngChunk::parseChunkContent(Exiv2::Image*, unsigned <- Exiv2::Internal::PngChunk::decodeTXTChunk(Exiv2::Image*, Exiv2:",
+   "count": 8
+  },
+  {
+   "bucket": "ae2eacf725",
+   "key": "heap-buffer-overflow | Exiv2::l2Data(unsigned char*, <- Exiv2::r2Data(unsigned char*, <- long Exiv2:",
+   "count": 7
+  },
+  {
+   "bucket": "432896ba6f",
+   "key": "SEGV | memcpy libc.so.6+0xc4853) <- (anonymous namespace): <- Exiv2::PreviewManager::getPreviewImage(Exiv2::PreviewProperties const&)",
+   "count": 7
+  },
+  {
+   "bucket": "b27bc5e8b5",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::DataBuf::DataBuf(long) types.hpp:204 <- Exiv2::WebPImage::decodeChunks(unsigned long)",
+   "count": 6
+  },
+  {
+   "bucket": "7c80ce3a1b",
+   "key": "SEGV | memcpy libc.so.6+0xc4841) <- (anonymous namespace): <- Exiv2::PreviewManager::getPreviewImage(Exiv2::PreviewProperties const&)",
+   "count": 6
+  },
+  {
+   "bucket": "962d77ca2f",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::DataBuf::alloc(long) types.cpp:158 <- Exiv2::zlibToDataBuf(unsigned char",
+   "count": 5
+  },
+  {
+   "bucket": "694afc9ab4",
+   "key": "SEGV | libc.so.6+0xc49a8 <- (anonymous namespace): <- Exiv2::PreviewManager::getPreviewImage(Exiv2::PreviewProperties const&)",
+   "count": 5
+  },
+  {
+   "bucket": "51a417231e",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::DataBuf::alloc(long) types.cpp:158 <- Exiv2::Internal::PngChunk::readRawProfile(Exiv2::DataBuf const&,",
+   "count": 4
+  },
+  {
+   "bucket": "bcf28f968a",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::DataBuf::DataBuf(long) types.hpp:204 <- Exiv2::PgfImage::readMetadata() pgfimage.cpp:145",
+   "count": 3
+  },
+  {
+   "bucket": "433d63a9e3",
+   "key": "heap-buffer-overflow | std::char_traits<char>::length(char const*) <- std::__cxx11::basic_string<char, std: <- Exiv2::Internal::PngChunk::parseTXTChunk(Exiv2::DataBuf const&,",
+   "count": 3
+  },
+  {
+   "bucket": "d96b6578fe",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::DataBuf::DataBuf(long) types.hpp:204 <- Exiv2::RafImage::readMetadata() rafimage.cpp:305",
+   "count": 2
+  },
+  {
+   "bucket": "69645e13e5",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::DataBuf::DataBuf(long) types.hpp:204 <- Exiv2::MrwImage::readMetadata() mrwimage.cpp:139",
+   "count": 2
+  },
+  {
+   "bucket": "edf74452fd",
+   "key": "heap-buffer-overflow | Exiv2::ul2Data(unsigned char*, <- Exiv2::ur2Data(unsigned char*, <- long Exiv2:",
+   "count": 2
+  },
+  {
+   "bucket": "612d69bcf8",
+   "key": "SEGV | libc.so.6+0xc4b13 <- (anonymous namespace): <- Exiv2::PreviewManager::getPreviewImage(Exiv2::PreviewProperties const&)",
+   "count": 2
+  },
+  {
+   "bucket": "a9031c0142",
+   "key": "heap-buffer-overflow | Exiv2::Image::byteSwap4(Exiv2::DataBuf&, unsigned <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, std: <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&, std:",
+   "count": 1
+  },
+  {
+   "bucket": "37c67b1dce",
+   "key": "heap-buffer-overflow | Exiv2::Internal::PngChunk::parseTXTChunk(Exiv2::DataBuf const&, <- Exiv2::Internal::PngChunk::decodeTXTChunk(Exiv2::Image*, Exiv2: <- Exiv2::PngImage::readMetadata() pngimage.cpp",
+   "count": 1
+  },
+  {
+   "bucket": "f5abc193ca",
+   "key": "heap-buffer-overflow | Exiv2::s2Data(unsigned char*, <- long Exiv2: <- Exiv2::ValueType<short>::copy(unsigned char*,",
+   "count": 1
+  },
+  {
+   "bucket": "3c5708e492",
+   "key": "heap-buffer-overflow | StrtolFixAndCheck(void*, char <- atol stdlib.h:369 <- Exiv2::Internal::PngChunk::readRawProfile(Exiv2::DataBuf const&,",
+   "count": 1
+  },
+  {
+   "bucket": "b8dd5dbfdc",
+   "key": "SEGV | memcpy libc.so.6+0xc4841) <- Exiv2::MemIo::read(unsigned char*, <- Exiv2::isTgaType(Exiv2::BasicIo&, bool)",
+   "count": 1
+  },
+  {
+   "bucket": "bd620f81f4",
+   "key": "heap-buffer-overflow | Exiv2::RafImage::readMetadata() rafimage.cpp:307 <- Action::Print::printSummary() actions.cpp:289 <- Action::Print::run(std::__cxx11::basic_string<char, std:",
+   "count": 1
+  },
+  {
+   "bucket": "d1a80287f2",
+   "key": "heap-buffer-overflow | Exiv2::getLong(unsigned char <- Exiv2::Internal::PngChunk::decodeIHDRChunk(Exiv2::DataBuf const&, <- Exiv2::PngImage::readMetadata() pngimage.cpp:444",
+   "count": 1
+  },
+  {
+   "bucket": "9da0b871ee",
+   "key": "stack-buffer-overflow | MemcmpInterceptorCommon(void*, int <- bcmp exiv2.asan+0x29abf9) <- Exiv2::WebPImage::getHeaderOffset(unsigned char*,",
+   "count": 1
+  },
+  {
+   "bucket": "ff743250f9",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::DataBuf::DataBuf(long) types.hpp:204 <- Exiv2::PsdImage::readResourceBlock(unsigned short,",
+   "count": 1
+  },
+  {
+   "bucket": "de06ca7191",
+   "key": "memcpy-param-overlap | (anonymous namespace): <- Exiv2::PreviewManager::getPreviewImage(Exiv2::PreviewProperties const&) <- Exiv2::Rw2Image::readMetadata() rw2image.cpp:154",
+   "count": 1
+  },
+  {
+   "bucket": "be13422f16",
+   "key": "SEGV | libc.so.6+0xc4990 <- (anonymous namespace): <- Exiv2::PreviewManager::getPreviewImage(Exiv2::PreviewProperties const&)",
+   "count": 1
+  }
+ ]
+}

@@ -1,0 +1,7 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:06,src:001037,time:1423485,execs:1438644,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000001,sig:11,src:001625,time:5330614,execs:5744765,op:havoc,rep:3	11	asan	SEGV	fde7652561	free imginfo.asan+0xd311b) <- jp2_cdef_destroy jp2_cod.c:230 <- jp2_box_destroy jp2_cod.c:212
+id:000002,sig:11,src:001618,time:6017623,execs:6638496,op:havoc,rep:1	11	asan	SEGV	fde7652561	free imginfo.asan+0xd311b) <- jp2_cdef_destroy jp2_cod.c:230 <- jp2_box_destroy jp2_cod.c:212
+id:000003,sig:06,src:001761,time:7187055,execs:8541545,op:havoc,rep:3	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000004,sig:06,src:001804,time:9814686,execs:13077174,op:havoc,rep:3	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000005,sig:06,src:001979,time:12015699,execs:16107238,op:havoc,rep:3	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)

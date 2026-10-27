@@ -1,0 +1,78 @@
+{
+ "campaign": "B-exiv2-afl503-r2",
+ "program": "exiv2",
+ "arm": "afl503",
+ "rep": 2,
+ "crash_files": 86,
+ "outcomes": {
+  "no-crash": 42,
+  "asan": 42,
+  "timeout": 2
+ },
+ "unique_bugs": 10,
+ "unique_bugs_fn": 10,
+ "buckets_fn": [
+  "ABRT | pthread_kill <- gsignal <- abort",
+  "SEGV | Exiv2::IptcData::printStructure(std::ostream&, <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&,",
+  "heap-buffer-overflow | Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&, <- Exiv2::TiffImage::printStructure(std::ostream&,",
+  "heap-buffer-overflow | Exiv2::Internal::PngChunk::parseTXTChunk(Exiv2::DataBuf <- Exiv2::Internal::PngChunk::decodeTXTChunk(Exiv2::Image*, <- Exiv2::PngImage::readMetadata()",
+  "heap-buffer-overflow | Exiv2::Internal::PngChunk::readRawProfile(Exiv2::DataBuf <- Exiv2::Internal::PngChunk::parseChunkContent(Exiv2::Image*, <- Exiv2::Internal::PngChunk::decodeTXTChunk(Exiv2::Image*,",
+  "heap-buffer-overflow | Exiv2::Internal::binaryToString[abi:cxx11](unsigned <- Exiv2::IptcData::printStructure(std::ostream&, <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&,",
+  "heap-buffer-overflow | Exiv2::RafImage::readMetadata() <- Action::Print::printSummary() <- Action::Print::run(std::__cxx11::basic_string<char,",
+  "heap-buffer-overflow | std::char_traits<char>::length(char <- std::__cxx11::basic_string<char, <- Exiv2::Internal::PngChunk::parseTXTChunk(Exiv2::DataBuf",
+  "out | operator <- Exiv2::DataBuf::DataBuf(long) <- Exiv2::RafImage::readMetadata()",
+  "out | operator <- Exiv2::DataBuf::alloc(long) <- Exiv2::Internal::PngChunk::readRawProfile(Exiv2::DataBuf"
+ ],
+ "buckets": [
+  {
+   "bucket": "433d63a9e3",
+   "key": "heap-buffer-overflow | std::char_traits<char>::length(char const*) <- std::__cxx11::basic_string<char, std: <- Exiv2::Internal::PngChunk::parseTXTChunk(Exiv2::DataBuf const&,",
+   "count": 13
+  },
+  {
+   "bucket": "32df00fa03",
+   "key": "heap-buffer-overflow | Exiv2::Internal::binaryToString[abi:cxx11](unsigned char <- Exiv2::IptcData::printStructure(std::ostream&, unsigned <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, std:",
+   "count": 13
+  },
+  {
+   "bucket": "fdb798c62f",
+   "key": "ABRT | pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)",
+   "count": 7
+  },
+  {
+   "bucket": "9593e6727e",
+   "key": "heap-buffer-overflow | Exiv2::Internal::PngChunk::readRawProfile(Exiv2::DataBuf const&, <- Exiv2::Internal::PngChunk::parseChunkContent(Exiv2::Image*, unsigned <- Exiv2::Internal::PngChunk::decodeTXTChunk(Exiv2::Image*, Exiv2:",
+   "count": 2
+  },
+  {
+   "bucket": "5290792755",
+   "key": "heap-buffer-overflow | Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, std: <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&, std: <- Exiv2::TiffImage::printStructure(std::ostream&, Exiv2:",
+   "count": 2
+  },
+  {
+   "bucket": "849f3c7330",
+   "key": "out | operator new[](unsigned <- Exiv2::DataBuf::DataBuf(long) types.hpp:204 <- Exiv2::RafImage::readMetadata() rafimage.cpp:305",
+   "count": 1
+  },
+  {
+   "bucket": "517fb1e742",
+   "key": "out | operator new[](unsigned <- Exiv2::DataBuf::alloc(long) types.cpp:158 <- Exiv2::Internal::PngChunk::readRawProfile(Exiv2::DataBuf const&,",
+   "count": 1
+  },
+  {
+   "bucket": "d84318075c",
+   "key": "SEGV | Exiv2::IptcData::printStructure(std::ostream&, unsigned <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, std: <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&, std:",
+   "count": 1
+  },
+  {
+   "bucket": "37c67b1dce",
+   "key": "heap-buffer-overflow | Exiv2::Internal::PngChunk::parseTXTChunk(Exiv2::DataBuf const&, <- Exiv2::Internal::PngChunk::decodeTXTChunk(Exiv2::Image*, Exiv2: <- Exiv2::PngImage::readMetadata() pngimage.cpp",
+   "count": 1
+  },
+  {
+   "bucket": "bd620f81f4",
+   "key": "heap-buffer-overflow | Exiv2::RafImage::readMetadata() rafimage.cpp:307 <- Action::Print::printSummary() actions.cpp:289 <- Action::Print::run(std::__cxx11::basic_string<char, std:",
+   "count": 1
+  }
+ ]
+}

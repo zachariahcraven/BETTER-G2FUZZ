@@ -1,0 +1,43 @@
+{
+ "campaign": "B-mp42aac-g2503-r3",
+ "program": "mp42aac",
+ "arm": "g2503",
+ "rep": 3,
+ "crash_files": 145,
+ "outcomes": {
+  "timeout": 87,
+  "no-crash": 51,
+  "signal:9": 3,
+  "asan": 4
+ },
+ "unique_bugs": 4,
+ "unique_bugs_fn": 4,
+ "buckets_fn": [
+  "SEGV | AP4_DataBuffer::SetData(unsigned <- AP4_AvccAtom::AP4_AvccAtom(unsigned <- AP4_AvccAtom::Create(unsigned",
+  "heap-buffer-overflow | AP4_AvccAtom::Create(unsigned <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&, <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&,",
+  "heap-buffer-overflow | AP4_HvccAtom::AP4_HvccAtom(unsigned <- AP4_HvccAtom::Create(unsigned <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&,",
+  "unknown-crash | AP4_DataBuffer::SetData(unsigned <- AP4_AvccAtom::AP4_AvccAtom(unsigned <- AP4_AvccAtom::Create(unsigned"
+ ],
+ "buckets": [
+  {
+   "bucket": "fdfd428eb2",
+   "key": "unknown-crash | AP4_DataBuffer::SetData(unsigned char <- AP4_AvccAtom::AP4_AvccAtom(unsigned int, <- AP4_AvccAtom::Create(unsigned int,",
+   "count": 1
+  },
+  {
+   "bucket": "4d2cc1af97",
+   "key": "heap-buffer-overflow | AP4_AvccAtom::Create(unsigned int, <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&, unsigned <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&, unsigned",
+   "count": 1
+  },
+  {
+   "bucket": "16d2635201",
+   "key": "SEGV | AP4_DataBuffer::SetData(unsigned char <- AP4_AvccAtom::AP4_AvccAtom(unsigned int, <- AP4_AvccAtom::Create(unsigned int,",
+   "count": 1
+  },
+  {
+   "bucket": "4cd903ca62",
+   "key": "heap-buffer-overflow | AP4_HvccAtom::AP4_HvccAtom(unsigned int, <- AP4_HvccAtom::Create(unsigned int, <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&, unsigned",
+   "count": 1
+  }
+ ]
+}

@@ -1,0 +1,111 @@
+{
+ "campaign": "C-gdk-pixbuf-pixdata-g2432-r4",
+ "program": "gdk-pixbuf-pixdata",
+ "arm": "g2432",
+ "rep": 4,
+ "crash_files": 117,
+ "outcomes": {
+  "no-crash": 78,
+  "asan": 31,
+  "timeout": 5,
+  "signal:5": 3
+ },
+ "unique_bugs": 16,
+ "unique_bugs_fn": 12,
+ "buckets_fn": [
+  "SEGV | DecodeHeader <- gdk_pixbuf__ico_image_load_increment <- gdk_pixbuf_loader_write",
+  "SEGV | gdk_pixbuf__qtif_image_load_increment <- gdk_pixbuf_loader_load_module <- gdk_pixbuf_loader_close",
+  "SEGV | pixops_scale_nearest <- _pixops_scale_real <- _pixops_scale",
+  "heap-buffer-overflow | DoCompressed <- gdk_pixbuf__bmp_image_load_increment <- generic_load_incrementally",
+  "heap-buffer-overflow | OneLine32 <- OneLine <- gdk_pixbuf__ico_image_load_increment",
+  "heap-buffer-overflow | gdk_pixbuf_from_pixdata <- try_load <- pixdata_image_load_increment",
+  "heap-buffer-overflow | pcx_increment_load_data_2 <- gdk_pixbuf__pcx_load_increment <- gdk_pixbuf_loader_load_module",
+  "heap-buffer-overflow | pcx_increment_load_data_2 <- gdk_pixbuf__pcx_load_increment <- generic_load_incrementally",
+  "heap-buffer-overflow | pcx_increment_load_data_24 <- gdk_pixbuf__pcx_load_increment <- gdk_pixbuf_loader_load_module",
+  "heap-buffer-overflow | pcx_increment_load_data_24 <- gdk_pixbuf__pcx_load_increment <- generic_load_incrementally",
+  "heap-buffer-overflow | read_pixel_1 <- pcx_increment_load_data_1 <- gdk_pixbuf__pcx_load_increment",
+  "heap-buffer-overflow | read_pixel_4 <- pcx_increment_load_data_4 <- gdk_pixbuf__pcx_load_increment"
+ ],
+ "buckets": [
+  {
+   "bucket": "255dca9438",
+   "key": "SEGV | gdk_pixbuf__qtif_image_load_increment io-qtif.c:437 <- gdk_pixbuf_loader_load_module gdk-pixbuf-loader.c:445 <- gdk_pixbuf_loader_close gdk-pixbuf-loader.c:810",
+   "count": 7
+  },
+  {
+   "bucket": "a8948e8d48",
+   "key": "heap-buffer-overflow | pcx_increment_load_data_24 io-pcx.c:528 <- gdk_pixbuf__pcx_load_increment io-pcx.c:687 <- generic_load_incrementally gdk-pixbuf-io.c:998",
+   "count": 3
+  },
+  {
+   "bucket": "a0c233833d",
+   "key": "heap-buffer-overflow | OneLine32 io-ico.c:596 <- OneLine io-ico.c:807 <- gdk_pixbuf__ico_image_load_increment io-ico.c:898",
+   "count": 2
+  },
+  {
+   "bucket": "9f18212c7d",
+   "key": "SEGV | DecodeHeader io-ico.c:322 <- gdk_pixbuf__ico_image_load_increment io-ico.c:905 <- gdk_pixbuf_loader_write gdk-pixbuf-loader.c:523",
+   "count": 2
+  },
+  {
+   "bucket": "3d961589f0",
+   "key": "heap-buffer-overflow | gdk_pixbuf_from_pixdata gdk-pixdata.c:472 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152",
+   "count": 2
+  },
+  {
+   "bucket": "2be469a697",
+   "key": "heap-buffer-overflow | pcx_increment_load_data_24 io-pcx.c:527 <- gdk_pixbuf__pcx_load_increment io-pcx.c:687 <- generic_load_incrementally gdk-pixbuf-io.c:998",
+   "count": 2
+  },
+  {
+   "bucket": "9666d456ee",
+   "key": "heap-buffer-overflow | pcx_increment_load_data_2 io-pcx.c:375 <- gdk_pixbuf__pcx_load_increment io-pcx.c:678 <- generic_load_incrementally gdk-pixbuf-io.c:998",
+   "count": 2
+  },
+  {
+   "bucket": "41c2f3bf2b",
+   "key": "heap-buffer-overflow | read_pixel_1 io-pcx.c <- pcx_increment_load_data_1 io-pcx.c:336 <- gdk_pixbuf__pcx_load_increment io-pcx.c:675",
+   "count": 2
+  },
+  {
+   "bucket": "346d3b2824",
+   "key": "heap-buffer-overflow | read_pixel_4 io-pcx.c:271 <- pcx_increment_load_data_4 io-pcx.c:410 <- gdk_pixbuf__pcx_load_increment io-pcx.c:681",
+   "count": 2
+  },
+  {
+   "bucket": "05d67b2282",
+   "key": "heap-buffer-overflow | gdk_pixbuf_from_pixdata gdk-pixdata.c:479 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152",
+   "count": 1
+  },
+  {
+   "bucket": "65d88aca7f",
+   "key": "SEGV | pixops_scale_nearest pixops.c:332 <- _pixops_scale_real pixops.c:2191 <- _pixops_scale pixops.c:2269",
+   "count": 1
+  },
+  {
+   "bucket": "9cc279e5bb",
+   "key": "heap-buffer-overflow | DoCompressed io-bmp.c:1060 <- gdk_pixbuf__bmp_image_load_increment io-bmp.c:1251 <- generic_load_incrementally gdk-pixbuf-io.c:998",
+   "count": 1
+  },
+  {
+   "bucket": "7e236214ac",
+   "key": "heap-buffer-overflow | pcx_increment_load_data_2 io-pcx.c:375 <- gdk_pixbuf__pcx_load_increment io-pcx.c:678 <- gdk_pixbuf_loader_load_module gdk-pixbuf-loader.c:445",
+   "count": 1
+  },
+  {
+   "bucket": "72620ec4c1",
+   "key": "heap-buffer-overflow | pcx_increment_load_data_24 io-pcx.c:528 <- gdk_pixbuf__pcx_load_increment io-pcx.c:687 <- gdk_pixbuf_loader_load_module gdk-pixbuf-loader.c:445",
+   "count": 1
+  },
+  {
+   "bucket": "4a9bdccbef",
+   "key": "heap-buffer-overflow | gdk_pixbuf_from_pixdata gdk-pixdata.c:506 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152",
+   "count": 1
+  },
+  {
+   "bucket": "4f7c808a92",
+   "key": "heap-buffer-overflow | read_pixel_1 io-pcx.c <- pcx_increment_load_data_1 io-pcx.c:318 <- gdk_pixbuf__pcx_load_increment io-pcx.c:675",
+   "count": 1
+  }
+ ]
+}

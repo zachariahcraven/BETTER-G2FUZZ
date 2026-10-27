@@ -1,0 +1,57 @@
+{
+ "campaign": "B-tiffsplit-g2432-r5",
+ "program": "tiffsplit",
+ "arm": "g2432",
+ "rep": 5,
+ "crash_files": 158,
+ "outcomes": {
+  "asan": 153,
+  "no-crash": 5
+ },
+ "unique_bugs": 7,
+ "unique_bugs_fn": 5,
+ "buckets_fn": [
+  "SEGV | memcpy <- _TIFFmemcpy <- TIFFReadRawStrip1",
+  "allocation-size-too-big | _TIFFCheckRealloc <- _TIFFCheckMalloc <- TIFFFetchNormalTag",
+  "allocation-size-too-big | _TIFFCheckRealloc <- _TIFFCheckMalloc <- TIFFFetchRationalArray",
+  "stack-buffer-overflow | _TIFFVGetField <- TIFFVGetField <- TIFFGetField",
+  "stack-use-after-return | _TIFFVGetField <- TIFFVGetField <- TIFFGetField"
+ ],
+ "buckets": [
+  {
+   "bucket": "0ca7fd554c",
+   "key": "stack-use-after-return | _TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960",
+   "count": 99
+  },
+  {
+   "bucket": "56738101cf",
+   "key": "SEGV | memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208",
+   "count": 35
+  },
+  {
+   "bucket": "6800c295db",
+   "key": "allocation-size-too-big | _TIFFCheckRealloc tif_aux.c:47 <- _TIFFCheckMalloc tif_aux.c:61 <- TIFFFetchNormalTag tif_dirread.c:1690",
+   "count": 9
+  },
+  {
+   "bucket": "178ea79b46",
+   "key": "stack-buffer-overflow | _TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960",
+   "count": 6
+  },
+  {
+   "bucket": "bc7fea039c",
+   "key": "allocation-size-too-big | _TIFFCheckRealloc tif_aux.c:47 <- _TIFFCheckMalloc tif_aux.c:61 <- TIFFFetchNormalTag tif_dirread.c:1652",
+   "count": 2
+  },
+  {
+   "bucket": "61640e73f6",
+   "key": "allocation-size-too-big | _TIFFCheckRealloc tif_aux.c:47 <- _TIFFCheckMalloc tif_aux.c:61 <- TIFFFetchRationalArray tif_dirread.c:1491",
+   "count": 1
+  },
+  {
+   "bucket": "affd0c4ee4",
+   "key": "allocation-size-too-big | _TIFFCheckRealloc tif_aux.c:47 <- _TIFFCheckMalloc tif_aux.c:61 <- TIFFFetchNormalTag tif_dirread.c:1658",
+   "count": 1
+  }
+ ]
+}

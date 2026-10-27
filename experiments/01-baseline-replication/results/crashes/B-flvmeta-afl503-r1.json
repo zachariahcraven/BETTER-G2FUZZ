@@ -1,0 +1,28 @@
+{
+ "campaign": "B-flvmeta-afl503-r1",
+ "program": "flvmeta",
+ "arm": "afl503",
+ "rep": 1,
+ "crash_files": 29,
+ "outcomes": {
+  "asan": 29
+ },
+ "unique_bugs": 2,
+ "unique_bugs_fn": 2,
+ "buckets_fn": [
+  "SEGV | libc.so.6+0xe0d54 <- strftime_l <- xml_amf_data_dump",
+  "SEGV | strcmp <- xml_on_metadata_tag_only <- flv_parse"
+ ],
+ "buckets": [
+  {
+   "bucket": "b4a8067c06",
+   "key": "SEGV | strcmp flvmeta.asan+0x46580) <- xml_on_metadata_tag_only dump_xml.c:271 <- flv_parse flv.c:506",
+   "count": 26
+  },
+  {
+   "bucket": "f2bf07f054",
+   "key": "SEGV | libc.so.6+0xe0d54 <- strftime_l libc.so.6+0xe2deb) <- xml_amf_data_dump dump_xml.c:151",
+   "count": 3
+  }
+ ]
+}

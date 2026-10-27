@@ -1,0 +1,3 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:08,src:000383,time:2917561,execs:137709,op:havoc,rep:15	08	asan	FPE	22dc810c55	gdv_read_header gdv.c:107 <- avformat_open_input utils.c:631 <- open_input_file ffmpeg_opt.c:1069
+id:000001,sig:08,src:000383,time:2938333,execs:145102,op:havoc,rep:5	08	asan	FPE	22dc810c55	gdv_read_header gdv.c:107 <- avformat_open_input utils.c:631 <- open_input_file ffmpeg_opt.c:1069

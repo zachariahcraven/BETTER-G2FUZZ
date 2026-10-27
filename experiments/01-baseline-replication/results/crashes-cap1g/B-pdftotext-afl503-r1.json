@@ -1,0 +1,34 @@
+{
+ "campaign": "B-pdftotext-afl503-r1",
+ "program": "pdftotext",
+ "arm": "afl503",
+ "rep": 1,
+ "crash_files": 63,
+ "outcomes": {
+  "asan": 63
+ },
+ "unique_bugs": 3,
+ "unique_bugs_fn": 3,
+ "buckets_fn": [
+  "ABRT | pthread_kill <- gsignal <- abort",
+  "SEGV | TextPage::findGaps(GList*, <- TextPage::split(GList*, <- TextPage::splitChars(GList*)",
+  "allocation-size-too-big | malloc <- gmalloc <- gmallocn"
+ ],
+ "buckets": [
+  {
+   "bucket": "fdb798c62f",
+   "key": "ABRT | pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)",
+   "count": 51
+  },
+  {
+   "bucket": "c665cfeebd",
+   "key": "SEGV | TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610",
+   "count": 8
+  },
+  {
+   "bucket": "304034d0fc",
+   "key": "allocation-size-too-big | malloc pdftotext.asan+0x1d73de) <- gmalloc gmem.cc:140 <- gmallocn gmem.cc:206",
+   "count": 4
+  }
+ ]
+}

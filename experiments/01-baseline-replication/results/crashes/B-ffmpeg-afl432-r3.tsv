@@ -1,0 +1,8 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:08,src:002150,time:6578224,execs:288873,op:colorization,rep:2	08	asan	FPE	22dc810c55	gdv_read_header gdv.c:107 <- avformat_open_input utils.c:631 <- open_input_file ffmpeg_opt.c:1069
+id:000001,sig:08,src:002506,time:6640926,execs:305505,op:colorization,rep:12	08	asan	FPE	22dc810c55	gdv_read_header gdv.c:107 <- avformat_open_input utils.c:631 <- open_input_file ffmpeg_opt.c:1069
+id:000002,sig:08,src:002527,time:6714610,execs:323519,op:colorization,rep:7	08	asan	FPE	22dc810c55	gdv_read_header gdv.c:107 <- avformat_open_input utils.c:631 <- open_input_file ffmpeg_opt.c:1069
+id:000003,sig:08,src:002540,time:6916106,execs:383206,op:colorization,rep:1	08	asan	FPE	22dc810c55	gdv_read_header gdv.c:107 <- avformat_open_input utils.c:631 <- open_input_file ffmpeg_opt.c:1069
+id:000004,sig:08,src:002540,time:6922764,execs:383591,op:colorization,rep:1	08	asan	FPE	22dc810c55	gdv_read_header gdv.c:107 <- avformat_open_input utils.c:631 <- open_input_file ffmpeg_opt.c:1069
+id:000005,sig:08,src:002502,time:10319067,execs:854350,op:colorization,rep:1	08	asan	FPE	22dc810c55	gdv_read_header gdv.c:107 <- avformat_open_input utils.c:631 <- open_input_file ffmpeg_opt.c:1069
+id:000006,sig:08,src:001582,time:12048464,execs:984666,op:quick,pos:32555	08	asan	FPE	e051e0bd7d	mov_write_stsz_tag movenc.c:195 <- mov_write_stbl_tag movenc.c:2422 <- mov_write_minf_tag movenc.c:2666

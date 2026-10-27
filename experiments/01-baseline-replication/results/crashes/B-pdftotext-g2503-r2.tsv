@@ -1,0 +1,120 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:06,src:000006,time:20197,execs:9204,op:havoc,rep:1	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000001,sig:06,src:000010,time:108691,execs:47073,op:havoc,rep:5	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000002,sig:06,src:000017,time:137625,execs:59055,op:havoc,rep:10	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000003,sig:06,src:000017,time:149125,execs:62579,op:havoc,rep:11	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000004,sig:06,src:000023,time:360512,execs:131431,op:int16,pos:318,val:-128	06	no-crash			
+id:000005,sig:06,src:000023,time:384392,execs:139022,op:int32,pos:308,val:+127	06	no-crash			
+id:000006,sig:06,src:000023,time:428643,execs:153340,op:havoc,rep:3	06	no-crash			
+id:000007,sig:06,src:000024,time:607549,execs:215162,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000008,sig:06,src:000039,time:722691,execs:251077,op:havoc,rep:3	06	no-crash			
+id:000009,sig:06,src:000046,time:896606,execs:308157,op:int32,pos:11526,val:be:+1	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000010,sig:06,src:000051,time:904777,execs:311504,op:havoc,rep:15	06	no-crash			
+id:000011,sig:06,src:000054,time:1073441,execs:372492,op:havoc,rep:7	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000012,sig:06,src:000054,time:1075184,execs:373072,op:havoc,rep:13	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000013,sig:06,src:000054,time:1138208,execs:394469,op:havoc,rep:11	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000014,sig:11,src:000065,time:1207356,execs:419462,op:havoc,rep:7	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000015,sig:11,src:000065,time:1209027,execs:420064,op:havoc,rep:5	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000016,sig:11,src:000065,time:1209459,execs:420150,op:havoc,rep:3	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000017,sig:11,src:000065,time:1215721,execs:422662,op:havoc,rep:4	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000018,sig:11,src:000065,time:1216719,execs:422981,op:havoc,rep:7	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000019,sig:11,src:000065,time:1218460,execs:423607,op:havoc,rep:7	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000020,sig:11,src:000065,time:1219270,execs:423858,op:havoc,rep:8	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000021,sig:11,src:000065,time:1220099,execs:424122,op:havoc,rep:6	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000022,sig:11,src:000065,time:1225262,execs:426080,op:havoc,rep:7	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000023,sig:11,src:000065,time:1227132,execs:426745,op:havoc,rep:8	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000024,sig:11,src:000065,time:1228280,execs:427118,op:havoc,rep:5	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000025,sig:11,src:000065,time:1229060,execs:427344,op:havoc,rep:8	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000026,sig:06,src:000065,time:1230115,execs:427699,op:havoc,rep:6	06	no-crash			
+id:000027,sig:11,src:000065,time:1232295,execs:428439,op:havoc,rep:5	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000028,sig:11,src:000065,time:1240009,execs:431458,op:havoc,rep:6	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000029,sig:11,src:000074,time:1394267,execs:496647,op:havoc,rep:2	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000030,sig:11,src:000082,time:1419564,execs:505898,op:quick,pos:2998,val:+2	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000031,sig:11,src:000082,time:1427106,execs:508238,op:quick,pos:4168,val:+2	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000032,sig:11,src:000082,time:1434488,execs:510316,op:flip32,pos:2998	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000033,sig:11,src:000082,time:1441541,execs:511746,op:int32,pos:2998,val:-100663046	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000034,sig:11,src:000082,time:1456284,execs:516622,op:havoc,rep:2	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000035,sig:11,src:000082,time:1460095,execs:517828,op:havoc,rep:4	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000036,sig:11,src:000082,time:1462010,execs:518387,op:havoc,rep:4	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000037,sig:11,src:000082,time:1462647,execs:518503,op:havoc,rep:2	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000038,sig:11,src:000082,time:1465855,execs:519508,op:havoc,rep:3	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000039,sig:11,src:000082,time:1469004,execs:520521,op:havoc,rep:3	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000040,sig:11,src:000082,time:1469730,execs:520695,op:havoc,rep:4	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000041,sig:11,src:000082,time:1472081,execs:521407,op:havoc,rep:4	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000042,sig:11,src:000082,time:1474165,execs:522054,op:havoc,rep:3	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000043,sig:11,src:000082,time:1476666,execs:522811,op:havoc,rep:2	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000044,sig:11,src:000082,time:1486869,execs:526070,op:havoc,rep:3	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000045,sig:11,src:000082,time:1487514,execs:526206,op:havoc,rep:4	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000046,sig:11,src:000082,time:1492720,execs:527879,op:havoc,rep:3	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000047,sig:11,src:000082,time:1506923,execs:532578,op:havoc,rep:3	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000048,sig:11,src:000082,time:1513270,execs:534638,op:havoc,rep:2	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000049,sig:11,src:000082,time:1539747,execs:543408,op:havoc,rep:2	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000050,sig:11,src:000082,time:1542871,execs:544423,op:havoc,rep:4	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000051,sig:11,src:000082,time:1544708,execs:544984,op:havoc,rep:2	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000052,sig:11,src:000082,time:1552212,execs:547434,op:havoc,rep:4	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000053,sig:11,src:000082,time:1571571,execs:553972,op:havoc,rep:3	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000054,sig:11,src:000082,time:1572703,execs:554293,op:havoc,rep:4	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000055,sig:11,src:000082,time:1578793,execs:556316,op:havoc,rep:4	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000056,sig:11,src:000082,time:1582077,execs:557380,op:havoc,rep:4	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000057,sig:11,src:000082,time:1583792,execs:557870,op:havoc,rep:4	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000058,sig:11,src:000082,time:1598501,execs:562874,op:havoc,rep:4	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000059,sig:11,src:000092,time:1631402,execs:575639,op:havoc,rep:7	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000060,sig:11,src:000092,time:1631959,execs:575741,op:havoc,rep:14	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000061,sig:11,src:000092,time:1633804,execs:576242,op:havoc,rep:11	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000062,sig:11,src:000092,time:1634403,execs:576366,op:havoc,rep:5	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000063,sig:11,src:000092,time:1638128,execs:577463,op:havoc,rep:13	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000064,sig:11,src:000092,time:1654473,execs:582400,op:havoc,rep:12	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000065,sig:11,src:000092,time:1655378,execs:582612,op:havoc,rep:13	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000066,sig:11,src:000092,time:1657338,execs:583176,op:havoc,rep:14	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000067,sig:11,src:000092,time:1658398,execs:583434,op:havoc,rep:11	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000068,sig:11,src:000092,time:1660836,execs:584131,op:havoc,rep:12	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000069,sig:06,src:000938,time:2780598,execs:1019636,op:trim,rep:1	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000070,sig:06,src:000089,time:2928661,execs:1070894,op:havoc,rep:1	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000071,sig:11,src:003296,time:3164410,execs:1156024,op:trim,rep:6	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000072,sig:06,src:002763,time:4431343,execs:1608561,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000073,sig:06,src:003148,time:4985580,execs:1802950,op:havoc,rep:4	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000074,sig:06,src:003178,time:5026743,execs:1816921,op:havoc,rep:4	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000075,sig:11,src:003222,time:5060823,execs:1831414,op:trim,rep:2	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000076,sig:11,src:003242,time:5093565,execs:1844668,op:havoc,rep:3	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000077,sig:11,src:003258,time:5120429,execs:1855450,op:trim,rep:14	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000078,sig:06,src:003326,time:5202968,execs:1890826,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000079,sig:11,src:003554,time:5416462,execs:1975684,op:trim,rep:1	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000080,sig:11,src:003554,time:5419892,execs:1976954,op:havoc,rep:4	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000081,sig:11,src:003585,time:5458528,execs:1990606,op:havoc,rep:4	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000082,sig:11,src:003587,time:5463344,execs:1992079,op:havoc,rep:2	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000083,sig:11,src:003592,time:5467756,execs:1993668,op:havoc,rep:7	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000084,sig:11,src:003595,time:5472106,execs:1995172,op:havoc,rep:7	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000085,sig:06,src:003617,time:5505419,execs:2006819,op:havoc,rep:7	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000086,sig:11,src:003658,time:5617499,execs:2040823,op:havoc,rep:3	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000087,sig:11,src:004457,time:6424479,execs:2308710,op:trim,rep:1	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000088,sig:11,src:004709,time:6860386,execs:2454375,op:trim,rep:2	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000089,sig:11,src:004731,time:6911823,execs:2473656,op:trim,rep:4	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000090,sig:11,src:005104,time:7587209,execs:2698750,op:quick,pos:2998,val:+3	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000091,sig:11,src:005247,time:7735501,execs:2749112,op:trim,rep:8	11	asan	stack-overflow	34508bbc53	Object::copy(Object*) Object.cc:80 <- XRef::fetch(int, int, <- Object::arrayGet(int, Object*)
+id:000092,sig:11,src:004487,time:8366745,execs:2960600,op:havoc,rep:16	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000093,sig:11,src:003199,time:8836020,execs:3118901,op:trim,rep:1	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000094,sig:06,src:005457,time:8919888,execs:3151762,op:havoc,rep:2	06	no-crash			
+id:000095,sig:11,src:005105,time:9126989,execs:3230221,op:havoc,rep:3	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000096,sig:11,src:003220,time:9276310,execs:3274649,op:havoc,rep:9	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000097,sig:11,src:003518,time:9586317,execs:3378934,op:havoc,rep:1	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000098,sig:06,src:002525,time:11308773,execs:3903812,op:havoc,rep:6	06	no-crash			
+id:000099,sig:11,src:003555,time:11418725,execs:3941271,op:havoc,rep:6	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000100,sig:11,src:003303,time:13274194,execs:4515094,op:trim,rep:8	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000101,sig:11,src:004721,time:13360178,execs:4539906,op:havoc,rep:1	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000102,sig:11,src:003522,time:14693699,execs:4922645,op:havoc,rep:3	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000103,sig:11,src:003318,time:14762100,execs:4945564,op:havoc,rep:7	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000104,sig:11,src:003218,time:14845403,execs:4974524,op:havoc,rep:3	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000105,sig:11,src:005103,time:15198587,execs:5075651,op:havoc,rep:7	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000106,sig:06,src:003476,time:16837696,execs:5526881,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000107,sig:11,src:003603,time:16886581,execs:5543699,op:havoc,rep:3	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000108,sig:06,src:006270,time:17110932,execs:5607621,op:havoc,rep:6	06	no-crash			
+id:000109,sig:11,src:003264,time:17632451,execs:5727862,op:havoc,rep:8	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000110,sig:06,src:005651,time:17687935,execs:5745958,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000111,sig:06,src:002801,time:18144787,execs:5878414,op:havoc,rep:6	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000112,sig:06,src:002762,time:18166858,execs:5884717,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000113,sig:11,src:002813,time:18581622,execs:5993837,op:havoc,rep:6	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000114,sig:11,src:003573,time:19103721,execs:6170441,op:havoc,rep:14	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000115,sig:11,src:006380,time:19211156,execs:6208945,op:havoc,rep:4	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000116,sig:11,src:003566,time:19949928,execs:6430109,op:havoc,rep:2	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000117,sig:11,src:003487,time:20924277,execs:6728643,op:havoc,rep:6	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000118,sig:11,src:005706,time:21575669,execs:6921532,op:havoc,rep:6	11	asan	stack-overflow	d17a414e1b	libc.so.6+0x75008 <- libc.so.6+0x77624 <- error(ErrorCategory, long,

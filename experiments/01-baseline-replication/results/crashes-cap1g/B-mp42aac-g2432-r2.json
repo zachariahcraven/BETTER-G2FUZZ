@@ -1,0 +1,77 @@
+{
+ "campaign": "B-mp42aac-g2432-r2",
+ "program": "mp42aac",
+ "arm": "g2432",
+ "rep": 2,
+ "crash_files": 178,
+ "outcomes": {
+  "asan": 172,
+  "no-crash": 6
+ },
+ "unique_bugs": 10,
+ "unique_bugs_fn": 10,
+ "buckets_fn": [
+  "SEGV | AP4_DataBuffer::SetData(unsigned <- AP4_AvccAtom::AP4_AvccAtom(unsigned <- AP4_AvccAtom::Create(unsigned",
+  "allocation-size-too-big | operator <- AP4_Array<AP4_CttsTableEntry>::EnsureCapacity(unsigned <- AP4_Array<AP4_CttsTableEntry>::SetItemCount(unsigned",
+  "allocation-size-too-big | operator <- AP4_Array<AP4_ElstEntry>::EnsureCapacity(unsigned <- AP4_ElstAtom::AP4_ElstAtom(unsigned",
+  "allocation-size-too-big | operator <- AP4_Array<AP4_TrunAtom::Entry>::EnsureCapacity(unsigned <- AP4_Array<AP4_TrunAtom::Entry>::SetItemCount(unsigned",
+  "allocation-size-too-big | operator <- AP4_DataBuffer::ReallocateBuffer(unsigned <- AP4_DataBuffer::SetDataSize(unsigned",
+  "allocation-size-too-big | operator <- AP4_HdlrAtom::AP4_HdlrAtom(unsigned <- AP4_HdlrAtom::Create(unsigned",
+  "allocation-size-too-big | operator <- AP4_StcoAtom::AP4_StcoAtom(unsigned <- AP4_StcoAtom::Create(unsigned",
+  "allocation-size-too-big | operator <- AP4_UrlAtom::AP4_UrlAtom(unsigned <- AP4_UrlAtom::Create(unsigned",
+  "heap-buffer-overflow | AP4_AvccAtom::AP4_AvccAtom(unsigned <- AP4_AvccAtom::Create(unsigned <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&,",
+  "heap-buffer-overflow | AP4_AvccAtom::Create(unsigned <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&, <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&,"
+ ],
+ "buckets": [
+  {
+   "bucket": "914d59ad3b",
+   "key": "allocation-size-too-big | operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)",
+   "count": 159
+  },
+  {
+   "bucket": "645c0e838c",
+   "key": "allocation-size-too-big | operator new(unsigned <- AP4_Array<AP4_TrunAtom::Entry>::EnsureCapacity(unsigned int) <- AP4_Array<AP4_TrunAtom::Entry>::SetItemCount(unsigned int)",
+   "count": 4
+  },
+  {
+   "bucket": "2afd73fac7",
+   "key": "allocation-size-too-big | operator new[](unsigned <- AP4_StcoAtom::AP4_StcoAtom(unsigned int, <- AP4_StcoAtom::Create(unsigned int,",
+   "count": 2
+  },
+  {
+   "bucket": "3593294196",
+   "key": "allocation-size-too-big | operator new(unsigned <- AP4_Array<AP4_CttsTableEntry>::EnsureCapacity(unsigned int) <- AP4_Array<AP4_CttsTableEntry>::SetItemCount(unsigned int)",
+   "count": 1
+  },
+  {
+   "bucket": "16d2635201",
+   "key": "SEGV | AP4_DataBuffer::SetData(unsigned char <- AP4_AvccAtom::AP4_AvccAtom(unsigned int, <- AP4_AvccAtom::Create(unsigned int,",
+   "count": 1
+  },
+  {
+   "bucket": "73d9467774",
+   "key": "heap-buffer-overflow | AP4_AvccAtom::AP4_AvccAtom(unsigned int, <- AP4_AvccAtom::Create(unsigned int, <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&, unsigned",
+   "count": 1
+  },
+  {
+   "bucket": "4d2cc1af97",
+   "key": "heap-buffer-overflow | AP4_AvccAtom::Create(unsigned int, <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&, unsigned <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&, unsigned",
+   "count": 1
+  },
+  {
+   "bucket": "e4b0bb78e8",
+   "key": "allocation-size-too-big | operator new[](unsigned <- AP4_HdlrAtom::AP4_HdlrAtom(unsigned int, <- AP4_HdlrAtom::Create(unsigned int,",
+   "count": 1
+  },
+  {
+   "bucket": "5872c1b033",
+   "key": "allocation-size-too-big | operator new[](unsigned <- AP4_UrlAtom::AP4_UrlAtom(unsigned int, <- AP4_UrlAtom::Create(unsigned int,",
+   "count": 1
+  },
+  {
+   "bucket": "c836389a01",
+   "key": "allocation-size-too-big | operator new(unsigned <- AP4_Array<AP4_ElstEntry>::EnsureCapacity(unsigned int) <- AP4_ElstAtom::AP4_ElstAtom(unsigned int,",
+   "count": 1
+  }
+ ]
+}

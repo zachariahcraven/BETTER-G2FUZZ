@@ -1,0 +1,88 @@
+{
+ "campaign": "B-exiv2-afl432-r3",
+ "program": "exiv2",
+ "arm": "afl432",
+ "rep": 3,
+ "crash_files": 93,
+ "outcomes": {
+  "asan": 93
+ },
+ "unique_bugs": 12,
+ "unique_bugs_fn": 12,
+ "buckets_fn": [
+  "ABRT | pthread_kill <- gsignal <- abort",
+  "allocation-size-too-big | operator <- Exiv2::DataBuf::DataBuf(long) <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&,",
+  "allocation-size-too-big | operator <- Exiv2::DataBuf::DataBuf(long) <- Exiv2::JpegBase::readMetadata()",
+  "allocation-size-too-big | operator <- Exiv2::DataBuf::DataBuf(long) <- Exiv2::MrwImage::readMetadata()",
+  "allocation-size-too-big | operator <- Exiv2::DataBuf::DataBuf(long) <- Exiv2::PgfImage::readMetadata()",
+  "allocation-size-too-big | operator <- Exiv2::DataBuf::DataBuf(long) <- Exiv2::RafImage::readMetadata()",
+  "allocation-size-too-big | operator <- Exiv2::DataBuf::DataBuf(long) <- Exiv2::WebPImage::decodeChunks(unsigned",
+  "allocation-size-too-big | operator <- Exiv2::DataBuf::alloc(long) <- Exiv2::zlibToDataBuf(unsigned",
+  "heap-buffer-overflow | Exiv2::Internal::PngChunk::keyTXTChunk(Exiv2::DataBuf <- Exiv2::Internal::PngChunk::decodeTXTChunk(Exiv2::Image*, <- Exiv2::PngImage::readMetadata()",
+  "heap-buffer-overflow | std::char_traits<char>::length(char <- std::__cxx11::basic_string<char, <- Exiv2::Internal::PngChunk::parseTXTChunk(Exiv2::DataBuf",
+  "stack-overflow | operator <- Exiv2::Internal::CiffDirectory::readDirectory(unsigned <- Exiv2::Internal::CiffComponent::read(unsigned",
+  "stack-overflow | printf_common(void*, <- vsnprintf <- Exiv2::Internal::stringFormat[abi:cxx11](char"
+ ],
+ "buckets": [
+  {
+   "bucket": "fdb798c62f",
+   "key": "ABRT | pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)",
+   "count": 47
+  },
+  {
+   "bucket": "ad0042bddc",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::DataBuf::DataBuf(long) types.hpp:204 <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, std:",
+   "count": 31
+  },
+  {
+   "bucket": "74c46d0bee",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::DataBuf::DataBuf(long) types.hpp:204 <- Exiv2::JpegBase::readMetadata() jpgimage.cpp:483",
+   "count": 4
+  },
+  {
+   "bucket": "d96b6578fe",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::DataBuf::DataBuf(long) types.hpp:204 <- Exiv2::RafImage::readMetadata() rafimage.cpp:305",
+   "count": 2
+  },
+  {
+   "bucket": "962d77ca2f",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::DataBuf::alloc(long) types.cpp:158 <- Exiv2::zlibToDataBuf(unsigned char",
+   "count": 2
+  },
+  {
+   "bucket": "bcf28f968a",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::DataBuf::DataBuf(long) types.hpp:204 <- Exiv2::PgfImage::readMetadata() pgfimage.cpp:145",
+   "count": 1
+  },
+  {
+   "bucket": "69645e13e5",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::DataBuf::DataBuf(long) types.hpp:204 <- Exiv2::MrwImage::readMetadata() mrwimage.cpp:139",
+   "count": 1
+  },
+  {
+   "bucket": "b27bc5e8b5",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::DataBuf::DataBuf(long) types.hpp:204 <- Exiv2::WebPImage::decodeChunks(unsigned long)",
+   "count": 1
+  },
+  {
+   "bucket": "41843a8478",
+   "key": "heap-buffer-overflow | Exiv2::Internal::PngChunk::keyTXTChunk(Exiv2::DataBuf const&, <- Exiv2::Internal::PngChunk::decodeTXTChunk(Exiv2::Image*, Exiv2: <- Exiv2::PngImage::readMetadata() pngimage.cpp",
+   "count": 1
+  },
+  {
+   "bucket": "61a3a5b551",
+   "key": "stack-overflow | printf_common(void*, char <- vsnprintf exiv2.asan+0x2a3579) <- Exiv2::Internal::stringFormat[abi:cxx11](char const*,",
+   "count": 1
+  },
+  {
+   "bucket": "433d63a9e3",
+   "key": "heap-buffer-overflow | std::char_traits<char>::length(char const*) <- std::__cxx11::basic_string<char, std: <- Exiv2::Internal::PngChunk::parseTXTChunk(Exiv2::DataBuf const&,",
+   "count": 1
+  },
+  {
+   "bucket": "e1efb772a5",
+   "key": "stack-overflow | operator new(unsigned <- Exiv2::Internal::CiffDirectory::readDirectory(unsigned char <- Exiv2::Internal::CiffComponent::read(unsigned char",
+   "count": 1
+  }
+ ]
+}

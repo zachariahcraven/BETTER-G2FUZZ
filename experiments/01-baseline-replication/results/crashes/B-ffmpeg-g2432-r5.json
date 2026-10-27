@@ -1,0 +1,22 @@
+{
+ "campaign": "B-ffmpeg-g2432-r5",
+ "program": "ffmpeg",
+ "arm": "g2432",
+ "rep": 5,
+ "crash_files": 1,
+ "outcomes": {
+  "asan": 1
+ },
+ "unique_bugs": 1,
+ "unique_bugs_fn": 1,
+ "buckets_fn": [
+  "SEGV | mov_write_udta_sdp <- mov_write_trak_tag <- mov_write_moov_tag"
+ ],
+ "buckets": [
+  {
+   "bucket": "80afa596e6",
+   "key": "SEGV | mov_write_udta_sdp movenc.c:3010 <- mov_write_trak_tag movenc.c:3101 <- mov_write_moov_tag movenc.c:3921",
+   "count": 1
+  }
+ ]
+}

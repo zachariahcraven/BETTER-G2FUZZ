@@ -1,0 +1,58 @@
+{
+ "campaign": "B-tiffsplit-afl503-r2",
+ "program": "tiffsplit",
+ "arm": "afl503",
+ "rep": 2,
+ "crash_files": 156,
+ "outcomes": {
+  "asan": 156
+ },
+ "unique_bugs": 7,
+ "unique_bugs_fn": 7,
+ "buckets_fn": [
+  "SEGV | memcpy <- _TIFFmemcpy <- TIFFReadRawStrip1",
+  "SEGV | memcpy <- _TIFFmemcpy <- TIFFReadRawTile1",
+  "allocation-size-too-big | _TIFFCheckRealloc <- _TIFFCheckMalloc <- TIFFFetchNormalTag",
+  "allocation-size-too-big | cpStrips <- tiffcp <- main",
+  "heap-buffer-overflow | _TIFFmemcpy <- setByteArray <- _TIFFsetShortArray",
+  "stack-buffer-overflow | _TIFFVGetField <- TIFFVGetField <- TIFFGetField",
+  "stack-use-after-return | _TIFFVGetField <- TIFFVGetField <- TIFFGetField"
+ ],
+ "buckets": [
+  {
+   "bucket": "0ca7fd554c",
+   "key": "stack-use-after-return | _TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960",
+   "count": 77
+  },
+  {
+   "bucket": "56738101cf",
+   "key": "SEGV | memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208",
+   "count": 69
+  },
+  {
+   "bucket": "178ea79b46",
+   "key": "stack-buffer-overflow | _TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960",
+   "count": 4
+  },
+  {
+   "bucket": "a309920604",
+   "key": "SEGV | memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawTile1 tif_read.c:451",
+   "count": 3
+  },
+  {
+   "bucket": "360c6c98ae",
+   "key": "heap-buffer-overflow | _TIFFmemcpy tif_unix.c:265 <- setByteArray tif_dir.c:53 <- _TIFFsetShortArray tif_dir.c:63",
+   "count": 1
+  },
+  {
+   "bucket": "f99b25d568",
+   "key": "allocation-size-too-big | cpStrips tiffsplit.c:246 <- tiffcp tiffsplit.c:227 <- main tiffsplit.c:89",
+   "count": 1
+  },
+  {
+   "bucket": "affd0c4ee4",
+   "key": "allocation-size-too-big | _TIFFCheckRealloc tif_aux.c:47 <- _TIFFCheckMalloc tif_aux.c:61 <- TIFFFetchNormalTag tif_dirread.c:1658",
+   "count": 1
+  }
+ ]
+}

@@ -1,0 +1,7 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:11,src:001735,time:8541769,execs:8342970,op:havoc,rep:2	11	asan	SEGV	7b28ca2526	free imginfo.asan+0xd311b) <- jp2_box_destroy jp2_cod.c:212 <- jp2_box_get jp2_cod.c:319
+id:000001,sig:11,src:001726,time:8543536,execs:8346674,op:its,rep:2	11	asan	SEGV	7b28ca2526	free imginfo.asan+0xd311b) <- jp2_box_destroy jp2_cod.c:212 <- jp2_box_get jp2_cod.c:319
+id:000002,sig:11,src:001726,time:8543726,execs:8346678,op:its,rep:2	11	asan	SEGV	fde7652561	free imginfo.asan+0xd311b) <- jp2_cdef_destroy jp2_cod.c:230 <- jp2_box_destroy jp2_cod.c:212
+id:000003,sig:11,src:001726,time:8543931,execs:8346698,op:its,rep:2	11	asan	SEGV	fde7652561	free imginfo.asan+0xd311b) <- jp2_cdef_destroy jp2_cod.c:230 <- jp2_box_destroy jp2_cod.c:212
+id:000004,sig:11,src:001751,time:8544896,execs:8348713,op:its,rep:5	11	asan	SEGV	7b28ca2526	free imginfo.asan+0xd311b) <- jp2_box_destroy jp2_cod.c:212 <- jp2_box_get jp2_cod.c:319
+id:000005,sig:06,src:001933,time:20890564,execs:23986905,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)

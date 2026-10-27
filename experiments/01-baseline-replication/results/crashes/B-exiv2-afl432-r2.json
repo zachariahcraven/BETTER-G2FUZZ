@@ -1,0 +1,48 @@
+{
+ "campaign": "B-exiv2-afl432-r2",
+ "program": "exiv2",
+ "arm": "afl432",
+ "rep": 2,
+ "crash_files": 82,
+ "outcomes": {
+  "no-crash": 21,
+  "asan": 58,
+  "timeout": 3
+ },
+ "unique_bugs": 5,
+ "unique_bugs_fn": 5,
+ "buckets_fn": [
+  "ABRT | pthread_kill <- gsignal <- abort",
+  "heap-buffer-overflow | std::char_traits<char>::length(char <- std::__cxx11::basic_string<char, <- Exiv2::Internal::PngChunk::parseTXTChunk(Exiv2::DataBuf",
+  "out | operator <- Exiv2::DataBuf::DataBuf(long) <- Exiv2::RafImage::readMetadata()",
+  "stack-overflow | operator <- Exiv2::Internal::CiffDirectory::readDirectory(unsigned <- Exiv2::Internal::CiffComponent::read(unsigned",
+  "stack-overflow | printf_common(void*, <- vsnprintf <- Exiv2::Internal::stringFormat[abi:cxx11](char"
+ ],
+ "buckets": [
+  {
+   "bucket": "fdb798c62f",
+   "key": "ABRT | pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)",
+   "count": 50
+  },
+  {
+   "bucket": "433d63a9e3",
+   "key": "heap-buffer-overflow | std::char_traits<char>::length(char const*) <- std::__cxx11::basic_string<char, std: <- Exiv2::Internal::PngChunk::parseTXTChunk(Exiv2::DataBuf const&,",
+   "count": 5
+  },
+  {
+   "bucket": "849f3c7330",
+   "key": "out | operator new[](unsigned <- Exiv2::DataBuf::DataBuf(long) types.hpp:204 <- Exiv2::RafImage::readMetadata() rafimage.cpp:305",
+   "count": 1
+  },
+  {
+   "bucket": "e1efb772a5",
+   "key": "stack-overflow | operator new(unsigned <- Exiv2::Internal::CiffDirectory::readDirectory(unsigned char <- Exiv2::Internal::CiffComponent::read(unsigned char",
+   "count": 1
+  },
+  {
+   "bucket": "61a3a5b551",
+   "key": "stack-overflow | printf_common(void*, char <- vsnprintf exiv2.asan+0x2a3579) <- Exiv2::Internal::stringFormat[abi:cxx11](char const*,",
+   "count": 1
+  }
+ ]
+}

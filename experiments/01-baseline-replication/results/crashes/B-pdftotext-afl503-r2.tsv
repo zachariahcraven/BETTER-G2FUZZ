@@ -1,0 +1,35 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:06,src:000006,time:103994,execs:42899,op:havoc,rep:1	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000001,sig:06,src:000010,time:162817,execs:69296,op:int32,pos:13146,val:be:+100	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000002,sig:06,src:000010,time:186310,execs:80462,op:havoc,rep:6	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000003,sig:06,src:000010,time:210666,execs:92471,op:havoc,rep:16	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000004,sig:06,src:000017,time:324705,execs:139727,op:havoc,rep:10	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000005,sig:06,src:000023,time:463328,execs:184453,op:int16,pos:318,val:-128	06	no-crash			
+id:000006,sig:06,src:000023,time:473800,execs:187591,op:int32,pos:308,val:+127	06	no-crash			
+id:000007,sig:06,src:000023,time:561478,execs:219694,op:havoc,rep:4	06	no-crash			
+id:000008,sig:06,src:000024,time:684728,execs:266751,op:colorization,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000009,sig:06,src:000037,time:1266257,execs:438654,op:havoc,rep:8	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000010,sig:06,src:000039,time:1285198,execs:444717,op:havoc,rep:15	06	no-crash			
+id:000011,sig:06,src:000039,time:1285249,execs:444724,op:havoc,rep:8	06	no-crash			
+id:000012,sig:06,src:000039,time:1314226,execs:453411,op:havoc,rep:8	06	no-crash			
+id:000013,sig:06,src:000040,time:1539825,execs:523048,op:havoc,rep:12	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000014,sig:06,src:000051,time:1861457,execs:622756,op:colorization,rep:1	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000015,sig:11,src:000051,time:1863644,execs:623342,op:colorization,rep:1	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000016,sig:11,src:000051,time:1867000,execs:624223,op:colorization,rep:1	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000017,sig:06,src:000054,time:2052429,execs:685173,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000018,sig:06,src:000070,time:2411451,execs:784885,op:havoc,rep:13	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000019,sig:06,src:000070,time:2423901,execs:786741,op:havoc,rep:8	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000020,sig:06,src:001229,time:5683268,execs:2053616,op:trim,rep:3	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000021,sig:06,src:004116,time:6266375,execs:2291264,op:havoc,rep:5	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000022,sig:11,src:001444,time:6479973,execs:2349052,op:trim,rep:1	11	asan	stack-overflow	34508bbc53	Object::copy(Object*) Object.cc:80 <- XRef::fetch(int, int, <- Object::arrayGet(int, Object*)
+id:000023,sig:06,src:002239,time:7333238,execs:2652340,op:trim,rep:2	06	no-crash			
+id:000024,sig:11,src:003391,time:10513119,execs:3696748,op:colorization,rep:15	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000025,sig:06,src:003313,time:14388342,execs:4899826,op:trim,rep:14	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000026,sig:11,src:003379,time:15488578,execs:5230735,op:colorization,rep:8	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000027,sig:11,src:003379,time:15506160,execs:5235616,op:colorization,rep:8	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000028,sig:11,src:003386,time:15540742,execs:5245706,op:colorization,rep:4	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000029,sig:06,src:003396,time:15608028,execs:5268352,op:colorization,rep:1	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000030,sig:06,src:003651,time:16654973,execs:5592274,op:colorization,rep:11	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000031,sig:06,src:003676,time:16791211,execs:5630337,op:trim,rep:15	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000032,sig:06,src:003677,time:16880591,execs:5652161,op:colorization,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000033,sig:11,src:004578,time:18866326,execs:6333879,op:havoc,rep:11	11	asan	global-buffer-overflow	e5a7f5db64	Lexer::getObj(Object*) Lexer.cc:133 <- Parser::Parser(XRef*, Lexer*, <- Gfx::display(Object*, int)

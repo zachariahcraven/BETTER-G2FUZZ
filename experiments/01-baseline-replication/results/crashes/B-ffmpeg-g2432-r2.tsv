@@ -1,0 +1,14 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:08,src:000679,time:11261977,execs:267619,op:havoc,rep:3	08	asan	FPE	22dc810c55	gdv_read_header gdv.c:107 <- avformat_open_input utils.c:631 <- open_input_file ffmpeg_opt.c:1069
+id:000001,sig:08,src:003090,time:11427729,execs:273418,op:havoc,rep:14	08	asan	FPE	22dc810c55	gdv_read_header gdv.c:107 <- avformat_open_input utils.c:631 <- open_input_file ffmpeg_opt.c:1069
+id:000002,sig:08,src:003090,time:11431868,execs:273932,op:havoc,rep:3	08	asan	FPE	22dc810c55	gdv_read_header gdv.c:107 <- avformat_open_input utils.c:631 <- open_input_file ffmpeg_opt.c:1069
+id:000003,sig:08,src:003090,time:11433776,execs:274091,op:havoc,rep:7	08	asan	FPE	22dc810c55	gdv_read_header gdv.c:107 <- avformat_open_input utils.c:631 <- open_input_file ffmpeg_opt.c:1069
+id:000004,sig:08,src:003090,time:11435910,execs:274322,op:havoc,rep:1	08	asan	FPE	22dc810c55	gdv_read_header gdv.c:107 <- avformat_open_input utils.c:631 <- open_input_file ffmpeg_opt.c:1069
+id:000005,sig:08,src:003090,time:11437550,execs:274436,op:havoc,rep:3	08	asan	FPE	22dc810c55	gdv_read_header gdv.c:107 <- avformat_open_input utils.c:631 <- open_input_file ffmpeg_opt.c:1069
+id:000006,sig:08,src:003090,time:11438088,execs:274505,op:havoc,rep:15	08	asan	FPE	22dc810c55	gdv_read_header gdv.c:107 <- avformat_open_input utils.c:631 <- open_input_file ffmpeg_opt.c:1069
+id:000007,sig:08,src:003090,time:11438837,execs:274559,op:havoc,rep:9	08	asan	FPE	22dc810c55	gdv_read_header gdv.c:107 <- avformat_open_input utils.c:631 <- open_input_file ffmpeg_opt.c:1069
+id:000008,sig:08,src:003090,time:11442817,execs:275038,op:havoc,rep:2	08	asan	FPE	22dc810c55	gdv_read_header gdv.c:107 <- avformat_open_input utils.c:631 <- open_input_file ffmpeg_opt.c:1069
+id:000009,sig:08,src:003090,time:11443853,execs:275110,op:havoc,rep:8	08	asan	FPE	22dc810c55	gdv_read_header gdv.c:107 <- avformat_open_input utils.c:631 <- open_input_file ffmpeg_opt.c:1069
+id:000010,sig:08,src:003090,time:11445255,execs:275317,op:havoc,rep:16	08	asan	FPE	22dc810c55	gdv_read_header gdv.c:107 <- avformat_open_input utils.c:631 <- open_input_file ffmpeg_opt.c:1069
+id:000011,sig:08,src:003090,time:11448569,execs:275717,op:havoc,rep:3	08	asan	FPE	22dc810c55	gdv_read_header gdv.c:107 <- avformat_open_input utils.c:631 <- open_input_file ffmpeg_opt.c:1069
+id:000012,sig:08,src:003090,time:11452275,execs:276142,op:havoc,rep:6	08	asan	FPE	22dc810c55	gdv_read_header gdv.c:107 <- avformat_open_input utils.c:631 <- open_input_file ffmpeg_opt.c:1069

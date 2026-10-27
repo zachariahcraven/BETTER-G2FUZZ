@@ -1,0 +1,2 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:06,src:001499,time:12348433,execs:11897097,op:havoc,rep:4	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)

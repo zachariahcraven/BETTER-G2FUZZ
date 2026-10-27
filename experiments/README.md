@@ -4,7 +4,7 @@ One folder per study, numbered in the order they started. Read a study's `README
 
 | Study | Question | Status | In the report |
 | --- | --- | --- | --- |
-| [01-baseline-replication](01-baseline-replication/) | Does G2FUZZ beat AFL++(cmplog) on the paper's targets with our setup (local LLM; AFL++ 4.32c and 5.03c)? | setup done, phase B next | yes (its `setup/` no) |
+| [01-baseline-replication](01-baseline-replication/) | Does G2FUZZ beat AFL++(cmplog) on the paper's targets with our setup (local LLM; AFL++ 4.32c and 5.03c)? | phase B done + analyzed (2026-10-25); phase C needs approval | yes (its `setup/` no) |
 
 ## Starting a study
 Copy [TEMPLATE/](TEMPLATE/) to `NN-<short-name>/` and add a row above. Rules:

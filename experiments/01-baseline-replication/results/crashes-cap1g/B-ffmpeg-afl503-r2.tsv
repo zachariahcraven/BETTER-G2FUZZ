@@ -1,0 +1,2 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:08,src:000483,time:7270467,execs:223665,op:quick,pos:32555	08	asan	FPE	e051e0bd7d	mov_write_stsz_tag movenc.c:195 <- mov_write_stbl_tag movenc.c:2422 <- mov_write_minf_tag movenc.c:2666

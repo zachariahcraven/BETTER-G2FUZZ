@@ -1,0 +1,30 @@
+{
+ "campaign": "B-mp42aac-afl432-r3",
+ "program": "mp42aac",
+ "arm": "afl432",
+ "rep": 3,
+ "crash_files": 66,
+ "outcomes": {
+  "asan": 49,
+  "no-crash": 16,
+  "timeout": 1
+ },
+ "unique_bugs": 2,
+ "unique_bugs_fn": 2,
+ "buckets_fn": [
+  "allocation-size-too-big | operator <- AP4_Array<AP4_ElstEntry>::EnsureCapacity(unsigned <- AP4_ElstAtom::AP4_ElstAtom(unsigned",
+  "allocation-size-too-big | operator <- AP4_DataBuffer::ReallocateBuffer(unsigned <- AP4_DataBuffer::SetDataSize(unsigned"
+ ],
+ "buckets": [
+  {
+   "bucket": "914d59ad3b",
+   "key": "allocation-size-too-big | operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)",
+   "count": 40
+  },
+  {
+   "bucket": "c836389a01",
+   "key": "allocation-size-too-big | operator new(unsigned <- AP4_Array<AP4_ElstEntry>::EnsureCapacity(unsigned int) <- AP4_ElstAtom::AP4_ElstAtom(unsigned int,",
+   "count": 9
+  }
+ ]
+}

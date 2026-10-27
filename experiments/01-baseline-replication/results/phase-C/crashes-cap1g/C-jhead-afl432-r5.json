@@ -1,0 +1,57 @@
+{
+ "campaign": "C-jhead-afl432-r5",
+ "program": "jhead",
+ "arm": "afl432",
+ "rep": 5,
+ "crash_files": 97,
+ "outcomes": {
+  "asan": 97
+ },
+ "unique_bugs": 7,
+ "unique_bugs_fn": 6,
+ "buckets_fn": [
+  "SEGV | show_IPTC <- ProcessFile <- main",
+  "heap-buffer-overflow | MemcmpInterceptorCommon(void*, <- bcmp <- ReadJpegSections",
+  "heap-buffer-overflow | MemcmpInterceptorCommon(void*, <- bcmp <- process_EXIF",
+  "heap-buffer-overflow | process_DHT <- ReadJpegSections <- ReadJpegFile",
+  "heap-buffer-overflow | process_DQT <- ReadJpegSections <- ReadJpegFile",
+  "heap-buffer-overflow | process_SOFn <- ReadJpegSections <- ReadJpegFile"
+ ],
+ "buckets": [
+  {
+   "bucket": "653c1ece6a",
+   "key": "SEGV | show_IPTC iptc.c:122 <- ProcessFile jhead.c:946 <- main jhead.c:1730",
+   "count": 85
+  },
+  {
+   "bucket": "6c35546140",
+   "key": "heap-buffer-overflow | process_DHT jpgqguess.c:188 <- ReadJpegSections jpgfile.c:228 <- ReadJpegFile jpgfile.c:375",
+   "count": 4
+  },
+  {
+   "bucket": "5e72187ccd",
+   "key": "heap-buffer-overflow | process_DQT jpgqguess.c:108 <- ReadJpegSections jpgfile.c:223 <- ReadJpegFile jpgfile.c:375",
+   "count": 3
+  },
+  {
+   "bucket": "ca7e32291e",
+   "key": "heap-buffer-overflow | MemcmpInterceptorCommon(void*, int <- bcmp jhead.asan+0x46a49) <- process_EXIF exif.c:995",
+   "count": 2
+  },
+  {
+   "bucket": "04f0aa20e2",
+   "key": "heap-buffer-overflow | process_SOFn jpgfile.c:81 <- ReadJpegSections jpgfile.c:329 <- ReadJpegFile jpgfile.c:375",
+   "count": 1
+  },
+  {
+   "bucket": "1b58db6ac7",
+   "key": "heap-buffer-overflow | process_DQT jpgqguess.c:110 <- ReadJpegSections jpgfile.c:223 <- ReadJpegFile jpgfile.c:375",
+   "count": 1
+  },
+  {
+   "bucket": "ad9c1fb2bd",
+   "key": "heap-buffer-overflow | MemcmpInterceptorCommon(void*, int <- bcmp jhead.asan+0x46a49) <- ReadJpegSections jpgfile.c:251",
+   "count": 1
+  }
+ ]
+}

@@ -1,0 +1,45 @@
+{
+ "campaign": "B-gdk-pixbuf-pixdata-g2503-r1",
+ "program": "gdk-pixbuf-pixdata",
+ "arm": "g2503",
+ "rep": 1,
+ "crash_files": 14,
+ "outcomes": {
+  "no-crash": 6,
+  "asan": 8
+ },
+ "unique_bugs": 5,
+ "unique_bugs_fn": 3,
+ "buckets_fn": [
+  "allocation-size-too-big | malloc <- gdk_pixbuf_new <- DecodeHeader",
+  "allocation-size-too-big | malloc <- gdk_pixbuf_new <- gif_get_lzw",
+  "heap-buffer-overflow | gdk_pixbuf_from_pixdata <- try_load <- pixdata_image_load_increment"
+ ],
+ "buckets": [
+  {
+   "bucket": "c4abdfa3c3",
+   "key": "allocation-size-too-big | malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gif_get_lzw io-gif.c:854",
+   "count": 3
+  },
+  {
+   "bucket": "3d961589f0",
+   "key": "heap-buffer-overflow | gdk_pixbuf_from_pixdata gdk-pixdata.c:472 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152",
+   "count": 2
+  },
+  {
+   "bucket": "05d67b2282",
+   "key": "heap-buffer-overflow | gdk_pixbuf_from_pixdata gdk-pixdata.c:479 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152",
+   "count": 1
+  },
+  {
+   "bucket": "4a9bdccbef",
+   "key": "heap-buffer-overflow | gdk_pixbuf_from_pixdata gdk-pixdata.c:506 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152",
+   "count": 1
+  },
+  {
+   "bucket": "1d8fbc906d",
+   "key": "allocation-size-too-big | malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-bmp.c",
+   "count": 1
+  }
+ ]
+}

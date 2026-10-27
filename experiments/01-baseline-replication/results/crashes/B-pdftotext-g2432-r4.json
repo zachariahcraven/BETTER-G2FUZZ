@@ -1,0 +1,53 @@
+{
+ "campaign": "B-pdftotext-g2432-r4",
+ "program": "pdftotext",
+ "arm": "g2432",
+ "rep": 4,
+ "crash_files": 123,
+ "outcomes": {
+  "asan": 112,
+  "no-crash": 11
+ },
+ "unique_bugs": 6,
+ "unique_bugs_fn": 6,
+ "buckets_fn": [
+  "ABRT | pthread_kill <- gsignal <- abort",
+  "SEGV | TextPage::findGaps(GList*, <- TextPage::split(GList*, <- TextPage::splitChars(GList*)",
+  "stack-overflow | ",
+  "stack-overflow | Object::copy(Object*) <- XRef::fetch(int, <- Object::arrayGet(int,",
+  "stack-overflow | _IO_default_xsputn <- libc.so.6+0x76fcb <- libc.so.6+0x77624",
+  "stack-overflow | libc.so.6+0x75008 <- libc.so.6+0x77624 <- error(ErrorCategory,"
+ ],
+ "buckets": [
+  {
+   "bucket": "c665cfeebd",
+   "key": "SEGV | TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610",
+   "count": 59
+  },
+  {
+   "bucket": "fdb798c62f",
+   "key": "ABRT | pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)",
+   "count": 47
+  },
+  {
+   "bucket": "d17a414e1b",
+   "key": "stack-overflow | libc.so.6+0x75008 <- libc.so.6+0x77624 <- error(ErrorCategory, long,",
+   "count": 3
+  },
+  {
+   "bucket": "51a7c8c3cd",
+   "key": "stack-overflow | _IO_default_xsputn libc.so.6+0x8dd9f) <- libc.so.6+0x76fcb <- libc.so.6+0x77624",
+   "count": 1
+  },
+  {
+   "bucket": "148bef40bf",
+   "key": "stack-overflow | ",
+   "count": 1
+  },
+  {
+   "bucket": "34508bbc53",
+   "key": "stack-overflow | Object::copy(Object*) Object.cc:80 <- XRef::fetch(int, int, <- Object::arrayGet(int, Object*)",
+   "count": 1
+  }
+ ]
+}

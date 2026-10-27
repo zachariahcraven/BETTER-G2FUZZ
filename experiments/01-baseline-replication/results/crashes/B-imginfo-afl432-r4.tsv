@@ -1,0 +1,2 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:11,src:001517,time:5328366,execs:7413709,op:havoc,rep:1	11	asan	SEGV	fde7652561	free imginfo.asan+0xd311b) <- jp2_cdef_destroy jp2_cod.c:230 <- jp2_box_destroy jp2_cod.c:212

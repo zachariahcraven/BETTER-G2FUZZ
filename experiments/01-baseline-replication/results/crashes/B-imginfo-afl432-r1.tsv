@@ -1,0 +1,4 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:06,src:001387,time:6936420,execs:8584290,op:havoc,rep:4	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000001,sig:06,src:001643,time:8655756,execs:11329595,op:havoc,rep:1	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000002,sig:11,src:001712,time:12422944,execs:18452850,op:havoc,rep:7	11	asan	SEGV	7b28ca2526	free imginfo.asan+0xd311b) <- jp2_box_destroy jp2_cod.c:212 <- jp2_box_get jp2_cod.c:319

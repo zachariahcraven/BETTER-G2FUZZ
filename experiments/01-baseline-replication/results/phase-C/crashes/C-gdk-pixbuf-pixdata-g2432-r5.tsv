@@ -1,0 +1,118 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:05,src:000156,time:1701,execs:2794,op:havoc,rep:16	05	no-crash			
+id:000001,sig:11,src:000081,time:59405,execs:58282,op:havoc,rep:2	11	asan	SEGV	a864624c7f	DecodeHeader io-ico.c:322 <- gdk_pixbuf__ico_image_load_increment io-ico.c:905 <- generic_load_incrementally gdk-pixbuf-io.c:998
+id:000002,sig:05,src:000081,time:88190,execs:85626,op:havoc,rep:2	05	no-crash			
+id:000003,sig:05,src:000062,time:137539,execs:122994,op:havoc,rep:15	05	no-crash			
+id:000004,sig:05,src:000049,time:172288,execs:145180,op:havoc,rep:9	05	no-crash			
+id:000005,sig:05,src:000049,time:180336,execs:150827,op:havoc,rep:12	05	no-crash			
+id:000006,sig:05,src:000049,time:201636,execs:168049,op:havoc,rep:5	05	no-crash			
+id:000007,sig:05,src:000049,time:202334,execs:168544,op:havoc,rep:13	05	no-crash			
+id:000008,sig:05,src:000049,time:204601,execs:170233,op:havoc,rep:6	05	no-crash			
+id:000009,sig:05,src:000049,time:219272,execs:181513,op:havoc,rep:15	05	no-crash			
+id:000010,sig:05,src:000609,time:269368,execs:214181,op:havoc,rep:2	05	no-crash			
+id:000011,sig:05,src:000170,time:323820,execs:256963,op:havoc,rep:5	05	no-crash			
+id:000012,sig:05,src:000170,time:339336,execs:269076,op:havoc,rep:3	05	no-crash			
+id:000013,sig:11,src:000163,time:387861,execs:295925,op:inf,rep:1	11	asan	heap-buffer-overflow	05d67b2282	gdk_pixbuf_from_pixdata gdk-pixdata.c:479 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000014,sig:11,src:000163,time:438064,execs:318271,op:havoc,rep:14	11	asan	heap-buffer-overflow	3d961589f0	gdk_pixbuf_from_pixdata gdk-pixdata.c:472 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000015,sig:05,src:000035,time:462193,execs:333217,op:quick,pos:24,val:+2	05	no-crash			
+id:000016,sig:05,src:000071,time:807567,execs:578817,op:colorization,rep:13	05	no-crash			
+id:000017,sig:05,src:000071,time:809664,execs:580083,op:havoc,rep:2	05	no-crash			
+id:000018,sig:05,src:000071,time:810810,execs:580611,op:havoc,rep:2	05	no-crash			
+id:000019,sig:11,src:000071,time:817238,execs:584815,op:havoc,rep:2	11	no-crash			
+id:000020,sig:05,src:001363,time:1710348,execs:837749,op:colorization,rep:1	05	no-crash			
+id:000021,sig:05,src:001442,time:1738250,execs:856296,op:havoc,rep:4	05	no-crash			
+id:000022,sig:05,src:001442,time:1758496,execs:866038,op:havoc,rep:7	05	no-crash			
+id:000023,sig:05,src:001619,time:2062405,execs:965865,op:colorization,rep:1	05	no-crash			
+id:000024,sig:05,src:001619,time:2062760,execs:965882,op:colorization,rep:1	05	no-crash			
+id:000025,sig:05,src:001619,time:2063033,execs:965893,op:colorization,rep:1	05	no-crash			
+id:000026,sig:05,src:001619,time:2063289,execs:965938,op:colorization,rep:1	05	no-crash			
+id:000027,sig:05,src:001619,time:2063534,execs:965973,op:colorization,rep:1	05	no-crash			
+id:000028,sig:05,src:001619,time:2064503,execs:966079,op:havoc,rep:4	05	no-crash			
+id:000029,sig:05,src:001638,time:2107469,execs:993895,op:havoc,rep:8	05	no-crash			
+id:000030,sig:05,src:000073,time:2204806,execs:1046432,op:havoc,rep:5	05	no-crash			
+id:000031,sig:05,src:001710,time:2258318,execs:1078634,op:havoc,rep:2	05	no-crash			
+id:000032,sig:05,src:001699,time:2263626,execs:1081695,op:havoc,rep:5	05	no-crash			
+id:000033,sig:05,src:001429,time:2335550,execs:1126280,op:havoc,rep:1	05	no-crash			
+id:000034,sig:05,src:001619,time:2488086,execs:1225238,op:havoc,rep:4	05	no-crash			
+id:000035,sig:05,src:001619,time:2488375,execs:1225281,op:havoc,rep:3	05	no-crash			
+id:000036,sig:05,src:001797,time:2590189,execs:1282831,op:havoc,rep:10	05	no-crash			
+id:000037,sig:05,src:001619,time:3665169,execs:1881217,op:havoc,rep:3	05	no-crash			
+id:000038,sig:05,src:001619,time:3666359,execs:1881317,op:havoc,rep:2	05	no-crash			
+id:000039,sig:05,src:001957,time:3707678,execs:1907714,op:havoc,rep:2	05	no-crash			
+id:000040,sig:11,src:000164,time:3737191,execs:1925945,op:havoc,rep:2	11	asan	heap-buffer-overflow	4a9bdccbef	gdk_pixbuf_from_pixdata gdk-pixdata.c:506 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000041,sig:06,src:002393,time:3839480,execs:1984370,op:havoc,rep:13	06	asan	heap-buffer-overflow	9cc279e5bb	DoCompressed io-bmp.c:1060 <- gdk_pixbuf__bmp_image_load_increment io-bmp.c:1251 <- generic_load_incrementally gdk-pixbuf-io.c:998
+id:000042,sig:05,src:001854,time:3896808,execs:2019715,op:havoc,rep:5	05	no-crash			
+id:000043,sig:05,src:001349,time:3927728,execs:2038919,op:havoc,rep:2	05	no-crash			
+id:000044,sig:05,src:001982,time:4169666,execs:2185909,op:havoc,rep:2	05	no-crash			
+id:000045,sig:05,src:000250,time:4193378,execs:2199608,op:havoc,rep:3	05	no-crash			
+id:000046,sig:05,src:002038,time:4253112,execs:2229560,op:havoc,rep:3	05	no-crash			
+id:000047,sig:11,src:001619,time:4277853,execs:2246146,op:havoc,rep:4	11	asan	SEGV	255dca9438	gdk_pixbuf__qtif_image_load_increment io-qtif.c:437 <- gdk_pixbuf_loader_load_module gdk-pixbuf-loader.c:445 <- gdk_pixbuf_loader_close gdk-pixbuf-loader.c:810
+id:000048,sig:05,src:001619,time:4279309,execs:2246289,op:havoc,rep:1	05	no-crash			
+id:000049,sig:05,src:001726,time:4309775,execs:2265655,op:havoc,rep:6	05	no-crash			
+id:000050,sig:05,src:001991,time:4597679,execs:2421370,op:havoc,rep:3	05	no-crash			
+id:000051,sig:05,src:001619,time:4843417,execs:2560374,op:havoc,rep:1	05	no-crash			
+id:000052,sig:05,src:002548,time:4896900,execs:2590250,op:havoc,rep:7	05	no-crash			
+id:000053,sig:05,src:002603,time:5111057,execs:2713006,op:havoc,rep:7	05	no-crash			
+id:000054,sig:05,src:002666,time:5152992,execs:2741838,op:havoc,rep:4	05	no-crash			
+id:000055,sig:05,src:002767,time:5320336,execs:2842632,op:havoc,rep:1	05	asan	heap-buffer-overflow	7e236214ac	pcx_increment_load_data_2 io-pcx.c:375 <- gdk_pixbuf__pcx_load_increment io-pcx.c:678 <- gdk_pixbuf_loader_load_module gdk-pixbuf-loader.c:445
+id:000056,sig:05,src:002808,time:5369287,execs:2878738,op:havoc,rep:2	05	asan	heap-buffer-overflow	346d3b2824	read_pixel_4 io-pcx.c:271 <- pcx_increment_load_data_4 io-pcx.c:410 <- gdk_pixbuf__pcx_load_increment io-pcx.c:681
+id:000057,sig:05,src:002721,time:5392883,execs:2896679,op:havoc,rep:13	05	no-crash			
+id:000058,sig:05,src:001983,time:6182634,execs:3195002,op:havoc,rep:3	05	no-crash			
+id:000059,sig:05,src:002914,time:7491466,execs:3726064,op:havoc,rep:3	05	no-crash			
+id:000060,sig:05,src:003162,time:8856190,execs:4184388,op:havoc,rep:2	05	no-crash			
+id:000061,sig:05,src:002007,time:8883681,execs:4201599,op:havoc,rep:10	05	no-crash			
+id:000062,sig:11,src:001685,time:8985199,execs:4233521,op:flip1,pos:14071	11	asan	heap-buffer-overflow	a0c233833d	OneLine32 io-ico.c:596 <- OneLine io-ico.c:807 <- gdk_pixbuf__ico_image_load_increment io-ico.c:898
+id:000063,sig:05,src:003207,time:9487132,execs:4418410,op:colorization,rep:4	05	no-crash			
+id:000064,sig:05,src:003207,time:9487178,execs:4418434,op:colorization,rep:4	05	no-crash			
+id:000065,sig:05,src:003299,time:11179565,execs:5277357,op:quick,pos:9760	05	no-crash			
+id:000066,sig:05,src:001437,time:11261073,execs:5323273,op:havoc,rep:2	05	no-crash			
+id:000067,sig:05,src:001688,time:11322638,execs:5359756,op:havoc,rep:2	05	no-crash			
+id:000068,sig:05,src:001431,time:11442274,execs:5434300,op:havoc,rep:1	05	no-crash			
+id:000069,sig:05,src:001132,time:11880672,execs:5697917,op:havoc,rep:3	05	no-crash			
+id:000070,sig:11,src:003284,time:11989757,execs:5762559,op:havoc,rep:15	11	asan	heap-buffer-overflow	3d961589f0	gdk_pixbuf_from_pixdata gdk-pixdata.c:472 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000071,sig:05,src:002689,time:12300771,execs:5942675,op:havoc,rep:8	05	no-crash			
+id:000072,sig:05,src:001190,time:12680178,execs:6177296,op:havoc,rep:11	05	no-crash			
+id:000073,sig:05,src:000218,time:14109321,execs:6842738,op:havoc,rep:1	05	no-crash			
+id:000074,sig:05,src:000451,time:15736394,execs:7394509,op:havoc,rep:16	05	no-crash			
+id:000075,sig:05,src:001139,time:15908952,execs:7472806,op:havoc,rep:11	05	no-crash			
+id:000076,sig:11,src:001904,time:15945465,execs:7491765,op:havoc,rep:4	11	asan	heap-buffer-overflow	7b6ecc61af	parse_data_for_row_pseudocolor io-tga.c:367 <- parse_data_for_row io-tga.c:413 <- gdk_pixbuf__tga_load_increment io-tga.c:922
+id:000077,sig:05,src:003325,time:16587536,execs:7817483,op:havoc,rep:2	05	no-crash			
+id:000078,sig:05,src:003411,time:16612889,execs:7835078,op:havoc,rep:2	05	no-crash			
+id:000079,sig:05,src:003411,time:16615661,execs:7836739,op:havoc,rep:2	05	no-crash			
+id:000080,sig:05,src:003173,time:16911848,execs:8012770,op:havoc,rep:2	05	no-crash			
+id:000081,sig:05,src:002770,time:16933133,execs:8023811,op:havoc,rep:16	05	asan	heap-buffer-overflow	7e236214ac	pcx_increment_load_data_2 io-pcx.c:375 <- gdk_pixbuf__pcx_load_increment io-pcx.c:678 <- gdk_pixbuf_loader_load_module gdk-pixbuf-loader.c:445
+id:000082,sig:05,src:003467,time:17996612,execs:8542181,op:havoc,rep:9	05	asan	heap-buffer-overflow	5a41314e36	pcx_increment_load_data_8 io-pcx.c:450 <- gdk_pixbuf__pcx_load_increment io-pcx.c:684 <- gdk_pixbuf_loader_load_module gdk-pixbuf-loader.c:445
+id:000083,sig:05,src:002509,time:18441909,execs:8769868,op:havoc,rep:4	05	no-crash			
+id:000084,sig:11,src:003486,time:19231712,execs:9137781,op:havoc,rep:7	11	asan	SEGV	49483b3752	gdk_pixbuf__qtif_image_load_increment io-qtif.c:437 <- gdk_pixbuf_loader_write gdk-pixbuf-loader.c:523 <- gdk_pixbuf__qtif_image_load_increment io-qtif.c:490
+id:000085,sig:05,src:003413,time:19546729,execs:9321442,op:havoc,rep:16	05	no-crash			
+id:000086,sig:11,src:003501,time:19846646,execs:9478718,op:havoc,rep:5	11	asan	heap-buffer-overflow	05d67b2282	gdk_pixbuf_from_pixdata gdk-pixdata.c:479 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000087,sig:05,src:001822,time:20413376,execs:9777866,op:havoc,rep:10	05	no-crash			
+id:000088,sig:05,src:002510,time:23583518,execs:11681452,op:havoc,rep:2	05	no-crash			
+id:000089,sig:05,src:002797,time:24031774,execs:11952140,op:havoc,rep:7	05	no-crash			
+id:000090,sig:05,src:003449,time:24105519,execs:11997291,op:havoc,rep:1	05	asan	heap-buffer-overflow	5a41314e36	pcx_increment_load_data_8 io-pcx.c:450 <- gdk_pixbuf__pcx_load_increment io-pcx.c:684 <- gdk_pixbuf_loader_load_module gdk-pixbuf-loader.c:445
+id:000091,sig:05,src:003575,time:24222790,execs:12083159,op:havoc,rep:1	05	no-crash			
+id:000092,sig:11,src:003592,time:24568495,execs:12317076,op:havoc,rep:7	11	asan	SEGV	255dca9438	gdk_pixbuf__qtif_image_load_increment io-qtif.c:437 <- gdk_pixbuf_loader_load_module gdk-pixbuf-loader.c:445 <- gdk_pixbuf_loader_close gdk-pixbuf-loader.c:810
+id:000093,sig:11,src:003501,time:27235043,execs:13926754,op:havoc,rep:16	11	asan	heap-buffer-overflow	05d67b2282	gdk_pixbuf_from_pixdata gdk-pixdata.c:479 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000094,sig:11,src:002211,time:29145113,execs:14899882,op:havoc,rep:6	11	asan	heap-buffer-overflow	2be469a697	pcx_increment_load_data_24 io-pcx.c:527 <- gdk_pixbuf__pcx_load_increment io-pcx.c:687 <- generic_load_incrementally gdk-pixbuf-io.c:998
+id:000095,sig:05,src:002870,time:29985287,execs:15424103,op:havoc,rep:1	05	no-crash			
+id:000096,sig:05,src:001619,time:30995078,execs:15989817,op:havoc,rep:10	05	no-crash			
+id:000097,sig:05,src:003468,time:31363120,execs:16176100,op:havoc,rep:14	05	no-crash			
+id:000098,sig:05,src:001136,time:32295029,execs:16705946,op:havoc,rep:11	05	no-crash			
+id:000099,sig:05,src:001595,time:40031929,execs:20417763,op:havoc,rep:2	05	no-crash			
+id:000100,sig:05,src:001708,time:42097775,execs:21567017,op:havoc,rep:8	05	no-crash			
+id:000101,sig:05,src:001865,time:42175661,execs:21609727,op:havoc,rep:2	05	no-crash			
+id:000102,sig:05,src:003414,time:42355442,execs:21710150,op:havoc,rep:2	05	no-crash			
+id:000103,sig:05,src:001748,time:42684993,execs:21907464,op:havoc,rep:5	05	no-crash			
+id:000104,sig:05,src:003775,time:42804704,execs:21980236,op:havoc,rep:2	05	no-crash			
+id:000105,sig:05,src:002516,time:42959819,execs:22061882,op:havoc,rep:2	05	no-crash			
+id:000106,sig:05,src:003535,time:44308270,execs:22839657,op:havoc,rep:2	05	no-crash			
+id:000107,sig:05,src:003539,time:45162837,execs:23321565,op:havoc,rep:9	05	no-crash			
+id:000108,sig:11,src:003826,time:52526148,execs:27348022,op:havoc,rep:4	11	asan	SEGV	49483b3752	gdk_pixbuf__qtif_image_load_increment io-qtif.c:437 <- gdk_pixbuf_loader_write gdk-pixbuf-loader.c:523 <- gdk_pixbuf__qtif_image_load_increment io-qtif.c:490
+id:000109,sig:05,src:002988,time:60444406,execs:31606403,op:havoc,rep:1	05	no-crash			
+id:000110,sig:11,src:003319,time:64221834,execs:33817274,op:havoc,rep:2	11	asan	heap-buffer-overflow	a8948e8d48	pcx_increment_load_data_24 io-pcx.c:528 <- gdk_pixbuf__pcx_load_increment io-pcx.c:687 <- generic_load_incrementally gdk-pixbuf-io.c:998
+id:000111,sig:05,src:003164,time:65986903,execs:34723225,op:havoc,rep:1	05	no-crash			
+id:000112,sig:05,src:002517,time:69025213,execs:36226376,op:havoc,rep:2	05	no-crash			
+id:000113,sig:05,src:003941,time:74647156,execs:38849133,op:havoc,rep:7	05	no-crash			
+id:000114,sig:05,src:003164,time:77392747,execs:40466760,op:havoc,rep:1	05	no-crash			
+id:000115,sig:05,src:003908,time:78874281,execs:41361326,op:havoc,rep:2	05	no-crash			
+id:000116,sig:11,src:003713,time:82746942,execs:43677434,op:havoc,rep:3	11	asan	SEGV	49483b3752	gdk_pixbuf__qtif_image_load_increment io-qtif.c:437 <- gdk_pixbuf_loader_write gdk-pixbuf-loader.c:523 <- gdk_pixbuf__qtif_image_load_increment io-qtif.c:490

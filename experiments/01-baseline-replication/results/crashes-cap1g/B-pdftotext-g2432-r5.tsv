@@ -1,0 +1,51 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:06,src:000429,time:93893,execs:45194,op:havoc,rep:16	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000001,sig:06,src:000429,time:95442,execs:45871,op:havoc,rep:8	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000002,sig:06,src:000429,time:103914,execs:49826,op:havoc,rep:9	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000003,sig:06,src:000429,time:121483,execs:57711,op:havoc,rep:6	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000004,sig:06,src:000429,time:126314,execs:59887,op:havoc,rep:10	06	asan	allocation-size-too-big	e93ed746c1	malloc pdftotext.asan+0x1d73de) <- grealloc gmem.cc:187 <- greallocn gmem.cc:222
+id:000005,sig:06,src:000429,time:130091,execs:61547,op:havoc,rep:10	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000006,sig:06,src:000429,time:142598,execs:66942,op:havoc,rep:13	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000007,sig:06,src:000429,time:164612,execs:76582,op:havoc,rep:8	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000008,sig:11,src:000993,time:197613,execs:91810,op:flip1,pos:390	11	asan	stack-overflow	34508bbc53	Object::copy(Object*) Object.cc:80 <- XRef::fetch(int, int, <- Object::arrayGet(int, Object*)
+id:000009,sig:06,src:000040,time:403149,execs:148755,op:havoc,rep:15	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000010,sig:06,src:000040,time:482445,execs:170556,op:havoc,rep:12	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000011,sig:06,src:000040,time:502560,execs:176144,op:havoc,rep:6	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000012,sig:06,src:001656,time:661404,execs:224689,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000013,sig:11,src:001715,time:753001,execs:253146,op:havoc,rep:6	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000014,sig:06,src:002271,time:814496,execs:272483,op:havoc,rep:3	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000015,sig:06,src:000135,time:926081,execs:314781,op:havoc,rep:3	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000016,sig:06,src:000026,time:1267607,execs:415195,op:havoc,rep:5	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000017,sig:11,src:002999,time:1436687,execs:462991,op:havoc,rep:3	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000018,sig:06,src:000447,time:1540324,execs:494367,op:havoc,rep:1	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000019,sig:06,src:000447,time:1563213,execs:499788,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000020,sig:06,src:002868,time:1899681,execs:618842,op:havoc,rep:3	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000021,sig:06,src:002868,time:1903347,execs:620193,op:havoc,rep:4	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000022,sig:06,src:002564,time:2158746,execs:701612,op:havoc,rep:8	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000023,sig:06,src:000396,time:2415481,execs:787076,op:havoc,rep:1	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000024,sig:06,src:000396,time:2425237,execs:790872,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000025,sig:06,src:000123,time:2489153,execs:813060,op:havoc,rep:6	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000026,sig:11,src:000123,time:2490491,execs:813446,op:havoc,rep:6	11	asan	stack-overflow	d17a414e1b	libc.so.6+0x75008 <- libc.so.6+0x77624 <- error(ErrorCategory, long,
+id:000027,sig:11,src:000089,time:2865611,execs:942848,op:havoc,rep:12	11	asan	stack-overflow	d17a414e1b	libc.so.6+0x75008 <- libc.so.6+0x77624 <- error(ErrorCategory, long,
+id:000028,sig:06,src:003935,time:3101938,execs:1015778,op:havoc,rep:7	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000029,sig:06,src:000006,time:3571389,execs:1184391,op:ext_AO,pos:10776	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000030,sig:06,src:000454,time:5391477,execs:1708784,op:havoc,rep:5	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000031,sig:06,src:001123,time:5569835,execs:1738557,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000032,sig:06,src:000039,time:5644239,execs:1761523,op:havoc,rep:3	06	asan	allocation-size-too-big	304034d0fc	malloc pdftotext.asan+0x1d73de) <- gmalloc gmem.cc:140 <- gmallocn gmem.cc:206
+id:000033,sig:11,src:005535,time:7658878,execs:2341458,op:havoc,rep:2	11	asan	stack-overflow	d17a414e1b	libc.so.6+0x75008 <- libc.so.6+0x77624 <- error(ErrorCategory, long,
+id:000034,sig:08,src:005613,time:8836970,execs:2632402,op:havoc,rep:3	08	no-crash			
+id:000035,sig:08,src:005613,time:8870481,execs:2639546,op:havoc,rep:3	08	no-crash			
+id:000036,sig:08,src:005613,time:8876050,execs:2640736,op:havoc,rep:7	08	no-crash			
+id:000037,sig:08,src:005613,time:8887345,execs:2643214,op:havoc,rep:2	08	no-crash			
+id:000038,sig:06,src:005624,time:8954474,execs:2656283,op:havoc,rep:3	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000039,sig:06,src:002918,time:9394795,execs:2779775,op:havoc,rep:6	06	asan	allocation-size-too-big	304034d0fc	malloc pdftotext.asan+0x1d73de) <- gmalloc gmem.cc:140 <- gmallocn gmem.cc:206
+id:000040,sig:08,src:005938,time:12605498,execs:3673945,op:havoc,rep:4	08	no-crash			
+id:000041,sig:11,src:005417,time:16768252,execs:4874531,op:havoc,rep:13	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000042,sig:06,src:005560,time:16850201,execs:4899967,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000043,sig:06,src:004613,time:17058438,execs:4965940,op:havoc,rep:12	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000044,sig:06,src:005518,time:17525872,execs:5103388,op:havoc,rep:9	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000045,sig:06,src:005530,time:17875033,execs:5214618,op:havoc,rep:10	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000046,sig:08,src:005938,time:18098245,execs:5282926,op:havoc,rep:11	08	no-crash			
+id:000047,sig:08,src:006484,time:18285634,execs:5329880,op:inf,rep:4	08	no-crash			
+id:000048,sig:08,src:006490,time:18349969,execs:5346292,op:havoc,rep:1	08	no-crash			
+id:000049,sig:06,src:006535,time:18907278,execs:5519444,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)

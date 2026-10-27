@@ -1,0 +1,12 @@
+{
+ "campaign": "B-ffmpeg-afl432-r4",
+ "program": "ffmpeg",
+ "arm": "afl432",
+ "rep": 4,
+ "crash_files": 0,
+ "outcomes": {},
+ "unique_bugs": 0,
+ "unique_bugs_fn": 0,
+ "buckets_fn": [],
+ "buckets": []
+}

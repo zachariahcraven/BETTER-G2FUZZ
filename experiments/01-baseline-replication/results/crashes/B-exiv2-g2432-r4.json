@@ -1,0 +1,138 @@
+{
+ "campaign": "B-exiv2-g2432-r4",
+ "program": "exiv2",
+ "arm": "g2432",
+ "rep": 4,
+ "crash_files": 155,
+ "outcomes": {
+  "timeout": 13,
+  "no-crash": 39,
+  "asan": 103
+ },
+ "unique_bugs": 20,
+ "unique_bugs_fn": 20,
+ "buckets_fn": [
+  "ABRT | pthread_kill <- gsignal <- abort",
+  "SEGV | Exiv2::IptcData::printStructure(std::ostream&, <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&,",
+  "SEGV | libc.so.6+0xc49a0 <- std::char_traits<char>::copy(char*, <- std::__cxx11::basic_string<char,",
+  "SEGV | unsigned <- unsigned <- unsigned",
+  "heap-buffer-overflow | Exiv2::Image::byteSwap4(Exiv2::DataBuf&, <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&,",
+  "heap-buffer-overflow | Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&, <- Exiv2::TiffImage::printStructure(std::ostream&,",
+  "heap-buffer-overflow | Exiv2::Internal::PngChunk::keyTXTChunk(Exiv2::DataBuf <- Exiv2::Internal::PngChunk::decodeTXTChunk(Exiv2::Image*, <- Exiv2::PngImage::readMetadata()",
+  "heap-buffer-overflow | Exiv2::IptcData::printStructure(std::ostream&, <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&,",
+  "heap-buffer-overflow | Exiv2::Jp2Image::readMetadata() <- Action::Print::printSummary() <- Action::Print::run(std::__cxx11::basic_string<char,",
+  "heap-buffer-overflow | Exiv2::RafImage::readMetadata() <- Action::Print::printSummary() <- Action::Print::run(std::__cxx11::basic_string<char,",
+  "heap-buffer-overflow | Exiv2::d2Data(unsigned <- long <- Exiv2::ValueType<double>::copy(unsigned",
+  "heap-buffer-overflow | Exiv2::l2Data(unsigned <- Exiv2::r2Data(unsigned <- long",
+  "heap-buffer-overflow | Exiv2::l2Data(unsigned <- long <- Exiv2::ValueType<int>::copy(unsigned",
+  "heap-buffer-overflow | Exiv2::s2Data(unsigned <- long <- Exiv2::ValueType<short>::copy(unsigned",
+  "heap-buffer-overflow | Exiv2::ul2Data(unsigned <- Exiv2::ur2Data(unsigned <- long",
+  "heap-buffer-overflow | Exiv2::ul2Data(unsigned <- long <- Exiv2::ValueType<unsigned",
+  "heap-buffer-overflow | Exiv2::us2Data(unsigned <- long <- Exiv2::ValueType<unsigned",
+  "heap-buffer-overflow | std::char_traits<char>::length(char <- std::__cxx11::basic_string<char, <- Exiv2::Internal::PngChunk::parseTXTChunk(Exiv2::DataBuf",
+  "stack-overflow | format_get_value_size(char, <- printf_common(void*, <- vsnprintf",
+  "stack-overflow | printf_common(void*, <- vsnprintf <- Exiv2::Internal::stringFormat[abi:cxx11](char"
+ ],
+ "buckets": [
+  {
+   "bucket": "26c395b344",
+   "key": "heap-buffer-overflow | Exiv2::l2Data(unsigned char*, <- long Exiv2: <- Exiv2::ValueType<int>::copy(unsigned char*,",
+   "count": 54
+  },
+  {
+   "bucket": "fdb798c62f",
+   "key": "ABRT | pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)",
+   "count": 11
+  },
+  {
+   "bucket": "433d63a9e3",
+   "key": "heap-buffer-overflow | std::char_traits<char>::length(char const*) <- std::__cxx11::basic_string<char, std: <- Exiv2::Internal::PngChunk::parseTXTChunk(Exiv2::DataBuf const&,",
+   "count": 6
+  },
+  {
+   "bucket": "12b328a6d3",
+   "key": "heap-buffer-overflow | Exiv2::ul2Data(unsigned char*, <- long Exiv2: <- Exiv2::ValueType<unsigned int>:",
+   "count": 6
+  },
+  {
+   "bucket": "213c534b40",
+   "key": "heap-buffer-overflow | Exiv2::IptcData::printStructure(std::ostream&, unsigned <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, std: <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&, std:",
+   "count": 3
+  },
+  {
+   "bucket": "5290792755",
+   "key": "heap-buffer-overflow | Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, std: <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&, std: <- Exiv2::TiffImage::printStructure(std::ostream&, Exiv2:",
+   "count": 3
+  },
+  {
+   "bucket": "d66e472586",
+   "key": "heap-buffer-overflow | Exiv2::d2Data(unsigned char*, <- long Exiv2: <- Exiv2::ValueType<double>::copy(unsigned char*,",
+   "count": 3
+  },
+  {
+   "bucket": "61a3a5b551",
+   "key": "stack-overflow | printf_common(void*, char <- vsnprintf exiv2.asan+0x2a3579) <- Exiv2::Internal::stringFormat[abi:cxx11](char const*,",
+   "count": 2
+  },
+  {
+   "bucket": "d84318075c",
+   "key": "SEGV | Exiv2::IptcData::printStructure(std::ostream&, unsigned <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, std: <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&, std:",
+   "count": 2
+  },
+  {
+   "bucket": "971c2cd594",
+   "key": "heap-buffer-overflow | Exiv2::Jp2Image::readMetadata() jp2image.cpp:277 <- Action::Print::printSummary() actions.cpp:289 <- Action::Print::run(std::__cxx11::basic_string<char, std:",
+   "count": 2
+  },
+  {
+   "bucket": "ae2eacf725",
+   "key": "heap-buffer-overflow | Exiv2::l2Data(unsigned char*, <- Exiv2::r2Data(unsigned char*, <- long Exiv2:",
+   "count": 2
+  },
+  {
+   "bucket": "b6f9896858",
+   "key": "stack-overflow | format_get_value_size(char, char <- printf_common(void*, char <- vsnprintf exiv2.asan+0x2a3579)",
+   "count": 1
+  },
+  {
+   "bucket": "a9031c0142",
+   "key": "heap-buffer-overflow | Exiv2::Image::byteSwap4(Exiv2::DataBuf&, unsigned <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, std: <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&, std:",
+   "count": 1
+  },
+  {
+   "bucket": "e1931d9ab1",
+   "key": "SEGV | libc.so.6+0xc49a0 <- std::char_traits<char>::copy(char*, char <- std::__cxx11::basic_string<char, std:",
+   "count": 1
+  },
+  {
+   "bucket": "966913e325",
+   "key": "SEGV | unsigned char* <- unsigned char* <- unsigned char*",
+   "count": 1
+  },
+  {
+   "bucket": "f5abc193ca",
+   "key": "heap-buffer-overflow | Exiv2::s2Data(unsigned char*, <- long Exiv2: <- Exiv2::ValueType<short>::copy(unsigned char*,",
+   "count": 1
+  },
+  {
+   "bucket": "e4471d582a",
+   "key": "heap-buffer-overflow | Exiv2::us2Data(unsigned char*, <- long Exiv2: <- Exiv2::ValueType<unsigned short>:",
+   "count": 1
+  },
+  {
+   "bucket": "41843a8478",
+   "key": "heap-buffer-overflow | Exiv2::Internal::PngChunk::keyTXTChunk(Exiv2::DataBuf const&, <- Exiv2::Internal::PngChunk::decodeTXTChunk(Exiv2::Image*, Exiv2: <- Exiv2::PngImage::readMetadata() pngimage.cpp",
+   "count": 1
+  },
+  {
+   "bucket": "bd620f81f4",
+   "key": "heap-buffer-overflow | Exiv2::RafImage::readMetadata() rafimage.cpp:307 <- Action::Print::printSummary() actions.cpp:289 <- Action::Print::run(std::__cxx11::basic_string<char, std:",
+   "count": 1
+  },
+  {
+   "bucket": "edf74452fd",
+   "key": "heap-buffer-overflow | Exiv2::ul2Data(unsigned char*, <- Exiv2::ur2Data(unsigned char*, <- long Exiv2:",
+   "count": 1
+  }
+ ]
+}

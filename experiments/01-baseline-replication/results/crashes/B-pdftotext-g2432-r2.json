@@ -1,0 +1,47 @@
+{
+ "campaign": "B-pdftotext-g2432-r2",
+ "program": "pdftotext",
+ "arm": "g2432",
+ "rep": 2,
+ "crash_files": 46,
+ "outcomes": {
+  "no-crash": 8,
+  "asan": 38
+ },
+ "unique_bugs": 5,
+ "unique_bugs_fn": 5,
+ "buckets_fn": [
+  "ABRT | pthread_kill <- gsignal <- abort",
+  "SEGV | TextPage::findGaps(GList*, <- TextPage::split(GList*, <- TextPage::splitChars(GList*)",
+  "stack-overflow | Object::copy(Object*) <- XRef::fetch(int, <- Object::arrayGet(int,",
+  "stack-overflow | XRef::fetch(int, <- Object::arrayGet(int, <- Catalog::countPageTree(Object*)",
+  "stack-overflow | libc.so.6+0x75008 <- libc.so.6+0x77624 <- error(ErrorCategory,"
+ ],
+ "buckets": [
+  {
+   "bucket": "fdb798c62f",
+   "key": "ABRT | pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)",
+   "count": 34
+  },
+  {
+   "bucket": "d17a414e1b",
+   "key": "stack-overflow | libc.so.6+0x75008 <- libc.so.6+0x77624 <- error(ErrorCategory, long,",
+   "count": 1
+  },
+  {
+   "bucket": "c665cfeebd",
+   "key": "SEGV | TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610",
+   "count": 1
+  },
+  {
+   "bucket": "34508bbc53",
+   "key": "stack-overflow | Object::copy(Object*) Object.cc:80 <- XRef::fetch(int, int, <- Object::arrayGet(int, Object*)",
+   "count": 1
+  },
+  {
+   "bucket": "c61243bfbf",
+   "key": "stack-overflow | XRef::fetch(int, int, <- Object::arrayGet(int, Object*) <- Catalog::countPageTree(Object*) Catalog.cc:495",
+   "count": 1
+  }
+ ]
+}

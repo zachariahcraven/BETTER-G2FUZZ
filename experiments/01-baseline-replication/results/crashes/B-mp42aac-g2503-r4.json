@@ -1,0 +1,31 @@
+{
+ "campaign": "B-mp42aac-g2503-r4",
+ "program": "mp42aac",
+ "arm": "g2503",
+ "rep": 4,
+ "crash_files": 272,
+ "outcomes": {
+  "timeout": 220,
+  "signal:9": 3,
+  "no-crash": 45,
+  "asan": 4
+ },
+ "unique_bugs": 2,
+ "unique_bugs_fn": 2,
+ "buckets_fn": [
+  "SEGV | AP4_DataBuffer::SetData(unsigned <- AP4_AvccAtom::AP4_AvccAtom(unsigned <- AP4_AvccAtom::Create(unsigned",
+  "heap-buffer-overflow | AP4_AvccAtom::Create(unsigned <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&, <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&,"
+ ],
+ "buckets": [
+  {
+   "bucket": "16d2635201",
+   "key": "SEGV | AP4_DataBuffer::SetData(unsigned char <- AP4_AvccAtom::AP4_AvccAtom(unsigned int, <- AP4_AvccAtom::Create(unsigned int,",
+   "count": 3
+  },
+  {
+   "bucket": "4d2cc1af97",
+   "key": "heap-buffer-overflow | AP4_AvccAtom::Create(unsigned int, <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&, unsigned <- AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream&, unsigned",
+   "count": 1
+  }
+ ]
+}

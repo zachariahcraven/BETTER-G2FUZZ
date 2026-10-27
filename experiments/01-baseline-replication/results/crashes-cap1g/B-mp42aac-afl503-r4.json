@@ -1,0 +1,60 @@
+{
+ "campaign": "B-mp42aac-afl503-r4",
+ "program": "mp42aac",
+ "arm": "afl503",
+ "rep": 4,
+ "crash_files": 246,
+ "outcomes": {
+  "asan": 214,
+  "no-crash": 31,
+  "timeout": 1
+ },
+ "unique_bugs": 7,
+ "unique_bugs_fn": 7,
+ "buckets_fn": [
+  "allocation-size-too-big | operator <- AP4_Array<AP4_ElstEntry>::EnsureCapacity(unsigned <- AP4_ElstAtom::AP4_ElstAtom(unsigned",
+  "allocation-size-too-big | operator <- AP4_Array<AP4_TfraAtom::Entry>::EnsureCapacity(unsigned <- AP4_Array<AP4_TfraAtom::Entry>::SetItemCount(unsigned",
+  "allocation-size-too-big | operator <- AP4_Array<AP4_TrunAtom::Entry>::EnsureCapacity(unsigned <- AP4_Array<AP4_TrunAtom::Entry>::SetItemCount(unsigned",
+  "allocation-size-too-big | operator <- AP4_DataBuffer::ReallocateBuffer(unsigned <- AP4_DataBuffer::SetDataSize(unsigned",
+  "allocation-size-too-big | operator <- AP4_HdlrAtom::AP4_HdlrAtom(unsigned <- AP4_HdlrAtom::Create(unsigned",
+  "allocation-size-too-big | operator <- AP4_RtpAtom::AP4_RtpAtom(unsigned <- AP4_RtpAtom::Create(unsigned",
+  "allocation-size-too-big | operator <- AP4_StcoAtom::AP4_StcoAtom(unsigned <- AP4_StcoAtom::Create(unsigned"
+ ],
+ "buckets": [
+  {
+   "bucket": "914d59ad3b",
+   "key": "allocation-size-too-big | operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)",
+   "count": 144
+  },
+  {
+   "bucket": "e4b0bb78e8",
+   "key": "allocation-size-too-big | operator new[](unsigned <- AP4_HdlrAtom::AP4_HdlrAtom(unsigned int, <- AP4_HdlrAtom::Create(unsigned int,",
+   "count": 35
+  },
+  {
+   "bucket": "c836389a01",
+   "key": "allocation-size-too-big | operator new(unsigned <- AP4_Array<AP4_ElstEntry>::EnsureCapacity(unsigned int) <- AP4_ElstAtom::AP4_ElstAtom(unsigned int,",
+   "count": 26
+  },
+  {
+   "bucket": "645c0e838c",
+   "key": "allocation-size-too-big | operator new(unsigned <- AP4_Array<AP4_TrunAtom::Entry>::EnsureCapacity(unsigned int) <- AP4_Array<AP4_TrunAtom::Entry>::SetItemCount(unsigned int)",
+   "count": 4
+  },
+  {
+   "bucket": "c5e19acb6f",
+   "key": "allocation-size-too-big | operator new[](unsigned <- AP4_RtpAtom::AP4_RtpAtom(unsigned int, <- AP4_RtpAtom::Create(unsigned int,",
+   "count": 3
+  },
+  {
+   "bucket": "2afd73fac7",
+   "key": "allocation-size-too-big | operator new[](unsigned <- AP4_StcoAtom::AP4_StcoAtom(unsigned int, <- AP4_StcoAtom::Create(unsigned int,",
+   "count": 1
+  },
+  {
+   "bucket": "67692e1c09",
+   "key": "allocation-size-too-big | operator new(unsigned <- AP4_Array<AP4_TfraAtom::Entry>::EnsureCapacity(unsigned int) <- AP4_Array<AP4_TfraAtom::Entry>::SetItemCount(unsigned int)",
+   "count": 1
+  }
+ ]
+}

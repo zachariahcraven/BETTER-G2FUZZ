@@ -1,0 +1,45 @@
+{
+ "campaign": "B-mp3gain-afl432-r3",
+ "program": "mp3gain",
+ "arm": "afl432",
+ "rep": 3,
+ "crash_files": 92,
+ "outcomes": {
+  "asan": 92
+ },
+ "unique_bugs": 5,
+ "unique_bugs_fn": 4,
+ "buckets_fn": [
+  "global-buffer-overflow | III_dequantize_sample <- do_layer3 <- decodeMP3",
+  "global-buffer-overflow | III_i_stereo <- do_layer3 <- decodeMP3",
+  "stack-buffer-overflow | filterYule <- AnalyzeSamples <- main",
+  "stack-buffer-overflow | sprintf <- WriteMP3GainAPETag <- WriteMP3GainTag"
+ ],
+ "buckets": [
+  {
+   "bucket": "e98042e5fa",
+   "key": "global-buffer-overflow | III_i_stereo layer3.c:1169 <- do_layer3 layer3.c:1661 <- decodeMP3 interface.c:643",
+   "count": 32
+  },
+  {
+   "bucket": "85d2326158",
+   "key": "global-buffer-overflow | III_dequantize_sample layer3.c:904 <- do_layer3 layer3.c:1630 <- decodeMP3 interface.c:643",
+   "count": 27
+  },
+  {
+   "bucket": "ec1f182061",
+   "key": "global-buffer-overflow | III_dequantize_sample layer3.c:904 <- do_layer3 layer3.c:1646 <- decodeMP3 interface.c:643",
+   "count": 26
+  },
+  {
+   "bucket": "bd3b7a7584",
+   "key": "stack-buffer-overflow | filterYule gain_analysis.c:195 <- AnalyzeSamples gain_analysis.c:344 <- main mp3gain.c:2281",
+   "count": 4
+  },
+  {
+   "bucket": "c8b98749fc",
+   "key": "stack-buffer-overflow | sprintf mp3gain.asan+0x4dcf3) <- WriteMP3GainAPETag apetag.c:578 <- WriteMP3GainTag mp3gain.c:1123",
+   "count": 3
+  }
+ ]
+}

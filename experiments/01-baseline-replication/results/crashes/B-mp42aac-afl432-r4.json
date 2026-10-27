@@ -1,0 +1,16 @@
+{
+ "campaign": "B-mp42aac-afl432-r4",
+ "program": "mp42aac",
+ "arm": "afl432",
+ "rep": 4,
+ "crash_files": 119,
+ "outcomes": {
+  "timeout": 40,
+  "no-crash": 74,
+  "signal:9": 5
+ },
+ "unique_bugs": 0,
+ "unique_bugs_fn": 0,
+ "buckets_fn": [],
+ "buckets": []
+}

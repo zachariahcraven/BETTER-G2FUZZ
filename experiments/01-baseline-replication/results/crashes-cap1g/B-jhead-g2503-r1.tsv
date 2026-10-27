@@ -1,0 +1,64 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:11,src:000200,time:73196,execs:163069,op:havoc,rep:7	11	asan	heap-buffer-overflow	93986022e6	Get32s exif.c:336 <- Get32u exif.c:364 <- process_EXIF exif.c:1020
+id:000001,sig:11,src:000193,time:143269,execs:318649,op:havoc,rep:4	11	asan	heap-buffer-overflow	93986022e6	Get32s exif.c:336 <- Get32u exif.c:364 <- process_EXIF exif.c:1020
+id:000002,sig:11,src:000349,time:358419,execs:801698,op:havoc,rep:1	11	asan	SEGV	d3102d892b	ConvertAnyFormat exif.c:417 <- ProcessExifDir exif.c:882 <- process_EXIF exif.c:1034
+id:000003,sig:11,src:000357,time:375035,execs:836980,op:havoc,rep:2	11	asan	SEGV	97d2a2d33c	ConvertAnyFormat exif.c:418 <- ProcessExifDir exif.c:721 <- process_EXIF exif.c:1034
+id:000004,sig:11,src:000361,time:382035,execs:851643,op:havoc,rep:4	11	asan	SEGV	0d4723f4ad	ConvertAnyFormat exif.c:418 <- ProcessExifDir exif.c:803 <- process_EXIF exif.c:1034
+id:000005,sig:11,src:000285,time:568636,execs:1256290,op:havoc,rep:1	11	asan	SEGV	d375568796	ConvertAnyFormat exif.c:418 <- ProcessExifDir exif.c:754 <- process_EXIF exif.c:1034
+id:000006,sig:11,src:000509,time:791433,execs:1723772,op:havoc,rep:2	11	asan	SEGV	97d2a2d33c	ConvertAnyFormat exif.c:418 <- ProcessExifDir exif.c:721 <- process_EXIF exif.c:1034
+id:000007,sig:11,src:000497,time:816990,execs:1775493,op:havoc,rep:5	11	asan	heap-buffer-overflow	66f28ca79e	Get32s exif.c:333 <- Get32u exif.c:364 <- process_EXIF exif.c:1020
+id:000008,sig:11,src:000568,time:994563,execs:2071519,op:havoc,rep:3	11	asan	SEGV	5f55076eae	ProcessExifDir exif.c:669 <- process_EXIF exif.c:1034 <- ReadJpegSections jpgfile.c:287
+id:000009,sig:11,src:000401,time:1060238,execs:2187543,op:havoc,rep:7	11	asan	SEGV	efcd808948	ConvertAnyFormat exif.c:418 <- ProcessExifDir exif.c:799 <- process_EXIF exif.c:1034
+id:000010,sig:11,src:000679,time:1107403,execs:2254952,op:havoc,rep:14	11	asan	SEGV	97d2a2d33c	ConvertAnyFormat exif.c:418 <- ProcessExifDir exif.c:721 <- process_EXIF exif.c:1034
+id:000011,sig:11,src:000728,time:1225620,execs:2445099,op:havoc,rep:1	11	asan	heap-buffer-overflow	d7d48143d6	MemcmpInterceptorCommon(void*, int <- bcmp jhead.asan+0x46a49) <- ReadJpegSections jpgfile.c:286
+id:000012,sig:11,src:000710,time:1325052,execs:2611458,op:havoc,rep:8	11	asan	SEGV	5f55076eae	ProcessExifDir exif.c:669 <- process_EXIF exif.c:1034 <- ReadJpegSections jpgfile.c:287
+id:000013,sig:11,src:000659,time:1348832,execs:2644264,op:havoc,rep:10	11	asan	heap-buffer-overflow	827d780264	process_DQT jpgqguess.c:112 <- ReadJpegSections jpgfile.c:223 <- ReadJpegFile jpgfile.c:375
+id:000014,sig:11,src:000684,time:1694733,execs:3090108,op:havoc,rep:8	11	asan	SEGV	97d2a2d33c	ConvertAnyFormat exif.c:418 <- ProcessExifDir exif.c:721 <- process_EXIF exif.c:1034
+id:000015,sig:11,src:000843,time:1768684,execs:3185899,op:havoc,rep:2	11	asan	heap-buffer-overflow	827d780264	process_DQT jpgqguess.c:112 <- ReadJpegSections jpgfile.c:223 <- ReadJpegFile jpgfile.c:375
+id:000016,sig:11,src:000770,time:1804062,execs:3204452,op:havoc,rep:1	11	asan	SEGV	a50b9539bd	ConvertAnyFormat exif.c:418 <- ProcessExifDir exif.c:832 <- process_EXIF exif.c:1034
+id:000017,sig:11,src:000856,time:1850604,execs:3258797,op:havoc,rep:15	11	asan	heap-buffer-overflow	827d780264	process_DQT jpgqguess.c:112 <- ReadJpegSections jpgfile.c:223 <- ReadJpegFile jpgfile.c:375
+id:000018,sig:11,src:000611,time:2021243,execs:3488966,op:havoc,rep:16	11	asan	SEGV	d375568796	ConvertAnyFormat exif.c:418 <- ProcessExifDir exif.c:754 <- process_EXIF exif.c:1034
+id:000019,sig:11,src:000556,time:2088159,execs:3576195,op:havoc,rep:12	11	asan	SEGV	97d2a2d33c	ConvertAnyFormat exif.c:418 <- ProcessExifDir exif.c:721 <- process_EXIF exif.c:1034
+id:000020,sig:11,src:000819,time:2130852,execs:3622874,op:havoc,rep:5	11	asan	SEGV	d125f3ebc9	ConvertAnyFormat exif.c:418 <- ProcessExifDir exif.c:791 <- process_EXIF exif.c:1034
+id:000021,sig:11,src:000925,time:2359320,execs:3864238,op:havoc,rep:14	11	asan	SEGV	e6364d8221	libc.so.6+0x19da45 <- ProcessExifDir exif.c:634 <- process_EXIF exif.c:1034
+id:000022,sig:11,src:000790,time:2560139,execs:4076911,op:havoc,rep:2	11	asan	SEGV	818c6773bc	Get16u exif.c:321 <- ConvertAnyFormat exif.c:441 <- ProcessExifDir exif.c:803
+id:000023,sig:11,src:000955,time:3013443,execs:4701372,op:havoc,rep:16	11	asan	heap-buffer-overflow	827d780264	process_DQT jpgqguess.c:112 <- ReadJpegSections jpgfile.c:223 <- ReadJpegFile jpgfile.c:375
+id:000024,sig:11,src:000578,time:3109991,execs:4845076,op:havoc,rep:2	11	asan	heap-buffer-overflow	c04cb5e9e8	Get32s exif.c:334 <- Get32u exif.c:364 <- process_EXIF exif.c:1020
+id:000025,sig:11,src:000987,time:3222601,execs:4974271,op:havoc,rep:6	11	asan	heap-buffer-overflow	d7d48143d6	MemcmpInterceptorCommon(void*, int <- bcmp jhead.asan+0x46a49) <- ReadJpegSections jpgfile.c:286
+id:000026,sig:11,src:000995,time:3680994,execs:5526980,op:havoc,rep:1	11	asan	SEGV	97d2a2d33c	ConvertAnyFormat exif.c:418 <- ProcessExifDir exif.c:721 <- process_EXIF exif.c:1034
+id:000027,sig:11,src:000416,time:4307089,execs:6312440,op:havoc,rep:10	11	asan	SEGV	b6832f70a4	Get32s exif.c:333 <- ConvertAnyFormat exif.c:427 <- ProcessExifDir exif.c:741
+id:000028,sig:11,src:001052,time:4361657,execs:6397375,op:havoc,rep:2	11	asan	SEGV	97d2a2d33c	ConvertAnyFormat exif.c:418 <- ProcessExifDir exif.c:721 <- process_EXIF exif.c:1034
+id:000029,sig:11,src:000980,time:4387888,execs:6430649,op:havoc,rep:16	11	asan	SEGV	97d2a2d33c	ConvertAnyFormat exif.c:418 <- ProcessExifDir exif.c:721 <- process_EXIF exif.c:1034
+id:000030,sig:11,src:000299,time:4575328,execs:6708131,op:havoc,rep:1	11	asan	SEGV	e6364d8221	libc.so.6+0x19da45 <- ProcessExifDir exif.c:634 <- process_EXIF exif.c:1034
+id:000031,sig:11,src:001074,time:4715041,execs:6868281,op:havoc,rep:2	11	asan	SEGV	608e6891cc	Get16u exif.c:321 <- ConvertAnyFormat exif.c:420 <- ProcessExifDir exif.c:735
+id:000032,sig:11,src:001078,time:4884658,execs:7059402,op:havoc,rep:1	11	asan	heap-buffer-overflow	93986022e6	Get32s exif.c:336 <- Get32u exif.c:364 <- process_EXIF exif.c:1020
+id:000033,sig:11,src:001109,time:5719443,execs:8136921,op:havoc,rep:13	11	asan	SEGV	97d2a2d33c	ConvertAnyFormat exif.c:418 <- ProcessExifDir exif.c:721 <- process_EXIF exif.c:1034
+id:000034,sig:11,src:001112,time:5956166,execs:8358609,op:havoc,rep:5	11	asan	SEGV	97d2a2d33c	ConvertAnyFormat exif.c:418 <- ProcessExifDir exif.c:721 <- process_EXIF exif.c:1034
+id:000035,sig:11,src:001111,time:8496072,execs:11095495,op:havoc,rep:15	11	asan	SEGV	97d2a2d33c	ConvertAnyFormat exif.c:418 <- ProcessExifDir exif.c:721 <- process_EXIF exif.c:1034
+id:000036,sig:11,src:000997,time:9435280,execs:12368924,op:havoc,rep:12	11	asan	heap-buffer-overflow	827d780264	process_DQT jpgqguess.c:112 <- ReadJpegSections jpgfile.c:223 <- ReadJpegFile jpgfile.c:375
+id:000037,sig:11,src:001105,time:10338641,execs:13777552,op:havoc,rep:4	11	asan	SEGV	97d2a2d33c	ConvertAnyFormat exif.c:418 <- ProcessExifDir exif.c:721 <- process_EXIF exif.c:1034
+id:000038,sig:11,src:000387+000879,time:10403384,execs:13884157,op:splice,rep:3	11	asan	SEGV	a50b9539bd	ConvertAnyFormat exif.c:418 <- ProcessExifDir exif.c:832 <- process_EXIF exif.c:1034
+id:000039,sig:11,src:001098+000826,time:11238368,execs:15244898,op:splice,rep:13	11	asan	heap-buffer-overflow	827d780264	process_DQT jpgqguess.c:112 <- ReadJpegSections jpgfile.c:223 <- ReadJpegFile jpgfile.c:375
+id:000040,sig:11,src:000077+000564,time:11239788,execs:15247112,op:splice,rep:8	11	asan	heap-buffer-overflow	5e72187ccd	process_DQT jpgqguess.c:108 <- ReadJpegSections jpgfile.c:223 <- ReadJpegFile jpgfile.c:375
+id:000041,sig:11,src:000200+001194,time:11757321,execs:15741048,op:splice,rep:2	11	asan	heap-buffer-overflow	d7d48143d6	MemcmpInterceptorCommon(void*, int <- bcmp jhead.asan+0x46a49) <- ReadJpegSections jpgfile.c:286
+id:000042,sig:11,src:000301+000899,time:11892967,execs:15938000,op:splice,rep:2	11	asan	SEGV	a30bedaa46	ConvertAnyFormat exif.c:418 <- ProcessExifDir exif.c:741 <- process_EXIF exif.c:1034
+id:000043,sig:11,src:001205,time:12119806,execs:16124358,op:havoc,rep:1	11	asan	SEGV	e6364d8221	libc.so.6+0x19da45 <- ProcessExifDir exif.c:634 <- process_EXIF exif.c:1034
+id:000044,sig:11,src:001212,time:12142572,execs:16165172,op:havoc,rep:5	11	asan	SEGV	f657d9bd0a	Get16u exif.c:321 <- ConvertAnyFormat exif.c:420 <- ProcessExifDir exif.c:727
+id:000045,sig:11,src:001222,time:12155546,execs:16188401,op:havoc,rep:11	11	asan	SEGV	134002e92c	Get16u exif.c:321 <- ConvertAnyFormat exif.c:420 <- ProcessExifDir exif.c:699
+id:000046,sig:11,src:001245,time:12186284,execs:16236520,op:havoc,rep:1	11	asan	SEGV	ec20b22f08	Get32s exif.c:333 <- Get32u exif.c:364 <- ProcessExifDir exif.c:862
+id:000047,sig:11,src:001207,time:12267175,execs:16355402,op:havoc,rep:7	11	asan	SEGV	519c2efb14	libc.so.6+0x19da45 <- ProcessExifDir exif.c <- process_EXIF exif.c:1034
+id:000048,sig:11,src:001206,time:12344147,execs:16454662,op:havoc,rep:6	11	asan	SEGV	171d000507	Get16u exif.c:321 <- ConvertAnyFormat exif.c:420 <- ProcessExifDir exif.c:795
+id:000049,sig:11,src:001246,time:12424580,execs:16526024,op:havoc,rep:1	11	asan	stack-buffer-overflow	894ea2e40d	sprintf jhead.asan+0x50cc3) <- ProcessGpsInfo gpsinfo.c:150 <- ProcessExifDir exif.c:866
+id:000050,sig:11,src:001268,time:12641656,execs:16773633,op:havoc,rep:4	11	asan	SEGV	e6364d8221	libc.so.6+0x19da45 <- ProcessExifDir exif.c:634 <- process_EXIF exif.c:1034
+id:000051,sig:11,src:001214,time:12644155,execs:16777636,op:havoc,rep:15	11	asan	SEGV	519c2efb14	libc.so.6+0x19da45 <- ProcessExifDir exif.c <- process_EXIF exif.c:1034
+id:000052,sig:11,src:001313,time:13193615,execs:17178525,op:havoc,rep:7	11	asan	SEGV	519c2efb14	libc.so.6+0x19da45 <- ProcessExifDir exif.c <- process_EXIF exif.c:1034
+id:000053,sig:11,src:001282,time:13522567,execs:17484831,op:havoc,rep:1	11	asan	SEGV	519c2efb14	libc.so.6+0x19da45 <- ProcessExifDir exif.c <- process_EXIF exif.c:1034
+id:000054,sig:11,src:001341,time:13861977,execs:17844637,op:havoc,rep:11	11	asan	heap-buffer-overflow	827d780264	process_DQT jpgqguess.c:112 <- ReadJpegSections jpgfile.c:223 <- ReadJpegFile jpgfile.c:375
+id:000055,sig:11,src:001354,time:13923188,execs:17904032,op:havoc,rep:8	11	asan	heap-buffer-overflow	827d780264	process_DQT jpgqguess.c:112 <- ReadJpegSections jpgfile.c:223 <- ReadJpegFile jpgfile.c:375
+id:000056,sig:11,src:001369,time:14539554,execs:18606445,op:havoc,rep:8	11	asan	heap-buffer-overflow	827d780264	process_DQT jpgqguess.c:112 <- ReadJpegSections jpgfile.c:223 <- ReadJpegFile jpgfile.c:375
+id:000057,sig:11,src:001263,time:14709216,execs:18823015,op:havoc,rep:8	11	asan	SEGV	519c2efb14	libc.so.6+0x19da45 <- ProcessExifDir exif.c <- process_EXIF exif.c:1034
+id:000058,sig:11,src:001347,time:14722273,execs:18834499,op:havoc,rep:6	11	asan	SEGV	519c2efb14	libc.so.6+0x19da45 <- ProcessExifDir exif.c <- process_EXIF exif.c:1034
+id:000059,sig:11,src:001223,time:15174461,execs:19427369,op:havoc,rep:1	11	asan	stack-buffer-overflow	894ea2e40d	sprintf jhead.asan+0x50cc3) <- ProcessGpsInfo gpsinfo.c:150 <- ProcessExifDir exif.c:866
+id:000060,sig:11,src:001255,time:16423650,execs:21000124,op:havoc,rep:4	11	asan	SEGV	519c2efb14	libc.so.6+0x19da45 <- ProcessExifDir exif.c <- process_EXIF exif.c:1034
+id:000061,sig:11,src:000887,time:17550152,execs:22219199,op:havoc,rep:8	11	asan	SEGV	5f55076eae	ProcessExifDir exif.c:669 <- process_EXIF exif.c:1034 <- ReadJpegSections jpgfile.c:287
+id:000062,sig:11,src:001124,time:19146020,execs:24249961,op:havoc,rep:15	11	asan	heap-buffer-overflow	d7d48143d6	MemcmpInterceptorCommon(void*, int <- bcmp jhead.asan+0x46a49) <- ReadJpegSections jpgfile.c:286

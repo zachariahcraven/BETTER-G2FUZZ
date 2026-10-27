@@ -1,0 +1,52 @@
+{
+ "campaign": "B-pdftotext-g2503-r2",
+ "program": "pdftotext",
+ "arm": "g2503",
+ "rep": 2,
+ "crash_files": 119,
+ "outcomes": {
+  "asan": 119
+ },
+ "unique_bugs": 6,
+ "unique_bugs_fn": 6,
+ "buckets_fn": [
+  "ABRT | pthread_kill <- gsignal <- abort",
+  "SEGV | TextPage::findGaps(GList*, <- TextPage::split(GList*, <- TextPage::splitChars(GList*)",
+  "allocation-size-too-big | grealloc <- greallocn <- XRef::constructXRef()",
+  "allocation-size-too-big | malloc <- gmalloc <- gmallocn",
+  "stack-overflow | Object::copy(Object*) <- XRef::fetch(int, <- Object::arrayGet(int,",
+  "stack-overflow | _IO_default_xsputn <- libc.so.6+0x76fcb <- libc.so.6+0x77624"
+ ],
+ "buckets": [
+  {
+   "bucket": "c665cfeebd",
+   "key": "SEGV | TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610",
+   "count": 88
+  },
+  {
+   "bucket": "fdb798c62f",
+   "key": "ABRT | pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)",
+   "count": 20
+  },
+  {
+   "bucket": "304034d0fc",
+   "key": "allocation-size-too-big | malloc pdftotext.asan+0x1d73de) <- gmalloc gmem.cc:140 <- gmallocn gmem.cc:206",
+   "count": 8
+  },
+  {
+   "bucket": "85b2c81bbe",
+   "key": "allocation-size-too-big | grealloc gmem.cc:185 <- greallocn gmem.cc:222 <- XRef::constructXRef() XRef.cc:931",
+   "count": 1
+  },
+  {
+   "bucket": "34508bbc53",
+   "key": "stack-overflow | Object::copy(Object*) Object.cc:80 <- XRef::fetch(int, int, <- Object::arrayGet(int, Object*)",
+   "count": 1
+  },
+  {
+   "bucket": "51a7c8c3cd",
+   "key": "stack-overflow | _IO_default_xsputn libc.so.6+0x8dd9f) <- libc.so.6+0x76fcb <- libc.so.6+0x77624",
+   "count": 1
+  }
+ ]
+}

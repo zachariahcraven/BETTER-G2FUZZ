@@ -1,0 +1,42 @@
+{
+ "campaign": "B-mp42aac-afl432-r1",
+ "program": "mp42aac",
+ "arm": "afl432",
+ "rep": 1,
+ "crash_files": 94,
+ "outcomes": {
+  "asan": 74,
+  "no-crash": 19,
+  "timeout": 1
+ },
+ "unique_bugs": 4,
+ "unique_bugs_fn": 4,
+ "buckets_fn": [
+  "allocation-size-too-big | operator <- AP4_Array<AP4_CttsTableEntry>::EnsureCapacity(unsigned <- AP4_Array<AP4_CttsTableEntry>::SetItemCount(unsigned",
+  "allocation-size-too-big | operator <- AP4_Array<AP4_ElstEntry>::EnsureCapacity(unsigned <- AP4_ElstAtom::AP4_ElstAtom(unsigned",
+  "allocation-size-too-big | operator <- AP4_DataBuffer::ReallocateBuffer(unsigned <- AP4_DataBuffer::SetDataSize(unsigned",
+  "allocation-size-too-big | operator <- AP4_UrlAtom::AP4_UrlAtom(unsigned <- AP4_UrlAtom::Create(unsigned"
+ ],
+ "buckets": [
+  {
+   "bucket": "914d59ad3b",
+   "key": "allocation-size-too-big | operator new[](unsigned <- AP4_DataBuffer::ReallocateBuffer(unsigned int) <- AP4_DataBuffer::SetDataSize(unsigned int)",
+   "count": 54
+  },
+  {
+   "bucket": "c836389a01",
+   "key": "allocation-size-too-big | operator new(unsigned <- AP4_Array<AP4_ElstEntry>::EnsureCapacity(unsigned int) <- AP4_ElstAtom::AP4_ElstAtom(unsigned int,",
+   "count": 9
+  },
+  {
+   "bucket": "3593294196",
+   "key": "allocation-size-too-big | operator new(unsigned <- AP4_Array<AP4_CttsTableEntry>::EnsureCapacity(unsigned int) <- AP4_Array<AP4_CttsTableEntry>::SetItemCount(unsigned int)",
+   "count": 9
+  },
+  {
+   "bucket": "5872c1b033",
+   "key": "allocation-size-too-big | operator new[](unsigned <- AP4_UrlAtom::AP4_UrlAtom(unsigned int, <- AP4_UrlAtom::Create(unsigned int,",
+   "count": 2
+  }
+ ]
+}

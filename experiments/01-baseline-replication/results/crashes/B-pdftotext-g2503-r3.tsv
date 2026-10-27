@@ -1,0 +1,38 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:06,src:000010,time:117692,execs:49116,op:int32,pos:13146,val:be:+100	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000001,sig:06,src:000010,time:131100,execs:55531,op:havoc,rep:7	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000002,sig:06,src:000010,time:155657,execs:67545,op:havoc,rep:7	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000003,sig:06,src:000023,time:521316,execs:191699,op:int16,pos:318,val:-128	06	no-crash			
+id:000004,sig:06,src:000023,time:544535,execs:198950,op:int32,pos:308,val:+127	06	no-crash			
+id:000005,sig:06,src:000024,time:602270,execs:217108,op:havoc,rep:1	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000006,sig:11,src:000051,time:828421,execs:289392,op:havoc,rep:4	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000007,sig:11,src:000051,time:837776,execs:293056,op:havoc,rep:8	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000008,sig:11,src:000051,time:846170,execs:295902,op:havoc,rep:3	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000009,sig:11,src:000051,time:850633,execs:297623,op:havoc,rep:7	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000010,sig:11,src:000051,time:851743,execs:297978,op:havoc,rep:7	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000011,sig:06,src:000054,time:972782,execs:338407,op:havoc,rep:1	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000012,sig:06,src:000054,time:990135,execs:344167,op:havoc,rep:8	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000013,sig:06,src:000096,time:1251448,execs:438499,op:havoc,rep:4	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000014,sig:06,src:000106,time:1332925,execs:468875,op:havoc,rep:16	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000015,sig:06,src:000106,time:1345612,execs:474142,op:havoc,rep:9	06	no-crash			
+id:000016,sig:06,src:000123,time:1533406,execs:505159,op:havoc,rep:3	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000017,sig:06,src:003958,time:2501469,execs:808318,op:havoc,rep:2	06	no-crash			
+id:000018,sig:11,src:004219,time:2645868,execs:852877,op:trim,rep:8	11	asan	stack-overflow	34508bbc53	Object::copy(Object*) Object.cc:80 <- XRef::fetch(int, int, <- Object::arrayGet(int, Object*)
+id:000019,sig:06,src:000777,time:2815243,execs:927152,op:havoc,rep:15	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000020,sig:11,src:002348,time:3935725,execs:1344050,op:havoc,rep:2	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000021,sig:06,src:003327,time:5266416,execs:1797971,op:havoc,rep:7	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000022,sig:06,src:003612,time:5695019,execs:1958759,op:havoc,rep:4	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000023,sig:06,src:003612,time:5696018,execs:1958996,op:havoc,rep:6	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000024,sig:06,src:003612,time:5709188,execs:1962427,op:havoc,rep:1	06	no-crash			
+id:000025,sig:06,src:003624,time:5771506,execs:1980318,op:havoc,rep:5	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000026,sig:06,src:004277,time:6219228,execs:2103060,op:trim,rep:1	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000027,sig:06,src:005282,time:8067808,execs:2715083,op:havoc,rep:16	06	timeout			
+id:000028,sig:06,src:005334,time:8191814,execs:2763263,op:havoc,rep:4	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000029,sig:11,src:005346,time:9987365,execs:3353031,op:havoc,rep:6	11	asan	SEGV	c665cfeebd	TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610
+id:000030,sig:06,src:005931,time:10560075,execs:3523745,op:havoc,rep:15	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000031,sig:06,src:005346,time:11135235,execs:3688415,op:havoc,rep:9	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000032,sig:06,src:004942,time:12686735,execs:4188364,op:havoc,rep:7	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000033,sig:11,src:005739,time:12747509,execs:4208339,op:trim,rep:7	11	asan	stack-overflow	104c8e91c6	XRef::fetch(int, int, <- AcroForm::scanField(Object*) AcroForm.cc:244 <- AcroForm::scanField(Object*) AcroForm.cc:271
+id:000034,sig:11,src:005739,time:12752608,execs:4210106,op:havoc,rep:12	11	asan	stack-overflow	104c8e91c6	XRef::fetch(int, int, <- AcroForm::scanField(Object*) AcroForm.cc:244 <- AcroForm::scanField(Object*) AcroForm.cc:271
+id:000035,sig:06,src:003594,time:17113682,execs:5615111,op:havoc,rep:5	06	no-crash			
+id:000036,sig:06,src:006681,time:18790117,execs:6199773,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)

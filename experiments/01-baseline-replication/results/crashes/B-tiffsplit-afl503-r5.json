@@ -1,0 +1,70 @@
+{
+ "campaign": "B-tiffsplit-afl503-r5",
+ "program": "tiffsplit",
+ "arm": "afl503",
+ "rep": 5,
+ "crash_files": 131,
+ "outcomes": {
+  "asan": 131
+ },
+ "unique_bugs": 9,
+ "unique_bugs_fn": 9,
+ "buckets_fn": [
+  "SEGV | libc.so.6+0x19d8bd <- strlen <- _TIFFsetString",
+  "SEGV | libc.so.6+0xc497f <- _TIFFmemcpy <- TIFFReadRawStrip1",
+  "SEGV | memcpy <- _TIFFmemcpy <- TIFFReadRawStrip1",
+  "SEGV | memcpy <- _TIFFmemcpy <- TIFFReadRawTile1",
+  "heap-buffer-overflow | _TIFFmemcpy <- setByteArray <- _TIFFsetShortArray",
+  "heap-buffer-overflow | checkInkNamesString <- _TIFFVSetField <- TIFFSetField",
+  "stack-buffer-overflow | _TIFFVGetField <- TIFFVGetField <- TIFFGetField",
+  "stack-buffer-overflow | checkInkNamesString <- _TIFFVSetField <- TIFFSetField",
+  "stack-use-after-return | _TIFFVGetField <- TIFFVGetField <- TIFFGetField"
+ ],
+ "buckets": [
+  {
+   "bucket": "0ca7fd554c",
+   "key": "stack-use-after-return | _TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960",
+   "count": 75
+  },
+  {
+   "bucket": "56738101cf",
+   "key": "SEGV | memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208",
+   "count": 46
+  },
+  {
+   "bucket": "178ea79b46",
+   "key": "stack-buffer-overflow | _TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960",
+   "count": 3
+  },
+  {
+   "bucket": "a29c21b47f",
+   "key": "SEGV | libc.so.6+0x19d8bd <- strlen tiffsplit.asan+0x48ada) <- _TIFFsetString tif_dir.c:59",
+   "count": 2
+  },
+  {
+   "bucket": "3160817570",
+   "key": "SEGV | libc.so.6+0xc497f <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208",
+   "count": 1
+  },
+  {
+   "bucket": "360c6c98ae",
+   "key": "heap-buffer-overflow | _TIFFmemcpy tif_unix.c:265 <- setByteArray tif_dir.c:53 <- _TIFFsetShortArray tif_dir.c:63",
+   "count": 1
+  },
+  {
+   "bucket": "a309920604",
+   "key": "SEGV | memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawTile1 tif_read.c:451",
+   "count": 1
+  },
+  {
+   "bucket": "e04c9275f7",
+   "key": "stack-buffer-overflow | checkInkNamesString tif_dir.c:120 <- _TIFFVSetField tif_dir.c:389 <- TIFFSetField tif_dir.c:658",
+   "count": 1
+  },
+  {
+   "bucket": "54ee9fe316",
+   "key": "heap-buffer-overflow | checkInkNamesString tif_dir.c:120 <- _TIFFVSetField tif_dir.c:389 <- TIFFSetField tif_dir.c:658",
+   "count": 1
+  }
+ ]
+}

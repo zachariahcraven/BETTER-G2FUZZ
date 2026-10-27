@@ -1,0 +1,10 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:05,src:000003,time:3614,execs:4936,op:havoc,rep:5	05	no-crash			
+id:000001,sig:05,src:000044,time:671855,execs:87217,op:havoc,rep:2	05	no-crash			
+id:000002,sig:05,src:000044,time:691170,execs:104267,op:havoc,rep:4	05	no-crash			
+id:000003,sig:05,src:000134,time:737530,execs:141742,op:flip1,pos:120	05	no-crash			
+id:000004,sig:11,src:000134,time:750983,execs:147906,op:int32,pos:94,val:+2147483647	11	asan	SEGV	9f18212c7d	DecodeHeader io-ico.c:322 <- gdk_pixbuf__ico_image_load_increment io-ico.c:905 <- gdk_pixbuf_loader_write gdk-pixbuf-loader.c:523
+id:000005,sig:05,src:000134,time:751607,execs:148010,op:int32,pos:122,val:be:+32767	05	no-crash			
+id:000006,sig:11,src:000135,time:807478,execs:185876,op:inf,rep:1	11	asan	heap-buffer-overflow	05d67b2282	gdk_pixbuf_from_pixdata gdk-pixdata.c:479 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000007,sig:05,src:000588,time:843888,execs:211806,op:flip2,pos:123	05	no-crash			
+id:000008,sig:11,src:000699,time:848900,execs:213969,op:quick,pos:14,val:+7	11	asan	heap-buffer-overflow	3d961589f0	gdk_pixbuf_from_pixdata gdk-pixdata.c:472 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152

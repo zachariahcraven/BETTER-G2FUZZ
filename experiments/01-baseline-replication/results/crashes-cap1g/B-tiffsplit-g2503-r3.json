@@ -1,0 +1,74 @@
+{
+ "campaign": "B-tiffsplit-g2503-r3",
+ "program": "tiffsplit",
+ "arm": "g2503",
+ "rep": 3,
+ "crash_files": 193,
+ "outcomes": {
+  "asan": 192,
+  "no-crash": 1
+ },
+ "unique_bugs": 10,
+ "unique_bugs_fn": 7,
+ "buckets_fn": [
+  "SEGV | memcpy <- _TIFFmemcpy <- TIFFReadRawStrip1",
+  "SEGV | memcpy <- _TIFFmemcpy <- TIFFReadRawTile1",
+  "allocation-size-too-big | _TIFFCheckRealloc <- _TIFFCheckMalloc <- TIFFFetchNormalTag",
+  "allocation-size-too-big | cpStrips <- tiffcp <- main",
+  "stack-buffer-overflow | _TIFFVGetField <- TIFFVGetField <- TIFFGetField",
+  "stack-buffer-overflow | checkInkNamesString <- _TIFFVSetField <- TIFFSetField",
+  "stack-use-after-return | _TIFFVGetField <- TIFFVGetField <- TIFFGetField"
+ ],
+ "buckets": [
+  {
+   "bucket": "0ca7fd554c",
+   "key": "stack-use-after-return | _TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960",
+   "count": 146
+  },
+  {
+   "bucket": "56738101cf",
+   "key": "SEGV | memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208",
+   "count": 29
+  },
+  {
+   "bucket": "178ea79b46",
+   "key": "stack-buffer-overflow | _TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960",
+   "count": 6
+  },
+  {
+   "bucket": "6800c295db",
+   "key": "allocation-size-too-big | _TIFFCheckRealloc tif_aux.c:47 <- _TIFFCheckMalloc tif_aux.c:61 <- TIFFFetchNormalTag tif_dirread.c:1690",
+   "count": 3
+  },
+  {
+   "bucket": "a309920604",
+   "key": "SEGV | memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawTile1 tif_read.c:451",
+   "count": 3
+  },
+  {
+   "bucket": "18f6df4396",
+   "key": "allocation-size-too-big | cpStrips tiffsplit.c:234 <- tiffcp tiffsplit.c:227 <- main tiffsplit.c:89",
+   "count": 1
+  },
+  {
+   "bucket": "affd0c4ee4",
+   "key": "allocation-size-too-big | _TIFFCheckRealloc tif_aux.c:47 <- _TIFFCheckMalloc tif_aux.c:61 <- TIFFFetchNormalTag tif_dirread.c:1658",
+   "count": 1
+  },
+  {
+   "bucket": "ff15b3296f",
+   "key": "allocation-size-too-big | _TIFFCheckRealloc tif_aux.c:47 <- _TIFFCheckMalloc tif_aux.c:61 <- TIFFFetchNormalTag tif_dirread.c:1670",
+   "count": 1
+  },
+  {
+   "bucket": "2b5175ff27",
+   "key": "allocation-size-too-big | _TIFFCheckRealloc tif_aux.c:47 <- _TIFFCheckMalloc tif_aux.c:61 <- TIFFFetchNormalTag tif_dirread.c:1664",
+   "count": 1
+  },
+  {
+   "bucket": "e04c9275f7",
+   "key": "stack-buffer-overflow | checkInkNamesString tif_dir.c:120 <- _TIFFVSetField tif_dir.c:389 <- TIFFSetField tif_dir.c:658",
+   "count": 1
+  }
+ ]
+}

@@ -1,0 +1,22 @@
+{
+ "campaign": "B-ffmpeg-afl503-r5",
+ "program": "ffmpeg",
+ "arm": "afl503",
+ "rep": 5,
+ "crash_files": 2,
+ "outcomes": {
+  "asan": 2
+ },
+ "unique_bugs": 1,
+ "unique_bugs_fn": 1,
+ "buckets_fn": [
+  "FPE | mov_write_stsz_tag <- mov_write_stbl_tag <- mov_write_minf_tag"
+ ],
+ "buckets": [
+  {
+   "bucket": "e051e0bd7d",
+   "key": "FPE | mov_write_stsz_tag movenc.c:195 <- mov_write_stbl_tag movenc.c:2422 <- mov_write_minf_tag movenc.c:2666",
+   "count": 2
+  }
+ ]
+}

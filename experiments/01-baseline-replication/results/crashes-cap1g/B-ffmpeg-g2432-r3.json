@@ -1,0 +1,22 @@
+{
+ "campaign": "B-ffmpeg-g2432-r3",
+ "program": "ffmpeg",
+ "arm": "g2432",
+ "rep": 3,
+ "crash_files": 27,
+ "outcomes": {
+  "asan": 27
+ },
+ "unique_bugs": 1,
+ "unique_bugs_fn": 1,
+ "buckets_fn": [
+  "FPE | gdv_read_header <- avformat_open_input <- open_input_file"
+ ],
+ "buckets": [
+  {
+   "bucket": "22dc810c55",
+   "key": "FPE | gdv_read_header gdv.c:107 <- avformat_open_input utils.c:631 <- open_input_file ffmpeg_opt.c:1069",
+   "count": 27
+  }
+ ]
+}

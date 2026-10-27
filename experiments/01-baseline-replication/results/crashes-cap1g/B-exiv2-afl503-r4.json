@@ -1,0 +1,149 @@
+{
+ "campaign": "B-exiv2-afl503-r4",
+ "program": "exiv2",
+ "arm": "afl503",
+ "rep": 4,
+ "crash_files": 108,
+ "outcomes": {
+  "asan": 107,
+  "no-crash": 1
+ },
+ "unique_bugs": 22,
+ "unique_bugs_fn": 22,
+ "buckets_fn": [
+  "allocation-size-too-big | operator <- Exiv2::DataBuf::DataBuf(long) <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&,",
+  "allocation-size-too-big | operator <- Exiv2::DataBuf::DataBuf(long) <- Exiv2::JpegBase::readMetadata()",
+  "allocation-size-too-big | operator <- Exiv2::DataBuf::DataBuf(long) <- Exiv2::MrwImage::readMetadata()",
+  "allocation-size-too-big | operator <- Exiv2::DataBuf::DataBuf(long) <- Exiv2::PgfImage::readMetadata()",
+  "allocation-size-too-big | operator <- Exiv2::DataBuf::DataBuf(long) <- Exiv2::RafImage::readMetadata()",
+  "allocation-size-too-big | operator <- Exiv2::DataBuf::DataBuf(long) <- Exiv2::WebPImage::decodeChunks(unsigned",
+  "allocation-size-too-big | operator <- Exiv2::DataBuf::alloc(long) <- Exiv2::zlibToDataBuf(unsigned",
+  "allocation-size-too-big | operator <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&,",
+  "heap-buffer-overflow | Exiv2::Internal::PngChunk::keyTXTChunk(Exiv2::DataBuf <- Exiv2::Internal::PngChunk::decodeTXTChunk(Exiv2::Image*, <- Exiv2::PngImage::readMetadata()",
+  "heap-buffer-overflow | Exiv2::Internal::binaryToString[abi:cxx11](unsigned <- Exiv2::IptcData::printStructure(std::ostream&, <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&,",
+  "heap-buffer-overflow | Exiv2::IptcData::printStructure(std::ostream&, <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&,",
+  "heap-buffer-overflow | Exiv2::WebPImage::decodeChunks(unsigned <- Exiv2::WebPImage::readMetadata() <- Action::Print::printSummary()",
+  "heap-buffer-overflow | Exiv2::d2Data(unsigned <- long <- Exiv2::ValueType<double>::copy(unsigned",
+  "heap-buffer-overflow | Exiv2::l2Data(unsigned <- Exiv2::r2Data(unsigned <- long",
+  "heap-buffer-overflow | Exiv2::l2Data(unsigned <- long <- Exiv2::ValueType<int>::copy(unsigned",
+  "heap-buffer-overflow | Exiv2::s2Data(unsigned <- long <- Exiv2::ValueType<short>::copy(unsigned",
+  "heap-buffer-overflow | Exiv2::ul2Data(unsigned <- Exiv2::f2Data(unsigned <- long",
+  "heap-buffer-overflow | Exiv2::ul2Data(unsigned <- Exiv2::ur2Data(unsigned <- long",
+  "heap-buffer-overflow | Exiv2::ul2Data(unsigned <- long <- Exiv2::ValueType<unsigned",
+  "heap-buffer-overflow | Exiv2::us2Data(unsigned <- long <- Exiv2::ValueType<unsigned",
+  "heap-buffer-overflow | std::char_traits<char>::length(char <- std::__cxx11::basic_string<char, <- Exiv2::Internal::PngChunk::parseTXTChunk(Exiv2::DataBuf",
+  "stack-overflow | printf_common(void*, <- vsnprintf <- Exiv2::Internal::stringFormat[abi:cxx11](char"
+ ],
+ "buckets": [
+  {
+   "bucket": "ad0042bddc",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::DataBuf::DataBuf(long) types.hpp:204 <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, std:",
+   "count": 30
+  },
+  {
+   "bucket": "b27bc5e8b5",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::DataBuf::DataBuf(long) types.hpp:204 <- Exiv2::WebPImage::decodeChunks(unsigned long)",
+   "count": 16
+  },
+  {
+   "bucket": "74c46d0bee",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::DataBuf::DataBuf(long) types.hpp:204 <- Exiv2::JpegBase::readMetadata() jpgimage.cpp:483",
+   "count": 8
+  },
+  {
+   "bucket": "433d63a9e3",
+   "key": "heap-buffer-overflow | std::char_traits<char>::length(char const*) <- std::__cxx11::basic_string<char, std: <- Exiv2::Internal::PngChunk::parseTXTChunk(Exiv2::DataBuf const&,",
+   "count": 7
+  },
+  {
+   "bucket": "e4471d582a",
+   "key": "heap-buffer-overflow | Exiv2::us2Data(unsigned char*, <- long Exiv2: <- Exiv2::ValueType<unsigned short>:",
+   "count": 7
+  },
+  {
+   "bucket": "edf74452fd",
+   "key": "heap-buffer-overflow | Exiv2::ul2Data(unsigned char*, <- Exiv2::ur2Data(unsigned char*, <- long Exiv2:",
+   "count": 7
+  },
+  {
+   "bucket": "32df00fa03",
+   "key": "heap-buffer-overflow | Exiv2::Internal::binaryToString[abi:cxx11](unsigned char <- Exiv2::IptcData::printStructure(std::ostream&, unsigned <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, std:",
+   "count": 6
+  },
+  {
+   "bucket": "61a3a5b551",
+   "key": "stack-overflow | printf_common(void*, char <- vsnprintf exiv2.asan+0x2a3579) <- Exiv2::Internal::stringFormat[abi:cxx11](char const*,",
+   "count": 3
+  },
+  {
+   "bucket": "26c395b344",
+   "key": "heap-buffer-overflow | Exiv2::l2Data(unsigned char*, <- long Exiv2: <- Exiv2::ValueType<int>::copy(unsigned char*,",
+   "count": 3
+  },
+  {
+   "bucket": "12b328a6d3",
+   "key": "heap-buffer-overflow | Exiv2::ul2Data(unsigned char*, <- long Exiv2: <- Exiv2::ValueType<unsigned int>:",
+   "count": 3
+  },
+  {
+   "bucket": "bcf28f968a",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::DataBuf::DataBuf(long) types.hpp:204 <- Exiv2::PgfImage::readMetadata() pgfimage.cpp:145",
+   "count": 2
+  },
+  {
+   "bucket": "213c534b40",
+   "key": "heap-buffer-overflow | Exiv2::IptcData::printStructure(std::ostream&, unsigned <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, std: <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&, std:",
+   "count": 2
+  },
+  {
+   "bucket": "31d2f47ef5",
+   "key": "heap-buffer-overflow | Exiv2::WebPImage::decodeChunks(unsigned long) <- Exiv2::WebPImage::readMetadata() webpimage.cpp:496 <- Action::Print::printSummary() actions.cpp:289",
+   "count": 2
+  },
+  {
+   "bucket": "f5abc193ca",
+   "key": "heap-buffer-overflow | Exiv2::s2Data(unsigned char*, <- long Exiv2: <- Exiv2::ValueType<short>::copy(unsigned char*,",
+   "count": 2
+  },
+  {
+   "bucket": "ae2eacf725",
+   "key": "heap-buffer-overflow | Exiv2::l2Data(unsigned char*, <- Exiv2::r2Data(unsigned char*, <- long Exiv2:",
+   "count": 2
+  },
+  {
+   "bucket": "69645e13e5",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::DataBuf::DataBuf(long) types.hpp:204 <- Exiv2::MrwImage::readMetadata() mrwimage.cpp:139",
+   "count": 1
+  },
+  {
+   "bucket": "d96b6578fe",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::DataBuf::DataBuf(long) types.hpp:204 <- Exiv2::RafImage::readMetadata() rafimage.cpp:305",
+   "count": 1
+  },
+  {
+   "bucket": "962d77ca2f",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::DataBuf::alloc(long) types.cpp:158 <- Exiv2::zlibToDataBuf(unsigned char",
+   "count": 1
+  },
+  {
+   "bucket": "41843a8478",
+   "key": "heap-buffer-overflow | Exiv2::Internal::PngChunk::keyTXTChunk(Exiv2::DataBuf const&, <- Exiv2::Internal::PngChunk::decodeTXTChunk(Exiv2::Image*, Exiv2: <- Exiv2::PngImage::readMetadata() pngimage.cpp",
+   "count": 1
+  },
+  {
+   "bucket": "8cabd2c455",
+   "key": "allocation-size-too-big | operator new[](unsigned <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, std: <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&, std:",
+   "count": 1
+  },
+  {
+   "bucket": "093fbf927e",
+   "key": "heap-buffer-overflow | Exiv2::ul2Data(unsigned char*, <- Exiv2::f2Data(unsigned char*, <- long Exiv2:",
+   "count": 1
+  },
+  {
+   "bucket": "d66e472586",
+   "key": "heap-buffer-overflow | Exiv2::d2Data(unsigned char*, <- long Exiv2: <- Exiv2::ValueType<double>::copy(unsigned char*,",
+   "count": 1
+  }
+ ]
+}

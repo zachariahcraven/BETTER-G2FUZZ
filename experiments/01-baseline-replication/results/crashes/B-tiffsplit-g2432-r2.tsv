@@ -1,0 +1,259 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:11,src:000102,time:26571,execs:5591,op:flip1,pos:1810	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000001,sig:11,src:000102,time:40242,execs:7211,op:flip32,pos:1831	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000002,sig:11,src:000102,time:41977,execs:7892,op:arith8,pos:1786,val:+34	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000003,sig:11,src:000102,time:45251,execs:8178,op:arith8,pos:1798,val:+33	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000004,sig:11,src:000102,time:49507,execs:8728,op:arith8,pos:1846,val:+13	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000005,sig:11,src:000102,time:86336,execs:13897,op:arith32,pos:1831,val:-1	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000006,sig:11,src:000102,time:363046,execs:46417,op:havoc,rep:5	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000007,sig:11,src:000102,time:433606,execs:54195,op:havoc,rep:4	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000008,sig:11,src:000435,time:620209,execs:79955,op:quick,pos:1798	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000009,sig:11,src:000434,time:664537,execs:87827,op:arith8,pos:4020,val:+34	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000010,sig:11,src:000453,time:670004,execs:89816,op:quick,pos:1834	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000011,sig:11,src:000411,time:682061,execs:92025,op:quick,pos:1798	11	asan	stack-buffer-overflow	178ea79b46	_TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000012,sig:11,src:000411,time:682291,execs:92030,op:quick,pos:1802	11	asan	stack-buffer-overflow	178ea79b46	_TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000013,sig:11,src:000411,time:682303,execs:92034,op:quick,pos:1806	11	asan	stack-buffer-overflow	178ea79b46	_TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000014,sig:11,src:000411,time:682313,execs:92035,op:quick,pos:1807	11	asan	stack-buffer-overflow	178ea79b46	_TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000015,sig:11,src:000411,time:690715,execs:93367,op:ext_AO,pos:1782	11	asan	stack-buffer-overflow	178ea79b46	_TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000016,sig:11,src:000411,time:690727,execs:93368,op:ext_AO,pos:1782	11	asan	stack-buffer-overflow	178ea79b46	_TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000017,sig:11,src:000010,time:771709,execs:113258,op:havoc,rep:3	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000018,sig:11,src:000010,time:773887,execs:115389,op:havoc,rep:1	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000019,sig:11,src:000010,time:782510,execs:125833,op:havoc,rep:14	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000020,sig:11,src:000010,time:800249,execs:145859,op:havoc,rep:7	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000021,sig:11,src:000547,time:805114,execs:149575,op:arith8,pos:736,val:+33	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000022,sig:11,src:000553,time:812019,execs:153800,op:quick,pos:771	11	asan	SEGV	a309920604	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawTile1 tif_read.c:451
+id:000023,sig:11,src:000553,time:812634,execs:153958,op:arith8,pos:736,val:+33	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000024,sig:11,src:000458,time:823273,execs:157790,op:quick,pos:4092	11	asan	stack-buffer-overflow	178ea79b46	_TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000025,sig:11,src:000459,time:832726,execs:161834,op:arith8,pos:4092,val:+8	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000026,sig:11,src:000170,time:846040,execs:167788,op:quick,pos:58	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000027,sig:11,src:000170,time:847132,execs:168238,op:arith8,pos:118,val:+10	11	no-crash			
+id:000028,sig:11,src:000578,time:867195,execs:178516,op:quick,pos:154	11	asan	stack-buffer-overflow	178ea79b46	_TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000029,sig:11,src:000587,time:910479,execs:200621,op:quick,pos:118	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000030,sig:11,src:000587,time:916617,execs:206796,op:havoc,rep:1	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000031,sig:11,src:000587,time:917619,execs:207937,op:havoc,rep:5	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000032,sig:11,src:000638,time:926110,execs:216319,op:quick,pos:142	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000033,sig:11,src:000336,time:945309,execs:220424,op:quick,pos:1833	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000034,sig:11,src:000672,time:956328,execs:221820,op:colorization,rep:8	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000035,sig:11,src:000705,time:973538,execs:238281,op:colorization,rep:14	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000036,sig:11,src:000705,time:974133,execs:238510,op:quick,pos:34	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000037,sig:11,src:000654,time:996963,execs:262185,op:havoc,rep:3	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000038,sig:11,src:000796,time:1165160,execs:346449,op:quick,pos:736	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000039,sig:11,src:000796,time:1165416,execs:346493,op:quick,pos:771	11	asan	SEGV	a309920604	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawTile1 tif_read.c:451
+id:000040,sig:11,src:000692,time:1167282,execs:348232,op:colorization,rep:3	11	no-crash			
+id:000041,sig:11,src:000756,time:1176765,execs:351607,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000042,sig:11,src:000701,time:1178737,execs:352025,op:colorization,rep:2	11	no-crash			
+id:000043,sig:11,src:000761,time:1195847,execs:369960,op:havoc,rep:1	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000044,sig:11,src:000817,time:1220053,execs:393829,op:its,rep:4	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000045,sig:11,src:000635,time:1322869,execs:443427,op:colorization,rep:1	11	no-crash			
+id:000046,sig:11,src:000617,time:1350892,execs:457334,op:havoc,rep:4	11	no-crash			
+id:000047,sig:11,src:000673,time:1366039,execs:476534,op:havoc,rep:3	11	no-crash			
+id:000048,sig:11,src:000699,time:1547782,execs:497380,op:havoc,rep:6	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000049,sig:11,src:000864,time:1659238,execs:532253,op:quick,pos:1786	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000050,sig:11,src:000864,time:1661623,execs:532760,op:arith8,pos:3782,val:+13	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000051,sig:11,src:000686,time:1735414,execs:570615,op:flip1,pos:58	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000052,sig:11,src:000873,time:1824143,execs:614959,op:havoc,rep:1	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000053,sig:11,src:000892,time:1842656,execs:624205,op:quick,pos:130	11	asan	stack-buffer-overflow	178ea79b46	_TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000054,sig:11,src:000896,time:1854766,execs:626738,op:quick,pos:58	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000055,sig:11,src:000903,time:1861524,execs:631951,op:havoc,rep:2	11	asan	stack-buffer-overflow	178ea79b46	_TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000056,sig:11,src:000903,time:1866278,execs:635181,op:havoc,rep:6	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000057,sig:11,src:000903,time:1866501,execs:635259,op:havoc,rep:4	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000058,sig:11,src:000940,time:1925316,execs:667807,op:colorization,rep:1	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000059,sig:11,src:000891,time:1944349,execs:676343,op:colorization,rep:2	11	no-crash			
+id:000060,sig:11,src:000712,time:1945931,execs:677312,op:its,rep:1	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000061,sig:11,src:000907,time:1999537,execs:709479,op:quick,pos:58	11	asan	stack-buffer-overflow	178ea79b46	_TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000062,sig:11,src:000916,time:2017278,execs:719793,op:quick,pos:154	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000063,sig:11,src:000895,time:2020699,execs:721174,op:colorization,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000064,sig:11,src:000921,time:2021378,execs:721689,op:colorization,rep:10	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000065,sig:11,src:000899,time:2022626,execs:722653,op:colorization,rep:3	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000066,sig:11,src:000925,time:2024636,execs:724444,op:quick,pos:82	11	no-crash			
+id:000067,sig:11,src:000917,time:2036646,execs:731178,op:havoc,rep:1	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000068,sig:11,src:000906,time:2046371,execs:734257,op:colorization,rep:4	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000069,sig:11,src:000909,time:2047966,execs:735012,op:colorization,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000070,sig:11,src:000913,time:2051130,execs:737155,op:colorization,rep:11	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000071,sig:11,src:000964,time:2053084,execs:737974,op:quick,pos:34	11	no-crash			
+id:000072,sig:11,src:000923,time:2075957,execs:744120,op:colorization,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000073,sig:11,src:000924,time:2077401,execs:744965,op:colorization,rep:5	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000074,sig:11,src:000926,time:2085478,execs:748419,op:havoc,rep:1	11	asan	stack-buffer-overflow	178ea79b46	_TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000075,sig:11,src:000908,time:2110197,execs:756212,op:colorization,rep:2	11	no-crash			
+id:000076,sig:11,src:000918,time:2116484,execs:759142,op:colorization,rep:1	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000077,sig:11,src:000918,time:2117469,execs:759359,op:havoc,rep:3	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000078,sig:11,src:000914,time:2169412,execs:770011,op:colorization,rep:1	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000079,sig:11,src:000920,time:2183660,execs:775640,op:colorization,rep:1	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000080,sig:11,src:000922,time:2193684,execs:778491,op:colorization,rep:7	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000081,sig:11,src:000975,time:2213632,execs:787760,op:quick,pos:771	11	asan	SEGV	a309920604	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawTile1 tif_read.c:451
+id:000082,sig:11,src:000979,time:2271422,execs:822202,op:quick,pos:771	11	asan	SEGV	a309920604	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawTile1 tif_read.c:451
+id:000083,sig:11,src:001001,time:2278578,execs:825576,op:quick,pos:771	11	asan	SEGV	a309920604	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawTile1 tif_read.c:451
+id:000084,sig:11,src:000798,time:2328107,execs:854064,op:havoc,rep:2	11	no-crash			
+id:000085,sig:11,src:000684,time:2352725,execs:867004,op:havoc,rep:1	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000086,sig:11,src:000744,time:2425503,execs:895049,op:havoc,rep:6	11	no-crash			
+id:000087,sig:11,src:000629,time:2427900,execs:898579,op:havoc,rep:3	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000088,sig:11,src:001017,time:2543841,execs:954792,op:havoc,rep:8	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000089,sig:11,src:001017,time:2543952,execs:954953,op:havoc,rep:1	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000090,sig:11,src:001017,time:2543963,execs:954955,op:havoc,rep:6	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000091,sig:11,src:000680,time:2781548,execs:1061715,op:havoc,rep:1	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000092,sig:11,src:000901,time:2809772,execs:1072631,op:havoc,rep:1	11	no-crash			
+id:000093,sig:11,src:001049,time:2928482,execs:1128931,op:quick,pos:46	11	no-crash			
+id:000094,sig:11,src:001050,time:2929049,execs:1129291,op:colorization,rep:14	11	no-crash			
+id:000095,sig:11,src:001050,time:2930311,execs:1129843,op:havoc,rep:2	11	no-crash			
+id:000096,sig:11,src:001037,time:3002931,execs:1168570,op:havoc,rep:1	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000097,sig:11,src:001050,time:3037870,execs:1183750,op:flip1,pos:34	11	no-crash			
+id:000098,sig:11,src:001050,time:3041619,execs:1184571,op:ext_AO,pos:34	11	no-crash			
+id:000099,sig:11,src:001050,time:3049212,execs:1185138,op:ext_AO,pos:34	11	no-crash			
+id:000100,sig:11,src:001050,time:3053796,execs:1187383,op:havoc,rep:2	11	no-crash			
+id:000101,sig:11,src:001050,time:3055134,execs:1188541,op:havoc,rep:1	11	no-crash			
+id:000102,sig:11,src:001050,time:3055531,execs:1188864,op:havoc,rep:3	11	no-crash			
+id:000103,sig:11,src:001050,time:3058916,execs:1191121,op:havoc,rep:1	11	no-crash			
+id:000104,sig:11,src:001050,time:3059197,execs:1191329,op:havoc,rep:3	11	no-crash			
+id:000105,sig:11,src:001050,time:3061680,execs:1192749,op:havoc,rep:4	11	no-crash			
+id:000106,sig:11,src:001050,time:3078946,execs:1200889,op:havoc,rep:4	11	no-crash			
+id:000107,sig:11,src:001050,time:3086557,execs:1205351,op:havoc,rep:4	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000108,sig:11,src:001050,time:3093790,execs:1209728,op:havoc,rep:2	11	no-crash			
+id:000109,sig:11,src:001050,time:3103715,execs:1214470,op:havoc,rep:1	11	no-crash			
+id:000110,sig:11,src:001050,time:3105812,execs:1215353,op:havoc,rep:2	11	no-crash			
+id:000111,sig:11,src:001062,time:3106643,execs:1215735,op:colorization,rep:4	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000112,sig:11,src:001071,time:3110656,execs:1217550,op:colorization,rep:2	11	no-crash			
+id:000113,sig:11,src:001075,time:3120122,execs:1222639,op:colorization,rep:1	11	no-crash			
+id:000114,sig:11,src:001058,time:3124326,execs:1226428,op:colorization,rep:1	11	no-crash			
+id:000115,sig:11,src:001058,time:3143360,execs:1233060,op:havoc,rep:3	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000116,sig:11,src:001058,time:3149928,execs:1237227,op:havoc,rep:3	11	no-crash			
+id:000117,sig:11,src:001058,time:3154502,execs:1239488,op:havoc,rep:2	11	no-crash			
+id:000118,sig:11,src:001058,time:3155288,execs:1239917,op:havoc,rep:2	11	no-crash			
+id:000119,sig:11,src:001058,time:3159515,execs:1241689,op:havoc,rep:3	11	no-crash			
+id:000120,sig:11,src:001058,time:3177661,execs:1249381,op:havoc,rep:4	11	asan	heap-buffer-overflow	67586f52a8	cpStrips tiffsplit.c:245 <- tiffcp tiffsplit.c:227 <- main tiffsplit.c:89
+id:000121,sig:11,src:001058,time:3180672,execs:1251084,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000122,sig:11,src:001058,time:3199695,execs:1258586,op:havoc,rep:4	11	asan	stack-buffer-overflow	178ea79b46	_TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000123,sig:11,src:001082,time:3204540,execs:1260069,op:havoc,rep:5	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000124,sig:11,src:001088,time:3205735,execs:1260865,op:colorization,rep:8	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000125,sig:11,src:001083,time:3208970,execs:1262396,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000126,sig:11,src:001087,time:3212822,execs:1263861,op:havoc,rep:3	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000127,sig:11,src:001060,time:3213298,execs:1264415,op:colorization,rep:6	11	no-crash			
+id:000128,sig:11,src:001083,time:3302561,execs:1296768,op:havoc,rep:1	11	asan	stack-buffer-overflow	178ea79b46	_TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000129,sig:11,src:001099,time:3437328,execs:1347070,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000130,sig:11,src:000964,time:3588445,execs:1416572,op:havoc,rep:3	11	asan	stack-buffer-overflow	178ea79b46	_TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000131,sig:11,src:000589,time:3609204,execs:1421619,op:colorization,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000132,sig:11,src:000949,time:3845996,execs:1577053,op:havoc,rep:8	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000133,sig:11,src:001078,time:3848273,execs:1578652,op:havoc,rep:2	11	no-crash			
+id:000134,sig:11,src:001149,time:3896722,execs:1596610,op:havoc,rep:3	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000135,sig:11,src:000989,time:3943360,execs:1623810,op:havoc,rep:1	11	asan	SEGV	a309920604	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawTile1 tif_read.c:451
+id:000136,sig:11,src:001144,time:4009941,execs:1659662,op:havoc,rep:4	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000137,sig:11,src:001062,time:4318013,execs:1867251,op:havoc,rep:4	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000138,sig:11,src:001126,time:4333798,execs:1875270,op:havoc,rep:2	11	asan	stack-buffer-overflow	178ea79b46	_TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000139,sig:11,src:001155,time:4405008,execs:1947370,op:havoc,rep:1	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000140,sig:11,src:001215,time:4449659,execs:1971544,op:quick,pos:81	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000141,sig:11,src:001215,time:4466416,execs:1980271,op:havoc,rep:2	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000142,sig:11,src:001226,time:4476524,execs:1987158,op:havoc,rep:2	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000143,sig:11,src:001232,time:4479435,execs:1988594,op:havoc,rep:1	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000144,sig:11,src:001225,time:4495910,execs:1996815,op:havoc,rep:7	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000145,sig:11,src:001089,time:4688630,execs:2144246,op:havoc,rep:4	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000146,sig:11,src:001253,time:4691336,execs:2147158,op:havoc,rep:4	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000147,sig:11,src:000768,time:4775236,execs:2207408,op:havoc,rep:7	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000148,sig:11,src:001187,time:4821905,execs:2246437,op:havoc,rep:4	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000149,sig:11,src:001236,time:4953697,execs:2375314,op:havoc,rep:2	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000150,sig:11,src:000927,time:5020546,execs:2445185,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000151,sig:11,src:000631,time:5070628,execs:2499357,op:havoc,rep:5	11	no-crash			
+id:000152,sig:11,src:001079,time:5159033,execs:2601911,op:havoc,rep:5	11	no-crash			
+id:000153,sig:11,src:000666,time:5165052,execs:2611198,op:havoc,rep:4	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000154,sig:11,src:001149,time:5211042,execs:2660461,op:havoc,rep:1	11	asan	stack-buffer-overflow	178ea79b46	_TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000155,sig:11,src:001093,time:5212760,execs:2661527,op:havoc,rep:3	11	no-crash			
+id:000156,sig:11,src:001151,time:5278564,execs:2743905,op:havoc,rep:2	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000157,sig:11,src:001237,time:5292549,execs:2758810,op:havoc,rep:2	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000158,sig:11,src:000928,time:5293349,execs:2759564,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000159,sig:11,src:001138,time:5310261,execs:2778010,op:havoc,rep:2	11	no-crash			
+id:000160,sig:11,src:001180,time:5394187,execs:2888193,op:havoc,rep:1	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000161,sig:11,src:001182,time:5486586,execs:3002671,op:havoc,rep:2	11	asan	SEGV	a309920604	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawTile1 tif_read.c:451
+id:000162,sig:11,src:001078,time:5628883,execs:3184173,op:havoc,rep:5	11	no-crash			
+id:000163,sig:11,src:000952,time:5676567,execs:3242117,op:havoc,rep:3	11	no-crash			
+id:000164,sig:11,src:001033,time:5726963,execs:3307090,op:havoc,rep:3	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000165,sig:11,src:001135,time:5744229,execs:3318518,op:havoc,rep:4	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000166,sig:11,src:001402,time:5756517,execs:3333757,op:havoc,rep:3	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000167,sig:11,src:001402,time:5766165,execs:3339123,op:havoc,rep:2	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000168,sig:11,src:001088,time:5860318,execs:3448820,op:havoc,rep:4	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000169,sig:11,src:000673,time:6041834,execs:3658170,op:havoc,rep:1	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000170,sig:11,src:001145,time:6149283,execs:3787916,op:havoc,rep:9	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000171,sig:11,src:000951,time:6218632,execs:3863386,op:havoc,rep:4	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000172,sig:11,src:000955,time:6221156,execs:3866882,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000173,sig:11,src:000853,time:6450878,execs:4133067,op:havoc,rep:4	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000174,sig:11,src:001062,time:6484624,execs:4171763,op:havoc,rep:5	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000175,sig:11,src:000688,time:6504228,execs:4194027,op:havoc,rep:3	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000176,sig:11,src:001139,time:6609635,execs:4316525,op:havoc,rep:8	11	asan	SEGV	3160817570	libc.so.6+0xc497f <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000177,sig:11,src:001099,time:7016909,execs:4805219,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000178,sig:11,src:001485,time:7072323,execs:4870811,op:havoc,rep:4	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000179,sig:11,src:000666,time:7180446,execs:4993670,op:havoc,rep:2	11	no-crash			
+id:000180,sig:11,src:001486,time:7252290,execs:5081065,op:havoc,rep:7	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000181,sig:11,src:000910,time:7260791,execs:5090282,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000182,sig:11,src:000916,time:7314885,execs:5143841,op:havoc,rep:3	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000183,sig:11,src:000604,time:7332200,execs:5156395,op:quick,pos:34	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000184,sig:11,src:001493,time:7343794,execs:5162239,op:havoc,rep:1	11	no-crash			
+id:000185,sig:11,src:000153,time:7506953,execs:5281275,op:havoc,rep:3	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000186,sig:11,src:001061,time:7529299,execs:5303018,op:havoc,rep:4	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000187,sig:11,src:001061,time:7529659,execs:5303240,op:havoc,rep:3	11	asan	SEGV	3160817570	libc.so.6+0xc497f <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000188,sig:11,src:000602,time:7541887,execs:5321666,op:quick,pos:94	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000189,sig:11,src:000943,time:7568709,execs:5353387,op:havoc,rep:2	11	no-crash			
+id:000190,sig:11,src:001499,time:7605410,execs:5403495,op:havoc,rep:1	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000191,sig:11,src:001260,time:7646995,execs:5448129,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000192,sig:11,src:001413,time:7916109,execs:5764582,op:havoc,rep:2	11	asan	SEGV	3160817570	libc.so.6+0xc497f <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000193,sig:11,src:001087,time:8155277,execs:6024012,op:havoc,rep:1	11	no-crash			
+id:000194,sig:11,src:000673,time:8216326,execs:6095367,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000195,sig:11,src:000570,time:8253194,execs:6137452,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000196,sig:11,src:001413,time:8267275,execs:6151923,op:havoc,rep:2	11	asan	SEGV	3160817570	libc.so.6+0xc497f <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000197,sig:11,src:000977,time:8273985,execs:6159661,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000198,sig:11,src:001081,time:8467819,execs:6405012,op:havoc,rep:2	11	asan	stack-buffer-overflow	178ea79b46	_TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000199,sig:11,src:001083,time:8471055,execs:6408703,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000200,sig:11,src:000949,time:8533014,execs:6480110,op:havoc,rep:7	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000201,sig:11,src:001130,time:8574477,execs:6528147,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000202,sig:11,src:001093,time:8813759,execs:6824184,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000203,sig:11,src:001088,time:8914098,execs:6926765,op:havoc,rep:4	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000204,sig:11,src:000785,time:8918928,execs:6933868,op:havoc,rep:16	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000205,sig:11,src:001035,time:8965628,execs:6982917,op:havoc,rep:1	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000206,sig:11,src:001515,time:9028497,execs:7048594,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000207,sig:11,src:001260,time:9512276,execs:7623824,op:havoc,rep:2	11	asan	stack-buffer-overflow	178ea79b46	_TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000208,sig:11,src:000489,time:9676212,execs:7811058,op:havoc,rep:1	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000209,sig:11,src:001574,time:9737479,execs:7885484,op:colorization,rep:5	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000210,sig:11,src:000865,time:9763665,execs:7913563,op:havoc,rep:7	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000211,sig:11,src:000915,time:9859319,execs:8025276,op:havoc,rep:1	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000212,sig:11,src:001548,time:10021671,execs:8218509,op:havoc,rep:5	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000213,sig:11,src:001258,time:10130250,execs:8348090,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000214,sig:11,src:001555,time:10213406,execs:8453058,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000215,sig:11,src:001081,time:10599602,execs:8918175,op:havoc,rep:4	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000216,sig:11,src:000912,time:10614066,execs:8932964,op:havoc,rep:1	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000217,sig:11,src:001440,time:10645158,execs:8973281,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000218,sig:11,src:000902,time:10911151,execs:9357045,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000219,sig:11,src:001698,time:11315619,execs:9911138,op:colorization,rep:2	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000220,sig:11,src:001698,time:11316720,execs:9913086,op:havoc,rep:1	11	asan	SEGV	a309920604	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawTile1 tif_read.c:451
+id:000221,sig:11,src:001189,time:11338359,execs:9942225,op:havoc,rep:4	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000222,sig:11,src:000498,time:11418898,execs:10047258,op:havoc,rep:4	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000223,sig:11,src:001707,time:11615790,execs:10306347,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000224,sig:11,src:001062,time:11683871,execs:10382561,op:havoc,rep:1	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000225,sig:11,src:001413,time:11927724,execs:10692403,op:havoc,rep:4	11	no-crash			
+id:000226,sig:11,src:001260,time:11937111,execs:10702838,op:havoc,rep:2	11	asan	SEGV	3160817570	libc.so.6+0xc497f <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000227,sig:11,src:000716,time:12214884,execs:11041505,op:havoc,rep:1	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000228,sig:11,src:001552,time:12801497,execs:11468140,op:havoc,rep:2	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000229,sig:11,src:000611,time:12818212,execs:11488344,op:havoc,rep:4	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000230,sig:11,src:000790,time:12832239,execs:11505363,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000231,sig:11,src:001798,time:13001762,execs:11723199,op:havoc,rep:3	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000232,sig:11,src:000754,time:13112169,execs:11857416,op:havoc,rep:3	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000233,sig:11,src:001472,time:13272423,execs:12053938,op:havoc,rep:3	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000234,sig:11,src:001802,time:13342716,execs:12141695,op:havoc,rep:3	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000235,sig:11,src:001574,time:13349514,execs:12153251,op:havoc,rep:8	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000236,sig:11,src:001173,time:14328749,execs:13267221,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000237,sig:11,src:001799,time:15138872,execs:14403059,op:havoc,rep:3	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000238,sig:11,src:001333,time:15392938,execs:14752399,op:havoc,rep:2	11	asan	stack-buffer-overflow	178ea79b46	_TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000239,sig:11,src:001575,time:15399900,execs:14761056,op:havoc,rep:2	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000240,sig:11,src:001048,time:15646869,execs:15086347,op:havoc,rep:2	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000241,sig:11,src:001547,time:15770330,execs:15256696,op:havoc,rep:1	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000242,sig:11,src:001577,time:16257421,execs:15705180,op:havoc,rep:4	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000243,sig:11,src:001737,time:16323654,execs:15797767,op:havoc,rep:2	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000244,sig:11,src:001579,time:16885683,execs:16121683,op:havoc,rep:3	11	no-crash			
+id:000245,sig:11,src:000883,time:17578255,execs:16915836,op:havoc,rep:5	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000246,sig:11,src:000467,time:18505153,execs:18029024,op:havoc,rep:2	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000247,sig:11,src:001003,time:18571524,execs:18111334,op:havoc,rep:4	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000248,sig:11,src:001093,time:19083205,execs:18755490,op:havoc,rep:7	11	asan	stack-buffer-overflow	178ea79b46	_TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000249,sig:11,src:001074,time:19367750,execs:19108451,op:havoc,rep:7	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000250,sig:11,src:001074,time:19390948,execs:19139723,op:havoc,rep:3	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000251,sig:11,src:001585,time:19588209,execs:19359481,op:havoc,rep:1	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000252,sig:11,src:001545,time:19783811,execs:19604616,op:havoc,rep:3	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000253,sig:11,src:000925,time:20000184,execs:19865962,op:havoc,rep:1	11	no-crash			
+id:000254,sig:11,src:001574,time:20789681,execs:20861872,op:havoc,rep:3	11	asan	SEGV	3160817570	libc.so.6+0xc497f <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208
+id:000255,sig:11,src:000673,time:20837087,execs:20914180,op:havoc,rep:1	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000256,sig:11,src:001099,time:20839166,execs:20916409,op:havoc,rep:1	11	asan	stack-use-after-return	0ca7fd554c	_TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960
+id:000257,sig:11,src:000565,time:20885759,execs:20981080,op:havoc,rep:2	11	asan	SEGV	56738101cf	memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208

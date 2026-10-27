@@ -1,0 +1,59 @@
+{
+ "campaign": "C-gdk-pixbuf-pixdata-afl432-r1",
+ "program": "gdk-pixbuf-pixdata",
+ "arm": "afl432",
+ "rep": 1,
+ "crash_files": 23,
+ "outcomes": {
+  "asan": 12,
+  "no-crash": 10,
+  "signal:5": 1
+ },
+ "unique_bugs": 7,
+ "unique_bugs_fn": 6,
+ "buckets_fn": [
+  "SEGV | DecodeHeader <- gdk_pixbuf__ico_image_load_increment <- gdk_pixbuf_loader_write",
+  "SEGV | gdk_pixbuf__qtif_image_load_increment <- gdk_pixbuf_loader_load_module <- gdk_pixbuf_loader_close",
+  "allocation-size-too-big | malloc <- gdk_pixbuf_new <- DecodeHeader",
+  "allocation-size-too-big | malloc <- get_contiguous_pixbuf <- fill_in_context",
+  "heap-buffer-overflow | OneLine32 <- OneLine <- gdk_pixbuf__ico_image_load_increment",
+  "heap-buffer-overflow | gdk_pixbuf_from_pixdata <- try_load <- pixdata_image_load_increment"
+ ],
+ "buckets": [
+  {
+   "bucket": "05d67b2282",
+   "key": "heap-buffer-overflow | gdk_pixbuf_from_pixdata gdk-pixdata.c:479 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152",
+   "count": 3
+  },
+  {
+   "bucket": "255dca9438",
+   "key": "SEGV | gdk_pixbuf__qtif_image_load_increment io-qtif.c:437 <- gdk_pixbuf_loader_load_module gdk-pixbuf-loader.c:445 <- gdk_pixbuf_loader_close gdk-pixbuf-loader.c:810",
+   "count": 3
+  },
+  {
+   "bucket": "abd3b450c1",
+   "key": "allocation-size-too-big | malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-ico.c:479",
+   "count": 2
+  },
+  {
+   "bucket": "4a9bdccbef",
+   "key": "heap-buffer-overflow | gdk_pixbuf_from_pixdata gdk-pixdata.c:506 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152",
+   "count": 1
+  },
+  {
+   "bucket": "a0c233833d",
+   "key": "heap-buffer-overflow | OneLine32 io-ico.c:596 <- OneLine io-ico.c:807 <- gdk_pixbuf__ico_image_load_increment io-ico.c:898",
+   "count": 1
+  },
+  {
+   "bucket": "a70a0032f8",
+   "key": "allocation-size-too-big | malloc gdk-pixbuf-pixdata.asan+0xd218e) <- get_contiguous_pixbuf io-tga.c:254 <- fill_in_context io-tga.c:335",
+   "count": 1
+  },
+  {
+   "bucket": "9f18212c7d",
+   "key": "SEGV | DecodeHeader io-ico.c:322 <- gdk_pixbuf__ico_image_load_increment io-ico.c:905 <- gdk_pixbuf_loader_write gdk-pixbuf-loader.c:523",
+   "count": 1
+  }
+ ]
+}

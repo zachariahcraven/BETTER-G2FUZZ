@@ -1,0 +1,47 @@
+{
+ "campaign": "B-pdftotext-g2503-r4",
+ "program": "pdftotext",
+ "arm": "g2503",
+ "rep": 4,
+ "crash_files": 143,
+ "outcomes": {
+  "asan": 135,
+  "no-crash": 7,
+  "timeout": 1
+ },
+ "unique_bugs": 5,
+ "unique_bugs_fn": 4,
+ "buckets_fn": [
+  "ABRT | pthread_kill <- gsignal <- abort",
+  "SEGV | TextPage::findGaps(GList*, <- TextPage::split(GList*, <- TextPage::splitChars(GList*)",
+  "stack-overflow | ",
+  "stack-overflow | malloc <- gmalloc <- copyString"
+ ],
+ "buckets": [
+  {
+   "bucket": "c665cfeebd",
+   "key": "SEGV | TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610",
+   "count": 85
+  },
+  {
+   "bucket": "fdb798c62f",
+   "key": "ABRT | pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)",
+   "count": 47
+  },
+  {
+   "bucket": "0563a807a2",
+   "key": "stack-overflow | malloc pdftotext.asan+0x1d742f) <- gmalloc gmem.cc:140 <- copyString gmem.cc:311",
+   "count": 1
+  },
+  {
+   "bucket": "148bef40bf",
+   "key": "stack-overflow | ",
+   "count": 1
+  },
+  {
+   "bucket": "cacfe878bb",
+   "key": "stack-overflow | malloc pdftotext.asan+0x1d743e) <- gmalloc gmem.cc:140 <- copyString gmem.cc:311",
+   "count": 1
+  }
+ ]
+}

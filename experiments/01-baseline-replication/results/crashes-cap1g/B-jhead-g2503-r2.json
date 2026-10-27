@@ -1,0 +1,126 @@
+{
+ "campaign": "B-jhead-g2503-r2",
+ "program": "jhead",
+ "arm": "g2503",
+ "rep": 2,
+ "crash_files": 97,
+ "outcomes": {
+  "asan": 97
+ },
+ "unique_bugs": 20,
+ "unique_bugs_fn": 10,
+ "buckets_fn": [
+  "SEGV | ConvertAnyFormat <- ProcessExifDir <- process_EXIF",
+  "SEGV | Get16u <- ConvertAnyFormat <- ProcessExifDir",
+  "SEGV | Get32s <- ConvertAnyFormat <- ProcessExifDir",
+  "SEGV | Get32s <- Get32u <- ConvertAnyFormat",
+  "SEGV | ProcessExifDir <- process_EXIF <- ReadJpegSections",
+  "SEGV | libc.so.6+0x19da45 <- ProcessExifDir <- process_EXIF",
+  "SEGV | show_IPTC <- ProcessFile <- main",
+  "heap-buffer-overflow | Get32s <- Get32u <- process_EXIF",
+  "heap-buffer-overflow | process_DHT <- ReadJpegSections <- ReadJpegFile",
+  "heap-buffer-overflow | process_DQT <- ReadJpegSections <- ReadJpegFile"
+ ],
+ "buckets": [
+  {
+   "bucket": "653c1ece6a",
+   "key": "SEGV | show_IPTC iptc.c:122 <- ProcessFile jhead.c:946 <- main jhead.c:1730",
+   "count": 32
+  },
+  {
+   "bucket": "519c2efb14",
+   "key": "SEGV | libc.so.6+0x19da45 <- ProcessExifDir exif.c <- process_EXIF exif.c:1034",
+   "count": 15
+  },
+  {
+   "bucket": "93986022e6",
+   "key": "heap-buffer-overflow | Get32s exif.c:336 <- Get32u exif.c:364 <- process_EXIF exif.c:1020",
+   "count": 9
+  },
+  {
+   "bucket": "d61b512f3c",
+   "key": "SEGV | ConvertAnyFormat exif.c:418 <- ProcessExifDir exif.c:775 <- process_EXIF exif.c:1034",
+   "count": 8
+  },
+  {
+   "bucket": "5e72187ccd",
+   "key": "heap-buffer-overflow | process_DQT jpgqguess.c:108 <- ReadJpegSections jpgfile.c:223 <- ReadJpegFile jpgfile.c:375",
+   "count": 6
+  },
+  {
+   "bucket": "36cba44de6",
+   "key": "SEGV | ConvertAnyFormat exif.c:417 <- ProcessExifDir exif.c:897 <- process_EXIF exif.c:1034",
+   "count": 5
+  },
+  {
+   "bucket": "9e4f7e33ad",
+   "key": "SEGV | Get16u exif.c:321 <- ConvertAnyFormat exif.c:441 <- ProcessExifDir exif.c:889",
+   "count": 4
+  },
+  {
+   "bucket": "827d780264",
+   "key": "heap-buffer-overflow | process_DQT jpgqguess.c:112 <- ReadJpegSections jpgfile.c:223 <- ReadJpegFile jpgfile.c:375",
+   "count": 3
+  },
+  {
+   "bucket": "e6364d8221",
+   "key": "SEGV | libc.so.6+0x19da45 <- ProcessExifDir exif.c:634 <- process_EXIF exif.c:1034",
+   "count": 2
+  },
+  {
+   "bucket": "1b58db6ac7",
+   "key": "heap-buffer-overflow | process_DQT jpgqguess.c:110 <- ReadJpegSections jpgfile.c:223 <- ReadJpegFile jpgfile.c:375",
+   "count": 2
+  },
+  {
+   "bucket": "7ffc8fcf49",
+   "key": "SEGV | Get16u exif.c:321 <- ConvertAnyFormat exif.c:420 <- ProcessExifDir exif.c:905",
+   "count": 2
+  },
+  {
+   "bucket": "1372553274",
+   "key": "SEGV | Get16u exif.c:323 <- ConvertAnyFormat exif.c:420 <- ProcessExifDir exif.c:897",
+   "count": 1
+  },
+  {
+   "bucket": "d372908a96",
+   "key": "SEGV | Get32s exif.c:336 <- Get32u exif.c:364 <- ConvertAnyFormat exif.c:421",
+   "count": 1
+  },
+  {
+   "bucket": "c04cb5e9e8",
+   "key": "heap-buffer-overflow | Get32s exif.c:334 <- Get32u exif.c:364 <- process_EXIF exif.c:1020",
+   "count": 1
+  },
+  {
+   "bucket": "5f55076eae",
+   "key": "SEGV | ProcessExifDir exif.c:669 <- process_EXIF exif.c:1034 <- ReadJpegSections jpgfile.c:287",
+   "count": 1
+  },
+  {
+   "bucket": "6751604a4b",
+   "key": "SEGV | Get32s exif.c:336 <- ConvertAnyFormat exif.c:427 <- ProcessExifDir exif.c:766",
+   "count": 1
+  },
+  {
+   "bucket": "de7ecc4c9e",
+   "key": "SEGV | ConvertAnyFormat exif.c:418 <- ProcessExifDir exif.c:815 <- process_EXIF exif.c:1034",
+   "count": 1
+  },
+  {
+   "bucket": "176437ea08",
+   "key": "SEGV | ConvertAnyFormat exif.c:445 <- ProcessExifDir exif.c:741 <- process_EXIF exif.c:1034",
+   "count": 1
+  },
+  {
+   "bucket": "66f28ca79e",
+   "key": "heap-buffer-overflow | Get32s exif.c:333 <- Get32u exif.c:364 <- process_EXIF exif.c:1020",
+   "count": 1
+  },
+  {
+   "bucket": "6c35546140",
+   "key": "heap-buffer-overflow | process_DHT jpgqguess.c:188 <- ReadJpegSections jpgfile.c:228 <- ReadJpegFile jpgfile.c:375",
+   "count": 1
+  }
+ ]
+}

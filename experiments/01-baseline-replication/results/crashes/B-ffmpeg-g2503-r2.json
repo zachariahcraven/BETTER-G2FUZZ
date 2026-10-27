@@ -1,0 +1,12 @@
+{
+ "campaign": "B-ffmpeg-g2503-r2",
+ "program": "ffmpeg",
+ "arm": "g2503",
+ "rep": 2,
+ "crash_files": 0,
+ "outcomes": {},
+ "unique_bugs": 0,
+ "unique_bugs_fn": 0,
+ "buckets_fn": [],
+ "buckets": []
+}

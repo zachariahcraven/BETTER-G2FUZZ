@@ -1,0 +1,41 @@
+{
+ "campaign": "B-pdftotext-g2503-r5",
+ "program": "pdftotext",
+ "arm": "g2503",
+ "rep": 5,
+ "crash_files": 61,
+ "outcomes": {
+  "no-crash": 3,
+  "asan": 58
+ },
+ "unique_bugs": 4,
+ "unique_bugs_fn": 4,
+ "buckets_fn": [
+  "ABRT | pthread_kill <- gsignal <- abort",
+  "SEGV | TextPage::findGaps(GList*, <- TextPage::split(GList*, <- TextPage::splitChars(GList*)",
+  "stack-overflow | Object::copy(Object*) <- XRef::fetch(int, <- Object::arrayGet(int,",
+  "stack-overflow | XRef::fetch(int, <- Object::arrayGet(int, <- Catalog::countPageTree(Object*)"
+ ],
+ "buckets": [
+  {
+   "bucket": "c665cfeebd",
+   "key": "SEGV | TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610",
+   "count": 33
+  },
+  {
+   "bucket": "fdb798c62f",
+   "key": "ABRT | pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)",
+   "count": 22
+  },
+  {
+   "bucket": "c61243bfbf",
+   "key": "stack-overflow | XRef::fetch(int, int, <- Object::arrayGet(int, Object*) <- Catalog::countPageTree(Object*) Catalog.cc:495",
+   "count": 2
+  },
+  {
+   "bucket": "34508bbc53",
+   "key": "stack-overflow | Object::copy(Object*) Object.cc:80 <- XRef::fetch(int, int, <- Object::arrayGet(int, Object*)",
+   "count": 1
+  }
+ ]
+}

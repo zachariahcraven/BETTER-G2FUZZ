@@ -1,0 +1,47 @@
+{
+ "campaign": "B-pdftotext-g2432-r1",
+ "program": "pdftotext",
+ "arm": "g2432",
+ "rep": 1,
+ "crash_files": 53,
+ "outcomes": {
+  "asan": 47,
+  "no-crash": 6
+ },
+ "unique_bugs": 5,
+ "unique_bugs_fn": 5,
+ "buckets_fn": [
+  "ABRT | pthread_kill <- gsignal <- abort",
+  "SEGV | TextPage::findGaps(GList*, <- TextPage::split(GList*, <- TextPage::splitChars(GList*)",
+  "stack-overflow | ",
+  "stack-overflow | XRef::fetch(int, <- AcroForm::scanField(Object*) <- AcroForm::scanField(Object*)",
+  "stack-overflow | libc.so.6+0x75008 <- libc.so.6+0x77624 <- error(ErrorCategory,"
+ ],
+ "buckets": [
+  {
+   "bucket": "fdb798c62f",
+   "key": "ABRT | pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)",
+   "count": 39
+  },
+  {
+   "bucket": "c665cfeebd",
+   "key": "SEGV | TextPage::findGaps(GList*, int, <- TextPage::split(GList*, int) <- TextPage::splitChars(GList*) TextOutputDev.cc:2610",
+   "count": 4
+  },
+  {
+   "bucket": "104c8e91c6",
+   "key": "stack-overflow | XRef::fetch(int, int, <- AcroForm::scanField(Object*) AcroForm.cc:244 <- AcroForm::scanField(Object*) AcroForm.cc:271",
+   "count": 2
+  },
+  {
+   "bucket": "148bef40bf",
+   "key": "stack-overflow | ",
+   "count": 1
+  },
+  {
+   "bucket": "d17a414e1b",
+   "key": "stack-overflow | libc.so.6+0x75008 <- libc.so.6+0x77624 <- error(ErrorCategory, long,",
+   "count": 1
+  }
+ ]
+}

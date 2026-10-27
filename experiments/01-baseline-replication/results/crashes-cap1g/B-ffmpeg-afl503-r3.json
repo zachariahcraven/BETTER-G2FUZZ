@@ -1,0 +1,12 @@
+{
+ "campaign": "B-ffmpeg-afl503-r3",
+ "program": "ffmpeg",
+ "arm": "afl503",
+ "rep": 3,
+ "crash_files": 0,
+ "outcomes": {},
+ "unique_bugs": 0,
+ "unique_bugs_fn": 0,
+ "buckets_fn": [],
+ "buckets": []
+}

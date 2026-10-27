@@ -1,0 +1,25 @@
+{
+ "campaign": "B-mp42aac-g2432-r1",
+ "program": "mp42aac",
+ "arm": "g2432",
+ "rep": 1,
+ "crash_files": 167,
+ "outcomes": {
+  "timeout": 105,
+  "no-crash": 53,
+  "signal:9": 8,
+  "asan": 1
+ },
+ "unique_bugs": 1,
+ "unique_bugs_fn": 1,
+ "buckets_fn": [
+  "SEGV | AP4_DataBuffer::SetData(unsigned <- AP4_AvccAtom::AP4_AvccAtom(unsigned <- AP4_AvccAtom::Create(unsigned"
+ ],
+ "buckets": [
+  {
+   "bucket": "16d2635201",
+   "key": "SEGV | AP4_DataBuffer::SetData(unsigned char <- AP4_AvccAtom::AP4_AvccAtom(unsigned int, <- AP4_AvccAtom::Create(unsigned int,",
+   "count": 1
+  }
+ ]
+}

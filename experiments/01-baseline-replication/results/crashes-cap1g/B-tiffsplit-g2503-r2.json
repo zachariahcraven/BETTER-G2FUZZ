@@ -1,0 +1,69 @@
+{
+ "campaign": "B-tiffsplit-g2503-r2",
+ "program": "tiffsplit",
+ "arm": "g2503",
+ "rep": 2,
+ "crash_files": 140,
+ "outcomes": {
+  "asan": 139,
+  "no-crash": 1
+ },
+ "unique_bugs": 9,
+ "unique_bugs_fn": 7,
+ "buckets_fn": [
+  "SEGV | libc.so.6+0xc497f <- _TIFFmemcpy <- TIFFReadRawStrip1",
+  "SEGV | memcpy <- _TIFFmemcpy <- TIFFReadRawStrip1",
+  "allocation-size-too-big | _TIFFCheckRealloc <- _TIFFCheckMalloc <- TIFFFetchNormalTag",
+  "allocation-size-too-big | _TIFFCheckRealloc <- _TIFFCheckMalloc <- TIFFFetchRationalArray",
+  "allocation-size-too-big | cpStrips <- tiffcp <- main",
+  "stack-buffer-overflow | _TIFFVGetField <- TIFFVGetField <- TIFFGetField",
+  "stack-use-after-return | _TIFFVGetField <- TIFFVGetField <- TIFFGetField"
+ ],
+ "buckets": [
+  {
+   "bucket": "0ca7fd554c",
+   "key": "stack-use-after-return | _TIFFVGetField tif_dir.c <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960",
+   "count": 71
+  },
+  {
+   "bucket": "56738101cf",
+   "key": "SEGV | memcpy libc.so.6+0xc4841) <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208",
+   "count": 27
+  },
+  {
+   "bucket": "61640e73f6",
+   "key": "allocation-size-too-big | _TIFFCheckRealloc tif_aux.c:47 <- _TIFFCheckMalloc tif_aux.c:61 <- TIFFFetchRationalArray tif_dirread.c:1491",
+   "count": 26
+  },
+  {
+   "bucket": "178ea79b46",
+   "key": "stack-buffer-overflow | _TIFFVGetField tif_dir.c:867 <- TIFFVGetField tif_dir.c:976 <- TIFFGetField tif_dir.c:960",
+   "count": 7
+  },
+  {
+   "bucket": "bc7fea039c",
+   "key": "allocation-size-too-big | _TIFFCheckRealloc tif_aux.c:47 <- _TIFFCheckMalloc tif_aux.c:61 <- TIFFFetchNormalTag tif_dirread.c:1652",
+   "count": 4
+  },
+  {
+   "bucket": "18f6df4396",
+   "key": "allocation-size-too-big | cpStrips tiffsplit.c:234 <- tiffcp tiffsplit.c:227 <- main tiffsplit.c:89",
+   "count": 1
+  },
+  {
+   "bucket": "2b5175ff27",
+   "key": "allocation-size-too-big | _TIFFCheckRealloc tif_aux.c:47 <- _TIFFCheckMalloc tif_aux.c:61 <- TIFFFetchNormalTag tif_dirread.c:1664",
+   "count": 1
+  },
+  {
+   "bucket": "3e6a1ef8f5",
+   "key": "allocation-size-too-big | _TIFFCheckRealloc tif_aux.c:47 <- _TIFFCheckMalloc tif_aux.c:61 <- TIFFFetchNormalTag tif_dirread.c:1680",
+   "count": 1
+  },
+  {
+   "bucket": "3160817570",
+   "key": "SEGV | libc.so.6+0xc497f <- _TIFFmemcpy tif_unix.c:265 <- TIFFReadRawStrip1 tif_read.c:208",
+   "count": 1
+  }
+ ]
+}

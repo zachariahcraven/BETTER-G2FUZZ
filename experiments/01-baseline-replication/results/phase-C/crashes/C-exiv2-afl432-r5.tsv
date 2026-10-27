@@ -1,0 +1,98 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:06,src:000100,time:41617,execs:57011,op:its,rep:4	06	asan	out	849f3c7330	operator new[](unsigned <- Exiv2::DataBuf::DataBuf(long) types.hpp:204 <- Exiv2::RafImage::readMetadata() rafimage.cpp:305
+id:000001,sig:06,src:000155,time:47795,execs:64650,op:its,rep:15	06	no-crash			
+id:000002,sig:06,src:000303,time:83495,execs:101973,op:havoc,rep:4	06	no-crash			
+id:000003,sig:06,src:000368,time:110563,execs:127932,op:colorization,rep:2	06	timeout			
+id:000004,sig:06,src:000368,time:127260,execs:133797,op:havoc,rep:2	06	timeout			
+id:000005,sig:06,src:000384,time:175879,execs:171645,op:havoc,rep:13	06	no-crash			
+id:000006,sig:06,src:000523,time:220593,execs:204394,op:havoc,rep:1	06	no-crash			
+id:000007,sig:06,src:000536,time:226902,execs:209311,op:havoc,rep:2	06	no-crash			
+id:000008,sig:06,src:000837,time:436504,execs:375608,op:havoc,rep:6	06	no-crash			
+id:000009,sig:06,src:000837,time:452831,execs:380001,op:havoc,rep:8	06	no-crash			
+id:000010,sig:06,src:000968,time:548068,execs:421371,op:havoc,rep:1	06	no-crash			
+id:000011,sig:06,src:001028,time:722934,execs:504291,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000012,sig:06,src:001028,time:723294,execs:504526,op:havoc,rep:3	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000013,sig:06,src:001028,time:723787,execs:504978,op:havoc,rep:1	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000014,sig:06,src:001028,time:724287,execs:505379,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000015,sig:06,src:001028,time:725655,execs:506939,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000016,sig:06,src:001028,time:726339,execs:507381,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000017,sig:06,src:001028,time:727568,execs:508553,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000018,sig:06,src:001028,time:729893,execs:511129,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000019,sig:06,src:001090,time:744159,execs:520101,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000020,sig:06,src:001083,time:775471,execs:541384,op:havoc,rep:1	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000021,sig:06,src:001034,time:816110,execs:568219,op:havoc,rep:2	06	asan	heap-buffer-overflow	5290792755	Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, std: <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&, std: <- Exiv2::TiffImage::printStructure(std::ostream&, Exiv2:
+id:000022,sig:06,src:001089,time:856815,execs:588304,op:havoc,rep:4	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000023,sig:06,src:000874,time:903274,execs:618337,op:havoc,rep:2	06	no-crash			
+id:000024,sig:11,src:000874,time:903869,execs:618464,op:havoc,rep:2	11	asan	heap-buffer-overflow	213c534b40	Exiv2::IptcData::printStructure(std::ostream&, unsigned <- Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, std: <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&, std:
+id:000025,sig:06,src:000874,time:911883,execs:621394,op:havoc,rep:2	06	no-crash			
+id:000026,sig:06,src:000874,time:917507,execs:623401,op:havoc,rep:2	06	no-crash			
+id:000027,sig:06,src:001186,time:924710,execs:625827,op:quick,pos:37	06	no-crash			
+id:000028,sig:06,src:001186,time:925006,execs:625901,op:havoc,rep:2	06	no-crash			
+id:000029,sig:06,src:000282,time:931044,execs:627608,op:its,rep:4	06	no-crash			
+id:000030,sig:06,src:001095,time:938539,execs:630714,op:havoc,rep:1	06	no-crash			
+id:000031,sig:06,src:001159,time:944900,execs:632909,op:havoc,rep:1	06	no-crash			
+id:000032,sig:06,src:001072,time:995843,execs:663600,op:havoc,rep:2	06	asan	heap-buffer-overflow	5290792755	Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, std: <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&, std: <- Exiv2::TiffImage::printStructure(std::ostream&, Exiv2:
+id:000033,sig:06,src:001226,time:1104596,execs:756858,op:havoc,rep:1	06	no-crash			
+id:000034,sig:06,src:001335,time:1214191,execs:818249,op:havoc,rep:6	06	no-crash			
+id:000035,sig:11,src:001096,time:1272807,execs:854569,op:colorization,rep:15	11	asan	stack-overflow	e1efb772a5	operator new(unsigned <- Exiv2::Internal::CiffDirectory::readDirectory(unsigned char <- Exiv2::Internal::CiffComponent::read(unsigned char
+id:000036,sig:06,src:000878,time:1305040,execs:869557,op:havoc,rep:4	06	asan	heap-buffer-overflow	5290792755	Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, std: <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&, std: <- Exiv2::TiffImage::printStructure(std::ostream&, Exiv2:
+id:000037,sig:06,src:001644,time:1581997,execs:1066178,op:havoc,rep:1	06	timeout			
+id:000038,sig:06,src:001192,time:1633321,execs:1116764,op:havoc,rep:2	06	no-crash			
+id:000039,sig:06,src:001239,time:1786381,execs:1236485,op:havoc,rep:16	06	no-crash			
+id:000040,sig:06,src:000808,time:1797534,execs:1243976,op:havoc,rep:1	06	timeout			
+id:000041,sig:06,src:001085,time:2054411,execs:1389318,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000042,sig:06,src:000173,time:2096197,execs:1419652,op:havoc,rep:2	06	no-crash			
+id:000043,sig:06,src:001939,time:2113198,execs:1431519,op:colorization,rep:15	06	asan	heap-buffer-overflow	433d63a9e3	std::char_traits<char>::length(char const*) <- std::__cxx11::basic_string<char, std: <- Exiv2::Internal::PngChunk::parseTXTChunk(Exiv2::DataBuf const&,
+id:000044,sig:06,src:001066,time:2243409,execs:1510176,op:havoc,rep:3	06	no-crash			
+id:000045,sig:06,src:001187,time:2338036,execs:1566890,op:havoc,rep:1	06	no-crash			
+id:000046,sig:06,src:001940,time:2341803,execs:1568886,op:havoc,rep:1	06	asan	heap-buffer-overflow	433d63a9e3	std::char_traits<char>::length(char const*) <- std::__cxx11::basic_string<char, std: <- Exiv2::Internal::PngChunk::parseTXTChunk(Exiv2::DataBuf const&,
+id:000047,sig:06,src:001237,time:2389837,execs:1602381,op:havoc,rep:4	06	no-crash			
+id:000048,sig:06,src:000943,time:2938839,execs:1948919,op:havoc,rep:2	06	timeout			
+id:000049,sig:06,src:002287,time:3542284,execs:2332170,op:havoc,rep:1	06	no-crash			
+id:000050,sig:06,src:002404,time:3543764,execs:2332763,op:havoc,rep:9	06	no-crash			
+id:000051,sig:06,src:001179,time:4226170,execs:2747043,op:havoc,rep:1	06	no-crash			
+id:000052,sig:06,src:000999,time:4393656,execs:2833964,op:havoc,rep:1	06	timeout			
+id:000053,sig:06,src:001868,time:4620248,execs:2954141,op:havoc,rep:2	06	no-crash			
+id:000054,sig:06,src:001943,time:4637366,execs:2966690,op:havoc,rep:5	06	asan	heap-buffer-overflow	433d63a9e3	std::char_traits<char>::length(char const*) <- std::__cxx11::basic_string<char, std: <- Exiv2::Internal::PngChunk::parseTXTChunk(Exiv2::DataBuf const&,
+id:000055,sig:06,src:001208,time:4657087,execs:2978374,op:havoc,rep:1	06	asan	heap-buffer-overflow	41843a8478	Exiv2::Internal::PngChunk::keyTXTChunk(Exiv2::DataBuf const&, <- Exiv2::Internal::PngChunk::decodeTXTChunk(Exiv2::Image*, Exiv2: <- Exiv2::PngImage::readMetadata() pngimage.cpp
+id:000056,sig:11,src:001471,time:4689683,execs:2994786,op:havoc,rep:1	11	asan	heap-buffer-overflow	5290792755	Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, std: <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&, std: <- Exiv2::TiffImage::printStructure(std::ostream&, Exiv2:
+id:000057,sig:06,src:002132,time:5097590,execs:3158162,op:havoc,rep:6	06	no-crash			
+id:000058,sig:06,src:001538,time:5333833,execs:3266969,op:havoc,rep:3	06	no-crash			
+id:000059,sig:06,src:001095,time:6021224,execs:3535852,op:havoc,rep:3	06	no-crash			
+id:000060,sig:06,src:002714,time:6446440,execs:3719314,op:havoc,rep:1	06	no-crash			
+id:000061,sig:06,src:002807,time:6471679,execs:3732582,op:havoc,rep:1	06	no-crash			
+id:000062,sig:06,src:003459,time:9177689,execs:4730851,op:havoc,rep:1	06	no-crash			
+id:000063,sig:06,src:003170,time:9257694,execs:4756951,op:havoc,rep:5	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000064,sig:06,src:001348,time:12717855,execs:5873683,op:havoc,rep:2	06	asan	heap-buffer-overflow	5290792755	Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, std: <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&, std: <- Exiv2::TiffImage::printStructure(std::ostream&, Exiv2:
+id:000065,sig:06,src:004092,time:15988381,execs:6928894,op:havoc,rep:2	06	no-crash			
+id:000066,sig:06,src:002282,time:16887556,execs:7176200,op:havoc,rep:1	06	asan	heap-buffer-overflow	5290792755	Exiv2::Image::printIFDStructure(Exiv2::BasicIo&, std: <- Exiv2::Image::printTiffStructure(Exiv2::BasicIo&, std: <- Exiv2::TiffImage::printStructure(std::ostream&, Exiv2:
+id:000067,sig:06,src:003463,time:17948512,execs:7517901,op:havoc,rep:7	06	no-crash			
+id:000068,sig:06,src:004026,time:18064680,execs:7549144,op:havoc,rep:2	06	no-crash			
+id:000069,sig:06,src:003950,time:19031659,execs:7926235,op:havoc,rep:4	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000070,sig:06,src:004387,time:23658254,execs:9985626,op:havoc,rep:2	06	no-crash			
+id:000071,sig:06,src:003114,time:24745795,execs:10510909,op:havoc,rep:2	06	no-crash			
+id:000072,sig:06,src:004435,time:24997836,execs:10650475,op:havoc,rep:1	06	no-crash			
+id:000073,sig:06,src:003950,time:25140508,execs:10729919,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000074,sig:06,src:003950,time:25140547,execs:10729939,op:havoc,rep:3	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000075,sig:06,src:003876,time:25880696,execs:11075543,op:havoc,rep:15	06	no-crash			
+id:000076,sig:06,src:001940,time:26567217,execs:11426628,op:havoc,rep:6	06	asan	heap-buffer-overflow	433d63a9e3	std::char_traits<char>::length(char const*) <- std::__cxx11::basic_string<char, std: <- Exiv2::Internal::PngChunk::parseTXTChunk(Exiv2::DataBuf const&,
+id:000077,sig:06,src:003950,time:27479921,execs:11891612,op:havoc,rep:2	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000078,sig:06,src:003950,time:28263751,execs:12265625,op:havoc,rep:8	06	asan	heap-buffer-overflow	26c395b344	Exiv2::l2Data(unsigned char*, <- long Exiv2: <- Exiv2::ValueType<int>::copy(unsigned char*,
+id:000079,sig:06,src:004435,time:30124627,execs:13274966,op:havoc,rep:4	06	no-crash			
+id:000080,sig:06,src:004504,time:31406151,execs:13914957,op:havoc,rep:4	06	asan	heap-buffer-overflow	bd620f81f4	Exiv2::RafImage::readMetadata() rafimage.cpp:307 <- Action::Print::printSummary() actions.cpp:289 <- Action::Print::run(std::__cxx11::basic_string<char, std:
+id:000081,sig:06,src:004554,time:34583974,execs:15431187,op:quick,pos:1865	06	no-crash			
+id:000082,sig:06,src:004493,time:36720520,execs:16439644,op:havoc,rep:7	06	no-crash			
+id:000083,sig:06,src:003950,time:47678104,execs:21007060,op:havoc,rep:1	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000084,sig:06,src:003950,time:53337683,execs:23219188,op:havoc,rep:4	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000085,sig:06,src:003950,time:59022983,execs:25638918,op:havoc,rep:3	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000086,sig:06,src:003950,time:61897827,execs:26904777,op:havoc,rep:4	06	asan	ABRT	fdb798c62f	pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)
+id:000087,sig:06,src:003343,time:69533014,execs:30024114,op:its,rep:1	06	no-crash			
+id:000088,sig:06,src:003521,time:69659316,execs:30112912,op:its,rep:4	06	no-crash			
+id:000089,sig:06,src:004881,time:72660104,execs:31192374,op:quick,pos:12	06	no-crash			
+id:000090,sig:06,src:004883,time:72679390,execs:31200191,op:quick,pos:12	06	no-crash			
+id:000091,sig:06,src:004882,time:72687863,execs:31203513,op:quick,pos:12	06	no-crash			
+id:000092,sig:06,src:004893,time:77104706,execs:33203066,op:havoc,rep:1	06	no-crash			
+id:000093,sig:06,src:003519,time:81019460,execs:35108242,op:its,rep:1	06	no-crash			
+id:000094,sig:06,src:004956,time:81783065,execs:35500494,op:inf,rep:3	06	asan	stack-buffer-overflow	9da0b871ee	MemcmpInterceptorCommon(void*, int <- bcmp exiv2.asan+0x29abf9) <- Exiv2::WebPImage::getHeaderOffset(unsigned char*,
+id:000095,sig:06,src:001095,time:84727260,execs:36826942,op:havoc,rep:2	06	timeout			
+id:000096,sig:06,src:004964,time:86120529,execs:37465508,op:havoc,rep:1	06	asan	stack-buffer-overflow	9da0b871ee	MemcmpInterceptorCommon(void*, int <- bcmp exiv2.asan+0x29abf9) <- Exiv2::WebPImage::getHeaderOffset(unsigned char*,

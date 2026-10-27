@@ -1,0 +1,22 @@
+{
+ "campaign": "B-imginfo-afl432-r5",
+ "program": "imginfo",
+ "arm": "afl432",
+ "rep": 5,
+ "crash_files": 2,
+ "outcomes": {
+  "asan": 2
+ },
+ "unique_bugs": 1,
+ "unique_bugs_fn": 1,
+ "buckets_fn": [
+  "ABRT | pthread_kill <- gsignal <- abort"
+ ],
+ "buckets": [
+  {
+   "bucket": "fdb798c62f",
+   "key": "ABRT | pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)",
+   "count": 2
+  }
+ ]
+}

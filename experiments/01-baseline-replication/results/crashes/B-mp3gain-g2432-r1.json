@@ -1,0 +1,33 @@
+{
+ "campaign": "B-mp3gain-g2432-r1",
+ "program": "mp3gain",
+ "arm": "g2432",
+ "rep": 1,
+ "crash_files": 31,
+ "outcomes": {
+  "asan": 31
+ },
+ "unique_bugs": 3,
+ "unique_bugs_fn": 2,
+ "buckets_fn": [
+  "global-buffer-overflow | III_dequantize_sample <- do_layer3 <- decodeMP3",
+  "stack-buffer-overflow | filterYule <- AnalyzeSamples <- main"
+ ],
+ "buckets": [
+  {
+   "bucket": "bd3b7a7584",
+   "key": "stack-buffer-overflow | filterYule gain_analysis.c:195 <- AnalyzeSamples gain_analysis.c:344 <- main mp3gain.c:2281",
+   "count": 21
+  },
+  {
+   "bucket": "85d2326158",
+   "key": "global-buffer-overflow | III_dequantize_sample layer3.c:904 <- do_layer3 layer3.c:1630 <- decodeMP3 interface.c:643",
+   "count": 6
+  },
+  {
+   "bucket": "ec1f182061",
+   "key": "global-buffer-overflow | III_dequantize_sample layer3.c:904 <- do_layer3 layer3.c:1646 <- decodeMP3 interface.c:643",
+   "count": 4
+  }
+ ]
+}

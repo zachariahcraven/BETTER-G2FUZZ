@@ -1,0 +1,52 @@
+{
+ "campaign": "B-jhead-afl432-r3",
+ "program": "jhead",
+ "arm": "afl432",
+ "rep": 3,
+ "crash_files": 63,
+ "outcomes": {
+  "asan": 63
+ },
+ "unique_bugs": 6,
+ "unique_bugs_fn": 6,
+ "buckets_fn": [
+  "SEGV | show_IPTC <- ProcessFile <- main",
+  "heap-buffer-overflow | Get16u <- ProcessExifDir <- ProcessExifDir",
+  "heap-buffer-overflow | Get32s <- Get32u <- process_EXIF",
+  "heap-buffer-overflow | MemcmpInterceptorCommon(void*, <- bcmp <- ReadJpegSections",
+  "heap-buffer-overflow | process_DHT <- ReadJpegSections <- ReadJpegFile",
+  "heap-buffer-overflow | process_SOFn <- ReadJpegSections <- ReadJpegFile"
+ ],
+ "buckets": [
+  {
+   "bucket": "653c1ece6a",
+   "key": "SEGV | show_IPTC iptc.c:122 <- ProcessFile jhead.c:946 <- main jhead.c:1730",
+   "count": 48
+  },
+  {
+   "bucket": "93986022e6",
+   "key": "heap-buffer-overflow | Get32s exif.c:336 <- Get32u exif.c:364 <- process_EXIF exif.c:1020",
+   "count": 8
+  },
+  {
+   "bucket": "04f0aa20e2",
+   "key": "heap-buffer-overflow | process_SOFn jpgfile.c:81 <- ReadJpegSections jpgfile.c:329 <- ReadJpegFile jpgfile.c:375",
+   "count": 2
+  },
+  {
+   "bucket": "54a0a093d8",
+   "key": "heap-buffer-overflow | Get16u exif.c:323 <- ProcessExifDir exif.c:476 <- ProcessExifDir exif.c:936",
+   "count": 2
+  },
+  {
+   "bucket": "6c35546140",
+   "key": "heap-buffer-overflow | process_DHT jpgqguess.c:188 <- ReadJpegSections jpgfile.c:228 <- ReadJpegFile jpgfile.c:375",
+   "count": 2
+  },
+  {
+   "bucket": "ad9c1fb2bd",
+   "key": "heap-buffer-overflow | MemcmpInterceptorCommon(void*, int <- bcmp jhead.asan+0x46a49) <- ReadJpegSections jpgfile.c:251",
+   "count": 1
+  }
+ ]
+}

@@ -1,0 +1,5 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:11,src:001608,time:8831498,execs:10188976,op:havoc,rep:15	11	asan	SEGV	fde7652561	free imginfo.asan+0xd311b) <- jp2_cdef_destroy jp2_cod.c:230 <- jp2_box_destroy jp2_cod.c:212
+id:000001,sig:11,src:001608,time:8833680,execs:10193222,op:havoc,rep:16	11	asan	SEGV	fde7652561	free imginfo.asan+0xd311b) <- jp2_cdef_destroy jp2_cod.c:230 <- jp2_box_destroy jp2_cod.c:212
+id:000002,sig:11,src:001616,time:8873127,execs:10261351,op:havoc,rep:8	11	asan	SEGV	fde7652561	free imginfo.asan+0xd311b) <- jp2_cdef_destroy jp2_cod.c:230 <- jp2_box_destroy jp2_cod.c:212
+id:000003,sig:11,src:001618,time:15937593,execs:21187299,op:havoc,rep:4	11	asan	SEGV	fde7652561	free imginfo.asan+0xd311b) <- jp2_cdef_destroy jp2_cod.c:230 <- jp2_box_destroy jp2_cod.c:212

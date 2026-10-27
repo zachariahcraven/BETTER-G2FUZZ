@@ -1,0 +1,24 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:05,src:000100,time:6986,execs:7759,op:havoc,rep:3	05	no-crash			
+id:000001,sig:05,src:000100,time:11427,execs:12001,op:havoc,rep:2	05	no-crash			
+id:000002,sig:05,src:000206,time:15385,execs:15370,op:havoc,rep:13	05	no-crash			
+id:000003,sig:05,src:000206,time:15571,execs:15499,op:havoc,rep:15	05	no-crash			
+id:000004,sig:05,src:000206,time:23274,execs:20117,op:havoc,rep:2	05	no-crash			
+id:000005,sig:11,src:000206,time:42069,execs:32459,op:havoc,rep:10	11	no-crash			
+id:000006,sig:05,src:000206,time:75915,execs:54683,op:havoc,rep:3	05	no-crash			
+id:000007,sig:05,src:000042,time:155572,execs:123561,op:havoc,rep:2	05	no-crash			
+id:000008,sig:05,src:000140,time:176495,execs:138831,op:quick,pos:120,val:+3	05	no-crash			
+id:000009,sig:11,src:000140,time:178872,execs:139858,op:flip1,pos:121	11	asan	heap-buffer-overflow	a0c233833d	OneLine32 io-ico.c:596 <- OneLine io-ico.c:807 <- gdk_pixbuf__ico_image_load_increment io-ico.c:898
+id:000010,sig:11,src:000140,time:179160,execs:139946,op:flip1,pos:14071	11	asan	heap-buffer-overflow	a0c233833d	OneLine32 io-ico.c:596 <- OneLine io-ico.c:807 <- gdk_pixbuf__ico_image_load_increment io-ico.c:898
+id:000011,sig:11,src:000140,time:193102,execs:146189,op:int32,pos:94,val:+2147483647	11	asan	SEGV	9f18212c7d	DecodeHeader io-ico.c:322 <- gdk_pixbuf__ico_image_load_increment io-ico.c:905 <- gdk_pixbuf_loader_write gdk-pixbuf-loader.c:523
+id:000012,sig:05,src:000140,time:193592,execs:146269,op:int32,pos:122,val:be:+32767	05	no-crash			
+id:000013,sig:11,src:000034,time:214858,execs:161730,op:havoc,rep:2	11	asan	heap-buffer-overflow	9cc279e5bb	DoCompressed io-bmp.c:1060 <- gdk_pixbuf__bmp_image_load_increment io-bmp.c:1251 <- generic_load_incrementally gdk-pixbuf-io.c:998
+id:000014,sig:05,src:000152,time:238215,execs:175955,op:havoc,rep:4	05	no-crash			
+id:000015,sig:05,src:000283,time:274433,execs:202936,op:havoc,rep:3	05	asan	allocation-size-too-big	c4abdfa3c3	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gif_get_lzw io-gif.c:854
+id:000016,sig:05,src:000360,time:312146,execs:225648,op:havoc,rep:16	05	no-crash			
+id:000017,sig:11,src:000141,time:428591,execs:276657,op:inf,rep:9	11	asan	heap-buffer-overflow	05d67b2282	gdk_pixbuf_from_pixdata gdk-pixdata.c:479 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000018,sig:11,src:000894,time:496128,execs:308476,op:quick,pos:13,val:+2	11	asan	heap-buffer-overflow	3d961589f0	gdk_pixbuf_from_pixdata gdk-pixdata.c:472 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000019,sig:11,src:001785,time:2569308,execs:1555797,op:havoc,rep:2	11	asan	heap-buffer-overflow	0552500b0d	OneLine32 io-bmp.c:764 <- OneLine io-bmp.c:976 <- gdk_pixbuf__bmp_image_load_increment io-bmp.c:1250
+id:000020,sig:11,src:002323,time:5017729,execs:2907915,op:havoc,rep:8	11	asan	heap-buffer-overflow	1b6571651a	DoCompressed io-bmp.c:1060 <- gdk_pixbuf__bmp_image_load_increment io-bmp.c:1251 <- gdk_pixbuf_loader_load_module gdk-pixbuf-loader.c:445
+id:000021,sig:11,src:002813,time:8906866,execs:4930977,op:havoc,rep:2	11	asan	heap-buffer-overflow	0552500b0d	OneLine32 io-bmp.c:764 <- OneLine io-bmp.c:976 <- gdk_pixbuf__bmp_image_load_increment io-bmp.c:1250
+id:000022,sig:11,src:001527,time:10928158,execs:5948838,op:havoc,rep:2	11	asan	heap-buffer-overflow	0552500b0d	OneLine32 io-bmp.c:764 <- OneLine io-bmp.c:976 <- gdk_pixbuf__bmp_image_load_increment io-bmp.c:1250

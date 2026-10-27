@@ -1,0 +1,62 @@
+{
+ "campaign": "B-gdk-pixbuf-pixdata-g2503-r5",
+ "program": "gdk-pixbuf-pixdata",
+ "arm": "g2503",
+ "rep": 5,
+ "crash_files": 26,
+ "outcomes": {
+  "asan": 9,
+  "no-crash": 17
+ },
+ "unique_bugs": 8,
+ "unique_bugs_fn": 5,
+ "buckets_fn": [
+  "allocation-size-too-big | malloc <- gdk_pixbuf_new <- DecodeHeader",
+  "heap-buffer-overflow | DoCompressed <- gdk_pixbuf__bmp_image_load_increment <- gdk_pixbuf_loader_load_module",
+  "heap-buffer-overflow | DoCompressed <- gdk_pixbuf__bmp_image_load_increment <- generic_load_incrementally",
+  "heap-buffer-overflow | OneLine32 <- OneLine <- gdk_pixbuf__ico_image_load_increment",
+  "heap-buffer-overflow | gdk_pixbuf_from_pixdata <- try_load <- pixdata_image_load_increment"
+ ],
+ "buckets": [
+  {
+   "bucket": "3d961589f0",
+   "key": "heap-buffer-overflow | gdk_pixbuf_from_pixdata gdk-pixdata.c:472 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152",
+   "count": 2
+  },
+  {
+   "bucket": "9cc279e5bb",
+   "key": "heap-buffer-overflow | DoCompressed io-bmp.c:1060 <- gdk_pixbuf__bmp_image_load_increment io-bmp.c:1251 <- generic_load_incrementally gdk-pixbuf-io.c:998",
+   "count": 1
+  },
+  {
+   "bucket": "abd3b450c1",
+   "key": "allocation-size-too-big | malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-ico.c:479",
+   "count": 1
+  },
+  {
+   "bucket": "a0c233833d",
+   "key": "heap-buffer-overflow | OneLine32 io-ico.c:596 <- OneLine io-ico.c:807 <- gdk_pixbuf__ico_image_load_increment io-ico.c:898",
+   "count": 1
+  },
+  {
+   "bucket": "05d67b2282",
+   "key": "heap-buffer-overflow | gdk_pixbuf_from_pixdata gdk-pixdata.c:479 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152",
+   "count": 1
+  },
+  {
+   "bucket": "4a9bdccbef",
+   "key": "heap-buffer-overflow | gdk_pixbuf_from_pixdata gdk-pixdata.c:506 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152",
+   "count": 1
+  },
+  {
+   "bucket": "1d8fbc906d",
+   "key": "allocation-size-too-big | malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-bmp.c",
+   "count": 1
+  },
+  {
+   "bucket": "a8f6384324",
+   "key": "heap-buffer-overflow | DoCompressed io-bmp.c:1109 <- gdk_pixbuf__bmp_image_load_increment io-bmp.c:1251 <- gdk_pixbuf_loader_load_module gdk-pixbuf-loader.c:445",
+   "count": 1
+  }
+ ]
+}

@@ -1,0 +1,43 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:05,src:000031,time:41138,execs:24225,op:trim,rep:2	05	no-crash			
+id:000001,sig:05,src:000031,time:41365,execs:24231,op:trim,rep:2	05	no-crash			
+id:000002,sig:05,src:000031,time:42495,execs:24836,op:havoc,rep:12	05	no-crash			
+id:000003,sig:05,src:000031,time:44042,execs:25918,op:havoc,rep:6	05	no-crash			
+id:000004,sig:05,src:000031,time:49332,execs:30678,op:havoc,rep:7	05	no-crash			
+id:000005,sig:05,src:000032,time:57192,execs:37510,op:trim,rep:13	05	no-crash			
+id:000006,sig:05,src:000032,time:57431,execs:37516,op:trim,rep:13	05	no-crash			
+id:000007,sig:05,src:000033,time:58962,execs:38738,op:trim,rep:2	05	no-crash			
+id:000008,sig:05,src:000033,time:59139,execs:38744,op:trim,rep:2	05	no-crash			
+id:000009,sig:05,src:000033,time:59313,execs:38747,op:trim,rep:2	05	no-crash			
+id:000010,sig:05,src:000044,time:70711,execs:50731,op:havoc,rep:8	05	no-crash			
+id:000011,sig:05,src:000045,time:117211,execs:97915,op:havoc,rep:10	05	no-crash			
+id:000012,sig:05,src:000045,time:117619,execs:98114,op:havoc,rep:10	05	no-crash			
+id:000013,sig:05,src:000045,time:123611,execs:103443,op:havoc,rep:11	05	no-crash			
+id:000014,sig:05,src:000045,time:125264,execs:104700,op:havoc,rep:11	05	no-crash			
+id:000015,sig:05,src:000062,time:156003,execs:135019,op:havoc,rep:14	05	no-crash			
+id:000016,sig:05,src:000064,time:161105,execs:140465,op:trim,rep:7	05	no-crash			
+id:000017,sig:05,src:000064,time:161833,execs:140771,op:colorization,rep:7	05	no-crash			
+id:000018,sig:05,src:000064,time:162504,execs:141056,op:havoc,rep:9	05	no-crash			
+id:000019,sig:11,src:000064,time:171331,execs:147078,op:havoc,rep:10	11	no-crash			
+id:000020,sig:05,src:000065,time:181856,execs:154243,op:trim,rep:1	05	no-crash			
+id:000021,sig:05,src:000066,time:184368,execs:156228,op:trim,rep:2	05	no-crash			
+id:000022,sig:05,src:000067,time:187217,execs:158595,op:trim,rep:2	05	no-crash			
+id:000023,sig:11,src:000128,time:231882,execs:200700,op:trim,rep:14	11	asan	heap-buffer-overflow	05d67b2282	gdk_pixbuf_from_pixdata gdk-pixdata.c:479 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000024,sig:11,src:000129,time:255944,execs:220773,op:trim,rep:2	11	asan	heap-buffer-overflow	4a9bdccbef	gdk_pixbuf_from_pixdata gdk-pixdata.c:506 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000025,sig:05,src:000956,time:841792,execs:411744,op:trim,rep:4	05	no-crash			
+id:000026,sig:05,src:000901,time:1014908,execs:577717,op:trim,rep:2	05	no-crash			
+id:000027,sig:05,src:000901,time:1015155,execs:577753,op:colorization,rep:2	05	no-crash			
+id:000028,sig:05,src:000900,time:1016134,execs:578512,op:colorization,rep:2	05	no-crash			
+id:000029,sig:05,src:000898,time:1019981,execs:581609,op:havoc,rep:8	05	no-crash			
+id:000030,sig:05,src:000885,time:1075221,execs:620742,op:havoc,rep:14	05	no-crash			
+id:000031,sig:05,src:000286,time:1086822,execs:629855,op:trim,rep:1	05	no-crash			
+id:000032,sig:05,src:000289,time:1087420,execs:630254,op:havoc,rep:8	05	no-crash			
+id:000033,sig:05,src:000300,time:1087798,execs:630453,op:colorization,rep:4	05	no-crash			
+id:000034,sig:05,src:000309,time:1090208,execs:632344,op:colorization,rep:15	05	no-crash			
+id:000035,sig:05,src:001170,time:1091359,execs:633207,op:havoc,rep:1	05	no-crash			
+id:000036,sig:05,src:000554,time:1205938,execs:735515,op:havoc,rep:11	05	no-crash			
+id:000037,sig:05,src:000727,time:1222481,execs:750743,op:quick,pos:120,val:+1	05	no-crash			
+id:000038,sig:11,src:000793,time:1257881,execs:772308,op:havoc,rep:4	11	asan	heap-buffer-overflow	3d961589f0	gdk_pixbuf_from_pixdata gdk-pixdata.c:472 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000039,sig:11,src:000793,time:1259692,execs:773260,op:havoc,rep:3	11	asan	heap-buffer-overflow	3d961589f0	gdk_pixbuf_from_pixdata gdk-pixdata.c:472 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000040,sig:11,src:000793,time:1266961,execs:778051,op:havoc,rep:2	11	asan	heap-buffer-overflow	3d961589f0	gdk_pixbuf_from_pixdata gdk-pixdata.c:472 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000041,sig:11,src:002185,time:5277220,execs:3134555,op:havoc,rep:3	11	asan	heap-buffer-overflow	9cc279e5bb	DoCompressed io-bmp.c:1060 <- gdk_pixbuf__bmp_image_load_increment io-bmp.c:1251 <- generic_load_incrementally gdk-pixbuf-io.c:998

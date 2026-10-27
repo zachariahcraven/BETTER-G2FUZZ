@@ -1,0 +1,11 @@
+program	g2_gpt35_cov	g2_gpt35_bugs	g2_gpt4_cov	g2_gpt4_bugs	afl_cmplog_cov	afl_cmplog_bugs
+exiv2	5099	31	5171	28	4965	26
+ffmpeg	31706	0	34218	1	22099	0
+flvmeta	228	4	228	4	228	4
+gdk-pixbuf-pixdata	2958	6	2327	2	2172	5
+imginfo	2839	0	3825	0	2189	0
+jhead	315	13	491	23	445	21
+mp3gain	921	11	921	12	923	11
+mp42aac	2067	17	2700	14	2091	13
+pdftotext	8265	43	7921	49	7434	25
+tiffsplit	1817	7	1840	10	1659	6

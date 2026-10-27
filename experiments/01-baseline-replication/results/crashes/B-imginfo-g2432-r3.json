@@ -1,0 +1,22 @@
+{
+ "campaign": "B-imginfo-g2432-r3",
+ "program": "imginfo",
+ "arm": "g2432",
+ "rep": 3,
+ "crash_files": 11,
+ "outcomes": {
+  "asan": 11
+ },
+ "unique_bugs": 1,
+ "unique_bugs_fn": 1,
+ "buckets_fn": [
+  "ABRT | pthread_kill <- gsignal <- abort"
+ ],
+ "buckets": [
+  {
+   "bucket": "fdb798c62f",
+   "key": "ABRT | pthread_kill libc.so.6+0x969bc) <- gsignal libc.so.6+0x42475) <- abort libc.so.6+0x287f2)",
+   "count": 11
+  }
+ ]
+}

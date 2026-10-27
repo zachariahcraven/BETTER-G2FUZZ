@@ -1,0 +1,36 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:05,src:000011,time:219676,execs:65784,op:havoc,rep:1	05	no-crash			
+id:000001,sig:05,src:000021,time:265607,execs:99995,op:havoc,rep:4	05	no-crash			
+id:000002,sig:11,src:000023,time:279774,execs:108740,op:trim,rep:2	11	asan	heap-buffer-overflow	05d67b2282	gdk_pixbuf_from_pixdata gdk-pixdata.c:479 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000003,sig:11,src:000024,time:311712,execs:129699,op:trim,rep:1	11	asan	heap-buffer-overflow	4a9bdccbef	gdk_pixbuf_from_pixdata gdk-pixdata.c:506 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000004,sig:05,src:000233,time:859852,execs:282955,op:havoc,rep:2	05	no-crash			
+id:000005,sig:05,src:000354,time:912533,execs:320730,op:quick,pos:38153,val:+2	05	no-crash			
+id:000006,sig:05,src:000354,time:918834,execs:322707,op:int32,pos:38155,val:be:+32767	05	no-crash			
+id:000007,sig:05,src:000372,time:926842,execs:328633,op:havoc,rep:3	05	no-crash			
+id:000008,sig:05,src:000395,time:941414,execs:337424,op:quick,pos:120,val:+6	05	no-crash			
+id:000009,sig:11,src:000463,time:1010429,execs:374661,op:trim,rep:1	11	asan	heap-buffer-overflow	3d961589f0	gdk_pixbuf_from_pixdata gdk-pixdata.c:472 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000010,sig:11,src:000619,time:1103545,execs:431409,op:havoc,rep:1	11	asan	SEGV	65d88aca7f	pixops_scale_nearest pixops.c:332 <- _pixops_scale_real pixops.c:2191 <- _pixops_scale pixops.c:2269
+id:000011,sig:05,src:001046,time:1828348,execs:700171,op:havoc,rep:6	05	no-crash			
+id:000012,sig:05,src:001046,time:1829063,execs:700515,op:havoc,rep:5	05	no-crash			
+id:000013,sig:05,src:001046,time:1831682,execs:702191,op:havoc,rep:2	05	no-crash			
+id:000014,sig:05,src:001054,time:1918247,execs:748871,op:havoc,rep:5	05	no-crash			
+id:000015,sig:05,src:001062,time:2462960,execs:984946,op:havoc,rep:1	05	no-crash			
+id:000016,sig:05,src:001062,time:2732124,execs:1110206,op:havoc,rep:13	05	no-crash			
+id:000017,sig:11,src:001165,time:3300113,execs:1317297,op:trim,rep:1	11	asan	heap-buffer-overflow	3d961589f0	gdk_pixbuf_from_pixdata gdk-pixdata.c:472 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000018,sig:11,src:001442,time:3834959,execs:1572444,op:havoc,rep:2	11	no-crash			
+id:000019,sig:05,src:001445,time:4200054,execs:1734475,op:havoc,rep:7	05	signal:5			
+id:000020,sig:05,src:001277,time:4671990,execs:1962360,op:havoc,rep:7	05	no-crash			
+id:000021,sig:05,src:001532,time:4782895,execs:2009850,op:havoc,rep:14	05	no-crash			
+id:000022,sig:05,src:001775,time:5840777,execs:2517061,op:int16,pos:66,val:be:-128	05	no-crash			
+id:000023,sig:05,src:001775,time:5853108,execs:2525417,op:havoc,rep:5	05	no-crash			
+id:000024,sig:05,src:001804,time:6201886,execs:2712538,op:havoc,rep:2	05	signal:5			
+id:000025,sig:05,src:001978,time:8067325,execs:3265703,op:havoc,rep:2	05	no-crash			
+id:000026,sig:11,src:002028,time:9621708,execs:3865488,op:havoc,rep:2	11	asan	heap-buffer-overflow	993f254afd	gdk_pixbuf__qtif_image_load_increment io-qtif.c:437 <- gdk_pixbuf_loader_write gdk-pixbuf-loader.c:523 <- gdk_pixbuf__qtif_image_load io-qtif.c:205
+id:000027,sig:05,src:002235,time:11668266,execs:4691074,op:havoc,rep:14	05	no-crash			
+id:000028,sig:11,src:001570,time:11826554,execs:4766070,op:havoc,rep:1	11	asan	SEGV	110d584621	gdk_pixbuf__qtif_image_load_increment io-qtif.c:437 <- gdk_pixbuf_loader_write gdk-pixbuf-loader.c:523 <- gdk_pixbuf__qtif_image_load io-qtif.c:205
+id:000029,sig:05,src:000430,time:15147562,execs:5809083,op:havoc,rep:8	05	no-crash			
+id:000030,sig:05,src:002136,time:15426886,execs:5931554,op:havoc,rep:2	05	no-crash			
+id:000031,sig:11,src:002543,time:19509184,execs:7620691,op:arith16,pos:4,val:be:-29	11	asan	heap-buffer-overflow	4f7c808a92	read_pixel_1 io-pcx.c <- pcx_increment_load_data_1 io-pcx.c:318 <- gdk_pixbuf__pcx_load_increment io-pcx.c:675
+id:000032,sig:11,src:002563,time:19918244,execs:7897330,op:trim,rep:2	11	asan	heap-buffer-overflow	90a09119ea	pcx_increment_load_data_8 io-pcx.c:450 <- gdk_pixbuf__pcx_load_increment io-pcx.c:684 <- generic_load_incrementally gdk-pixbuf-io.c:998
+id:000033,sig:11,src:002563,time:19919604,execs:7898070,op:havoc,rep:11	11	asan	heap-buffer-overflow	90a09119ea	pcx_increment_load_data_8 io-pcx.c:450 <- gdk_pixbuf__pcx_load_increment io-pcx.c:684 <- generic_load_incrementally gdk-pixbuf-io.c:998
+id:000034,sig:11,src:002118,time:20136803,execs:8022455,op:havoc,rep:1	11	asan	SEGV	a864624c7f	DecodeHeader io-ico.c:322 <- gdk_pixbuf__ico_image_load_increment io-ico.c:905 <- generic_load_incrementally gdk-pixbuf-io.c:998

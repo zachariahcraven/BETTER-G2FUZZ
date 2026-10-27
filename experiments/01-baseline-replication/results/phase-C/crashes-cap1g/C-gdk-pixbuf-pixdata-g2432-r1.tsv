@@ -1,0 +1,171 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:05,src:000012,time:483,execs:1579,op:havoc,rep:5	05	no-crash			
+id:000001,sig:05,src:000012,time:749,execs:1753,op:havoc,rep:4	05	no-crash			
+id:000002,sig:05,src:000012,time:26712,execs:29494,op:havoc,rep:1	05	no-crash			
+id:000003,sig:05,src:000012,time:36561,execs:40160,op:havoc,rep:12	05	no-crash			
+id:000004,sig:05,src:000121,time:104215,execs:103441,op:flip1,pos:120	05	no-crash			
+id:000005,sig:11,src:000121,time:104423,execs:103450,op:flip1,pos:121	11	asan	heap-buffer-overflow	a0c233833d	OneLine32 io-ico.c:596 <- OneLine io-ico.c:807 <- gdk_pixbuf__ico_image_load_increment io-ico.c:898
+id:000006,sig:11,src:000121,time:104711,execs:103555,op:flip1,pos:14071	11	asan	heap-buffer-overflow	a0c233833d	OneLine32 io-ico.c:596 <- OneLine io-ico.c:807 <- gdk_pixbuf__ico_image_load_increment io-ico.c:898
+id:000007,sig:05,src:000121,time:116914,execs:109831,op:int32,pos:122,val:be:+32767	05	no-crash			
+id:000008,sig:05,src:000263,time:139721,execs:132370,op:havoc,rep:3	05	no-crash			
+id:000009,sig:05,src:000263,time:142862,execs:134916,op:havoc,rep:6	05	no-crash			
+id:000010,sig:05,src:000263,time:143243,execs:135257,op:havoc,rep:5	05	no-crash			
+id:000011,sig:05,src:000042,time:178278,execs:168213,op:havoc,rep:16	05	asan	allocation-size-too-big	c4abdfa3c3	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gif_get_lzw io-gif.c:854
+id:000012,sig:05,src:000619,time:184839,execs:174877,op:quick,pos:50,val:+16	05	no-crash			
+id:000013,sig:05,src:000619,time:185471,execs:175411,op:havoc,rep:2	05	asan	allocation-size-too-big	c4abdfa3c3	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gif_get_lzw io-gif.c:854
+id:000014,sig:11,src:000122,time:254490,execs:241171,op:inf,rep:16	11	asan	heap-buffer-overflow	05d67b2282	gdk_pixbuf_from_pixdata gdk-pixdata.c:479 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000015,sig:11,src:000122,time:294477,execs:268249,op:havoc,rep:7	11	asan	heap-buffer-overflow	3d961589f0	gdk_pixbuf_from_pixdata gdk-pixdata.c:472 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000016,sig:05,src:000128,time:325924,execs:291223,op:havoc,rep:6	05	no-crash			
+id:000017,sig:05,src:000528,time:389036,execs:352034,op:havoc,rep:3	05	no-crash			
+id:000018,sig:05,src:000673,time:456475,execs:409062,op:havoc,rep:13	05	no-crash			
+id:000019,sig:05,src:000673,time:458340,execs:410575,op:havoc,rep:9	05	no-crash			
+id:000020,sig:05,src:000673,time:459789,execs:411709,op:havoc,rep:12	05	no-crash			
+id:000021,sig:05,src:000673,time:461674,execs:413363,op:havoc,rep:14	05	asan	allocation-size-too-big	c4abdfa3c3	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gif_get_lzw io-gif.c:854
+id:000022,sig:05,src:000673,time:463039,execs:414640,op:havoc,rep:11	05	no-crash			
+id:000023,sig:05,src:000673,time:466813,execs:417935,op:havoc,rep:16	05	no-crash			
+id:000024,sig:05,src:000991,time:525339,execs:476531,op:havoc,rep:4	05	no-crash			
+id:000025,sig:05,src:000444,time:583588,execs:531591,op:quick,pos:124,val:+5	05	no-crash			
+id:000026,sig:05,src:000025,time:587147,execs:533652,op:colorization,rep:13	05	asan	allocation-size-too-big	1d8fbc906d	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-bmp.c
+id:000027,sig:05,src:000025,time:587828,execs:533919,op:flip2,pos:25	05	asan	allocation-size-too-big	1d8fbc906d	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-bmp.c
+id:000028,sig:05,src:000025,time:588376,execs:534008,op:arith8,pos:25,val:-2	05	no-crash			
+id:000029,sig:11,src:000025,time:619565,execs:562447,op:havoc,rep:7	11	asan	allocation-size-too-big	1d8fbc906d	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-bmp.c
+id:000030,sig:05,src:000989,time:657659,execs:596993,op:havoc,rep:7	05	no-crash			
+id:000031,sig:05,src:000989,time:659885,execs:598783,op:havoc,rep:15	05	no-crash			
+id:000032,sig:05,src:000989,time:660190,execs:599031,op:havoc,rep:14	05	no-crash			
+id:000033,sig:05,src:000989,time:667775,execs:605918,op:havoc,rep:13	05	no-crash			
+id:000034,sig:11,src:001268,time:720110,execs:650361,op:havoc,rep:2	11	asan	heap-buffer-overflow	9cc279e5bb	DoCompressed io-bmp.c:1060 <- gdk_pixbuf__bmp_image_load_increment io-bmp.c:1251 <- generic_load_incrementally gdk-pixbuf-io.c:998
+id:000035,sig:05,src:000061,time:760238,execs:671803,op:havoc,rep:15	05	no-crash			
+id:000036,sig:05,src:000061,time:760467,execs:672056,op:havoc,rep:16	05	no-crash			
+id:000037,sig:05,src:001324,time:776383,execs:686073,op:colorization,rep:15	05	asan	allocation-size-too-big	1d8fbc906d	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-bmp.c
+id:000038,sig:05,src:001331,time:810347,execs:721454,op:colorization,rep:4	05	asan	allocation-size-too-big	1db3f742b2	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__pnm_image_load_increment io-pnm.c:983
+id:000039,sig:11,src:001366,time:819453,execs:729634,op:havoc,rep:4	11	asan	SEGV	65d88aca7f	pixops_scale_nearest pixops.c:332 <- _pixops_scale_real pixops.c:2191 <- _pixops_scale pixops.c:2269
+id:000040,sig:11,src:001445,time:883475,execs:790484,op:havoc,rep:3	11	asan	heap-buffer-overflow	8f2d334d66	read_pixel_1 io-pcx.c <- pcx_increment_load_data_1 io-pcx.c:332 <- gdk_pixbuf__pcx_load_increment io-pcx.c:675
+id:000041,sig:11,src:001600,time:946866,execs:866001,op:havoc,rep:2	11	asan	heap-buffer-overflow	346d3b2824	read_pixel_4 io-pcx.c:271 <- pcx_increment_load_data_4 io-pcx.c:410 <- gdk_pixbuf__pcx_load_increment io-pcx.c:681
+id:000042,sig:11,src:001388,time:1019241,execs:939822,op:havoc,rep:1	11	asan	SEGV	65d88aca7f	pixops_scale_nearest pixops.c:332 <- _pixops_scale_real pixops.c:2191 <- _pixops_scale pixops.c:2269
+id:000043,sig:05,src:000036,time:1173376,execs:1080522,op:havoc,rep:1	05	asan	allocation-size-too-big	1d8fbc906d	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-bmp.c
+id:000044,sig:05,src:000839,time:1194590,execs:1097879,op:havoc,rep:3	05	no-crash			
+id:000045,sig:05,src:001703,time:1292745,execs:1177199,op:havoc,rep:11	05	asan	allocation-size-too-big	abd3b450c1	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-ico.c:479
+id:000046,sig:05,src:001703,time:1298859,execs:1182612,op:havoc,rep:15	05	asan	allocation-size-too-big	abd3b450c1	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-ico.c:479
+id:000047,sig:05,src:000164,time:1372643,execs:1246258,op:havoc,rep:10	05	no-crash			
+id:000048,sig:05,src:001745,time:1646889,execs:1470546,op:havoc,rep:3	05	no-crash			
+id:000049,sig:05,src:001889,time:1696302,execs:1509999,op:havoc,rep:8	05	no-crash			
+id:000050,sig:05,src:001889,time:1698238,execs:1511451,op:havoc,rep:5	05	no-crash			
+id:000051,sig:05,src:001889,time:1701544,execs:1513717,op:havoc,rep:4	05	no-crash			
+id:000052,sig:05,src:000348,time:2042424,execs:1802024,op:havoc,rep:7	05	asan	allocation-size-too-big	c4abdfa3c3	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gif_get_lzw io-gif.c:854
+id:000053,sig:11,src:001889,time:2114821,execs:1866434,op:havoc,rep:4	11	asan	SEGV	65d88aca7f	pixops_scale_nearest pixops.c:332 <- _pixops_scale_real pixops.c:2191 <- _pixops_scale pixops.c:2269
+id:000054,sig:05,src:002034,time:2118465,execs:1869161,op:colorization,rep:1	05	asan	allocation-size-too-big	1d8fbc906d	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-bmp.c
+id:000055,sig:05,src:002034,time:2120990,execs:1871218,op:havoc,rep:4	05	no-crash			
+id:000056,sig:05,src:002066,time:2271700,execs:2001067,op:havoc,rep:1	05	asan	allocation-size-too-big	1d8fbc906d	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-bmp.c
+id:000057,sig:11,src:002060,time:2316702,execs:2041181,op:havoc,rep:1	11	asan	SEGV	65d88aca7f	pixops_scale_nearest pixops.c:332 <- _pixops_scale_real pixops.c:2191 <- _pixops_scale pixops.c:2269
+id:000058,sig:11,src:001905,time:2321511,execs:2045728,op:havoc,rep:4	11	asan	SEGV	65d88aca7f	pixops_scale_nearest pixops.c:332 <- _pixops_scale_real pixops.c:2191 <- _pixops_scale pixops.c:2269
+id:000059,sig:05,src:002084,time:2438247,execs:2153118,op:havoc,rep:6	05	no-crash			
+id:000060,sig:05,src:001964,time:2455723,execs:2166678,op:havoc,rep:4	05	no-crash			
+id:000061,sig:11,src:001567,time:2617984,execs:2309756,op:havoc,rep:8	11	asan	heap-buffer-overflow	2be469a697	pcx_increment_load_data_24 io-pcx.c:527 <- gdk_pixbuf__pcx_load_increment io-pcx.c:687 <- generic_load_incrementally gdk-pixbuf-io.c:998
+id:000062,sig:11,src:002106,time:2682487,execs:2354921,op:havoc,rep:1	11	asan	SEGV	65d88aca7f	pixops_scale_nearest pixops.c:332 <- _pixops_scale_real pixops.c:2191 <- _pixops_scale pixops.c:2269
+id:000063,sig:05,src:002629,time:3119382,execs:2718907,op:havoc,rep:2	05	no-crash			
+id:000064,sig:05,src:002629,time:3119468,execs:2718995,op:havoc,rep:1	05	no-crash			
+id:000065,sig:11,src:002761,time:4149146,execs:3345271,op:havoc,rep:4	11	asan	heap-buffer-overflow	9cc279e5bb	DoCompressed io-bmp.c:1060 <- gdk_pixbuf__bmp_image_load_increment io-bmp.c:1251 <- generic_load_incrementally gdk-pixbuf-io.c:998
+id:000066,sig:11,src:002852,time:4259912,execs:3408008,op:havoc,rep:14	11	asan	SEGV	65d88aca7f	pixops_scale_nearest pixops.c:332 <- _pixops_scale_real pixops.c:2191 <- _pixops_scale pixops.c:2269
+id:000067,sig:05,src:002852,time:4271659,execs:3413166,op:havoc,rep:16	05	asan	allocation-size-too-big	c4abdfa3c3	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gif_get_lzw io-gif.c:854
+id:000068,sig:05,src:002127,time:4573587,execs:3580483,op:havoc,rep:1	05	no-crash			
+id:000069,sig:11,src:002905,time:4951680,execs:3784268,op:havoc,rep:1	11	asan	SEGV	65d88aca7f	pixops_scale_nearest pixops.c:332 <- _pixops_scale_real pixops.c:2191 <- _pixops_scale pixops.c:2269
+id:000070,sig:05,src:002049,time:5621043,execs:4183113,op:havoc,rep:2	05	no-crash			
+id:000071,sig:05,src:001330,time:5622543,execs:4184423,op:havoc,rep:1	05	no-crash			
+id:000072,sig:05,src:002075,time:6070144,execs:4471063,op:havoc,rep:3	05	no-crash			
+id:000073,sig:11,src:002865,time:6435315,execs:4710529,op:havoc,rep:13	11	asan	heap-buffer-overflow	4a9bdccbef	gdk_pixbuf_from_pixdata gdk-pixdata.c:506 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000074,sig:05,src:001323,time:6467991,execs:4737208,op:havoc,rep:2	05	no-crash			
+id:000075,sig:11,src:001762,time:6778755,execs:4950764,op:havoc,rep:2	11	no-crash			
+id:000076,sig:05,src:002274,time:7173043,execs:5244748,op:havoc,rep:5	05	asan	allocation-size-too-big	021fa9965e	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- g_malloc libglib-2.0.so.0+0x5e788) <- pixops_process pixops.c:1271
+id:000077,sig:11,src:002127,time:7194783,execs:5261316,op:havoc,rep:13	11	asan	SEGV	65d88aca7f	pixops_scale_nearest pixops.c:332 <- _pixops_scale_real pixops.c:2191 <- _pixops_scale pixops.c:2269
+id:000078,sig:05,src:001701,time:7196324,execs:5262261,op:havoc,rep:5	05	no-crash			
+id:000079,sig:11,src:001529,time:7220547,execs:5281290,op:havoc,rep:16	11	asan	heap-buffer-overflow	2be469a697	pcx_increment_load_data_24 io-pcx.c:527 <- gdk_pixbuf__pcx_load_increment io-pcx.c:687 <- generic_load_incrementally gdk-pixbuf-io.c:998
+id:000080,sig:06,src:001206,time:7291690,execs:5341678,op:havoc,rep:3	06	asan	heap-buffer-overflow	9cc279e5bb	DoCompressed io-bmp.c:1060 <- gdk_pixbuf__bmp_image_load_increment io-bmp.c:1251 <- generic_load_incrementally gdk-pixbuf-io.c:998
+id:000081,sig:05,src:001909,time:7380614,execs:5411145,op:havoc,rep:4	05	no-crash			
+id:000082,sig:05,src:002186,time:7592405,execs:5586965,op:havoc,rep:3	05	no-crash			
+id:000083,sig:05,src:001939,time:8782750,execs:6531440,op:havoc,rep:4	05	signal:5			
+id:000084,sig:11,src:000728,time:8820756,execs:6555816,op:havoc,rep:15	11	asan	heap-buffer-overflow	3d961589f0	gdk_pixbuf_from_pixdata gdk-pixdata.c:472 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000085,sig:05,src:002450,time:9192929,execs:6853679,op:havoc,rep:1	05	no-crash			
+id:000086,sig:05,src:002055,time:9225379,execs:6881170,op:havoc,rep:1	05	asan	allocation-size-too-big	1d8fbc906d	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-bmp.c
+id:000087,sig:06,src:003381,time:10524613,execs:7822263,op:havoc,rep:8	06	asan	heap-buffer-overflow	1b6571651a	DoCompressed io-bmp.c:1060 <- gdk_pixbuf__bmp_image_load_increment io-bmp.c:1251 <- gdk_pixbuf_loader_load_module gdk-pixbuf-loader.c:445
+id:000088,sig:11,src:003381,time:10525103,execs:7822598,op:havoc,rep:5	11	asan	heap-buffer-overflow	1b6571651a	DoCompressed io-bmp.c:1060 <- gdk_pixbuf__bmp_image_load_increment io-bmp.c:1251 <- gdk_pixbuf_loader_load_module gdk-pixbuf-loader.c:445
+id:000089,sig:11,src:003381,time:10525141,execs:7822628,op:havoc,rep:16	11	asan	heap-buffer-overflow	1b6571651a	DoCompressed io-bmp.c:1060 <- gdk_pixbuf__bmp_image_load_increment io-bmp.c:1251 <- gdk_pixbuf_loader_load_module gdk-pixbuf-loader.c:445
+id:000090,sig:06,src:003381,time:10747981,execs:7995751,op:havoc,rep:1	06	asan	heap-buffer-overflow	1b6571651a	DoCompressed io-bmp.c:1060 <- gdk_pixbuf__bmp_image_load_increment io-bmp.c:1251 <- gdk_pixbuf_loader_load_module gdk-pixbuf-loader.c:445
+id:000091,sig:05,src:002632,time:11006403,execs:8212383,op:havoc,rep:1	05	no-crash			
+id:000092,sig:05,src:001796,time:11557525,execs:8668492,op:havoc,rep:2	05	no-crash			
+id:000093,sig:05,src:003223,time:11726764,execs:8810885,op:quick,pos:9760,val:+14	05	asan	allocation-size-too-big	abd3b450c1	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-ico.c:479
+id:000094,sig:05,src:003213,time:12185358,execs:9188271,op:havoc,rep:12	05	no-crash			
+id:000095,sig:05,src:003532,time:12438225,execs:9400319,op:havoc,rep:5	05	asan	allocation-size-too-big	a0be9c4565	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__pcx_load_increment io-pcx.c:637
+id:000096,sig:05,src:001781,time:13614693,execs:10232631,op:havoc,rep:3	05	no-crash			
+id:000097,sig:05,src:002038,time:13837524,execs:10410502,op:havoc,rep:2	05	no-crash			
+id:000098,sig:05,src:000394,time:14359105,execs:10828516,op:quick,pos:124,val:+3	05	no-crash			
+id:000099,sig:05,src:000458,time:14406964,execs:10868992,op:quick,pos:124,val:+2	05	no-crash			
+id:000100,sig:05,src:001860,time:14454422,execs:10909955,op:quick,pos:124,val:+4	05	no-crash			
+id:000101,sig:05,src:000036,time:14519139,execs:10962398,op:havoc,rep:2	05	asan	allocation-size-too-big	1d8fbc906d	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-bmp.c
+id:000102,sig:05,src:001269,time:14568168,execs:10986362,op:havoc,rep:2	05	asan	allocation-size-too-big	1d8fbc906d	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-bmp.c
+id:000103,sig:05,src:002634,time:14581884,execs:10997214,op:havoc,rep:1	05	no-crash			
+id:000104,sig:05,src:002355,time:15095668,execs:11423968,op:havoc,rep:15	05	no-crash			
+id:000105,sig:05,src:001298,time:15095837,execs:11424104,op:havoc,rep:3	05	no-crash			
+id:000106,sig:05,src:001341,time:15170329,execs:11477770,op:havoc,rep:5	05	no-crash			
+id:000107,sig:11,src:003616,time:15502204,execs:11742101,op:colorization,rep:7	11	asan	heap-buffer-overflow	4a9bdccbef	gdk_pixbuf_from_pixdata gdk-pixdata.c:506 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000108,sig:05,src:002254,time:15583536,execs:11809713,op:havoc,rep:13	05	no-crash			
+id:000109,sig:05,src:001118,time:15585031,execs:11810945,op:havoc,rep:1	05	no-crash			
+id:000110,sig:11,src:003622,time:15724112,execs:11922087,op:havoc,rep:4	11	asan	heap-buffer-overflow	991b0e65df	gdk_pixbuf_from_pixdata gdk-pixdata.c:491 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000111,sig:05,src:001752,time:15727717,execs:11925223,op:havoc,rep:2	05	asan	allocation-size-too-big	1d8fbc906d	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-bmp.c
+id:000112,sig:05,src:003591,time:15836013,execs:12010776,op:havoc,rep:1	05	asan	allocation-size-too-big	abd3b450c1	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-ico.c:479
+id:000113,sig:11,src:000546,time:18346034,execs:13877362,op:havoc,rep:6	11	no-crash			
+id:000114,sig:05,src:002466,time:18942983,execs:14302031,op:havoc,rep:6	05	no-crash			
+id:000115,sig:05,src:002451,time:19163828,execs:14450354,op:havoc,rep:11	05	no-crash			
+id:000116,sig:05,src:000232,time:19214532,execs:14485115,op:havoc,rep:1	05	no-crash			
+id:000117,sig:11,src:003659,time:19215851,execs:14486252,op:havoc,rep:2	11	asan	SEGV	255dca9438	gdk_pixbuf__qtif_image_load_increment io-qtif.c:437 <- gdk_pixbuf_loader_load_module gdk-pixbuf-loader.c:445 <- gdk_pixbuf_loader_close gdk-pixbuf-loader.c:810
+id:000118,sig:05,src:003299,time:19376464,execs:14589237,op:havoc,rep:3	05	asan	allocation-size-too-big	a70a0032f8	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- get_contiguous_pixbuf io-tga.c:254 <- fill_in_context io-tga.c:335
+id:000119,sig:05,src:003299,time:19376537,execs:14589302,op:havoc,rep:9	05	no-crash			
+id:000120,sig:05,src:003595,time:19652063,execs:14768892,op:havoc,rep:10	05	asan	allocation-size-too-big	a70a0032f8	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- get_contiguous_pixbuf io-tga.c:254 <- fill_in_context io-tga.c:335
+id:000121,sig:11,src:002445,time:20330529,execs:15219488,op:havoc,rep:1	11	asan	heap-buffer-overflow	0552500b0d	OneLine32 io-bmp.c:764 <- OneLine io-bmp.c:976 <- gdk_pixbuf__bmp_image_load_increment io-bmp.c:1250
+id:000122,sig:11,src:003622,time:20524485,execs:15380417,op:havoc,rep:5	11	asan	heap-buffer-overflow	991b0e65df	gdk_pixbuf_from_pixdata gdk-pixdata.c:491 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000123,sig:05,src:003506,time:20604034,execs:15444151,op:havoc,rep:7	05	asan	allocation-size-too-big	a70a0032f8	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- get_contiguous_pixbuf io-tga.c:254 <- fill_in_context io-tga.c:335
+id:000124,sig:11,src:003381,time:21219883,execs:15920411,op:havoc,rep:7	11	asan	heap-buffer-overflow	1b6571651a	DoCompressed io-bmp.c:1060 <- gdk_pixbuf__bmp_image_load_increment io-bmp.c:1251 <- gdk_pixbuf_loader_load_module gdk-pixbuf-loader.c:445
+id:000125,sig:05,src:003023,time:22013217,execs:16476230,op:havoc,rep:2	05	no-crash			
+id:000126,sig:05,src:003688,time:24917420,execs:18561426,op:havoc,rep:5	05	no-crash			
+id:000127,sig:05,src:000500,time:25516316,execs:19039057,op:havoc,rep:11	05	no-crash			
+id:000128,sig:05,src:003538,time:27819543,execs:20702726,op:havoc,rep:2	05	no-crash			
+id:000129,sig:05,src:003324,time:30574119,execs:22682200,op:havoc,rep:11	05	asan	allocation-size-too-big	a70a0032f8	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- get_contiguous_pixbuf io-tga.c:254 <- fill_in_context io-tga.c:335
+id:000130,sig:05,src:003372,time:32421695,execs:24067515,op:havoc,rep:10	05	asan	allocation-size-too-big	021fa9965e	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- g_malloc libglib-2.0.so.0+0x5e788) <- pixops_process pixops.c:1271
+id:000131,sig:11,src:003616,time:35661702,execs:26576641,op:havoc,rep:4	11	asan	heap-buffer-overflow	4a9bdccbef	gdk_pixbuf_from_pixdata gdk-pixdata.c:506 <- try_load io-pixdata.c:83 <- pixdata_image_load_increment io-pixdata.c:152
+id:000132,sig:05,src:002856,time:38510303,execs:28766832,op:havoc,rep:13	05	no-crash			
+id:000133,sig:05,src:001180,time:38673487,execs:28878974,op:havoc,rep:13	05	asan	allocation-size-too-big	1db3f742b2	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__pnm_image_load_increment io-pnm.c:983
+id:000134,sig:11,src:003607,time:39457704,execs:29441228,op:havoc,rep:1	11	asan	SEGV	65d88aca7f	pixops_scale_nearest pixops.c:332 <- _pixops_scale_real pixops.c:2191 <- _pixops_scale pixops.c:2269
+id:000135,sig:05,src:001339,time:40441883,execs:30237520,op:havoc,rep:7	05	no-crash			
+id:000136,sig:05,src:002096,time:47021218,execs:34532946,op:havoc,rep:2	05	asan	allocation-size-too-big	1d8fbc906d	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-bmp.c
+id:000137,sig:05,src:003852,time:53432173,execs:38747618,op:havoc,rep:4	05	no-crash			
+id:000138,sig:05,src:003109,time:53490426,execs:38796853,op:havoc,rep:5	05	no-crash			
+id:000139,sig:05,src:001141,time:53540718,execs:38837853,op:havoc,rep:14	05	asan	allocation-size-too-big	1d8fbc906d	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- DecodeHeader io-bmp.c
+id:000140,sig:05,src:003872,time:59676321,execs:43070417,op:havoc,rep:4	05	asan	allocation-size-too-big	8583c1a6c2	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__wbmp_image_load_increment io-wbmp.c:266
+id:000141,sig:05,src:003872,time:59676333,execs:43070420,op:havoc,rep:4	05	asan	allocation-size-too-big	8583c1a6c2	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__wbmp_image_load_increment io-wbmp.c:266
+id:000142,sig:05,src:003872,time:59676375,execs:43070438,op:havoc,rep:1	05	asan	allocation-size-too-big	8583c1a6c2	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__wbmp_image_load_increment io-wbmp.c:266
+id:000143,sig:05,src:003872,time:59676461,execs:43070468,op:havoc,rep:2	05	asan	allocation-size-too-big	8583c1a6c2	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__wbmp_image_load_increment io-wbmp.c:266
+id:000144,sig:05,src:003872,time:59676472,execs:43070471,op:havoc,rep:2	05	asan	allocation-size-too-big	8583c1a6c2	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__wbmp_image_load_increment io-wbmp.c:266
+id:000145,sig:05,src:003872,time:59677106,execs:43070737,op:havoc,rep:4	05	asan	allocation-size-too-big	8583c1a6c2	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__wbmp_image_load_increment io-wbmp.c:266
+id:000146,sig:05,src:003872,time:59677240,execs:43070784,op:havoc,rep:2	05	asan	allocation-size-too-big	8583c1a6c2	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__wbmp_image_load_increment io-wbmp.c:266
+id:000147,sig:05,src:003872,time:59677349,execs:43070835,op:havoc,rep:4	05	asan	allocation-size-too-big	8583c1a6c2	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__wbmp_image_load_increment io-wbmp.c:266
+id:000148,sig:05,src:003872,time:59677996,execs:43071081,op:havoc,rep:2	05	asan	allocation-size-too-big	8583c1a6c2	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__wbmp_image_load_increment io-wbmp.c:266
+id:000149,sig:05,src:003872,time:59678294,execs:43071179,op:havoc,rep:4	05	asan	allocation-size-too-big	8583c1a6c2	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__wbmp_image_load_increment io-wbmp.c:266
+id:000150,sig:05,src:003872,time:59680066,execs:43071759,op:havoc,rep:4	05	asan	allocation-size-too-big	8583c1a6c2	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__wbmp_image_load_increment io-wbmp.c:266
+id:000151,sig:05,src:003872,time:59684001,execs:43073155,op:havoc,rep:1	05	asan	allocation-size-too-big	8583c1a6c2	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__wbmp_image_load_increment io-wbmp.c:266
+id:000152,sig:05,src:003872,time:59760438,execs:43126574,op:havoc,rep:4	05	asan	allocation-size-too-big	8583c1a6c2	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__wbmp_image_load_increment io-wbmp.c:266
+id:000153,sig:05,src:003872,time:59762149,execs:43127254,op:havoc,rep:3	05	asan	allocation-size-too-big	8583c1a6c2	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__wbmp_image_load_increment io-wbmp.c:266
+id:000154,sig:05,src:003872,time:59884501,execs:43206033,op:havoc,rep:4	05	asan	allocation-size-too-big	8583c1a6c2	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__wbmp_image_load_increment io-wbmp.c:266
+id:000155,sig:05,src:002463,time:60131454,execs:43371672,op:havoc,rep:13	05	asan	allocation-size-too-big	c4abdfa3c3	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gif_get_lzw io-gif.c:854
+id:000156,sig:05,src:003872,time:60326791,execs:43503889,op:havoc,rep:7	05	asan	allocation-size-too-big	8583c1a6c2	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__wbmp_image_load_increment io-wbmp.c:266
+id:000157,sig:05,src:001149,time:61911710,execs:44665860,op:havoc,rep:1	05	no-crash			
+id:000158,sig:05,src:003796,time:62364899,execs:45031619,op:havoc,rep:5	05	no-crash			
+id:000159,sig:05,src:003888,time:63384679,execs:45759054,op:havoc,rep:1	05	asan	allocation-size-too-big	8583c1a6c2	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__wbmp_image_load_increment io-wbmp.c:266
+id:000160,sig:05,src:001324,time:63431743,execs:45794483,op:havoc,rep:2	05	no-crash			
+id:000161,sig:11,src:003381,time:63705549,execs:46014049,op:havoc,rep:15	11	asan	heap-buffer-overflow	1b6571651a	DoCompressed io-bmp.c:1060 <- gdk_pixbuf__bmp_image_load_increment io-bmp.c:1251 <- gdk_pixbuf_loader_load_module gdk-pixbuf-loader.c:445
+id:000162,sig:05,src:003888,time:64276111,execs:46488507,op:havoc,rep:2	05	asan	allocation-size-too-big	8583c1a6c2	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__wbmp_image_load_increment io-wbmp.c:266
+id:000163,sig:05,src:003533,time:64399261,execs:46592661,op:havoc,rep:3	05	asan	heap-buffer-overflow	e258f4b730	pcx_increment_load_data_24 io-pcx.c:527 <- gdk_pixbuf__pcx_load_increment io-pcx.c:687 <- gdk_pixbuf_loader_load_module gdk-pixbuf-loader.c:445
+id:000164,sig:05,src:003872,time:65602887,execs:47373053,op:havoc,rep:8	05	asan	allocation-size-too-big	8583c1a6c2	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__wbmp_image_load_increment io-wbmp.c:266
+id:000165,sig:05,src:003872,time:65604369,execs:47373476,op:havoc,rep:8	05	asan	allocation-size-too-big	8583c1a6c2	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__wbmp_image_load_increment io-wbmp.c:266
+id:000166,sig:05,src:003872,time:66151058,execs:47738038,op:havoc,rep:4	05	asan	allocation-size-too-big	8583c1a6c2	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__wbmp_image_load_increment io-wbmp.c:266
+id:000167,sig:11,src:003538,time:69864974,execs:50262527,op:havoc,rep:2	11	asan	heap-buffer-overflow	72620ec4c1	pcx_increment_load_data_24 io-pcx.c:528 <- gdk_pixbuf__pcx_load_increment io-pcx.c:687 <- gdk_pixbuf_loader_load_module gdk-pixbuf-loader.c:445
+id:000168,sig:05,src:003872,time:84078142,execs:58435924,op:havoc,rep:4	05	asan	allocation-size-too-big	8583c1a6c2	malloc gdk-pixbuf-pixdata.asan+0xd218e) <- gdk_pixbuf_new gdk-pixbuf.c:456 <- gdk_pixbuf__wbmp_image_load_increment io-wbmp.c:266
+id:000169,sig:05,src:002112,time:84427903,execs:58674761,op:havoc,rep:2	05	no-crash			

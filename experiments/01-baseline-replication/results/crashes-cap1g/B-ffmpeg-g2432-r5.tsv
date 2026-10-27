@@ -1,0 +1,2 @@
+file	afl_sig	outcome	bug_type	bucket	frames
+id:000000,sig:11,src:003124,time:11783369,execs:499387,op:ext_AO,pos:840	11	asan	SEGV	80afa596e6	mov_write_udta_sdp movenc.c:3010 <- mov_write_trak_tag movenc.c:3101 <- mov_write_moov_tag movenc.c:3921
