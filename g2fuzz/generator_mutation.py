@@ -133,7 +133,7 @@ Please respond according to the following template:
 
 
 
-def mutation_based_on_pattern(model, tmp_path, seeds_path, generators, output_path, mutation_log, relationship, mutation_pattern):
+def mutation_based_on_pattern(model, tmp_path, seeds_path, generators, output_path, mutation_log, relationship, mutation_pattern, scheduler_context):
     cur_mutation_pattern = random.choice(mutation_pattern)
     ori_code_path = os.path.join(generators, cur_mutation_pattern[0]) 
     mutated_code_path = os.path.join(generators, cur_mutation_pattern[1]) 
@@ -149,9 +149,8 @@ def mutation_based_on_pattern(model, tmp_path, seeds_path, generators, output_pa
 
     # get a generator
     generator_list = [f for f in os.listdir(generators) if os.path.isfile(os.path.join(generators, f))]
-    # target_generator = random.choice(generator_list)
     filtered_list = [s for s in generator_list if s.startswith(file_format)]
-    target_generator = random.choice(filtered_list)
+    target_generator = select_parent_generator(filtered_list, **scheduler_context)
     # target_generator = 'tiff-2.py'
     target_generator_path = os.path.join(generators, target_generator)
     print(target_generator_path)
@@ -187,7 +186,7 @@ def mutation_based_on_pattern(model, tmp_path, seeds_path, generators, output_pa
         return False
 
 
-def mutation_based_on_predefined_mutators(model, tmp_path, seeds_path, generators, output_path, mutation_log, cur_mutator):
+def mutation_based_on_predefined_mutators(model, tmp_path, seeds_path, generators, output_path, mutation_log, cur_mutator, scheduler_context):
 
     if cur_mutator == "feature": # file feature mutation
         prompt_init = copy.deepcopy(generator_mutation_feature_prompt_init)
@@ -206,7 +205,7 @@ def mutation_based_on_predefined_mutators(model, tmp_path, seeds_path, generator
 
     # step I: get a generator
     generator_list = [f for f in os.listdir(generators) if os.path.isfile(os.path.join(generators, f))]
-    target_generator = random.choice(generator_list)
+    target_generator = select_parent_generator(generator_list, **scheduler_context)
     # target_generator = 'tiff-2.py'
     file_format = target_generator.split('-')[0]
     target_generator_path = os.path.join(generators, target_generator)
@@ -264,6 +263,7 @@ if __name__ == "__main__":
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(current_dir)
+    from py_utils.generator_scheduler import select_parent_generator
     from py_utils.func import *
     from py_utils.llm_analysis import *
     from py_utils.llm_utils import *
@@ -289,6 +289,12 @@ if __name__ == "__main__":
         os.makedirs(generators)
     if not os.path.exists(mutation_log):
         os.makedirs(mutation_log)
+
+    scheduler_context = {
+        "generator_dir": generators,
+        "queue_dir": os.path.join(output_path, "queue"),
+        "state_path": os.path.join(mutation_log, "generator_scheduler_state.json"),
+    }
 
     mutators = ["feature", "structure"]
 
@@ -328,6 +334,6 @@ if __name__ == "__main__":
     print("cur_mutator:", cur_mutator)
 
     if cur_mutator == "pattern":
-        mutation_based_on_pattern(model, tmp_path, seeds_path, generators, output_path, mutation_log, relationship, mutation_pattern)
+        mutation_based_on_pattern(model, tmp_path, seeds_path, generators, output_path, mutation_log, relationship, mutation_pattern, scheduler_context)
     else:
-        mutation_based_on_predefined_mutators(model, tmp_path, seeds_path, generators, output_path, mutation_log, cur_mutator)
+        mutation_based_on_predefined_mutators(model, tmp_path, seeds_path, generators, output_path, mutation_log, cur_mutator, scheduler_context)
