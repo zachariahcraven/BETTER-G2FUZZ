@@ -1,0 +1,77 @@
+2026-10-25 09:18:27 phaseC.sh start (driver 885876, DRY=0)
+2026-10-25 09:18:28 group exiv2 r1 -> http://gpu054:39011/v1
+submitted Slurm job 885879 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-exiv2-g2432-r1
+submitted Slurm job 885880 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-exiv2-afl432-r1
+2026-10-25 09:18:48 group gdk-pixbuf-pixdata r1 -> http://gpu056:21296/v1
+submitted Slurm job 885905 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-gdk-pixbuf-pixdata-g2432-r1
+submitted Slurm job 885906 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-gdk-pixbuf-pixdata-afl432-r1
+2026-10-25 09:19:08 group imginfo r1 -> http://gpu054:39011/v1
+submitted Slurm job 885928 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-imginfo-g2432-r1
+submitted Slurm job 885929 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-imginfo-afl432-r1
+2026-10-25 09:19:29 group jhead r1 -> http://gpu056:21296/v1
+submitted Slurm job 885982 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-jhead-g2432-r1
+submitted Slurm job 885983 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-jhead-afl432-r1
+2026-10-25 09:19:49 group mp3gain r1 -> http://gpu054:39011/v1
+submitted Slurm job 886030 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-mp3gain-g2432-r1
+submitted Slurm job 886031 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-mp3gain-afl432-r1
+2026-10-25 09:20:10 group exiv2 r2 -> http://gpu056:21296/v1
+submitted Slurm job 886057 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-exiv2-g2432-r2
+submitted Slurm job 886059 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-exiv2-afl432-r2
+2026-10-25 09:20:31 group gdk-pixbuf-pixdata r2 -> http://gpu054:39011/v1
+submitted Slurm job 886081 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-gdk-pixbuf-pixdata-g2432-r2
+submitted Slurm job 886082 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-gdk-pixbuf-pixdata-afl432-r2
+2026-10-25 09:20:51 group imginfo r2 -> http://gpu056:21296/v1
+submitted Slurm job 886115 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-imginfo-g2432-r2
+submitted Slurm job 886117 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-imginfo-afl432-r2
+2026-10-25 09:21:11 group jhead r2 -> http://gpu054:39011/v1
+submitted Slurm job 886140 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-jhead-g2432-r2
+submitted Slurm job 886141 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-jhead-afl432-r2
+2026-10-25 09:21:33 group mp3gain r2 -> http://gpu056:21296/v1
+submitted Slurm job 886174 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-mp3gain-g2432-r2
+submitted Slurm job 886175 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-mp3gain-afl432-r2
+2026-10-25 09:21:53 group exiv2 r3 -> http://gpu054:39011/v1
+submitted Slurm job 886196 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-exiv2-g2432-r3
+submitted Slurm job 886197 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-exiv2-afl432-r3
+2026-10-25 09:22:13 group gdk-pixbuf-pixdata r3 -> http://gpu056:21296/v1
+submitted Slurm job 886226 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-gdk-pixbuf-pixdata-g2432-r3
+submitted Slurm job 886227 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-gdk-pixbuf-pixdata-afl432-r3
+2026-10-25 09:22:35 group imginfo r3 -> http://gpu054:39011/v1
+submitted Slurm job 886243 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-imginfo-g2432-r3
+submitted Slurm job 886244 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-imginfo-afl432-r3
+2026-10-25 09:22:55 group jhead r3 -> http://gpu056:21296/v1
+submitted Slurm job 886267 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-jhead-g2432-r3
+submitted Slurm job 886268 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-jhead-afl432-r3
+2026-10-25 09:23:15 group mp3gain r3 -> http://gpu054:39011/v1
+submitted Slurm job 886284 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-mp3gain-g2432-r3
+submitted Slurm job 886285 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-mp3gain-afl432-r3
+2026-10-25 09:23:37 group exiv2 r4 -> http://gpu056:21296/v1
+submitted Slurm job 886297 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-exiv2-g2432-r4
+submitted Slurm job 886298 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-exiv2-afl432-r4
+2026-10-25 09:23:57 group gdk-pixbuf-pixdata r4 -> http://gpu056:21296/v1
+submitted Slurm job 886323 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-gdk-pixbuf-pixdata-g2432-r4
+submitted Slurm job 886324 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-gdk-pixbuf-pixdata-afl432-r4
+2026-10-25 09:24:18 group imginfo r4 -> http://gpu054:39011/v1
+submitted Slurm job 886333 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-imginfo-g2432-r4
+submitted Slurm job 886334 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-imginfo-afl432-r4
+2026-10-25 09:24:39 group jhead r4 -> http://gpu056:21296/v1
+submitted Slurm job 886344 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-jhead-g2432-r4
+submitted Slurm job 886345 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-jhead-afl432-r4
+2026-10-25 09:24:59 group mp3gain r4 -> http://gpu054:39011/v1
+submitted Slurm job 886351 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-mp3gain-g2432-r4
+submitted Slurm job 886352 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-mp3gain-afl432-r4
+2026-10-25 09:25:20 group exiv2 r5 -> http://gpu056:21296/v1
+submitted Slurm job 886353 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-exiv2-g2432-r5
+submitted Slurm job 886354 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-exiv2-afl432-r5
+2026-10-25 09:31:42 group gdk-pixbuf-pixdata r5 -> http://gpu056:21296/v1
+submitted Slurm job 886433 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-gdk-pixbuf-pixdata-g2432-r5
+submitted Slurm job 886434 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-gdk-pixbuf-pixdata-afl432-r5
+2026-10-25 09:34:03 group imginfo r5 -> http://gpu056:21296/v1
+submitted Slurm job 886439 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-imginfo-g2432-r5
+submitted Slurm job 886440 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-imginfo-afl432-r5
+2026-10-25 09:36:24 group jhead r5 -> http://gpu054:39011/v1
+submitted Slurm job 886441 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-jhead-g2432-r5
+submitted Slurm job 886442 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-jhead-afl432-r5
+2026-10-25 09:38:45 group mp3gain r5 -> http://gpu056:21296/v1
+submitted Slurm job 886482 (fuzz 86400s, limit 1680 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-mp3gain-g2432-r5
+submitted Slurm job 886483 (fuzz 86400s, limit 1470 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch C-mp3gain-afl432-r5
+2026-10-25 09:39:05 phaseC.sh: all 25 groups launched
