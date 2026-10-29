@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# group-perms: give the CSCI 591 group full access (g+rwX) to every file and folder YOU own in the shared
+# students folder. See docs/GROUP_PERMISSIONS.md.
+#
+# Usage: scripts/group-perms [folder]   (default: the shared students folder)
+#
+# Only adds group bits: your own files only, nothing removed, nothing opened to other users.
+set -euo pipefail
+D=${1:-/home/group/csci-591-automated-vulnerability-discovery/students}
+[ -d "$D" ] || { echo "group-perms: no folder $D" >&2; exit 2; }
+find "$D" -user "$USER" \( -type f ! -perm -g=rw -o -type d ! -perm -g=rwx \) -print0 2>/dev/null |
+  xargs -0 -r chmod g+rwX
+echo "group-perms: the group now has full access to your files in $D"

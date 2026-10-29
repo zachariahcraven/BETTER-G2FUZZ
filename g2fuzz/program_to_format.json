@@ -29,5 +29,20 @@
     "crl":["binary_large_object_BLOB"],
     "ct":["binary_large_object_BLOB"],
     "server":["binary_large_object_BLOB"],
-    "x509":["binary_large_object_BLOB"]
+    "x509":["binary_large_object_BLOB"],
+
+    "_comment_fuzzbench":["format tokens below: chosen by this project; the paper gives none for FuzzBench"],
+    "mp42avc":["mp4"],
+    "mp42hevc":["mp4"],
+    "bloaty_fuzz_target":["elf"],
+    "freetype2_ftfuzzer":["ttf"],
+    "harfbuzz_hb-shape-fuzzer":["ttf"],
+    "lcms_cms_transform_fuzzer":["icc"],
+    "libjpeg-turbo_libjpeg_turbo_fuzzer":["jpg"],
+    "libpcap_fuzz_both":["pcap"],
+    "libpng_libpng_read_fuzzer":["png"],
+    "openssl_x509":["der"],
+    "vorbis_decode_fuzzer":["ogg"],
+    "woff2_convert_woff2ttf_fuzzer":["woff2"],
+    "zlib_zlib_uncompress_fuzzer":["zlib"]
 }

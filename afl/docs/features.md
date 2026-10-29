@@ -14,10 +14,9 @@ Note that afl-gcc and afl-clang have been removed because their instrumentation 
 | NeverZero           [B]       |    x(1)   |      x     |        x       |         x        |         x        |              |                    |
 | Persistent Mode     [C]       |     x     |      x     | x86[_64]/arm64 | x86[_64]/arm[64] |         x        |              |                    |
 | LAF-Intel / CompCov [D]       |     x     |            |                | x86[_64]/arm[64] | x86[_64]/arm[64] |   x86[_64]   |                    |
-| CmpLog              [E]       |     x     |      x     | x86[_64]/arm64 | x86[_64]/arm[64] |                  |              |                    |
+| CmpLog              [E]       |     x     |      x     | x86[_64]/arm64 | x86[_64]/arm[64] | x86[_64]/arm[64] |              |                    |
 | Selective Instrumentation [F] |     x     |      x     |        x       |         x        |                  |              |                    |
 | Non-Colliding Coverage    [G] |    x(4)   |            |                |       (x)(5)     |                  |              |                    |
-| Ngram prev_loc Coverage   [H] |    x(6)   |            |                |                  |                  |              |                    |
 | Context Coverage    [I]       |    x(6)   |            |                |                  |                  |              |                    |
 | Auto Dictionary     [J]       |    x(7)   |            |                |                  |                  |              |                    |
 | Snapshot Support    [K]       |   (x)(8)  |   (x)(8)   |                |       (x)(5)     |                  |       x      |                    |
@@ -45,7 +44,7 @@ E. CmpLog is our enhanced
    implementation, see
    [instrumentation/README.cmplog.md](../instrumentation/README.cmplog.md)
 
-F. Similar and compatible to clang 13+ sancov sanitize-coverage-allow/deny but
+F. Similar and compatible to clang 14+ sancov sanitize-coverage-allow/deny but
    for all llvm versions and all our compile modes, only instrument what should
    be instrumented, for more speed, directed fuzzing and less instability; see
    [instrumentation/README.instrument_list.md](../instrumentation/README.instrument_list.md)
@@ -53,13 +52,11 @@ F. Similar and compatible to clang 13+ sancov sanitize-coverage-allow/deny but
 G. Vanilla AFL uses coverage where edges could collide to the same coverage
    bytes the larger the target is. Our default instrumentation in LTO and
    afl-clang-fast (PCGUARD) uses non-colliding coverage that also makes it
-   faster. Vanilla AFL style is available with `AFL_LLVM_INSTRUMENT=AFL`; see
+   faster; see
    [instrumentation/README.llvm.md](../instrumentation/README.llvm.md).
 
-H.+I. Alternative coverage based on previous edges (NGRAM) or depending on the
-   caller (CTX), based on
-   [https://www.usenix.org/system/files/raid2019-wang-jinghan.pdf](https://www.usenix.org/system/files/raid2019-wang-jinghan.pdf);
-   see [instrumentation/README.llvm.md](../instrumentation/README.llvm.md).
+I. Alternative coverage depending on the caller (CTX); see
+   [instrumentation/README.lto.md](../instrumentation/README.lto.md).
 
 J. An LTO feature that creates a fuzzing dictionary based on comparisons found
    during compilation/instrumentation. Automatic feature :) See
@@ -81,7 +78,7 @@ L. Faster fuzzing and less kernel syscall overhead by in-memory fuzz testcase
 3. With `AFL_LLVM_THREADSAFE_INST`, disables NeverZero
 4. With pcguard mode and LTO mode for LLVM 11 and newer
 5. Upcoming, development in the branch
-6. Not compatible with LTO instrumentation and needs at least LLVM v4.1
+6. Only available in LTO mode (afl-clang-lto)
 7. Automatic in LTO mode with LLVM 11 and newer, an extra pass for all LLVM
    versions that write to a file to use with afl-fuzz' `-x`
 8. The snapshot LKM is currently unmaintained due to too many kernel changes
@@ -107,13 +104,12 @@ Among others, the following features and patches have been integrated:
 * AFLfast's power schedules by Marcel Böhme:
   [https://github.com/mboehme/aflfast](https://github.com/mboehme/aflfast)
 * The fast deterministic stage by Han Zheng: [https://github.com/hexhive/mendelFuzz-Artifact/](https://github.com/hexhive/mendelFuzz-Artifact/)
-* The MOpt mutator:
-  [https://github.com/puppet-meteor/MOpt-AFL](https://github.com/puppet-meteor/MOpt-AFL)
-* LLVM mode Ngram coverage by Adrian Herrera
-  [https://github.com/adrianherrera/afl-ngram-pass](https://github.com/adrianherrera/afl-ngram-pass)
+* An adaptive mutation scheduler inspired by the MOpt mutator
+  ([https://github.com/puppet-meteor/MOpt-AFL](https://github.com/puppet-meteor/MOpt-AFL)),
+  enabled with the `-L` switch (default: standard havoc)
 * LAF-Intel/CompCov support for instrumentation, QEMU mode and unicorn_mode
   (with enhanced capabilities)
-* Radamsa and honggfuzz mutators (as custom mutators).
+* honggfuzz mutator (as a custom mutator).
 * QBDI mode to fuzz android native libraries via Quarkslab's
   [QBDI](https://github.com/QBDI/QBDI) framework
 * Frida and ptrace mode to fuzz binary-only libraries, etc.

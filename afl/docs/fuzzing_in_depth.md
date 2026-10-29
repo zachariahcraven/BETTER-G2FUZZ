@@ -132,11 +132,15 @@ options are available:
   locations. This technique is very fast and good - if the target does not
   transform input data before comparison. Therefore, this technique is called
   `input to state` or `redqueen`. If you want to use this technique, then you
-  have to compile the target twice, once specifically with/for this mode by
-  setting `AFL_LLVM_CMPLOG=1`, and pass this binary to afl-fuzz via the `-c`
-  parameter. Note that you can compile also just a cmplog binary and use that
-  for both, however, there will be a performance penalty. You can read more
-  about this in
+  have to compile the target with `AFL_LLVM_CMPLOG=1`.
+  You could use the resulting binary for both normal fuzzing and `-c` CMPLOG
+  mode (with `-c 0`), however this will result in a performance loss of about
+  20%.
+  It is therefore better to compile a specific CMPLOG target with
+  `AFL_LLVM_CMPLOG=1` and pass this binary name via
+  `-c cmplog-fuzzing-target` and compile target again normally with `afl-cc`
+   and use this is the fuzzing target as usual.
+  You can read more about this in
   [instrumentation/README.cmplog.md](../instrumentation/README.cmplog.md).
 
 If you use LTO, LLVM, or GCC_PLUGIN mode
@@ -404,6 +408,11 @@ shared-memory test cases and hence gives you the fastest speed possible.
 For more information, see
 [utils/aflpp_driver/README.md](../utils/aflpp_driver/README.md).
 
+Writing a harness that actually exercises the interesting parts of the target is
+a skill of its own. For a practical walkthrough of what makes a harness
+effective - and the common mistakes that cripple one - see
+[https://srlabs.de/blog/unlocking-secrets-effective-fuzzing-harness](https://srlabs.de/blog/unlocking-secrets-effective-fuzzing-harness).
+
 ## 2. Preparing the fuzzing campaign
 
 As you fuzz the target with mutated input, having as diverse inputs for the
@@ -451,6 +460,22 @@ produce a new path/coverage in the target:
 
 This step is highly recommended, because afterwards the testcase corpus is not
 bloated with duplicates anymore, which would slow down the fuzzing progress!
+
+To instead *add* only the inputs that give new coverage to an already existing
+corpus (like libFuzzer's `-merge=1`), use `afl-merge`. Unlike `afl-cmin` it does
+not minimize the output directory itself, it only appends inputs that cover
+something the output corpus does not already cover:
+
+```
+afl-merge -o CORPUS -i NEW_INPUTS -- bin/target -someopt @@
+```
+
+The output corpus may also be given as the first directory (then `-i` must not
+be used), and `-o` may appear at the beginning or the end:
+
+```
+afl-merge CORPUS NEW_INPUTS1 NEW_INPUTS2 -- bin/target -someopt @@
+```
 
 ### c) Minimizing all corpus files
 
@@ -612,6 +637,10 @@ during fuzzing) and their number, a value between 50-500MB is recommended. You
 can set the cache size (in MB) by setting the environment variable
 `AFL_TESTCACHE_SIZE`.
 
+The cache keeps the test cases with the highest selection probability per byte,
+recomputed whenever the queue changes, so raising the size keeps improving the
+hit rate instead of filling up with arbitrary entries.
+
 There should be one main fuzzer (`-M main-$HOSTNAME` option - set also
 `AFL_FINAL_SYNC=1`) and as many secondary fuzzers (e.g., `-S variant1`) as you
 have cores that you use. Every `-M`/`-S` entry needs a unique name (that can be
@@ -629,7 +658,6 @@ For every secondary fuzzer there should be a variation, e.g.:
   be one of them (although this is not really recommended).
 
 The other secondaries should be run like this:
-* 10% with the MOpt mutator enabled: `-L 0`
 * 10% should use the old queue cycling with `-Z`
 * 50-70% should run with `AFL_DISABLE_TRIM`
 * 40% should run with `-P explore` and 20% with `-P exploit`
@@ -712,6 +740,13 @@ You can run this manually, per cron job - as you need it. There is a more
 complex and configurable script in
 [utils/distributed_fuzzing](../utils/distributed_fuzzing).
 
+An instance only picks up such freshly copied test cases with its next
+scheduled sync, which can be up to `AFL_SYNC_TIME` (20 minutes by default)
+away. To make it sync immediately, send it a `SIGUSR2`, e.g.
+`killall -USR2 afl-fuzz`. The sync - of the `-M`/`-S` sync directory as well as
+of all `-F` foreign directories - is performed as soon as the queue entry that
+is currently being fuzzed is done, so it does not throw away any work.
+
 ### e) The status of the fuzz campaign
 
 AFL++ comes with the `afl-whatsup` script to show the status of the fuzzing
@@ -725,6 +760,44 @@ To have only the summary, use the `-s` switch, e.g., `afl-whatsup -s out/`.
 If you have multiple servers, then use the command after a sync or you have to
 execute this script per server.
 
+For a deeper analysis than the `afl-whatsup` summary, use `afl-health`. Instead
+of just listing the numbers it diagnoses the campaign and emits a verdict
+(`healthy`, `degraded`, `stalled`, `misconfigured`, `dead`, or - if no
+`fuzzer_stats` was found at all - `no_instances`), a within-run and
+cross-run trend, and a ranked list of concrete, actionable recommendations (e.g.
+triage crashes, inject seeds, add a CMPLOG instance, investigate low stability).
+It is read-only - it never modifies the campaign it inspects - and understands
+AFL++, cargo-afl, and ziggy output directories. Like `afl-whatsup` you point it
+at the `-o` directory:
+
+```bash
+afl-health out/
+```
+
+Unlike `afl-whatsup` it can reach campaigns on other machines directly over ssh,
+so a whole fleet can be checked in one invocation without syncing first:
+
+```bash
+afl-health out/ user@host1:/target/foo/out user@host2:/target/foo/out
+```
+
+It also offers `--json` (machine-readable report including the action
+directives), `--summary` (one line per campaign / fleet roll-up), `--watch N`
+(live refresh every N seconds), `--on-change CMD` (run a hook when a campaign
+flips state or gains new crashes) and process exit codes suitable for cron/CI.
+
+A `DEGRADED` verdict always names its reason - `dead-instances`,
+`low-stability`, `exec-slowdown`, or a `+`-joined combination. Instances that
+are no longer running are told apart rather than lumped together: `killed` (died
+unexpectedly - OOM, SIGKILL, a crash), `stopped` (shut down cleanly by the user
+or by a `-V`/`-E` limit) and `leftover` (ran before the currently running
+instances started, i.e. a previous campaign generation that was not restarted).
+Only the first counts against the verdict, so deliberately stopped or retired
+instances no longer make a healthy campaign look degraded. The distinction comes
+from the `fastresume.bin` file, which afl-fuzz writes only on a clean shutdown
+(so it needs AFL++ >= 4.22a and no `AFL_NO_FASTRESUME`; otherwise the cause is
+reported as `unknown` and does count).
+
 Another tool to inspect the current state and history of a specific instance is
 afl-plot, which generates an index.html file and graphs that show how the
 fuzzing instance is performing. The syntax is `afl-plot instance_dir web_dir`,
@@ -737,12 +810,10 @@ To stop an afl-fuzz run, press Control-C.
 To restart an afl-fuzz run, just reuse the same command line but replace the `-i
 directory` with `-i -` or set `AFL_AUTORESUME=1`.
 
-If you want to add new seeds to a fuzzing campaign, you can run a temporary
-fuzzing instance, e.g., when your main fuzzer is using `-o out` and the new
-seeds are in `newseeds/` directory:
+If you want to add new seeds to a fuzzing campaign, you can use `afl-addseeds`:
 
 ```
-AFL_BENCH_JUST_ONE=1 AFL_FAST_CAL=1 afl-fuzz -i newseeds -o out -S newseeds -- ./target
+afl-addseeds -i newseeds-an-be-file-or-directory -o out-of-the-fuzzing-campaign
 ```
 
 ### g) Checking the coverage of the fuzzing
@@ -769,8 +840,22 @@ It is even better to check out the exact lines of code that have been reached -
 and which have not been found so far.
 
 An "easy" helper script for this is
-[https://github.com/vanhauser-thc/afl-cov](https://github.com/vanhauser-thc/afl-cov),
-just follow the README of that separate project.
+[https://github.com/AFLplusplus/cov-analysis](https://github.com/AFLplusplus/cov-analysis),
+just follow the README.md of our separate project. It replays the corpus through
+an LLVM source-based coverage build and produces annotated HTML/text reports.
+
+A coverage gap is only worth chasing if the harness can actually reach it. Our
+companion tool
+[https://github.com/AFLplusplus/fuzz-reachability](https://github.com/AFLplusplus/fuzz-reachability)
+statically computes the set of functions a fuzz entry point can reach (C, C++
+and Rust). Feed its report to `cov-analysis` with `--reachability` to have the
+coverage report tell apart code that is *reachable but not reached yet* (the
+actionable gap) from code that is *unreachable* by the harness (expected to stay
+uncovered, so safe to ignore).
+
+For a walkthrough on how to read such coverage reports and turn them into
+concrete next steps for a campaign, see
+[https://srlabs.de/blog/coverage-analysis](https://srlabs.de/blog/coverage-analysis).
 
 If you see that an important area or a feature has not been covered so far, then
 try to find an input that is able to reach that and start a new secondary in
@@ -865,10 +950,13 @@ Here are some of the most important caveats for AFL++:
 
 - There is no direct support for fuzzing network services, background daemons,
   or interactive apps that require UI interaction to work. You may need to make
-  simple code changes to make them behave in a more traditional way. Preeny or
-  libdesock may offer a relatively simple option, too - see:
+  simple code changes to make them behave in a more traditional way. Preeny,
+  libdesock or desockmulti may offer a relatively simple option, too - see:
   [https://github.com/zardus/preeny](https://github.com/zardus/preeny) or
   [https://github.com/fkie-cad/libdesock](https://github.com/fkie-cad/libdesock)
+  [https://github.com/zyingp/desockmulti](https://github.com/zyingp/desockmulti)
+  If these fail then try our own which might be a bit slower but is more
+  reliable: [utils/libaflppdesock](../utils/libaflppdesock)
 
   Some useful tips for modifying network-based services can be also found at:
   [https://www.fastly.com/blog/how-to-fuzz-server-american-fuzzy-lop](https://www.fastly.com/blog/how-to-fuzz-server-american-fuzzy-lop)
@@ -931,6 +1019,25 @@ contain severity and other information.
 casr-afl -i /path/to/afl/out/dir -o /path/to/casr/out/dir
 ```
 
+### If crashes do not reproduce
+
+Sometimes crashes AFL++ finds cannot be reproduced.
+
+This usually means that limits applied at the time of fuzzing that crashes the
+target process, e.g. running out of memory, or the limit of a set `-m` being
+reached.
+
+If you do persistent fuzzing, then it is also possible that the target keeps
+persistent state (this is mostly for AFL_LOOP/LLVMFuzzerTestOneInput type
+targets).
+In this case either fuzz with the env var `AFL_ALLOW_CORES` to create core
+files and analyze them where the cash occur (slows down fuzzing, so only use
+this for analysis), or you recompile AFL++ with a config.h setting that enables
+`AFL_PERSISTENT_RECORD` and `AFL_PERSISTENT_REPLAY_ARGPARSE`.
+[Read the documentation](../instrumentation/README.persistent_mode.md) on how
+to configure persistent record at runtime, and how to replay these.
+
+
 ## 5. CI fuzzing
 
 Some notes on continuous integration (CI) fuzzing - this fuzzing is different to
@@ -951,6 +1058,7 @@ too long for your overall available fuzz run time.
       saturated corpus needs to be loaded.
     * `AFL_CMPLOG_ONLY_NEW` - only perform cmplog on new finds, not the initial
       corpus as this very likely has been done for them already.
+    * If you do not like surprises then set `AFL_PIZZA_MODE=-1`
     * Keep the generated corpus, use afl-cmin and reuse it every time!
 
 2. Additionally randomize the AFL++ compilation options, e.g.:
@@ -961,7 +1069,6 @@ too long for your overall available fuzz run time.
     * 65% for `AFL_DISABLE_TRIM`
     * 50% for `AFL_KEEP_TIMEOUTS`
     * 50% use a dictionary generated by `AFL_LLVM_DICT2FILE` + `AFL_LLVM_DICT2FILE_NO_MAIN=1`
-    * 10% use MOpt (`-L 0`)
     * 40% for `AFL_EXPAND_HAVOC_NOW`
     * 20% for old queue processing (`-Z`)
     * for CMPLOG targets, 70% for `-l 2`, 10% for `-l 3`, 20% for `-l 2AT`

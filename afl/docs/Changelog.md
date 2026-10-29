@@ -3,6 +3,387 @@
   This is the list of all noteworthy changes made in every public
   release of the tool. See README.md for the general instruction manual.
 
+### Version ++5.03c (release)
+  ! Value Profile implementation for AFL++ by Khaled Yakdan (@kyakdan) that
+    is much more efficient and intelligent than the libfuzzer implementation.
+    Enable in the fuzz target with `AFL_LLVM_VALUE_PROFILE=1` and enable for
+    afl-fuzz with `-r <seconds>` when to activate (default off)
+  ! macOS now uses POSIX shared memory instead of SysV, which lifts the
+    `kern.sysv.shmseg` / `kern.sysv.shmmax` ceilings (CmpLog alone needs a
+    145 MB segment, far past the 4 MB macOS default). !!! You need to
+    recompile your targets on macOS - a target built by an older afl-cc still
+    expects a SysV id in `__AFL_SHM_ID` !!!
+  afl-fuzz
+    - big change: limits before switching modes is not time based but exec based now.
+    - fix: shmem leakage on target timeouts and crashes - this has been the case
+      since vanilla AFL. Now fixed for Linux, MacOS and mmap targets.
+    - for more variability, a "starved" mode is implemented now. If for a longer
+      time no finds are found, then more seed and mutation variability is
+      introduced incl. splicing phase enabled. This is visible in the UI.
+    - env `AFL_STARVED_MINIMIZE_QUEUE`: if starve mode does not help either,
+      minimize the the queue like afl-cmin does and make the coverage of the
+      removed entries rediscoverable. Inspired by `Novelty Not Found: Adaptive
+      Fuzzer Restarts to Improve Input Space Coverage`
+    - sending `SIGUSR2` forces a sync (AFL internal sync and foreign `-F` ) as
+      soon as the current queue entry has been fuzzed
+    - the trimming stage no longer throws away what it produces: crashes,
+      hangs and new coverage found while shortening a queue entry are now
+      saved (visible as `op:trim`/`op:ptrim` in the file names)
+    - `-s fixed_seed` now only sets a fixed seed and does not ignore timings
+      anymore (required for proper benchmarking in containers without urandom)
+    - `-t xxx+` fix so dummy seeds do not kill a start-up. rechecks now over
+      time
+    - a queue entry that fails its calibration is never fuzzed, so the
+      coverage it claimed is now handed back to `virgin_bits` and can be
+      rediscovered by an input that does calibrate.
+    - the variable behavior flag of a queue entry is cleared now on slow
+      resumes, another afl vanilla legacy bug
+    - fixed SAND and FrameShift issues
+    - symlinked test cases and symlinked subdirectories in the `-i` input
+      directory are now followed
+    - foreign sync directories (`-F`) now import symlinked test cases too
+    - enhancements and fixes for cmplog and ijon
+    - due to a bug first introduced in v4.30c the cmplog target was used for
+      fuzzing if present - fixed
+    - an unreadable foreign sync (`-F`) directory is reported now, once per
+      directory, and the directories are listed at startup - a mistyped path
+      was silently ignored for the whole run before
+    - the queue driver always returns to the main loop now, even when every
+      entry it looks at is skipped
+    - a custom mutator that fails to load because it was built with an
+      instrumenting compiler is named as such instead of just showing the
+      missing `__afl_*` symbol
+  - afl-cc
+    - remove classic AFL instrumentation (colliding coverage), as `AFL_LLVM_PATH`
+      and `AFL_LLVM_CALLER` replace these mostly and are overall much better
+    - more invisible decisions can be instrumented now, all optional
+    - new env var `AFL_LLVM_DENSE=1` to disable PCGUARD basic block pruning
+    - new env var `AFL_LLVM_MINMAX=1` scores min/max/abs intrinsics, i.e.
+      clamps that the optimizer made branchless. Default off: it adds 10% map
+      entries but costs 20% throughput
+    - new env var `AFL_LLVM_FUSED=1` scores both halves of a fused condition,
+      i.e. `if (a && b)` speculated into a single `and i1`
+    - new env var `AFL_LLVM_VECTORS=1` instruments vector selects and vector
+      min/max one guard pair per lane (default off, they are rarely worth it)
+    - removed the obsolete afl-as assembler wrapper and its remaining references
+    - headers shipped in a source checkout are found in `include/` now, an
+      in-tree build silently preferred an older installed copy before
+    - fix: `CODE_COVERAGE=1` builds
+    - IJON: the map expansion is re-applied after a guard-init reset, so a
+      target whose coverage is split over several instrumented modules gets
+      the full map; the IJON channels also stay live under a tool that
+      attached a map without being a forkserver parent (`afl-showmap` on a
+      single input, `afl-cmin.bash`); `AFL_DUMP_MAP_SIZE` prints the
+      coverage/IJON breakdown to stderr
+  - afl-cmin:
+    - (all variants: C, python, bash, awk): empty (0 byte) input files are now
+      skipped, plus various other fixes and corner case handling
+    - afl-merge (symlink) - merge new files into an existing corpus (that is
+      not minimized)
+    - afl-cmin.c is now the default afl-cmin, but it needed a larger rewrite
+    - `-T all` (C and python variants) now counts the CPUs the process is
+      actually allowed to run on (like `nproc` does)
+    - fix: afl-cmin.c asked afl_shm_init() to chown the shared maps to gid 0,
+      which aborted with `fchown() failed` on POSIX shared memory. No tool
+      wants a chown here, so it now passes -1 like all the others do.
+  - afl-showmap:
+    - `-i` now follows symlinked test cases and symlinked subdirectories
+    - a child killed by a signal no longer reports a garbage exit code in
+      streaming mode (`-S`)
+    - the target's instrumentation is checked in `-I` and `-S` mode too, not
+      only with `-i`
+  - afl-showmap, afl-cmin, afl-tmin, afl-analyze:
+    - the IJON max-value slots and a bug-pass map are no longer counted as
+      coverage: they hold wide values, not hit counts, and were reported as
+      tuples, minimised against and bucket-classified in place
+    - fix: releaseshared memory when aborted
+  - afl-health
+    - more speed, more info, a few fixes
+  - custom_mutators:
+    - removed outdated and pointless radamsa
+  - frida_mode:
+    - fix arm64 inline coverage ADRP fixups when instrumentation suppression is
+      disabled
+
+
+### Version ++5.02c (release)
+  !!! You need to recompile persistent mode/LLVMFuzzerTestOneInput target !!!
+  - afl-health:
+    - new tool: AFL++ campaign health tool checker, much more advanced than
+      afl-whatsup, with tips, analysis and ssh support
+  - afl-fuzz:
+    - Futex implementation missed the clean-up of the shmem
+    - Futex shmem now lives in general shared memory map as by default only
+      32 such regions are supported in MacOS
+    - new runtime value-profiling guidance mode (`-r0`/`-rN`) for LLVM targets
+      compiled with `AFL_LLVM_VALUE_PROFILE=1`
+  - afl-cc:
+    - new C11 mode (`AFL_LLVM_C11` at compile time): afl-cc records each
+      function's local variable count and afl-fuzz uses it as an extra queue
+      scheduling signal to favor more complex code paths. Noticably improvement,
+      based on the paper https://mlsec.org/docs/2026-icse.pdf
+    - if `-fsanitize-coverage-allowlist=`/`-fsanitize-coverage-ignorelist=` is
+      passed without `AFL_LLVM_ALLOWLIST`/`AFL_LLVM_DENYLIST` being set, the
+      supplied list is reused as `AFL_LLVM_ALLOWLIST`/`AFL_LLVM_DENYLIST` (with
+      a warning) so the optimized PCGUARD honors it
+    - instrument allow/deny lists (`AFL_LLVM_ALLOWLIST`/`AFL_LLVM_DENYLIST` and
+      the GCC equivalents): function (`fun:`) entries are now matched verbatim
+      with `fnmatch()` instead of having a `*` prepended automatically - add a
+      leading `*` yourself for a suffix match. Function entries are matched
+      against both the mangled and the demangled (LLVM) / unqualified (GCC)
+      name, and an explicit `fun:` prefix now permits `:` so demangled C++/Rust
+      names can be listed. File (`src:`) entries are unchanged and still match
+      as a suffix (an implicit leading `*`)
+    - AFL_LLVM_CRASHLIST - crash on any function that is marked not to be
+      instrumented but is entered by fuzzing input
+    - bugfix for __AFL_LOOP() that lingered since vanilla afl, first run
+      coverage map would look different to following runs, impacting lots of
+      functionality (minimizing, stability, etc.)
+  - afl-* script tools:
+    - prefer AFL_PATH to find afl-showmap
+  - man pages: fixed the SYNOPSIS and OPTIONS sections for several tools
+
+
+### Version ++5.01c (release)
+  - MacOS persistent mode now uses futex mode now too which increases speed
+    and reduces system call overhead (opt out with AFL_FAST_CHILD_SYNC) - this
+    requires a MacOS from 2024 onwards.
+  - afl-fuzz
+    - new adaptive MOpt! Much better than the outdated one we still had.
+      How good it is still needs to be seen but initially it seems to be
+      better than standard havoc
+    - enforce halt on UBSAN errors
+  - afl-cc:
+    - enforce halt on UBSAN errors (AFL_USE_USBAN=1)
+    - better cmplog on MacOS
+    - removed unsupported LLVM version code paths from afl-cc and llvm passes
+    - compcov: fixes for float splittings (thanks to @ngg)
+  - nyx_mode:
+    - fix nyx_mode issues (thanks to @morehouse)
+  - qemu_mode:
+    - non-colliding coverage!
+    - faster persistent fuzzing
+    - minor bug fixes
+  - qemu_bridge:
+    - new mode with current QEMU version, so plugins possible, new processors
+    - sightly slower than qemu_mode
+    - WIP!
+
+
+### Version ++5.00c (release)
+  ! AFL++ is now an AGPL 3.0 project !
+  ! Files where the license could be switched were moved to AGPL 3.0+, files
+    that were under Apache 2.0 with contributations stay on that license.
+  ! Commercial license (donate to a good cause - no money for AFL++) is available
+  - Switched https://github.com/AFLplusplus/cov-analysis for outdated afl-cov
+  - MacOS most current version support for afl-fuzz, afl-cc (incl. LTO) and
+    frida mode!
+  - Refreshed FreeBSD support by jsaunders-rr, thanks!
+  - Linux persistent mode uses futex now which increases speed and reduces
+    system call overhead (opt out with AFL_FAST_CHILD_SYNC), thanks to
+    @martinus for most of the implementation!
+  - afl-fuzz:
+    - `-I tool` call now receives the new crash as a command line parameter
+    - changed to a better map classifier
+    - frameshift is disabled now if AFL_CUSTOM_MUTATOR_ONLY is set
+    - python module fixes
+    - minor speed, leak and zombie enhancements
+    - stability info was lost on fast resume - fixed
+    - somewhere we removed .state/variable/... now it is back :-)
+  - afl-cc:
+    - Add LLVM 23 support
+    - LTO and PCGUARD: new `AFL_LLVM_PATH` (also `AFL_LLVM_LTO_PATH` /
+      `AFL_LLVM_PATH_MODE`) Ball-Larus per-function path coverage on top
+      of edge coverage. Three levels: `=1` relaxed (collapse all
+      guard-only BBs), `=2` restricted (collapse only 2-successor
+      guard-only BBs), `=3` strict Ball-Larus. LTO additionally composes
+      with `AFL_LLVM_LTO_CALLER`. See
+      instrumentation/README.llvm.md and instrumentation/README.lto.md.
+    - Fixes in the PCGUARD and LTO instrumentation that could lead to sanitizer
+      triggers in target binaries
+    - new instrumentation: `afl-llvm-bug-pass.so` provides five runtime
+      oracles (SCALAR, BUDGET, SIZEFILL, ALLOCSIZE, SLACK) plus a slice-
+      filter sub-mode for SCALAR, covering arithmetic-bound and logical-
+      OOB bugs that ASan misses (CVE-2023-4863 / libwebp-Huffman class).
+      Note: ALLOCSIZE/DERIVE are disabled automatically under
+      AFL_USE_ASAN to avoid double-instrumentation; see
+      docs/env_variables.md.
+        * `AFL_LLVM_BUG_SCALAR=1`   - max-value-per-arithmetic-site coverage,
+                                      plus per-loop iteration count
+        * `AFL_LLVM_BUG_SCALAR_SLICE=1` - restrict SCALAR instrumentation to
+                                      arithmetic that flows into a memory-
+                                      size sink (allocator size, GEP index,
+                                      memcpy/memset length). Implies SCALAR.
+        * `AFL_LLVM_BUG_BUDGET=1`   - check `ptr += func()` write-extent
+                                      contract
+        * `AFL_LLVM_BUG_SIZEFILL=1`  - check NULL-means-size-only idioms
+        * `AFL_LLVM_BUG_ALLOCSIZE=1` - track every malloc/calloc/realloc and
+                                       feed three signals (headroom IJON-min,
+                                       proximity-bucket coverage edge, soft-OOB
+                                       tripwire) per in-loop store
+        * `AFL_LLVM_BUG_SLACK=1`    - per-icmp |op0-op1| feedback, mapped
+                                      MIN-style onto the bug map (inverse-
+                                      bucket) for tight-comparison signal
+        * `AFL_LLVM_BUG_ALLOCSIZE_FUNCS=Name1,Name2,...` - extend tracking
+                                       to user-listed custom allocators
+        * `AFL_LLVM_BUG_ALLOCSIZE_FREE_FUNCS=Name1,Name2,...` - matching
+                                       custom-free functions for the above
+        * `AFL_LLVM_BUG_ALLOCSIZE_DERIVE=1` - log tracked allocation sizes
+                                       into CmpLog RTN slots for `-l Z`
+        * `AFL_LLVM_BUG=1`           - enable all bug-pass modes
+      Per-site bug-map slots are kept in a private MAP_SIZE_BUG region and
+      tracked max-rule (compatible with the IJON model)
+    - cmplog scheduling extensions (companion to bug-pass):
+        * `-l M` (afl-fuzz) - predicate-tightness scheduling. Treat any
+          new per-site minimum slack on an inequality CmpLog cmp as a
+          coverage event and mark the queue entry favoured. Catches the
+          libwebp-1.3.1 / CVE-2023-4863 input pattern (validation
+          predicates simultaneously at their tight edges).
+        * `AFL_LLVM_BUG_ALLOCSIZE_DERIVE=1` or `AFL_LLVM_BUG=1`
+          (compile-time) and
+          `-l Z` (afl-fuzz) - size-derive logging. On every freed tracked
+          allocation, write `(computed_size, max_observed_offset)` into a
+          CmpLog RTN slot keyed by alloc-site. The existing CmpLog
+          dictionary mining harvests `computed_size` as a magic constant
+          and feeds the producing input bytes back into havoc.
+    - afl-cc command line parsing fix for ijon
+  - afl-cmin*:
+    - nyx_mode is now working for all minimizer variants
+  - afl-showmap:
+    - no more .afl-showmap-temp-* files lying around
+  - IJON dist was changed to original IJON implementation: initial matching
+    bytes, max length is 1024
+  - lib* tools:
+    - MacOS support is back, thanks to @Jay-1409 !
+
+
+### Version ++4.40c (release)
+  - afl-fuzz:
+    - FrameShift integrated and enabled by default, disable with
+      AFL_FRAMESHIFT_DISABLE and configure effort via
+      AFL_FRAMESHIFT_MAX_OVERHEAD. In extensive fuzzbench analysis at worst
+      (on average) it does nothing, at best it improves time to new coverage
+      and total coverage unlocked. https://arxiv.org/pdf/2507.05421
+      Thanks to @hgarrereyn for the PR!
+    - Fixed several potential crashes when using IJON
+    - added `AFL_FORCE_FASTRESUME` which will ignore the saved hash of the
+      target - but note it will only work if the coverage map size did not
+      change
+    - prevent further executed instrumented programs by the fuzz target to
+      manipulate the coverage
+  - afl-cc:
+    - LLVM 22 support (they are again switching around include files ...)
+    - g_/curl_/xml_ string support for COMPCOV, thanks to @Prajwal-kp-18
+    - optimized hidden CFG instrumentation (don't instrument vector selects)
+    - plugin optimization and fixes by @nbars, @kyakdan and @koltiradw
+    - marked GCC plugins as unmaintained. We need someone who know gimple and
+      is willing to fix the plugin issues, workarounds for gcc bugs and
+      overall improve the plugin.
+    - env `AFL_LLVM_DENY_EXEC` will abort any common exec calls
+  - afl-cmin:
+    - new implementation in C by @kcwu - it is currenlty not built though
+      because of maturity issues, e.g. does not work with Nyx
+    - afl-cmin.py was changing behaviour to hash the original filenames,
+      this was reverted.
+    - afl-cmin and afl-cmin.py honor `AFL_SHA1_FILENAMES` now
+  - afl-showmap:
+    - -f support added by Prajwal-kp-18 - thanks!
+    - faster stream mode by @nbars
+  - qemu_mode:
+    - fix when AFL_EXITPOINT is not set, which could prevent detecting crashes
+  - afl-plot:
+    - multiple AFL++ out directories now supported, thanks to @Jay-1409 !
+
+
+### Version ++4.35c (release)
+  - GUIFuzz++ merged: Unleashing Grey-box Fuzzing on Desktop Graphical User
+                      Interfacing Applications
+    https://futures.cs.utah.edu/papers/25ASE.pdf
+  - afl-fuzz:
+    - fix syncing issues with crashes and custom mutators by @AndyH-1
+    - another attempt to kill every client, thanks to @leonasdev
+  - afl-cc:
+    - Huge refactor for default pcguard instrumentation, several minor and
+      medium bug fixes, complete hidden decision coverage
+    - LTO: also added complete hidden decision coverage
+    - Various small fixes by @nbars, thanks!
+    - IJON fix to search for the necessary include
+    - Allow compiling the gcc plugin with clang++, thanks to @exoosh
+    - Fix for unusual bit sizes in cmplog-instructions-pass by @forzafedor
+  - qemu_mode:
+    - IJON support, thanks to @nj00001! see qemu_mode/README.md
+    - leaner, less warnings, thanks to @McSinyx!
+  - afl-tmin
+    - fix custom trimmings, thanks to @renatahodovan!
+  - custom mutators:
+    - Gramatron: fixes + cjson switch by @CarvedCoder, fix by @jubnzv
+
+
+### Version ++4.34c (release)
+  - IJON integration by @vi3tL0u1s - thanks a lot!!
+    - see docs/IJON.md on how to use it
+  - unicorn_mode:
+    - UnicornAFL v3!! thanks to @wtdcode!
+  - qemu_mode:
+    - fix compilation for a few platforms
+  - afl-fuzz
+    - larger improvements to CMPLOG, thanks to @am009
+    - scroll down before clearing the screen to not loose content
+    - minor bug fixes
+  - afl-showmap
+    - fix -C parameter breakage introduced in v4.33c
+  - afl-cc:
+    - enabled LLVM 22
+    - new env: AFL_COMPILER_LAUNCHER to allow ccache usage (thanks to @nbars)
+    - fix a offset calculation bug in AFL++ PCGUARD
+    - make AFL_DUMP_MAP_SIZE work for CLASSIC modes
+    - fix a crash when running with LLVM 20 when compiling PCGUARD with LTO
+    - fix deprecation warnings for LLVM 20+
+    - fix 128 bit support for cmplog-switches pass
+    - fix 32 bit cmplog support
+    - skip blocks for instrumentation that are already instrumented
+  - Building:
+    - new NO_UNICORN and NO_QEMU and NO_FRIDA build options
+    - build fixes for FreeBSD
+  - custom_mutators:
+    - added AIXCC Team Atlanta's zero-mq plugin to add testcases from remote
+
+
+### Version ++4.33c (release)
+  - afl-fuzz:
+    - Use `AFL_PRELOAD_DISCRIMINATE_FORKSERVER_PARENT` if you use AFL_PRELOAD
+      to disable fork, see docs (thanks to @alexandredoyen29)
+    - Fix for FAST power schedules (introduced in 4.32c) (thanks to @kcwu)
+    - Colors for NO_UI output (thanks to @smoelius)
+    - Fix potential sync issues when resuming sessions and when instances in a
+      campaign are restarted and skip entries that were synced from itself
+      (thanks to @kcwu for raising the issues and providing support!)
+    - Fix for when fast resuming failed
+    - more 64 bit archicture support by @maribu
+  - afl-cc:
+    - Added instrumenting hidden edges (approx 5% edges were not instrumented,
+      LLVM sancov overall misses 8% of edges compared to our implementation)
+      Note that is is currently only implemented for our PCGUARD plugin, not
+      LTO, CLASSIC, etc.!
+    - Fix to make AFL_SAN_NO_INST work with gcc_plugin
+    - MacOS aflpp driver compilation fix (-fsanitize=fuzzer implementation)
+    - Make AFL_DUMP_MAP_SIZE work even if the target has sanitizer issues
+  - qemuafl:
+    - Better MIPS persistent mode support
+    - `AFL_EXITPOINT` support added
+    - `AFL_QEMU_BLOCK_COV` block coverage support added
+  - afl-cmin:
+    - New afl-cmin.py which is much faster, will be executed by default via
+      afl-cmin if it executes successfully (thanks to @kcwu!)
+    - Nyx mode now fully works for minimizing (with afl-cmin.py which is
+      called by afl-cmin if python is available) - before the map size was
+      fixed and so large targets lost coverage.
+  - New desocketing library: utils/libaflppdesock
+    - Likely works when all other desocketing options fail
+  - nyx_mode:
+    - Properly determine map size
+
+
 ### Version ++4.32c (release)
   - Fixed a bug where after a fast restart of a full fuzzed corpus afl-fuzz
     terminates with "need at least one valid input seed that does not crash"
@@ -21,7 +402,6 @@
     - various minor fixes
   - frida_mode:
     - fixes for new MacOS + M4 hardware
-
 
 ### Version ++4.31c (release)
   - SAND mode added (docs/SAND.md) for more effecient fuzzing with sanitizers

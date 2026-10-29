@@ -18,7 +18,7 @@
 #
 
 FROM ubuntu:22.04
-LABEL "about"="G2Fuzz (AFL++ 4.32c + LLM-synthesized input generators)"
+LABEL "about"="G2Fuzz (AFL++ 5.03c + LLM-synthesized input generators)"
 
 ENV NO_CORESIGHT=1
 ENV NO_NYX=1

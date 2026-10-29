@@ -1,9 +1,10 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 /* GCC plugin for cmplog instrumentation of code for AFL++.
 
    Copyright 2014-2019 Free Software Foundation, Inc
    Copyright 2015, 2016 Google Inc. All rights reserved.
    Copyright 2019-2020 AFLplusplus Project. All rights reserved.
-   Copyright 2019-2024 AdaCore
+   Copyright 2019-2026 AdaCore
 
    Written by Alexandre Oliva <oliva@adacore.com>, based on the AFL++
    LLVM CmpLog pass by Andrea Fioraldi <andreafioraldi@gmail.com>, and
@@ -25,6 +26,7 @@
  */
 
 #include "afl-gcc-common.h"
+#include "../include/cmplog.h"
 
 /* This plugin, being under the same license as GCC, satisfies the
    "GPL-compatible Software" definition in the GCC RUNTIME LIBRARY
@@ -44,8 +46,8 @@ static const struct pass_data afl_cmplog_pass_data = {
     .properties_provided = 0,
     .properties_destroyed = 0,
     .todo_flags_start = 0,
-    .todo_flags_finish = (TODO_update_ssa | TODO_cleanup_cfg | TODO_verify_il |
-                          TODO_rebuild_cgraph_edges),
+    .todo_flags_finish =
+        (TODO_update_ssa | TODO_cleanup_cfg | TODO_rebuild_cgraph_edges),
 
 };
 
@@ -163,6 +165,7 @@ struct afl_cmplog_pass : afl_base_pass {
 
     /* Round it up.  */
     if (sz % 8) sz = (((sz - 1) / 8) + 1) * 8;
+    if (sz == 8 && !CONSTANT_CLASS_P(lhs) && !CONSTANT_CLASS_P(rhs)) return;
 
     /* Select the hook function to call, based on the size.  */
     switch (sz) {
@@ -195,41 +198,66 @@ struct afl_cmplog_pass : afl_base_pass {
     }
 
     /* Set attr according to the compare operation.  */
-    unsigned char attr = 0;
+    unsigned char attr = CMP_ATTR_NONE;
+    bool          floating = FLOAT_TYPE_P(TREE_TYPE(lhs));
+    bool          signed_int = !floating && !TYPE_UNSIGNED(TREE_TYPE(lhs));
 
     switch (code) {
 
       case UNORDERED_EXPR:
+        attr = CMP_ATTR_FCMP_UNO;
+        break;
       case ORDERED_EXPR:
-        /* ??? */
-        /* Fallthrough.  */
+        attr = CMP_ATTR_FCMP_ORD;
+        break;
       case NE_EXPR:
+        attr = floating ? CMP_ATTR_FCMP_UNE : CMP_ATTR_ICMP_NE;
+        break;
       case LTGT_EXPR:
+        attr = CMP_ATTR_FCMP_ONE;
         break;
 
       case EQ_EXPR:
+        attr = floating ? CMP_ATTR_FCMP_OEQ : CMP_ATTR_ICMP_EQ;
+        break;
       case UNEQ_EXPR:
-        attr += 1;
+        attr = CMP_ATTR_FCMP_UEQ;
         break;
 
       case GT_EXPR:
+        attr = floating     ? CMP_ATTR_FCMP_OGT
+               : signed_int ? CMP_ATTR_ICMP_SGT
+                            : CMP_ATTR_ICMP_UGT;
+        break;
       case UNGT_EXPR:
-        attr += 2;
+        attr = CMP_ATTR_FCMP_UGT;
         break;
 
       case GE_EXPR:
+        attr = floating     ? CMP_ATTR_FCMP_OGE
+               : signed_int ? CMP_ATTR_ICMP_SGE
+                            : CMP_ATTR_ICMP_UGE;
+        break;
       case UNGE_EXPR:
-        attr += 3;
+        attr = CMP_ATTR_FCMP_UGE;
         break;
 
       case LT_EXPR:
+        attr = floating     ? CMP_ATTR_FCMP_OLT
+               : signed_int ? CMP_ATTR_ICMP_SLT
+                            : CMP_ATTR_ICMP_ULT;
+        break;
       case UNLT_EXPR:
-        attr += 4;
+        attr = CMP_ATTR_FCMP_ULT;
         break;
 
       case LE_EXPR:
+        attr = floating     ? CMP_ATTR_FCMP_OLE
+               : signed_int ? CMP_ATTR_ICMP_SLE
+                            : CMP_ATTR_ICMP_ULE;
+        break;
       case UNLE_EXPR:
-        attr += 5;
+        attr = CMP_ATTR_FCMP_ULE;
         break;
 
       default:
@@ -237,15 +265,13 @@ struct afl_cmplog_pass : afl_base_pass {
 
     }
 
-    if (FLOAT_TYPE_P(TREE_TYPE(lhs))) {
-
-      attr += 8;
+    if (floating) {
 
       tree t = build_nonstandard_integer_type(sz, 1);
 
-      tree   s = make_ssa_name(t);
-      gimple g = gimple_build_assign(s, VIEW_CONVERT_EXPR,
-                                     build1(VIEW_CONVERT_EXPR, t, lhs));
+      tree s = make_ssa_name(t);
+      auto g = gimple_build_assign(s, VIEW_CONVERT_EXPR,
+                                   build1(VIEW_CONVERT_EXPR, t, lhs));
       lhs = s;
       gsi_insert_before(&gsi, g, GSI_SAME_STMT);
 
@@ -263,8 +289,8 @@ struct afl_cmplog_pass : afl_base_pass {
     lhs = fold_convert_loc(UNKNOWN_LOCATION, t, lhs);
     if (!is_gimple_val(lhs)) {
 
-      tree   s = make_ssa_name(t);
-      gimple g = gimple_build_assign(s, lhs);
+      tree s = make_ssa_name(t);
+      auto g = gimple_build_assign(s, lhs);
       lhs = s;
       gsi_insert_before(&gsi, g, GSI_SAME_STMT);
 
@@ -273,8 +299,8 @@ struct afl_cmplog_pass : afl_base_pass {
     rhs = fold_convert_loc(UNKNOWN_LOCATION, t, rhs);
     if (!is_gimple_val(rhs)) {
 
-      tree   s = make_ssa_name(t);
-      gimple g = gimple_build_assign(s, rhs);
+      tree s = make_ssa_name(t);
+      auto g = gimple_build_assign(s, rhs);
       rhs = s;
       gsi_insert_before(&gsi, g, GSI_SAME_STMT);
 
@@ -282,7 +308,7 @@ struct afl_cmplog_pass : afl_base_pass {
 
     /* Insert the call.  */
     tree   att = build_int_cst(t8u, attr);
-    gimple call;
+    gcall *call;
     if (pass_n)
       call = gimple_build_call(fn, 4, lhs, rhs, att,
                                build_int_cst(t8u, sz / 8 - 1));
@@ -305,7 +331,7 @@ struct afl_cmplog_pass : afl_base_pass {
       gimple_stmt_iterator gsi = gsi_last_bb(bb);
       if (gsi_end_p(gsi)) continue;
 
-      gimple stmt = gsi_stmt(gsi);
+      auto stmt = gsi_stmt(gsi);
 
       if (gimple_code(stmt) == GIMPLE_COND) {
 

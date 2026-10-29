@@ -52,6 +52,7 @@ eval/
 initial_seeds/
 core
 core.*
+experiments/**/campaigns/
 
 # ---- Editors / OS ----
 .DS_Store
@@ -63,3 +64,5 @@ core.*
 *.sif
 *.sif.version
 g2fuzz-amd64.tar*
+experiments/**/analysis/logs/
+experiments/**/results/coverage/edges/
