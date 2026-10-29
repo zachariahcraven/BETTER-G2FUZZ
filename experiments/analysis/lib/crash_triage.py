@@ -9,7 +9,7 @@ models found them. Replays are cached in results/cache/triage-cache.json, so rer
 Replay settings match AFL++'s run: a 1 GB allocation limit (allocations over it return NULL, as
 under `afl-fuzz -m 1024`), no leak checks, 20 s per crash.
 """
-import csv, glob, json, os, re, subprocess, sys
+import csv, glob, json, os, re, shlex, shutil, subprocess, sys, tempfile
 from collections import defaultdict
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -19,10 +19,11 @@ TARGET = {"lineup": "jhead", "tiff": "tiff_read_rgba_fuzzer", "png": "libpng_rea
 NAME = re.compile(r"(lineup|tiff|png|xml|wad|demo)([0-9a-z]*)-(.+)-r(\d+)$")   # optional run tag, e.g. wad4h
 BANDIT = re.compile(r"bandit-(jhead|tiff|png|xml|wad|demo)-(\w+)-r(\d+)$")   # scheduler runs: model sched-<sched>
 TAG = {"jhead": "lineup", "tiff": "tiff", "png": "png", "xml": "xml", "wad": "wad", "demo": "demo"}
+TARGETS_DIR = os.environ.get("G2F_TARGETS_DIR", "/targets")
 ENV = dict(os.environ,
            ASAN_OPTIONS="detect_leaks=0:allocator_may_return_null=1:max_allocation_size_mb=1024:symbolize=1",
            ASAN_SYMBOLIZER_PATH="/usr/lib/llvm-16/bin/llvm-symbolizer",
-           G2F_DOOM_IWAD="/targets/freedoom2.wad")
+           G2F_DOOM_IWAD=os.path.join(TARGETS_DIR, "freedoom2.wad"))
 FRAME = re.compile(r"^\s*#(\d+) 0x[0-9a-f]+ in (\S+) (\S+?):(\d+)")
 
 
@@ -45,20 +46,44 @@ def signature(stderr):
     return m.group(1), " | ".join(frames) or "(no frames in the target's code)"
 
 
+def target_args(target):
+    """Target replay arguments from <targets>/<target>.args, defaulting to '@@'."""
+    path = os.path.join(TARGETS_DIR, target + ".args")
+    if not os.path.exists(path):
+        return shlex.split("@@")
+    with open(path) as f:
+        lines = [line.strip() for line in f if line.strip()]
+    if len(lines) != 1:
+        raise ValueError(f"crash_triage: {path} must contain one line of arguments")
+    argv = shlex.split(lines[0])
+    if argv.count("@@") != 1:
+        raise ValueError(f"crash_triage: {path} must contain exactly one '@@'")
+    return argv
+
+
 def replay(target, path):
+    argv = target_args(target)
+    work_dir = tempfile.mkdtemp()
     try:
-        r = subprocess.run(["/targets/%s.asan" % target, path], capture_output=True, text=True,
-                           errors="replace", env=ENV, timeout=20)
-    except subprocess.TimeoutExpired:
-        return "hang", ""
-    sig = signature(r.stderr)
-    if sig:
-        return sig
-    # a signal shows as a negative return code, or 129-159 from a shell; 255 is a normal error
-    # exit (Doom's I_Error calls exit(-1)), not a crash
-    if r.returncode < 0 or 128 < r.returncode < 160:
-        return "signal-%d" % (-r.returncode if r.returncode < 0 else r.returncode - 128), ""
-    return "no-repro", ""
+        copy_path = os.path.join(work_dir, os.path.basename(path))
+        shutil.copyfile(path, copy_path)
+        cmd = [os.path.join(TARGETS_DIR, "%s.asan" % target)]
+        cmd += [copy_path if arg == "@@" else arg for arg in argv]
+        try:
+            r = subprocess.run(cmd, capture_output=True, text=True, errors="replace",
+                               env=ENV, cwd=work_dir, timeout=20)
+        except subprocess.TimeoutExpired:
+            return "hang", ""
+        sig = signature(r.stderr)
+        if sig:
+            return sig
+        # a signal shows as a negative return code, or 129-159 from a shell; 255 is a normal error
+        # exit (Doom's I_Error calls exit(-1)), not a crash
+        if r.returncode < 0 or 128 < r.returncode < 160:
+            return "signal-%d" % (-r.returncode if r.returncode < 0 else r.returncode - 128), ""
+        return "no-repro", ""
+    finally:
+        shutil.rmtree(work_dir, ignore_errors=True)
 
 
 cache_path = "results/cache/triage-cache.json"

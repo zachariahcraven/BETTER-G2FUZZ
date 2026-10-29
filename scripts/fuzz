@@ -77,6 +77,21 @@ if [ "$BACKEND" = slurm ]; then
   KEY="${G2F_KEY:-$LLM_DIR/dummy.key}"
 fi
 
+# Per-target arguments: <G2F_TARGETS>/<target>.args (one line, e.g. "-f @@" or "@@ /dev/null", from
+# targets/paper/) replaces the default "@@"; the paper's UNIFUZZ and MAGMA programs take extra arguments.
+# Read here, on the host, so job.sbatch and run.sh show the full command. Image targets have no .args file.
+target_args() {
+  local f="${G2F_TARGETS:+$G2F_TARGETS/$TARGET.args}" a
+  if [ -n "$f" ] && [ -f "$f" ]; then
+    a=$(tr -d '\n' < "$f")
+    [[ "$a" =~ ^[A-Za-z0-9@/.:_=+,\ -]+$ ]] || die "$f: unexpected characters in the target arguments"
+    [ "$(grep -o '@@' <<< "$a" | wc -l)" = 1 ] || die "$f: the target arguments need exactly one @@"
+    echo "$a"
+  else
+    echo "@@"
+  fi
+}
+
 die() { echo "fuzz: $*" >&2; exit 1; }
 # The folder of campaign <name>, wherever its experiment folder is; nothing if there is none.
 campaign_dir() {
@@ -252,8 +267,9 @@ mkdir -p initial_seeds && cp $SEEDS/* initial_seeds/ && find $OUT/default/gen_se
   else
     echo "reusing $(count "$d/initial_seeds") seeds: fuzzing only"
   fi
+  TARGS=$(target_args)
   inner="$inner afl-fuzz -i initial_seeds -o $OUT -c /targets/$TARGET.cmp -m 1024 -V $secs ${G2F_TIMEOUT_MS:+-t $G2F_TIMEOUT_MS} \
--k /AFLplusplus/g2fuzz/ -- /targets/$TARGET.afl @@ > fuzz.log 2>&1"
+-k /AFLplusplus/g2fuzz/ -- /targets/$TARGET.afl $TARGS > fuzz.log 2>&1"
   # AFL++ is 5-8x slower writing its output to a shared folder (Mac) or network home (Tempest),
   # so /eval/$OUT is fast local disk inside the container. /host is the campaign folder again;
   # its $OUT copy is updated every 30 s and at the end, for watch/status/results.
@@ -291,7 +307,8 @@ mkdir -p initial_seeds && cp $SEEDS/* initial_seeds/ && find $OUT/default/gen_se
       echo 'fast=${TMPDIR:-/tmp}/g2f-$SLURM_JOB_ID; mkdir -p "$fast"   # node-local disk for the AFL++ output'
       # The final copy runs here, outside the image: on scancel or the time limit, Slurm also
       # stops the process that mounts the image, so the tools inside it are already gone.
-      printf 'copy_back() { cp -a -u "$fast"/. %q/ 2>/dev/null; echo "job.sbatch: output copied back (cp exit $?)"; rm -rf "$fast"; }\n' "$d/$OUT"
+      # AFL++ writes its files 0600 and folders 0700 (DEFAULT_PERMISSION): give the group full access after the copy
+      printf 'copy_back() { cp -a -u "$fast"/. %q/ 2>/dev/null; echo "job.sbatch: output copied back (cp exit $?)"; chmod -R g+rwX %q; rm -rf "$fast"; }\n' "$d/$OUT" "$d/$OUT"
       printf 'apptainer exec'; printf ' %q' "${ARGS[@]}"
       printf ' --bind "$fast":%q --bind %q' "/eval/$OUT" "$d:/host"
       printf ' %q' --env AFL_NO_UI=1 "$SIF" bash /eval/run.sh; echo ' &'

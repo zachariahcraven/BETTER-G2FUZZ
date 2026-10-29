@@ -4,6 +4,7 @@
 import argparse
 import json
 import os
+import shlex
 import shutil
 import subprocess
 import sys
@@ -18,6 +19,8 @@ def parse_args():
     parser.add_argument("target", help="AFL-instrumented binary")
     parser.add_argument("seed_dir", help="Folder of seed files")
     parser.add_argument("--stock", help="Folder of stock seeds")
+    parser.add_argument("--args", default="@@",
+                        help="Target command-line arguments, with one '@@' for the input file")
     parser.add_argument("-t", "--timeout", type=int, default=1000,
                         help="Per-input timeout in ms (default: 1000)")
     return parser.parse_args()
@@ -41,7 +44,15 @@ def get_generator(filename):
     return "stock"
 
 
-def run_afl_showmap(target, input_dir, output_dir, timeout_ms):
+def target_argv(args):
+    """Split target arguments and check that exactly one '@@' marks the input file."""
+    argv = shlex.split(args)
+    if argv.count("@@") != 1:
+        raise ValueError("--args must contain exactly one '@@'")
+    return argv
+
+
+def run_afl_showmap(target, input_dir, output_dir, timeout_ms, args="@@"):
     """Run afl-showmap once per input, writing <output_dir>/<input name>.
 
     Not its folder mode (-i): that runs the target persistently, so one-time setup edges land only
@@ -49,18 +60,28 @@ def run_afl_showmap(target, input_dir, output_dir, timeout_ms):
     writes the edges it reached, so afl-showmap's exit status is not an error here.
     """
     timeouts = []
+    argv = target_argv(args)
     for name in sorted(os.listdir(input_dir)):
         path = os.path.join(input_dir, name)
         if not os.path.isfile(path):
             continue
-        cmd = ["afl-showmap", "-q", "-o", os.path.join(output_dir, name), "-t", str(timeout_ms),
-               "--", target, path]
+        work_dir = tempfile.mkdtemp()
         try:
-            subprocess.run(cmd, capture_output=True, timeout=timeout_ms / 1000.0 + 30)
-        except FileNotFoundError:
-            raise RuntimeError("afl-showmap not found on PATH")
-        except subprocess.TimeoutExpired:
-            timeouts.append(name)
+            copy_path = os.path.join(work_dir, name)
+            shutil.copyfile(path, copy_path)
+            cmd = ["afl-showmap", "-q", "-o", os.path.abspath(os.path.join(output_dir, name)),
+                   "-t", str(timeout_ms),
+                   "--", os.path.abspath(target),
+                   *[copy_path if arg == "@@" else arg for arg in argv]]
+            try:
+                subprocess.run(cmd, capture_output=True, timeout=timeout_ms / 1000.0 + 30,
+                               cwd=work_dir)
+            except FileNotFoundError:
+                raise RuntimeError("afl-showmap not found on PATH")
+            except subprocess.TimeoutExpired:
+                timeouts.append(name)
+        finally:
+            shutil.rmtree(work_dir, ignore_errors=True)
     return timeouts
 
 
@@ -87,6 +108,7 @@ def main():
 
     try:
         # Validate inputs
+        target_argv(args.args)
         if not os.path.isfile(args.target):
             raise FileNotFoundError(f"Target not found: {args.target}")
 
@@ -108,7 +130,8 @@ def main():
             # Run afl-showmap on seed directory
             seed_map_dir = os.path.join(temp_dir, "seed_maps")
             os.makedirs(seed_map_dir)
-            seed_timeouts = run_afl_showmap(args.target, args.seed_dir, seed_map_dir, args.timeout)
+            seed_timeouts = run_afl_showmap(args.target, args.seed_dir, seed_map_dir, args.timeout,
+                                            args.args)
             failures = [(n, "timeout") for n in seed_timeouts]
 
             # Collect edges from each seed file
@@ -144,7 +167,8 @@ def main():
 
                 stock_map_dir = os.path.join(temp_dir, "stock_maps")
                 os.makedirs(stock_map_dir)
-                stock_timeouts = run_afl_showmap(args.target, args.stock, stock_map_dir, args.timeout)
+                stock_timeouts = run_afl_showmap(args.target, args.stock, stock_map_dir, args.timeout,
+                                                 args.args)
                 failures.extend([(n, "timeout") for n in stock_timeouts])
 
                 stock_edges_set = set()
