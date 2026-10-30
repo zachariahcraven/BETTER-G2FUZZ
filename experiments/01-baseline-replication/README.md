@@ -2,8 +2,10 @@
 
 **Question:** does G2FUZZ beat AFL++(cmplog) on the paper's targets with our setup, as in the paper's Table 1?
 We rerun the paper's evaluation before changing anything, so later studies have a baseline on our own setup.
-**Status:** phase B done and analyzed (2026-10-25); phase C needs approval. **Design and dated changes:** [PLAN.md](PLAN.md).
+**Status:** done: phase B (2026-10-25) and phase C (2026-10-26), both analyzed. **Design and dated changes:** [PLAN.md](PLAN.md).
 **Differences from the paper:** [DRIFT.md](DRIFT.md).
+**Paths since 2026-10-29:** the repo folder is `BETTERG2FUZZ` (was `WORKING-BETTERG2FUZZ`) and the target build
+scripts are in `build/targets/` (was `targets/paper/`); this study's scripts, logs and campaigns keep the old paths.
 
 ## Arms
 | Arm | Repo | AFL++ | What runs |
@@ -21,7 +23,7 @@ Each arm runs with its own repo's scripts and image; all campaign data is kept h
 | --- | --- | --- |
 | Setup | Which model? Do all 4 arms work end to end? ([setup/](setup/)) | done |
 | B | UNIFUZZ: 10 programs x 4 arms x 5 reps x 6 h = 200 campaigns | done (2026-10-23 13:13 to 2026-10-24 22:27) |
-| C | The paper's 24 h x 5, scoped (2026-10-25) to exiv2, gdk-pixbuf-pixdata, imginfo, jhead, mp3gain with the 4.32c arms: `launch/phaseC.sh`, 50 campaigns; MAGMA and FuzzBench later | approved, launch pending |
+| C | The paper's 24 h x 5, scoped (2026-10-25) to exiv2, gdk-pixbuf-pixdata, imginfo, jhead, mp3gain with the 4.32c arms: `launch/phaseC.sh`, 50 campaigns; MAGMA and FuzzBench later | done (2026-10-26) |
 
 ## Layout
 | Folder | Holds |

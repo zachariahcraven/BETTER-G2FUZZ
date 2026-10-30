@@ -1,0 +1,181 @@
+#!/usr/bin/env bash
+# sweep: run one model against every target in targets.txt (study 02-model-sweep, see its README.md).
+#
+# Usage (from any folder, on Tempest):
+#   launch/sweep start  <model> [secs] [rep] [--wait]   launch every campaign of this model that isn't launched yet
+#   launch/sweep status <model> [rep]                   one line per target: state, coverage, crashes, LLM use
+#   launch/sweep csv    <model> [rep]                   the same as CSV (for results/)
+#
+#   <model>  a folder in students/shared-models, e.g. Qwen3.8-27B-FP8 or phi-4. Start its server first:
+#            scripts/fuzz llm start 48 --model <model>
+#   secs     fuzzing time per campaign (default 21600 = 6 h, as in 01-baseline-replication). rep: default 1.
+#   --wait   keep going until every target is launched (checks every 10 min; run it in tmux). Without it,
+#            start launches what it can now; run it again later. It never launches a campaign twice.
+#
+# Seed generation sends many LLM calls. With too many campaigns generating seeds on one server, calls queue past
+# G2FUZZ's 300 s limit, so start keeps at most MAX_SEEDGEN of this model's campaigns in seed generation at once.
+#
+# Settings (environment): MAX_SEEDGEN [4]   DRY=1 (print what start would do)
+# Scheduler: every campaign of this study uses ucb (SCHEDULER below, passed as --scheduler, so a G2F_GENERATOR_SCHEDULER
+#            in your shell can't change it; recorded in each launch.txt).
+#                         G2F_SEEDGEN_MIN [300]  minutes of seed generation each job's time limit allows (scripts/fuzz
+#                         default 120 is too short: gdk-pixbuf-pixdata took 115 min alone on the server)
+# Campaigns: campaigns/<model>/<target>-r<rep>/, each with launch.txt (what, when, who).
+set -euo pipefail
+umask 002   # shared folder: teammates can write the campaigns
+
+STUDY="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO="$(cd "$STUDY/../.." && pwd)"
+FUZZ="$REPO/scripts/fuzz"
+STUDENTS=/home/group/csci-591-automated-vulnerability-discovery/students
+TARGET_TREE="$STUDENTS/g2f-targets/paper"
+MAX_SEEDGEN="${MAX_SEEDGEN:-4}"
+SCHEDULER=ucb   # the study's design (README.md): the team's UCB generator scheduler for every model and target
+# Only the job's time limit: a seed generation that outlasts it would cut the fuzzing short. Fuzz time is unchanged.
+export G2F_SEEDGEN_MIN="${G2F_SEEDGEN_MIN:-300}"
+
+die() { echo "sweep: $*" >&2; exit 1; }
+
+# The target names in targets.txt (comments and blank lines dropped)
+targets() { sed 's/#.*//' "$STUDY/launch/targets.txt" | awk 'NF { print $1 }'; }
+
+# Sets MODEL and points every scripts/fuzz call at this model's campaign folder and the paper's targets
+use_model() {
+  MODEL="${1:-}"
+  [ -n "$MODEL" ] || die "which model? e.g. launch/sweep status phi-4 (models: ls $STUDENTS/shared-models)"
+  [ -f "$STUDENTS/shared-models/$MODEL/config.json" ] || die "no model folder $STUDENTS/shared-models/$MODEL"
+  export G2F_EVAL="$STUDY/campaigns/$MODEL" G2F_TARGETS="$TARGET_TREE"
+}
+
+# A target's campaign (this model, rep REP) and its AFL++ output folder
+campaign() { echo "$G2F_EVAL/$1-r$REP"; }
+output() { echo "$(campaign "$1")/$1_output/default"; }
+
+# State of a target's campaign: not launched, not started, queued, seed generation, fuzzing, done, failed
+state() {
+  local c job
+  c=$(campaign "$1")
+  [ -d "$c" ] || { echo "not launched"; return; }
+  [ -f "$c/slurm.jobid" ] || { echo "not started"; return; }
+  job=$(squeue -h -j "$(cat "$c/slurm.jobid")" -o %T 2>/dev/null || true)
+  if [ "$job" = PENDING ]; then echo "queued"
+  elif [ -n "$job" ] && [ -z "$(ls -A "$c/initial_seeds" 2>/dev/null)" ]; then echo "seed generation"
+  elif [ -n "$job" ]; then echo "fuzzing"
+  elif [ -f "$(output "$1")/fuzzer_stats" ]; then echo "done"
+  else echo "failed"; fi
+}
+
+# How many of this model's campaigns are queued or generating seeds (both will call the LLM soon)
+seedgen_count() {
+  local t n=0
+  for t in $(targets); do
+    case "$(state "$t")" in queued|"seed generation") n=$((n + 1)) ;; esac
+  done
+  echo "$n"
+}
+
+server_ready() { "$FUZZ" llm status --model "$MODEL" | grep -q '^ready:'; }
+
+# Creates (if needed) and submits one campaign, and records how it was launched
+launch() {
+  local t=$1 c="$1-r$REP"
+  export G2F_TARGET="$t"
+  [ -d "$(campaign "$t")" ] || "$FUZZ" new "$c" --model "$MODEL" > /dev/null
+  "$FUZZ" run "$c" "$SECS" --model "$MODEL" --scheduler "$SCHEDULER" | sed "s/^/  $c: /"
+  {
+    echo "model:     $MODEL"
+    echo "target:    $t ($TARGET_TREE)"
+    echo "rep:       $REP"
+    echo "fuzz secs: $SECS"
+    echo "scheduler: $SCHEDULER"
+    echo "image:     $(cat "$REPO/build/g2fuzz.sif.version" 2>/dev/null)"
+    echo "launched:  $(date '+%F %T') by $USER with launch/sweep start"
+  } > "$(campaign "$t")/launch.txt"
+}
+
+# One pass over the targets: launches what the seed-generation limit allows. Sets LEFT (targets still to launch).
+start_pass() {
+  local t s busy
+  busy=$(seedgen_count); LEFT=()
+  for t in $(targets); do
+    s=$(state "$t")
+    case "$s" in
+      "not launched"|"not started") ;;   # to launch
+      *) continue ;;                      # launched before: never twice
+    esac
+    if [ "$busy" -ge "$MAX_SEEDGEN" ]; then LEFT+=("$t"); continue; fi
+    if [ "${DRY:-0}" = 1 ]; then echo "  would launch $t-r$REP ($SECS s)"
+    else launch "$t"; fi
+    busy=$((busy + 1))
+  done
+}
+
+cmd_start() {
+  local wait=0 args=() a
+  for a in "$@"; do [ "$a" = --wait ] && wait=1 || args+=("$a"); done
+  use_model "${args[0]:-}"
+  SECS="${args[1]:-21600}" REP="${args[2]:-1}"
+  case "$SECS$REP" in *[!0-9]*) die "secs and rep must be whole numbers" ;; esac
+  if ! server_ready; then
+    [ "${DRY:-0}" = 1 ] && echo "note: the $MODEL server isn't ready (dry run goes on)" ||
+      die "the $MODEL server isn't ready. Start it: scripts/fuzz llm start 48 --model $MODEL (check: scripts/fuzz llm status)"
+  fi
+  echo "== $MODEL, rep $REP, ${SECS} s each, scheduler $SCHEDULER, at most $MAX_SEEDGEN in seed generation"
+  [ "${DRY:-0}" = 1 ] || mkdir -p "$G2F_EVAL"
+  start_pass
+  while [ "$wait" = 1 ] && [ ${#LEFT[@]} -gt 0 ] && [ "${DRY:-0}" != 1 ]; do
+    echo "$(date '+%F %T') waiting for seed generation to finish; still to launch: ${LEFT[*]}"
+    sleep 600
+    server_ready || die "the $MODEL server stopped; ${#LEFT[@]} targets not launched (run start again once it is up)"
+    start_pass
+  done
+  if [ ${#LEFT[@]} -gt 0 ]; then echo "not launched yet (seed-generation limit): ${LEFT[*]}. Run start again later, or add --wait."
+  else echo "all targets launched. Progress: launch/sweep status $MODEL $REP"; fi
+}
+
+# One field of a fuzzer_stats file (written by AFL++ every minute): afl_stat <file> <field>
+afl_stat() { awk -v k="$2" '$1 == k { print $3 }' "$1" 2>/dev/null || true; }
+
+# The state as status shows it: a done campaign that fuzzed less than 95% of the time it was launched with
+# (Slurm's time limit cut it, e.g. after a very long seed generation) shows as "done (short)"
+shown_state() {
+  local s secs run
+  s=$(state "$1")
+  if [ "$s" = done ]; then
+    secs=$(awk '/^fuzz secs:/ { print $3 }' "$(campaign "$1")/launch.txt" 2>/dev/null || true)
+    run=$(afl_stat "$(output "$1")/fuzzer_stats" run_time)
+    if [ -n "$secs" ] && [ -n "$run" ] && [ $((run * 100)) -lt $((secs * 95)) ]; then s="done (short)"; fi
+  fi
+  echo "$s"
+}
+
+# One target's numbers: state, fuzzer_stats fields, generators, LLM steps (llmGen-M) and LLM calls
+row() {
+  local t=$1 c o
+  c=$(campaign "$t"); o=$(output "$t")
+  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$t" "$(shown_state "$t")" \
+    "$(afl_stat "$o/fuzzer_stats" edges_found)" "$(afl_stat "$o/fuzzer_stats" saved_crashes)" \
+    "$(afl_stat "$o/fuzzer_stats" execs_per_sec)" "$(afl_stat "$o/fuzzer_stats" run_time)" \
+    "$(ls "$o/generators" 2>/dev/null | wc -l | tr -d ' ')" \
+    "$(grep -a -c 'Gen-M start' "$c/fuzz.log" 2>/dev/null || true)" \
+    "$(cat "$c/llm_calls.jsonl" 2>/dev/null | wc -l | tr -d ' ')"
+}
+HEADER="target\tstate\tedges\tcrashes\texecs/s\trun_s\tgenerators\tllm_steps\tllm_calls"
+
+cmd_status() {
+  use_model "${1:-}"; REP="${2:-1}"
+  echo "== $MODEL, rep $REP ($G2F_EVAL)"
+  { echo -e "$HEADER"; for t in $(targets); do row "$t"; done; } | column -t -s $'\t'
+}
+
+cmd_csv() {
+  use_model "${1:-}"; REP="${2:-1}"
+  { echo -e "model\t$HEADER"; for t in $(targets); do echo -e "$MODEL\t$(row "$t")"; done; } | tr '\t' ','
+}
+
+case "${1:-help}" in
+  start)  shift; cmd_start "$@" ;;
+  status) shift; cmd_status "$@" ;;
+  csv)    shift; cmd_csv "$@" ;;
+  *) awk 'NR > 1 && !/^#/ { exit } NR > 1 { sub(/^# ?/, ""); print }' "${BASH_SOURCE[0]}" ;;
+esac

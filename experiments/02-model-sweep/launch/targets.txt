@@ -1,0 +1,22 @@
+# The 15 targets of 02-model-sweep: one name per line, from g2f-targets/paper (ls it for all 28).
+# Text after # is a note. launch/sweep runs them in this order.
+#
+# target                          format             benchmark   why it is in
+jhead                           # jpg                UNIFUZZ     team reference; phase B/C baseline (Qwen3.8)
+gdk-pixbuf-pixdata              # 9 image formats    UNIFUZZ     multi-format; phase B baseline
+imginfo                         # 8 image formats    UNIFUZZ     multi-format; phase B baseline
+tiffsplit                       # tiff               UNIFUZZ     phase B baseline
+mp3gain                         # mp3                UNIFUZZ     phase B baseline
+mp42aac                         # mp4                UNIFUZZ     G2FUZZ significantly ahead in phase B
+pdftotext                       # pdf                UNIFUZZ     G2FUZZ significantly ahead in phase B
+bloaty_fuzz_target              # elf                FuzzBench   complex binary format
+freetype2_ftfuzzer              # ttf                FuzzBench   2 stock seeds: LLM seeds matter
+lcms_cms_transform_fuzzer       # icc                FuzzBench   1 stock seed
+libpcap_fuzz_both               # pcap               FuzzBench   stock corpus is only "hi"
+vorbis_decode_fuzzer            # ogg                FuzzBench   1 stock seed
+woff2_convert_woff2ttf_fuzzer   # woff2              FuzzBench   compressed container format
+libpng_read_fuzzer              # png                MAGMA       known bugs (MAGMA canaries)
+sndfile_fuzzer                  # 7 audio formats    MAGMA       known bugs; multi-format
+#
+# Left out: ffmpeg (slowest seed generation, mp4 again), flvmeta (saturated in phase B), exiv2 (jpg again, its
+# seeds take one path), openssl_x509, libjpeg-turbo, harfbuzz (1,000-3,000 stock seeds drown out LLM seeds).
