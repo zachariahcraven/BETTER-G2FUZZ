@@ -1,0 +1,49 @@
+# Builders for the G2FUZZ paper's targets (build/targets/). One stage per benchmark, each with only the
+# packages that benchmark's own build environment installs, because autotools/cmake builds switch features
+# on when they find a library (e.g. libsndfile + libflac). Base: the g2fuzz image, so the compilers are the
+# same AFL++ 4.32c / LLVM 16 that fuzz the targets.
+#   docker buildx build --platform linux/amd64 -f build/Dockerfile.targets --build-arg BASE=g2fuzz:amd64 \
+#     --target <unifuzz|fuzzbench|magma-libpng|magma-libtiff|magma-poppler|magma-libsndfile> -t g2f-builder:<stage> --load .
+# Binaries must still run in the plain g2fuzz image: build.sh copies libraries the run image lacks into
+# OUT/lib and sets RPATH $ORIGIN/lib (patchelf); build/targets/test_paper_targets.sh checks it with ldd.
+ARG BASE=g2fuzz:amd64
+
+FROM ${BASE} AS common
+# Build tools only (no libraries whose presence changes what a target compiles in)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends pkg-config unzip yasm nasm ragel flex bison autogen \
+      autopoint gettext texinfo libtool-bin wget patchelf && \
+    rm -rf /var/lib/apt/lists/*
+
+# UNIFUZZ (unifuzz/unibench_build afl/Dockerfile): gdk-pixbuf's step adds these; ffmpeg's adds nasm
+FROM common AS unifuzz
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libglib2.0-dev gtk-doc-tools libtiff-dev libpng-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# FuzzBench (benchmarks/*/Dockerfile on oss-fuzz base-builder): build tools only; libraries come from source
+FROM common AS fuzzbench
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends zlib1g-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# MAGMA v1.2: one image per library, as MAGMA does (targets/<lib>/preinstall.sh). Kept apart because e.g.
+# Ubuntu's libtiff-dev pulls in webp/zstd/jbig dev packages, which MAGMA's own libtiff build would then detect.
+FROM common AS magma-libpng
+RUN apt-get update && apt-get install -y --no-install-recommends zlib1g-dev && rm -rf /var/lib/apt/lists/*
+
+FROM common AS magma-libtiff
+RUN apt-get update && apt-get install -y --no-install-recommends zlib1g-dev liblzma-dev libjpeg-turbo8-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+FROM common AS magma-poppler
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends zlib1g-dev libjpeg-dev libopenjp2-7-dev libpng-dev libcairo2-dev \
+      libtiff-dev liblcms2-dev libboost-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+FROM common AS magma-libsndfile
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libasound2-dev libflac-dev libogg-dev libvorbis-dev libopus-dev \
+      libmp3lame-dev libmpg123-dev && \
+    rm -rf /var/lib/apt/lists/*
