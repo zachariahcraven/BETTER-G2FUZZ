@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# fetch-models: download the bake-off models into the shared students/shared-models folder, one folder per model
+# (same layout as Qwen3.8-27B-FP8, so llm-serve.sbatch can serve any of them as /models/<folder>).
+# Run on a Tempest login node, in tmux or with nohup: about 180 GB in all. Skips models already downloaded.
+#
+# Usage: scripts/fetch-models [repo-id[@revision] ...]   (default: all of MODELS below, in order)
+#
+# Gated repos (Llama, Mistral): accept the license on huggingface.co first, then
+# `uvx --from huggingface_hub hf auth login` (or set HF_TOKEN).
+# Each model's commit is pinned in <folder>/.cache/huggingface/download/*.metadata and logged to REVISIONS.txt.
+set -uo pipefail
+module load tools/uv/0.9.22
+export HF_HUB_DISABLE_TELEMETRY=1 DO_NOT_TRACK=1
+DEST=/home/group/csci-591-automated-vulnerability-discovery/students/shared-models
+# Smaller and coding models first, then the ones that want an A100/H100 (or quantization on an A40)
+MODELS=(
+  meta-llama/Llama-3.1-8B-Instruct               # Llama 3.1 Community License (gated)
+  microsoft/phi-4                                # MIT
+  bigcode/starcoder2-15b-instruct-v0.1           # BigCode OpenRAIL-M; the base starcoder2-15b has no chat template
+  deepseek-ai/DeepSeek-Coder-V2-Lite-Instruct    # DeepSeek Model License (code MIT)
+  mistralai/Mistral-Small-3.1-24B-Instruct-2503  # Apache 2.0 (gated: share contact info)
+)
+# Duplicate weight formats we don't serve: Llama's original/ (Meta format), Mistral's consolidated (mistral format)
+EXCLUDE=(--exclude 'original/*' --exclude 'consolidated*.safetensors' --exclude '*.pth' --exclude '*.gguf')
+
+[ $# -gt 0 ] && MODELS=("$@")
+for spec in "${MODELS[@]}"; do
+  repo=${spec%@*} rev=(); [ "$spec" != "$repo" ] && rev=(--revision "${spec#*@}")
+  dir=$DEST/${repo#*/}
+  if [ -f "$dir/.done" ]; then echo "SKIP $repo (already in $dir)"; continue; fi
+  mkdir -p "$dir" && chmod 2755 "$dir"
+  if uvx --from "huggingface_hub[hf_xet]" hf download "$repo" "${rev[@]}" --local-dir "$dir" "${EXCLUDE[@]}"; then
+    touch "$dir/.done"; chmod -R g-w,o-rwx "$dir"
+    echo "$(date '+%F') $repo @ $(head -1 "$dir/.cache/huggingface/download/config.json.metadata") ($(du -sh "$dir" | cut -f1))" \
+      | tee -a "$DEST/REVISIONS.txt"
+    echo "DONE $repo $(date +%T)"
+  else echo "FAILED $repo"; fi
+done
+echo "ALL FINISHED $(date)"

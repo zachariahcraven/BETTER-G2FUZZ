@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# enable-completion: turn on Tab completion and the `fuzz` alias for scripts/fuzz in your bash (Tempest).
+# Adds one line to ~/.bashrc that runs `scripts/fuzz completion` in every new shell. Running it again changes nothing.
+#
+# Usage: scripts/enable-completion           then open a new shell (or: source ~/.bashrc)
+#        source scripts/enable-completion    the same, and it's on in this shell right away
+# Undo: delete the two lines it added at the end of ~/.bashrc.
+#
+# No `set -e` or `exit` here: when sourced, this runs inside your own shell.
+
+fuzz_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/fuzz"   # the real path, the same for every teammate
+line="eval \"\$($(printf %q "$fuzz_path") completion)\""
+
+if grep -qxF "$line" ~/.bashrc 2>/dev/null; then
+  echo "enable-completion: already in ~/.bashrc"
+else
+  printf '\n# scripts/fuzz: Tab completion + the fuzz alias (added by scripts/enable-completion)\n%s\n' "$line" >> ~/.bashrc
+  echo "enable-completion: added to ~/.bashrc: $line"
+fi
+
+if [ "${BASH_SOURCE[0]}" != "$0" ]; then   # sourced: turn it on in this shell too
+  eval "$("$fuzz_path" completion)" && echo "enable-completion: on in this shell too (try: fuzz run <Tab>)"
+else
+  echo "enable-completion: open a new shell, or run: source ~/.bashrc"
+fi
+unset fuzz_path line

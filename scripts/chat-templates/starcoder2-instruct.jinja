@@ -1,0 +1,17 @@
+{#- starcoder2-15b-instruct-v0.1's template, except that a leading system message replaces its fixed preamble
+    (the original raises "System messages are not allowed", and G2Fuzz starts most dialogs with one). -#}
+{{ bos_token }}
+{%- if messages[0]['role'] != 'system' %}
+{{- 'You are an exceptionally intelligent coding assistant that consistently delivers accurate and reliable responses to user instructions.\n\n' }}
+{%- endif %}
+{%- for message in messages %}
+    {%- if message['role'] == 'system' %}
+        {%- if not loop.first %}{{ raise_exception('Only the first message can be a system message.') }}{% endif %}
+        {{- message['content'] + '\n\n' }}
+    {%- elif message['role'] == 'user' %}
+        {{- '### Instruction\n' + message['content'] + '\n\n' }}
+    {%- else %}
+        {{- '### Response\n' + message['content'] + eos_token + '\n\n' }}
+    {%- endif %}
+{%- endfor %}
+{{- '### Response\n' }}
