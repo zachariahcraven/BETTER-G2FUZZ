@@ -4,6 +4,7 @@
 **/.env
 
 # Campaign data and local outputs
+experiments/**/campaigns/
 eval/
 *_output/
 initial_seeds/
@@ -21,5 +22,5 @@ initial_seeds/
 *.so
 
 # Apptainer image and its source archive
-*.sif
-g2fuzz-amd64.tar*
+**/*.sif
+**/g2fuzz-amd64.tar*

@@ -24,10 +24,10 @@ flowchart TB
     targets["g2f-targets/<br/>the paper's target programs + seeds"]
     models["shared-models/<br/>Qwen3.8 model weights"]
   end
-  server["LLM server (Slurm GPU job)<br/>one per experiment, started with scripts/fuzz llm start"]
+  server["LLM server (Slurm GPU job)<br/>one per model, started with scripts/fuzz llm start"]
   job["Campaign (Slurm job)<br/>2 CPUs, 8 GB, hours to a day"]
   subgraph study["This repo: experiments/STUDY/"]
-    folder["campaigns/NAME/<br/>one folder per campaign (or eval/NAME/)"]
+    folder["campaigns/NAME/<br/>one folder per campaign (practice runs: experiments/practice/)"]
     analysis["analysis/ and results/<br/>coverage, bugs, statistics, report"]
   end
   code -.->|"built into"| image
@@ -81,69 +81,37 @@ flowchart TB
 ```
 
 Unlabelled arrows mean "then". `scripts/fuzz reuse` copies another campaign's seeds and skips step 1. Which generator
-step 3 mutates is chosen at random today; replacing that choice with a scheduler is this project's change.
+step 3 mutates is this project's change: our UCB scheduler picks it (the default; `--scheduler random` is upstream's
+random pick).
 
 ## Quick start (Tempest)
 First time only: [Tempest setup](#tempest-setup) steps 1–6. Then:
 
 ```bash
 ssh tempest
-cd /home/group/csci-591-automated-vulnerability-discovery/students/WORKING-BETTERG2FUZZ
+cd /home/group/csci-591-automated-vulnerability-discovery/students/BETTERG2FUZZ
 scripts/fuzz llm status                    # the team's model server; none yet? see step 8
 scripts/fuzz reuse example $USER-try       # the example run's seeds + generators: skips seed generation
-scripts/fuzz run $USER-try 300 --test      # ~5 min, with an LLM step
+scripts/fuzz run $USER-try 2400 --test     # ~40 min, with 2-3 LLM steps (each takes ~13 min on an A40)
 scripts/fuzz watch $USER-try               # Ctrl-C closes it; the run keeps going
 ```
 
 Campaign folders are shared: put your NetID (`$USER`) in each name.
 
 More: [Step II](#step-ii-run-a-campaign), [docs/EXAMPLE_RUN.md](docs/EXAMPLE_RUN.md) (a real run, start to finish).
-Local runs: [Local setup](#local-setup). Studies (design, launch scripts, results): [experiments/](experiments/README.md).
+Every command with its output: [docs/notes.md](docs/notes.md). Studies (design, launch scripts, results):
+[experiments/](experiments/README.md).
 
 Branches: `dev` is the team's working branch (one shared copy on Tempest). `exploration` keeps the October 2026 experiments as a record. `main` tracks the upstream version.
 
 # How to use it
-`scripts/fuzz` runs the upstream steps below for you, the same way in both places. Run every command from the repo root.
-
-|  | Local | Tempest |
-| --- | --- | --- |
-| Runs in | Docker image `g2fuzz:dev` | Slurm job per campaign, Apptainer image `g2fuzz.sif` |
-| LLM | CatChat (`gpt-oss:120b`), free key | the team's Qwen3.8 server (`Qwen3.8-27B-FP8-nothink`), one per experiment |
-| Setup | [Local setup](#local-setup), ~30 min | [Tempest setup](#tempest-setup) steps 1–6, ~15 min |
+`scripts/fuzz` runs the upstream steps below for you, on Tempest: each campaign is a Slurm job in the Apptainer image
+`g2fuzz.sif`, and the LLM is the team's own model server (Qwen3.8 by default, one server per model). It needs Slurm,
+so it doesn't run on a laptop; the Mac is only used to build the image (step 7). Setup: [Tempest setup](#tempest-setup)
+steps 1–6, ~15 min. Run `scripts/fuzz` from the repo root, or set up the `fuzz` alias ([Day to day](#day-to-day)) and
+run it from any folder.
 
 ## Step I: Preparation
-
-### Local setup
-Tested on an arm64 Mac.
-
-**1. Install Docker**
-
-| OS | Install |
-| --- | --- |
-| macOS | `brew install docker colima`, then `colima start --cpu 4 --memory 8 --disk 60` |
-| Linux | Docker Engine, then `sudo usermod -aG docker $USER` and log in again |
-| Windows | Docker Desktop with WSL2. Clone the repo and run every command inside WSL |
-
-Docker needs about 8 GB of RAM. On macOS, run `colima start` after each reboot and `colima stop` when you're done.
-
-**2. Get the code**
-
-```bash
-git clone https://github.com/zachariahcraven/BETTER-G2FUZZ.git
-cd BETTER-G2FUZZ
-```
-
-**3. Get a CatChat key:** follow [docs/CATCHAT_API_KEY.md](docs/CATCHAT_API_KEY.md), including its test step. The key
-goes in `~/.secrets/catchat.key`. Off campus, connect to the MSU VPN.
-
-**4. Build the image** (15–30 min the first time)
-
-```bash
-docker build -f docker/Dockerfile.g2fuzz -t g2fuzz:dev .
-```
-
-Rebuild after changing `afl/src/`, `afl/include/` or the Python files in `g2fuzz/`. Next: [Step II](#step-ii-run-a-campaign)
-(locally there is no `example` campaign to reuse, so the first run includes seed generation: ~25 min).
 
 ### Tempest setup
 Tempest can't reach CatChat, so runs use our own model server. Teammates: steps 1–6. Step 7 is the maintainer's;
@@ -197,10 +165,10 @@ priority-csci-591-automated-vulnerability-discovery
 Type `yes` only if the fingerprint is `SHA256:7mk+Xk/AepBmtj03PHQaiZJBnNnWWAJDSFtOJy6wy1Q` (ED25519; older clients may
 show ECDSA `SHA256:PyOIbM6dL+Wks93FQqXjJoeo28aquaCe8A5kLGqFm8o`). Asked once per computer.
 
-**6. Go to the shared copy.** The team runs everything from one copy on `dev`: one image, one `eval/`.
+**6. Go to the shared copy.** The team runs everything from one copy on `dev`: one image, one `experiments/` folder.
 
 ```console
-$ cd /home/group/csci-591-automated-vulnerability-discovery/students/WORKING-BETTERG2FUZZ
+$ cd /home/group/csci-591-automated-vulnerability-discovery/students/BETTERG2FUZZ
 $ git config --global --add safe.directory "$PWD"     # one time: lets git work in a folder another user owns
 $ scripts/fuzz account
 group-csci-591-automated-vulnerability-discovery
@@ -225,10 +193,10 @@ colima stop && colima start --vz-rosetta        # fast x86_64 builds
 ```
 
 After each code change, commit, then from the Mac repo (VPN on, ~10 min): `scripts/tempest-image`.
-It replaces `g2fuzz.sif` in the shared copy, writes the git version to `g2fuzz.sif.version`, and refuses while
+It replaces `build/g2fuzz.sif` in the shared copy, writes the git version to `build/g2fuzz.sif.version`, and refuses while
 anyone's campaigns run. The image holds the code: `git pull` on Tempest alone changes nothing.
 
-**8. The model server: one per experiment.** One person starts it; everyone's runs find it. It serves
+**8. The model server: one per model.** One person starts it; everyone's runs find it. By default it serves
 `Qwen3.8-27B-FP8-nothink` with vLLM from the shared `students/shared-models` folder, so there's nothing to download.
 Thinking is off: our build gives up on an LLM call after 300 s (`G2F_LLM_TIMEOUT`; upstream G2Fuzz has no limit of its own and uses the OpenAI SDK's 600 s). Qwen won our model bake-off against `gpt-oss:120b` and
 `llama3:70b`: the only one to finish seed generation in every run (20–40 min), and the most coverage after it on
@@ -239,18 +207,39 @@ mp42aac and pdftotext (about even with gpt-oss on jhead).
 | `scripts/fuzz llm start [hours]` | 1 A40 on the class priority account: starts right away (default 24 h; the class has 2 GPUs) |
 | `scripts/fuzz llm start [hours] h100` | 1 H100 on `gpufairshare`: uses no class GPU, but may wait hours or days |
 | `scripts/fuzz llm status` | The team's server: owner, queued, loading or ready, time left |
+| `scripts/fuzz llm host` | The running server's `<node>:<port>` (e.g. for an SSH tunnel) |
 | `scripts/fuzz llm stop` | Stops your server. Refuses while anyone's campaigns run |
 
-`start` refuses while a team server is up. Start it for longer than the experiment's runs (`run` warns if it would
-stop first) and stop it when done. Speed: an A40 has no native FP8, so calls take ~2.5× longer than on an A100/H100
+**Other models: `--model <folder>`**, any folder in `students/shared-models` (`scripts/fetch-models` downloads
+more). `new`/`reuse` record the model in the campaign's `model_setting.json`; `run` and `shell` then use that model's
+server, so each campaign keeps its model. `llm start|stop|status|host --model <folder>` act on that model's server:
+one server per model, so two models can run side by side on the class's two A40s.
+
+```bash
+scripts/fuzz llm start 24 --model phi-4
+scripts/fuzz new jhead-phi4 --model phi-4 && scripts/fuzz run jhead-phi4 86400
+```
+
+| Folder | Served with | GPU |
+| --- | --- | --- |
+| `Qwen3.8-27B-FP8` (default) | 32K context, thinking off | A40 |
+| `DeepSeek-Coder-V2-Lite-Instruct` | 32K context | A40 |
+| `phi-4` | 16K context (its maximum) | A40 |
+| `starcoder2-15b-instruct-v0.1` | 16K context; `scripts/chat-templates/starcoder2-instruct.jinja`, since its own template refuses system messages | A40 |
+| `Mistral-Small-3.1-24B-Instruct-2503` | 32K context, text only; fp8 on an A40 (the bf16 weights don't fit), bf16 on an H100 | A40 (fp8) or H100 |
+
+`Llama-3.1-8B-Instruct` is not downloaded yet (gated: accept its license on huggingface.co, log in, then
+`scripts/fetch-models meta-llama/Llama-3.1-8B-Instruct`; it is served like DeepSeek, 32K context on an A40).
+
+`start` refuses while a server for that model is up. Start it for longer than the experiment's runs (a run that outlasts it loses its
+LLM; `run` refuses while it is still loading) and stop it when done. Speed: an A40 has no native FP8, so calls take ~2.5× longer than on an A100/H100
 (median ~50 s); a long generator rewrite can pass our 300 s limit, and the call is then retried. `~/llm/VERSIONS.txt` records the model revision and GPU for the write-up.
 
 ### The setting files
-Upstream asks you to set up three files by hand; `scripts/fuzz new` does it for each campaign in `eval/<campaign>/`:
-- `openai_key.txt`: the key, mounted read-only (local: `~/.secrets/catchat.key`; Tempest: `~/llm/dummy.key`).
+Upstream asks you to set up three files by hand; `scripts/fuzz new` does it for each campaign, in its folder (default `experiments/practice/campaigns/<campaign>/`):
+- `openai_key.txt`: the key, mounted read-only (`~/llm/dummy.key`, made for you: the team's server takes any key).
 - `program_to_format.json`: copied from `g2fuzz/program_to_format.json`. `--program` must be one of its keys.
-- `model_setting.json`: written from `G2F_MODEL` (default: the team server's `Qwen3.8-27B-FP8-nothink` on Tempest,
-  CatChat's `gpt-oss:120b` locally).
+- `model_setting.json`: the model (default `Qwen3.8-27B-FP8-nothink`; `--model <folder>` picks another).
 
 G2Fuzz and the targets are compiled inside the image (`make source-only`, then `/targets/<name>.afl` and `.cmp`), as
 upstream describes. `scripts/fuzz help` lists all settings (key, server, model, target, image).
@@ -259,17 +248,17 @@ upstream describes. `scripts/fuzz help` lists all settings (key, server, model, 
 Seed generation (upstream Step II) and fuzzing (upstream Step III) run as one campaign:
 
 ```bash
-scripts/fuzz llm status               # Tempest only: "ready"? No server: scripts/fuzz llm start 2
+scripts/fuzz llm status               # "ready"? No server: scripts/fuzz llm start 2
 scripts/fuzz new $USER-first
 scripts/fuzz run $USER-first 900 --test
 scripts/fuzz watch $USER-first
 ```
 
-- Seed generation runs first (15–20 min), then fuzzing for 900 s.
+- Seed generation runs first (20 min to 2 h, depending on the target), then fuzzing for 900 s.
 - `--test` fires the LLM step (`llmGen-M`) after 10 s without new coverage, so you see one. Never use it for experiments.
 - Ctrl-C closes `watch`; the run keeps going. When it finishes: `scripts/fuzz results $USER-first`.
-- On Tempest the job shows up as `g2f-<netid>-first` (the server as `llm-serve`). A job that ends at once: read
-  `eval/<campaign>/slurm-<jobid>.out` (it checks the LLM first).
+- The job shows up as `g2f-<netid>-first` (the server as `llm-serve`). A job that ends at once: read
+  `slurm-<jobid>.out` in the campaign folder (it checks the LLM first).
 
 ![Active Jobs](docs/img/tempest/04-active-jobs.webp)
 
@@ -277,45 +266,50 @@ scripts/fuzz watch $USER-first
 
 | Command | Does |
 | --- | --- |
-| `new [name]` | Create a campaign in `eval/` (default name `jhead-MMDD-HHMM`) |
-| `reuse <from> [name]` | New campaign with `<from>`'s seeds and generators. Skips seed generation (15–20 min) |
-| `run <name> [secs] [--test]` | Background run: seed generation if needed, then fuzz (default 3600 s). Tempest: a Slurm job |
+| `new [name]` | Create a campaign in `experiments/practice/campaigns/` (default name `<netid>-<target>-MMDD-HHMM`) |
+| `reuse <from> [name]` | New campaign with `<from>`'s seeds and generators. Skips seed generation (20 min to 2 h) |
+| `run <name> [secs] [--test]` | Background run: seed generation if needed, then fuzz (default 3600 s), as a Slurm job |
 | `run <name> [secs] --afl` | The paper's baseline, AFL++(cmplog): same fuzzer, no LLM, stock seeds. Needs no server |
-| `shell <name>` | Shell in the image, in that campaign (Tempest: an interactive 4 h job) |
+| `run <name> [secs] --scheduler random` | Upstream's random generator pick instead of our UCB scheduler (the default), e.g. for comparisons. `status` shows which one a campaign uses |
+| `shell <name>` | Shell in the image, in that campaign (an interactive Slurm job, up to 4 h) |
 | `watch <name>` | Live view (Ctrl-C closes it; the run keeps going) |
 | `status [name]`, `results <name>`, `list` | Numbers once, final summary, all campaigns |
-| `stop <name>` | Stop the run (Tempest: `scancel`, after copying the output back). Files stay |
+| `stop <name>` | Stop the run (`scancel`, after copying the output back). Files stay |
+| `completion` | Tab completion + the `fuzz` alias for bash; set it up once with `source scripts/enable-completion` |
 
-On Tempest, run `watch`, `status` and `list` on the login node. What you see (a 5-minute `--test` run):
+Run `watch`, `status` and `list` on the login node. What you see (a 40-minute `--test` run with the UCB scheduler):
 
 ```console
-$ scripts/fuzz status llmtest2
-llmtest2  [ended]
+$ scripts/fuzz status zach-ubc
+zach-ubc  [ended]
 
 phase        finished
-run time     0:05:00
-corpus       732
-crashes      9
-coverage     634 edges (32.31%)
-speed        2290.12 execs/s, 487681 total
-last find    1s ago   (LLM step after 10s without one)
-llmGen-M     1 steps
-LLM calls    68 (68 ok)
+run time     0:40:00
+corpus       1152
+crashes      12
+coverage     582 edges (29.66%)
+speed        0.00 execs/s, 1759904 total
+last find    9s ago   (LLM step after 10s without one)
+llmGen-M     3 steps
+scheduler    ucb (exploration 1.0)
+LLM calls    12 (12 ok)   last: ok after 137.15s, 1544s ago
 
-$ scripts/fuzz results llmtest2
+$ scripts/fuzz results zach-ubc
 ...
-llmGen-M steps    : 1
-LLM calls         : 68 (68 ok, 0 errors)
-generator lineage : {"jpg-9.py": ["jpg-36.py"]}
-crashes dir       : eval/llmtest2/jhead_output/default/crashes
+generators        : 34
+scheduler         : ucb (exploration 1.0)
+llmGen-M steps    : 3
+LLM calls         : 12 (12 ok, 0 errors)
+generator lineage : {"jpg-15.py": ["jpg-33.py"], "xmp-10.py": ["xmp-34.py"]}
+crashes dir       : experiments/practice/campaigns/zach-ubc/jhead_output/default/crashes
 ```
 
-`generator lineage` shows which generator the LLM step mutated into which.
+`generator lineage` shows which generator each LLM step mutated into which (`speed` reads 0 once a run has ended).
 
 ### Output files
-Everything is in `eval/<campaign>/` and stays after the run. AFL++ writes `jhead_output/` on fast local disk (it is
-5–8x slower on a network home or shared folder); the copy in `eval/` is updated every 30 s and when the run ends or
-is stopped. On Tempest, pip installs from generators go to `eval/<campaign>/.pyuser/`.
+Everything is in the campaign folder (default `experiments/practice/campaigns/<campaign>/`) and stays after the run. AFL++ writes `jhead_output/` on fast local disk (it is
+5–8x slower on a network home or shared folder); the copy in the campaign folder is updated every 30 s and when the run ends or
+is stopped. Pip installs from generators go to `<campaign>/.pyuser/`.
 
 | Path | Contents |
 | --- | --- |
@@ -326,53 +320,62 @@ is stopped. On Tempest, pip installs from generators go to `eval/<campaign>/.pyu
 | `jhead_output/default/generators/` | Python generators the LLM wrote |
 | `jhead_output/default/fuzzer_stats`, `plot_data` | Coverage and speed (`afl-plot` graphs these) |
 | `jhead_output/default/mutation_log/relationship.json` | Which generator was mutated into which |
+| `jhead_output/default/mutation_log/generator_scheduler_state.json` | UCB's bookkeeping: each generator's credit, children, failures |
+| `generator_scheduler`, `ucb_exploration` | Which scheduler the run used (`status` shows it) |
 | `jhead_output/default/gen_seeds_energy_log` | Seeds added and time spent in the LLM |
-| `job.sbatch`, `run.sh`, `slurm-<jobid>.out` | Tempest only: the Slurm job |
+| `job.sbatch`, `run.sh`, `slurm-<jobid>.out` | The Slurm job |
 
 Debugging the pipeline? The raw commands `scripts/fuzz` runs: [docs/BY_HAND.md](docs/BY_HAND.md).
 
 ## Day to day
 
-**Alias (zsh):**
+**`fuzz` alias + Tab completion (Tempest, bash):** run once. Then `fuzz` means `scripts/fuzz` from any folder (it wins
+over any other `fuzz` on your PATH, e.g. an old `~/bin/fuzz`), and Tab completes commands, campaign names, options
+and model folders: `fuzz run <Tab>` lists your campaigns, `fuzz run <name> 900 --<Tab>` the options.
 
 ```bash
-printf '%s\n' "alias fuzz='$PWD/scripts/fuzz'" >> ~/.zshrc && source ~/.zshrc
+source scripts/enable-completion      # adds one line to ~/.bashrc (only once) and turns it on in this shell
 ```
 
-**Change the code,** then rebuild the image (local: `docker build`, Tempest: `scripts/tempest-image`) and start a
-new campaign:
+**Change the code,** then rebuild the image (`scripts/tempest-image` from the Mac, step 7) and start a new campaign:
 
 | What | File |
 | --- | --- |
-| Generator and mutator selection (scheduler hook) | `g2fuzz/generator_mutation.py` |
+| The generator scheduler (UCB) | `g2fuzz/py_utils/generator_scheduler.py` |
+| Where the scheduler is called (generator and mutator selection) | `g2fuzz/generator_mutation.py` |
 | Seed generation | `g2fuzz/program_gen.py` |
 | LLM calls, retries, logging | `g2fuzz/py_utils/llm_utils.py` |
 | When `llmGen-M` triggers | `afl/src/afl-fuzz.c` (search `G2F:`) |
-| Image contents and targets | `docker/Dockerfile.g2fuzz` |
+| Image contents | `build/Dockerfile.g2fuzz` |
+
+**Change `scripts/fuzz`** (no image rebuild needed): run `scripts/tests/test_fuzz_cli.sh` on Tempest before committing.
+It compares every command with the committed version under fake Slurm, and checks what other scripts read from its
+output. An intended change shows up as a difference: check it, then commit.
 
 **The paper's targets** (Tempest): `paper/` has the paper's exact versions (all 25 UNIFUZZ, FuzzBench and MAGMA
 projects), `latest/` the newest releases. Each target's arguments and seeds come from the folder; `ls` it (`*.afl`) for
-the names. G2FUZZ-upgradedAFL uses its own build, `g2f-targets/afl503/paper`. Build scripts: `targets/paper/`
-(`build-paper.sh`, tested by `tests/image/test_paper_targets.sh`). Keep both set for `new` and `run`:
+the names. `g2f-targets/afl503/` holds AFL++ 5.03c builds (for the archived G2FUZZ-upgradedAFL copy). Build scripts: `build/targets/`
+(`build-paper.sh`, tested by `build/targets/test_paper_targets.sh`). Keep both set for `new` and `run`:
 
 ```bash
 export G2F_TARGETS=/home/group/csci-591-automated-vulnerability-discovery/students/g2f-targets/paper
 export G2F_TARGET=libpng_libpng_read_fuzzer
-scripts/fuzz new png1 && scripts/fuzz run png1 3600
+scripts/fuzz new $USER-png1 && scripts/fuzz run $USER-png1 3600
 ```
 
 **Results on the Mac:**
 
 ```bash
-rsync -a tempest:/home/group/csci-591-automated-vulnerability-discovery/students/WORKING-BETTERG2FUZZ/eval/<campaign> eval/
-scripts/fuzz results <campaign>
+rsync -a tempest:/home/group/csci-591-automated-vulnerability-discovery/students/BETTERG2FUZZ/experiments/practice/campaigns/<campaign> experiments/practice/campaigns/
 ```
+
+Then read its files there (`fuzzer_stats`, `plot_data`, `crashes/`); `scripts/fuzz` itself only runs on Tempest.
 
 **Tempest's model from the Mac** (VPN on), through a tunnel:
 
 ```bash
-ssh -f -N -L 8000:$(ssh tempest /home/group/csci-591-automated-vulnerability-discovery/students/WORKING-BETTERG2FUZZ/scripts/fuzz llm host) tempest
-G2F_BASE_URL=http://host.docker.internal:8000/v1 G2F_MODEL=Qwen3.8-27B-FP8-nothink scripts/fuzz run <campaign>
+ssh -f -N -L 8000:$(ssh tempest /home/group/csci-591-automated-vulnerability-discovery/students/BETTERG2FUZZ/scripts/fuzz llm host) tempest
+curl -s http://localhost:8000/v1/models     # the server answers on your Mac now, e.g. to try prompts
 pkill -f "ssh -f -N -L 8000"      # close it afterwards
 ```
 
@@ -382,8 +385,7 @@ the group access to everything you own in the shared folder ([docs/GROUP_PERMISS
 
 **Git:**
 - Work on `dev`. The shared copy on Tempest stays on `dev` (everyone runs from it).
-- `eval/` and keys are git-ignored. Don't force-add them.
-- Linux Docker: campaign files are owned by root. Delete them with `sudo`.
+- Campaign folders (`experiments/*/campaigns/`) and keys are git-ignored. Don't force-add them.
 
 **Push to GitHub from Tempest (optional):** [docs/GITHUB_FROM_TEMPEST.md](docs/GITHUB_FROM_TEMPEST.md).
 
