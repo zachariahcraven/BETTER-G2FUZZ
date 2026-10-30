@@ -4,50 +4,46 @@
 **Owner:** n59m742 (+ team). **Status:** planned. **Started:** 2026-10-29.
 
 ## Design
-- **Arms:** one per model, G2FUZZ only (`scripts/fuzz run`, no `--afl`). One model at a time: all 15 targets, then
-  the next model.
-- **Targets:** the 15 in [launch/targets.txt](launch/targets.txt) (paper versions, `g2f-targets/paper`), with
-  the reason for each and what was left out.
-- **Models:** folders in `students/shared-models`, served by `scripts/fuzz llm start --model <folder>`.
-- **Run:** 6 h of fuzzing per campaign (default), rep 1 first, image `g2fuzz.sif` as recorded in each campaign's
-  `launch.txt`, generator scheduler **`ucb`** for every campaign (the team's UCB bandit; set in `launch/sweep`,
-  recorded in each `launch.txt`).
+- **Arms:** one per model in `students/shared-models`, G2FUZZ only, generator scheduler **`ucb`**
+  ([launch/study.conf](launch/study.conf)).
+- **Targets:** the 15 in [launch/targets.txt](launch/targets.txt) (paper versions, `g2f-targets/paper`), with the
+  reason for each and what was left out.
+- **Run:** 6 h of fuzzing per campaign, rep 1; image, server and settings recorded in each campaign's `launch.txt`.
 - **Compared against:** the Qwen3.8 runs of the same image are the reference. For the 7 UNIFUZZ targets,
   `01-baseline-replication/campaigns/B-<target>-g2432-r*` is an earlier Qwen3.8 baseline (older image bdb816a, and the
   random scheduler: a difference in two things, not one).
 
-## Running one model
+## Running it
 On Tempest, from the repo root:
 
 ```bash
-scripts/fuzz llm start 48 --model phi-4             # the model's server (1 A40); wait for "ready":
-scripts/fuzz llm status --model phi-4
-experiments/02-model-sweep/launch/sweep start phi-4 --wait     # in tmux: launches all 15 over a few hours
-experiments/02-model-sweep/launch/sweep status phi-4           # any time: one line per target
-experiments/02-model-sweep/launch/sweep csv phi-4 > experiments/02-model-sweep/results/phi-4-r1.csv   # when all are done
-scripts/fuzz llm stop --model phi-4                 # once every campaign has finished
+scripts/study start 02-model-sweep --servers --dry          # what it would start and launch
+scripts/study start 02-model-sweep --servers --background   # the whole study, in one command
+scripts/study status 02-model-sweep                         # any time: the driver, the servers, one line per campaign
 ```
 
-- `start` never launches a campaign twice, so it is safe to rerun (without `--wait` it launches what it can and
-  says what is left). `DRY=1` prints what it would do.
-- A `failed` campaign (ended without fuzzer_stats) is not retried by itself: read its `slurm-*.out` and
-  `seedgen.log`, move the folder to `campaigns/<model>/failed/`, and run `start` again.
-- At most `MAX_SEEDGEN` (default 4) campaigns of a model generate seeds at once. Seed generation takes 20 min to
-  2 h per target on an A40 (Qwen3.8 test, 2026-10-29: jhead 22 min, gdk-pixbuf-pixdata 115 min; multi-format
-  targets, pdftotext and mp42aac take longest), so all 15 are launched after several hours, and the model is done
-  about 6 h after the last one starts. Start the server for that long (48 h is safe). `sweep` gives each job 5 h for
-  seed generation (`G2F_SEEDGEN_MIN=300`); a run that still got cut short shows as `done (short)` in `status`.
-- Campaigns: `campaigns/<model>/<target>-r<rep>/` (git-ignored). `scripts/fuzz status|results|watch` work on them with
+- The driver (a small Slurm job, log `campaigns/study-driver-<job>.log`) starts each model's server on a class A40
+  when its campaigns need it, launches them (at most 4 seed generations per model), stops the server when the model
+  is done and writes `results/<model>-r1.csv`. `scancel <job>` stops it; `start` again picks up where it left off.
+  One model only: add `--only arm=<model>`.
+- **Time:** about 12–14 h per model (seed generation 20 min to 2 h per target, then 6 h of fuzzing). The class has 2
+  A40s, so two models run at once: **about 36–42 h for the whole study**, and teammates' servers on the class account
+  queue behind it. Only for members of `priority-quantumcore` (not partners), with that group's OK: `--gpu qc-h100`,
+  about 16–18 h on all 4 of its H100s.
+- A `failed` campaign (no fuzzer_stats) isn't retried by itself: read its `slurm-*.out` and `seedgen.log` and move it
+  to `campaigns/<model>/failed/`; the driver then launches it again. `done (short)` in `status`: Slurm's limit cut it.
+- `scripts/fuzz status|results|watch` work on a campaign with
   `G2F_EVAL=experiments/02-model-sweep/campaigns/<model> G2F_TARGET=<target>`.
 
 ## Layout
 | Folder | Holds |
 | --- | --- |
-| `launch/` | `sweep` (launches and summarizes a model's campaigns) and `targets.txt` |
-| `results/` | One CSV per model and rep (`sweep csv`), then tables and figures for the report |
+| `launch/` | `study.conf` (the campaigns) and `targets.txt` (the 15 targets, with reasons) |
+| `results/` | `<model>-r1.csv` per finished model and `campaigns.csv` (written by `scripts/study`), then the report's tables and figures |
 | `campaigns/` | Campaign data (git-ignored): `<model>/<target>-r<rep>/` |
-| `setup/sweep-test/` | The launcher's end-to-end test (2 targets, 600 s); not results |
+| `setup/sweep-test/` | Data of the first end-to-end test (2026-10-29, Qwen3.8, 600 s; seed generation took 22 min on jhead and 115 min on gdk-pixbuf-pixdata); not results |
 
 ## Results
-Filled in when the study ends. `edges` in `sweep status/csv` come from AFL++'s own `fuzzer_stats`: fine for comparing
-models on the same target (same binary). For the report, replay the queues as in `01-baseline-replication/analysis`.
+Filled in when the study ends. `edges` in `scripts/study status/csv` come from AFL++'s own `fuzzer_stats`: fine for
+comparing models on the same target (same binary). For the report, replay the queues as in
+`01-baseline-replication/analysis`.

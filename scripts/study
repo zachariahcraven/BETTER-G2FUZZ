@@ -1,0 +1,713 @@
+#!/usr/bin/env bash
+# study: launch, track and summarize the campaigns of a study (experiments/<study>/launch/study.conf).
+# See experiments/README.md ("New study"); a commented example is experiments/TEMPLATE/launch/study.conf.
+#
+# Usage (on Tempest, from any folder):
+#   scripts/study show    <study> [options]   the campaigns study.conf describes (changes nothing)
+#   scripts/study start   <study> [options]   launch the campaigns that aren't launched yet (never one twice)
+#   scripts/study status  <study> [options]   one line per campaign: state, coverage, crashes, LLM use
+#   scripts/study csv     <study> [options]   the same as CSV
+#   scripts/study results <study> [options]   write CSVs into the study's results/ (each finished arm, and all)
+#
+#   <study>  a folder in experiments/ (e.g. 02-model-sweep), or a path to one
+#
+# The whole study, in one command (a small Slurm job does the rest; scripts/study status shows it):
+#   scripts/study start <study> --servers --background
+#
+# Options (for this call only; start records the whole command in each campaign's launch.txt):
+#   --only KEY=VALUE  only the campaigns with that arm, target or rep (repeatable: --only arm=ucb --only rep=1)
+#   --secs N   --reps SPEC   --max-seedgen N   --gpu G   instead of study.conf's secs, reps, max_seedgen, gpu
+#   --dry             start: print what it would do, change nothing
+#   --wait            start: keep going until every campaign has finished (checks every 10 min): launches as
+#                     seed-generation slots free up, and writes each arm's CSV into results/ once it is done
+#   --servers         start: start each model's server when its campaigns need one (sized to the study), and stop
+#                     the servers it started once their model's campaigns are done
+#   --background      start: run start --wait (with the other options) as a small Slurm job, so nothing has to stay
+#                     open; log: the study's campaigns/study-driver-<job>.log; stop it: scancel <job>. One per study.
+#
+# study.conf: one "key = value" per line, # starts a comment, a line starting with | continues the one above.
+#   targets       jhead mp42aac ...   or @targets.txt (a file next to study.conf: one name per line, # comments)
+#   arms          name: options | name: options ...   options: --scheduler ucb|random, --afl, --model <folder>,
+#                 image=<sif> (instead of build/g2fuzz.sif), targets=<tree> (instead of targets_tree), gpu=<G>
+#   reps [1]      a count (5), a range (2-4) or a list (1 3)
+#   secs [21600]  fuzzing time per campaign
+#   model [Qwen3.8-27B-FP8]  scheduler [ucb]   the defaults for arms that don't name their own
+#   seeds [fresh] where the G2FUZZ arms' seeds come from (--afl arms always start from the stock seeds):
+#                 fresh: each campaign generates its own
+#                 shared: one seed generation per target and model (campaign seeds/<model>-<target>, fuzzing
+#                 seed_secs [60]), then every arm reuses its seeds and generators: the arms differ only in their options
+#                 reuse:<campaign>: every arm reuses that campaign (a path relative to the study's campaigns/;
+#                 it needs seeds and generators for each target, so usually one target)
+#   name [{target}-{arm}-r{rep}]  campaign names; {model} works too; a / makes a subfolder ({arm}/{target}-r{rep})
+#   order [target]  target: one target's campaigns, then the next; rep: rep 1 of every target, then rep 2, ...
+#   max_seedgen [4] campaigns of one model in seed generation at once (more push LLM calls past the 300 s limit)
+#   targets_tree [students/g2f-targets/paper]
+#   gpu [a40]       where --servers starts a model's server: a40 (the default: the class priority account, which every
+#                   partner has), h100 (gpufairshare queue), qc-a40 or qc-h100 (only for members of priority-quantumcore,
+#                   another group's account: ask them first); an arm can name its own with gpu=<G>
+#   server_hours    how long a started server may run [fuzzing time + 3 h per round of seed generations + 12 h]
+set -euo pipefail
+umask 002   # shared folder: teammates can write the campaigns
+
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+FUZZ="$REPO/scripts/fuzz"
+STUDENTS=/home/group/csci-591-automated-vulnerability-discovery/students
+SHARED_MODELS="$STUDENTS/shared-models"
+# A study decides these itself, so a setting left in your shell can't change it (the scripts/fuzz defaults:
+# ucb exploration 1.0, 2 CPUs and 8G per campaign)
+unset G2F_EVAL G2F_TARGET G2F_TARGETS G2F_SIF G2F_SEEDS G2F_BASE_URL G2F_MODEL G2F_GENERATOR_SCHEDULER \
+  G2F_UCB_EXPLORATION G2F_CPUS G2F_MEM
+# only the job's time limit: a long seed generation must not cut the fuzzing short (fuzz time is unchanged)
+export G2F_SEEDGEN_MIN="${G2F_SEEDGEN_MIN:-300}"
+
+die() { echo "study: $*" >&2; exit 1; }
+usage() { awk 'NR > 1 && !/^#/ { exit } NR > 1 { sub(/^# ?/, ""); print }' "${BASH_SOURCE[0]}"; }
+
+# === Arguments ======================================================================================================
+cmd="${1:-help}"; shift || true
+case "$cmd" in start|status|csv|show|results) ;; help|-h|--help) usage; exit 0 ;; *) die "unknown command '$cmd' (try: scripts/study help)" ;; esac
+[ -n "${1:-}" ] || die "which study? (a folder in experiments/: $(ls "$REPO/experiments" | grep -v '^README.md$' | xargs))"
+STUDY_ARG=$1; shift
+DRY=0 WAIT=0 SERVERS=0 BACKGROUND=0 ONLY=() O_SECS="" O_REPS="" O_MAX="" O_GPU=""
+COMMAND="scripts/study $cmd $STUDY_ARG $*"
+ARGS_IN=("$@")   # the options as given: --background reruns start with them
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --dry) DRY=1 ;;
+    --wait) WAIT=1 ;;
+    --servers) SERVERS=1 ;;
+    --background) BACKGROUND=1 ;;
+    --only|--secs|--reps|--max-seedgen|--gpu)
+      [ $# -ge 2 ] || die "$1 needs a value"
+      case "$1" in --only) ONLY+=("$2") ;; --secs) O_SECS=$2 ;; --reps) O_REPS=$2 ;; --max-seedgen) O_MAX=$2 ;; --gpu) O_GPU=$2 ;; esac
+      shift ;;
+    --only=*) ONLY+=("${1#--only=}") ;;
+    *) die "unknown option '$1' (try: scripts/study help)" ;;
+  esac
+  shift
+done
+
+if [ -d "$STUDY_ARG" ]; then STUDY=$(cd "$STUDY_ARG" && pwd)
+elif [ -d "$REPO/experiments/$STUDY_ARG" ]; then STUDY="$REPO/experiments/$STUDY_ARG"
+else die "no study '$STUDY_ARG' (folders in experiments/: $(ls "$REPO/experiments" | grep -v '^README.md$' | xargs))"; fi
+CONF="$STUDY/launch/study.conf"
+[ -f "$CONF" ] || die "no $CONF (copy experiments/TEMPLATE/launch/study.conf)"
+CAMPAIGNS="$STUDY/campaigns"
+REF=$STUDY; [ "$STUDY" != "$REPO/experiments/${STUDY##*/}" ] || REF=${STUDY##*/}   # how a command names this study
+
+# === study.conf =====================================================================================================
+declare -A C=([reps]=1 [secs]=21600 [model]=Qwen3.8-27B-FP8 [scheduler]=ucb [seeds]=fresh [name]='{target}-{arm}-r{rep}'
+              [order]=target [max_seedgen]=4 [targets_tree]="$STUDENTS/g2f-targets/paper" [seed_secs]=60 [gpu]=a40
+              [server_hours]="")
+key=""
+while IFS= read -r line || [ -n "$line" ]; do
+  line=${line%%#*}
+  [[ "$line" =~ ^[[:space:]]*$ ]] && continue
+  if [[ "$line" =~ ^[[:space:]]*\|(.*)$ ]]; then   # continues the line above
+    [ -n "$key" ] || die "$CONF: a | line must follow a setting"
+    if [ "$key" = arms ]; then C[$key]="${C[$key]} |${BASH_REMATCH[1]}"; else C[$key]="${C[$key]} ${BASH_REMATCH[1]}"; fi
+    continue
+  fi
+  [[ "$line" =~ ^[[:space:]]*([a-z_]+)[[:space:]]*=[[:space:]]*(.*[^[:space:]])[[:space:]]*$ ]] ||
+    die "$CONF: can't read this line: $line"
+  key=${BASH_REMATCH[1]}
+  case "$key" in
+    targets|arms|reps|secs|model|scheduler|seeds|name|order|max_seedgen|targets_tree|seed_secs|gpu|server_hours) C[$key]=${BASH_REMATCH[2]} ;;
+    *) die "$CONF: unknown setting '$key'" ;;
+  esac
+done < "$CONF"
+[ -n "${C[targets]:-}" ] || die "$CONF: no targets"
+[ -n "${C[arms]:-}" ] || die "$CONF: no arms"
+[ -z "$O_SECS" ] || C[secs]=$O_SECS
+[ -z "$O_REPS" ] || C[reps]=$O_REPS
+[ -z "$O_MAX" ] || C[max_seedgen]=$O_MAX
+[ -z "$O_GPU" ] || C[gpu]=$O_GPU
+# results/ holds whole arms (and campaigns.csv the whole study): --only target= sees part of every arm, and any
+# --only or --reps part of the study, so those calls leave those files alone
+PART_ARMS=0 PART_STUDY=0
+[ -z "$O_REPS" ] || PART_STUDY=1
+for o in ${ONLY[@]+"${ONLY[@]}"}; do PART_STUDY=1; [[ "$o" != target=* ]] || PART_ARMS=1; done
+gpu_ok() { case "$1" in a40|h100|qc-a40|qc-h100) ;; *) die "gpu must be a40, h100, qc-a40 or qc-h100 (got '$1')" ;; esac; }
+gpu_ok "${C[gpu]}"
+[ -z "${C[server_hours]}" ] || [[ "${C[server_hours]}" =~ ^[0-9]+$ ]] || die "server_hours must be a whole number of hours"
+for k in secs max_seedgen seed_secs; do [[ "${C[$k]}" =~ ^[0-9]+$ ]] || die "$k must be a whole number (got '${C[$k]}')"; done
+case "${C[order]}" in target|rep) ;; *) die "order must be target or rep (got '${C[order]}')" ;; esac
+case "${C[seeds]}" in fresh|shared|reuse:?*) ;; *) die "seeds must be fresh, shared or reuse:<campaign> (got '${C[seeds]}')" ;; esac
+model_ok() { [ -f "$SHARED_MODELS/$1/config.json" ] || die "no model '$1' in $SHARED_MODELS"; }
+
+# targets: a list, or @file next to study.conf
+if [[ "${C[targets]}" == @* ]]; then
+  f="$STUDY/launch/${C[targets]#@}"; [ -f "$f" ] || die "no targets file $f"
+  TARGETS=($(sed 's/#.*//' "$f" | awk 'NF { print $1 }'))
+else
+  TARGETS=(${C[targets]})
+fi
+
+# reps: a count, a range or a list
+r="${C[reps]}"
+if [[ "$r" =~ ^[0-9]+$ ]]; then REPS=($(seq 1 "$r"))
+elif [[ "$r" =~ ^([0-9]+)-([0-9]+)$ ]]; then REPS=($(seq "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}"))
+elif [[ "$r" =~ ^[0-9]+([[:space:]]+[0-9]+)+$ ]]; then REPS=($r)
+else die "reps must be a count (5), a range (2-4) or a list (1 3) (got '$r')"; fi
+
+# arms: "name: options | name: options"; each arm's flags for scripts/fuzz run, model, image and target tree
+declare -A A_AFL A_SCHED A_MODEL A_SIF A_TREE A_OPTS A_GPU
+ARMS=()
+IFS='|' read -r -a parts <<< "${C[arms]}"
+for p in "${parts[@]}"; do
+  [[ "$p" =~ ^[[:space:]]*$ ]] && continue
+  [[ "$p" =~ ^[[:space:]]*([A-Za-z0-9_.-]+)[[:space:]]*:(.*)$ ]] || die "arms: '$p' is not 'name: options'"
+  a=${BASH_REMATCH[1]}; set -- ${BASH_REMATCH[2]}
+  [ -z "${A_OPTS[$a]+x}" ] || die "arms: '$a' appears twice"
+  [ "$a" != seeds ] || die "arms: 'seeds' is reserved for the shared seed campaigns"
+  ARMS+=("$a"); A_AFL[$a]=0 A_SCHED[$a]="" A_MODEL[$a]=${C[model]} A_SIF[$a]="$REPO/build/g2fuzz.sif" A_TREE[$a]=${C[targets_tree]}
+  A_GPU[$a]=${C[gpu]}
+  A_OPTS[$a]="$*"
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --afl) A_AFL[$a]=1 ;;
+      --scheduler|--model) [ $# -ge 2 ] || die "arm $a: $1 needs a value"
+        if [ "$1" = --model ]; then A_MODEL[$a]=$2; else A_SCHED[$a]=$2; fi; shift ;;
+      image=*) A_SIF[$a]=${1#image=} ;;
+      targets=*) A_TREE[$a]=${1#targets=} ;;
+      gpu=*) A_GPU[$a]=${1#gpu=} ;;
+      --test) die "arm $a: --test is for practice runs, never for a study" ;;
+      *) die "arm $a: unknown option '$1' (use --scheduler, --afl, --model, image=, targets=, gpu=)" ;;
+    esac
+    shift
+  done
+  if [ "${A_AFL[$a]}" = 1 ]; then
+    [ -z "${A_SCHED[$a]}" ] || die "arm $a: --afl and --scheduler don't mix (--afl has no LLM step)"
+  else
+    A_SCHED[$a]=${A_SCHED[$a]:-${C[scheduler]}}
+    case "${A_SCHED[$a]}" in ucb|random) ;; *) die "arm $a: the scheduler must be ucb or random" ;; esac
+  fi
+  model_ok "${A_MODEL[$a]}"
+  [ -z "$O_GPU" ] || A_GPU[$a]=$O_GPU   # --gpu wins over an arm's own gpu=
+  gpu_ok "${A_GPU[$a]}"
+  [ -f "${A_SIF[$a]}" ] || die "arm $a: no image ${A_SIF[$a]}"
+  for t in "${TARGETS[@]}"; do [ -f "${A_TREE[$a]}/$t.afl" ] || die "no target '$t' in ${A_TREE[$a]} (ls it: *.afl)"; done
+done
+[ ${#ARMS[@]} -gt 0 ] || die "$CONF: no arms"
+# one server per model: where --servers starts it (the GPU of the model's arms)
+declare -A MGPU
+for a in "${ARMS[@]}"; do
+  if [ "${A_AFL[$a]}" = 1 ]; then continue; fi
+  m=${A_MODEL[$a]}
+  if [ -z "${MGPU[$m]:-}" ]; then MGPU[$m]=${A_GPU[$a]}
+  elif [ "${MGPU[$m]}" != "${A_GPU[$a]}" ]; then die "the arms on model $m ask for different GPUs (${MGPU[$m]}, ${A_GPU[$a]}): one server per model"; fi
+done
+# seeds = reuse:<campaign>: it must exist and have seeds and generators for every target
+if [[ "${C[seeds]}" == reuse:* ]]; then
+  src=$(realpath -m "$CAMPAIGNS/${C[seeds]#reuse:}")
+  [ -n "$(ls -A "$src/initial_seeds" 2>/dev/null)" ] || die "seeds = ${C[seeds]}: $src has no initial_seeds/"
+  for t in "${TARGETS[@]}"; do
+    [ -n "$(ls -A "$src/${t}_output/default/generators" 2>/dev/null)" ] ||
+      die "seeds = ${C[seeds]}: no generators for target $t there (reuse needs a campaign of the same target)"
+  done
+fi
+
+# === The campaigns ==================================================================================================
+# Each planned campaign: target, arm, rep, its folder (campaigns/<name>) and where its seeds come from.
+# Shared seed campaigns are planned too (arm "seeds"), once per target and model a G2FUZZ arm needs.
+P_T=() P_A=() P_R=() P_N=() P_SRC=() P_M=()
+declare -A PLANNED
+plan() {   # plan <target> <arm> <rep> <name> <seed source> <model>
+  [ -z "${PLANNED[$4]+x}" ] || die "two campaigns would be named $4: make name include {arm}, {target} and {rep}"
+  PLANNED[$4]=1; P_T+=("$1") P_A+=("$2") P_R+=("$3") P_N+=("$4") P_SRC+=("$5") P_M+=("$6")
+}
+selected() {   # selected <target> <arm> <rep>: does --only keep this campaign?
+  local o k v any
+  for k in arm target rep; do
+    any=0
+    for o in ${ONLY[@]+"${ONLY[@]}"}; do
+      [[ "$o" == *=* ]] || die "--only needs KEY=VALUE (e.g. arm=ucb)"
+      case "${o%%=*}" in arm|target|rep) ;; *) die "--only: KEY must be arm, target or rep (got '${o%%=*}')" ;; esac
+      [ "${o%%=*}" = "$k" ] || continue
+      v=${o#*=}; [ "$any" = 1 ] || any=2
+      case $k in arm) [ "$v" = "$2" ] && any=1 ;; target) [ "$v" = "$1" ] && any=1 ;; rep) [ "$v" = "$3" ] && any=1 ;; esac
+    done
+    [ "$any" != 2 ] || return 1
+  done
+  return 0
+}
+declare -A SEED_ARM   # shared seed campaign -> the arm whose image and target tree it uses (the first that needs it)
+add() {   # add <target> <arm> <rep>: plans one campaign (and, with seeds = shared, its target's seed campaign first)
+  local t=$1 a=$2 r=$3 n src
+  selected "$t" "$a" "$r" || return 0
+  n=${C[name]//\{target\}/$t}; n=${n//\{arm\}/$a}; n=${n//\{rep\}/$r}; n=${n//\{model\}/${A_MODEL[$a]}}
+  src=new
+  if [ "${A_AFL[$a]}" = 0 ]; then
+    case "${C[seeds]}" in
+      shared) src="seeds/${A_MODEL[$a]}-$t"
+              [ -n "${PLANNED[$src]+x}" ] || { plan "$t" seeds - "$src" new "${A_MODEL[$a]}"; SEED_ARM[$src]=$a; } ;;
+      reuse:*) src=${C[seeds]#reuse:} ;;
+    esac
+  fi
+  plan "$t" "$a" "$r" "$n" "$src" "${A_MODEL[$a]}"
+}
+if [ "${C[order]}" = rep ]; then
+  for r in "${REPS[@]}"; do for t in "${TARGETS[@]}"; do for a in "${ARMS[@]}"; do add "$t" "$a" "$r"; done; done; done
+else
+  for t in "${TARGETS[@]}"; do for r in "${REPS[@]}"; do for a in "${ARMS[@]}"; do add "$t" "$a" "$r"; done; done; done
+fi
+[ ${#P_N[@]} -gt 0 ] || die "no campaigns match (check --only)"
+
+# The arm-level settings of planned campaign i (seed campaigns use the study's defaults)
+model_of() { echo "${P_M[$1]}"; }
+afl_of() { local a=${P_A[$1]}; [ "$a" != seeds ] && [ "${A_AFL[$a]}" = 1 ]; }
+image_arm() { if [ "${P_A[$1]}" = seeds ]; then echo "${SEED_ARM[${P_N[$1]}]}"; else echo "${P_A[$1]}"; fi; }   # whose image/tree
+in_plan() { local i; for i in "${!P_M[@]}"; do if [ "${P_M[$i]}" = "$1" ] && ! afl_of "$i"; then return 0; fi; done; return 1; }
+
+# === Campaign state =================================================================================================
+# The Slurm state of every campaign's job, from one squeue call (JOB[<jobid>]); state() reads it. jobs_now again
+# after launching: a job submitted since isn't in it. Fails (returns 1) when squeue does: then nothing is known.
+# (squeue exits 1 with "Invalid job id" when the only job asked for has ended: that is no failure.)
+declare -A JOB=()
+jobs_now() {
+  local i id st ids="" out rc=0
+  JOB=()
+  for i in "${!P_N[@]}"; do
+    if [ -f "$CAMPAIGNS/${P_N[$i]}/slurm.jobid" ]; then ids+=,$(cat "$CAMPAIGNS/${P_N[$i]}/slurm.jobid"); fi
+  done
+  [ -n "$ids" ] || return 0
+  out=$(squeue -h -j "${ids#,}" -o '%i %T' 2>&1 < /dev/null) || rc=$?
+  if [ "$rc" != 0 ] && ! grep -q 'Invalid job id' <<< "$out"; then return 1; fi
+  while read -r id st; do
+    if [[ "$id" =~ ^[0-9]+$ ]]; then JOB[$id]=$st; fi
+  done <<< "$out"
+  return 0
+}
+squeue_ok() { squeue -h -u "$USER" -o %i > /dev/null 2>&1 < /dev/null; }   # can Slurm be asked right now?
+# not launched, not started (folder, no job yet), queued, seed generation, fuzzing, done, done (short), failed
+state() {
+  local c="$CAMPAIGNS/$1" job
+  [ -d "$c" ] || { echo "not launched"; return; }
+  [ -f "$c/slurm.jobid" ] || { echo "not started"; return; }
+  job=${JOB[$(cat "$c/slurm.jobid")]:-}
+  if [ "$job" = PENDING ]; then echo "queued"
+  elif [ -n "$job" ] && [ -z "$(ls -A "$c/initial_seeds" 2>/dev/null)" ]; then echo "seed generation"
+  elif [ -n "$job" ]; then echo "fuzzing"
+  elif [ -f "$(output "$1")/fuzzer_stats" ]; then echo "done"
+  else echo "failed"; fi
+}
+output() { local c="$CAMPAIGNS/$1"; ls -d "$c"/*_output/default 2>/dev/null | head -1 || true; }
+afl_stat() { awk -v k="$2" '$1 == k { print $3 }' "$1" 2>/dev/null || true; }
+# a done campaign that fuzzed under 95% of its secs (Slurm's time limit cut it) shows as "done (short)"
+shown_state() {
+  local s secs run
+  s=$(state "$1")
+  if [ "$s" = done ]; then
+    secs=$(awk '/^fuzz secs:/ { print $3 }' "$CAMPAIGNS/$1/launch.txt" 2>/dev/null || true)
+    run=$(afl_stat "$(output "$1")/fuzzer_stats" run_time)
+    if [ -n "$secs" ] && [ -n "$run" ] && [ $((run * 100)) -lt $((secs * 95)) ]; then s="done (short)"; fi
+  fi
+  echo "$s"
+}
+seeds_ready() {   # does campaign $1 (a path relative to campaigns/) have seeds and generators to reuse?
+  local c; c=$(realpath -m "$CAMPAIGNS/$1")   # -m: campaigns/ itself may not exist yet
+  [ -n "$(ls -A "$c/initial_seeds" 2>/dev/null)" ] && [ -n "$(ls -A "$c"/*_output/default/generators 2>/dev/null)" ]
+}
+
+finished() { case "$(state "$1")" in done|failed) return 0 ;; *) return 1 ;; esac; }
+count_finished() { local i n=0; for i in "${!P_N[@]}"; do if finished "${P_N[$i]}"; then n=$((n + 1)); fi; done; echo "$n"; }
+
+# === Model servers (--servers) ======================================================================================
+# .study-servers: "<model> <job>" for each server this study started, and "<model> <job> ready" once it answered
+SERVERS_FILE="$CAMPAIGNS/.study-servers"
+# What scripts/fuzz llm status says about model $1's server (anyone's: one per model). Sets S_STATE (ready, starting
+# or none), S_JOB, S_DESC (owner, GPU, node) and S_LEFT (seconds of its time limit left; a queued job: all of it).
+to_secs() {   # Slurm's [D-]HH:MM:SS, MM:SS, ...; UNLIMITED and the like: a lot
+  local t=$1 d=0 x n=0
+  [[ "$t" =~ ^[0-9:-]+$ ]] || { echo 99999999; return; }
+  if [[ "$t" == *-* ]]; then d=${t%%-*}; t=${t#*-}; fi
+  local IFS=:; for x in $t; do n=$((n * 60 + 10#$x)); done
+  echo $((d * 86400 + n))
+}
+server_info() {
+  local out row node gres
+  S_STATE=none S_JOB="" S_DESC="" S_LEFT=0
+  out=$("$FUZZ" llm status --model "$1" 2>/dev/null < /dev/null || true)
+  if [ -z "$out" ] || grep -q '^no team LLM server' <<< "$out"; then return 0; fi
+  if grep -q '^ready:' <<< "$out"; then S_STATE=ready; else S_STATE=starting; fi
+  row=$(awk '$1 ~ /^[0-9]+$/ { print $1, $4, (NF >= 5 ? $5 : "-"); exit }' <<< "$out")   # JOBID STATE TIME TIME_LEFT NODE
+  read -r S_JOB S_LEFT node <<< "$row"; S_LEFT=$(to_secs "${S_LEFT:-0}")
+  S_DESC="$(sed -n "s/.*, \(.*\)'s server:\$/\1/p" <<< "$out" | head -1)'s, job $S_JOB"
+  [ "$node" = - ] || S_DESC+=" on $node"
+  gres=$(squeue -h -j "$S_JOB" -o '%b' 2>/dev/null < /dev/null || true)
+  [ -z "$gres" ] || S_DESC+=" ($gres)"
+}
+hours() { echo "$(( ($1 + 1800) / 3600 )) h"; }
+# The time limit of a server --servers starts: study.conf's server_hours, else fuzzing + 3 h per round of
+# seed generations + 12 h. Only a safety net: the study stops its servers once their campaigns are done.
+server_hours() {   # server_hours <model>
+  local i n=0 h
+  if [ -n "${C[server_hours]}" ]; then echo "${C[server_hours]}"; return; fi
+  for i in "${!P_N[@]}"; do if [ "$(model_of "$i")" = "$1" ] && ! afl_of "$i" && [ "${P_SRC[$i]}" = new ]; then n=$((n + 1)); fi; done
+  h=$(( (${C[secs]} + 3599) / 3600 + 3 * ((n + ${C[max_seedgen]} - 1) / ${C[max_seedgen]}) + 12 ))
+  echo $(( h > 336 ? 336 : h ))
+}
+# The longest campaign i can run (its Slurm job's limit, as scripts/fuzz sets it): a server must last that long
+campaign_secs() {
+  local secs=${C[secs]}; [ "${P_A[$1]}" = seeds ] && secs=${C[seed_secs]}
+  [ "${P_SRC[$1]}" != new ] || afl_of "$1" || secs=$((secs + G2F_SEEDGEN_MIN * 60))
+  echo $((secs + 1800))
+}
+gpu_account() { case "$1" in a40) echo "priority-csci-591-automated-vulnerability-discovery" ;; qc-*) echo priority-quantumcore ;; esac; }
+# How often in a row model $1's server failed: the servers this study started that ended without ever answering
+# (since the last one that did), plus this run's `llm start` errors (FAILS)
+declare -A FAILS=() GAVEUP=()
+failed_starts() {
+  local m id flag n=0
+  if [ -f "$SERVERS_FILE" ]; then
+    while read -r m id flag; do
+      [ "$m" = "$1" ] || continue
+      if [ "$flag" = ready ]; then n=0
+      elif ! grep -qx "$m $id ready" "$SERVERS_FILE" && [ -z "$(squeue -h -j "$id" -o %i 2>/dev/null < /dev/null || true)" ]; then
+        n=$((n + 1))
+      fi
+    done < "$SERVERS_FILE"
+  fi
+  echo $((n + ${FAILS[$1]:-0}))
+}
+mark_ready() {   # mark_ready <model> <job>: the server this study started answered
+  [ "$DRY" = 0 ] && [ -f "$SERVERS_FILE" ] && grep -qx "$1 $2" "$SERVERS_FILE" && ! grep -qx "$1 $2 ready" "$SERVERS_FILE" &&
+    echo "$1 $2 ready" >> "$SERVERS_FILE" || true
+}
+start_server() {   # start_server <model>: submits its server (scripts/fuzz llm start) and records the job; 1 if it couldn't
+  local m=$1 h out id rc=0 acct
+  h=$(server_hours "$m")
+  if [ "$DRY" = 1 ]; then
+    echo "  would start the $m server (${MGPU[$m]}, $h h)"
+    acct=$(gpu_account "${MGPU[$m]}")
+    if [ -n "$acct" ] && ! sacctmgr -nP show assoc user="$USER" format=account 2>/dev/null | grep -qx "$acct"; then
+      echo "  note: you're not in the Slurm account $acct, so starting it (gpu ${MGPU[$m]}) would fail"
+    fi
+    return 0
+  fi
+  out=$("$FUZZ" llm start "$h" "${MGPU[$m]}" --model "$m" 2>&1 < /dev/null) || rc=$?
+  echo "$out" | sed "s#^#  $m server: #"
+  if [ "$rc" != 0 ]; then FAILS[$m]=$(( ${FAILS[$m]:-0} + 1 )); return 1; fi
+  FAILS[$m]=0
+  id=$(sed -n 's/.* server job \([0-9]*\) .*/\1/p' <<< "$out" | head -1)
+  mkdir -p "$CAMPAIGNS"
+  if [ -n "$id" ]; then echo "$m $id" >> "$SERVERS_FILE"; fi
+}
+# Stops each server this study started once its model has no campaign left to run (--servers only, models of this
+# call only; scripts/fuzz llm stop still refuses while campaigns of any study use the model)
+stop_done_servers() {
+  local m id flag i busy
+  [ "$SERVERS" = 1 ] && [ -f "$SERVERS_FILE" ] || return 0
+  while read -r m id flag; do
+    [ -z "$flag" ] && in_plan "$m" || continue
+    [ -n "$(squeue -h -j "$id" -o %i 2>/dev/null < /dev/null || true)" ] || continue   # gone already
+    busy=0
+    for i in "${!P_N[@]}"; do
+      if [ "$(model_of "$i")" = "$m" ] && ! afl_of "$i" && ! finished "${P_N[$i]}"; then busy=1; break; fi
+    done
+    [ "$busy" = 0 ] || continue
+    if [ "$DRY" = 1 ]; then echo "  would stop the $m server (job $id): its campaigns are done"
+    else "$FUZZ" llm stop --model "$m" 2>&1 < /dev/null | sed "s#^#  $m server: #" || true; fi
+  done < "$SERVERS_FILE"
+}
+# start --servers --wait ending before every campaign finished (an error, scancel, giving up): stops the servers it
+# started that are still up. scripts/fuzz llm stop refuses (and the server stays) while campaigns still use one.
+stop_servers_on_exit() {
+  local rc=$? m id flag
+  trap - EXIT
+  if [ -f "$SERVERS_FILE" ]; then
+    while read -r m id flag; do
+      [ -z "$flag" ] && in_plan "$m" || continue
+      [ -n "$(squeue -h -j "$id" -o %i 2>/dev/null < /dev/null || true)" ] || continue
+      echo "  ending early: stopping the $m server (job $id), unless campaigns still use it"
+      "$FUZZ" llm stop --model "$m" 2>&1 < /dev/null | sed "s#^#  $m server: #" || true
+    done < "$SERVERS_FILE"
+  fi
+  exit "$rc"
+}
+
+# === results ========================================================================================================
+rep_label() {   # rep_label <rep>...: 1 2 3 -> 1-3, 1 3 -> 1_3, 2 -> 2
+  local s first last n
+  s=$(printf '%s\n' "$@" | sort -nu | xargs); first=${s%% *}; last=${s##* }; n=$(wc -w <<< "$s" | tr -d ' ')
+  if [ "$n" = 1 ]; then echo "$first"
+  elif [ $((last - first + 1)) = "$n" ]; then echo "$first-$last"
+  else echo "${s// /_}"; fi
+}
+csv_rows() { local i; echo -e "study\t$HEADER" | tr '\t' ','; for i in "$@"; do echo -e "${STUDY##*/}\t$(row "$i")" | tr '\t' ','; done; }
+# Writes results/<arm>-r<reps>.csv for each arm whose campaigns have all finished, again whenever its rows change
+# (e.g. a failed campaign rerun), and results/campaigns.csv (every campaign) with "all"
+write_results() {
+  local a i f rows reps new
+  mkdir -p "$STUDY/results"
+  for a in "${ARMS[@]}"; do
+    [ "$PART_ARMS" = 0 ] || continue
+    rows=() reps=()
+    for i in "${!P_N[@]}"; do if [ "${P_A[$i]}" = "$a" ]; then rows+=("$i"); reps+=("${P_R[$i]}"); fi; done
+    [ ${#rows[@]} -gt 0 ] || continue
+    for i in "${rows[@]}"; do finished "${P_N[$i]}" || continue 2; done
+    f="results/$a-r$(rep_label "${reps[@]}").csv"
+    new=$(csv_rows "${rows[@]}")
+    if [ -f "$STUDY/$f" ] && [ "$(cat "$STUDY/$f")" = "$new" ]; then
+      [ "${1:-}" != all ] || echo "  $f is up to date"
+      continue
+    fi
+    printf '%s\n' "$new" > "$STUDY/$f"
+    echo "  wrote $f (${#rows[@]} campaigns of arm $a)"
+  done
+  [ "${1:-}" = all ] || return 0
+  if [ "$PART_STUDY" = 1 ]; then echo "  results/campaigns.csv left alone: --only/--reps pick part of the study (scripts/study results $REF)"
+  else csv_rows "${!P_N[@]}" > "$STUDY/results/campaigns.csv"; echo "  wrote results/campaigns.csv (${#P_N[@]} campaigns)"; fi
+}
+
+# === start ==========================================================================================================
+# Runs scripts/fuzz for campaign i: in its folder's parent (G2F_EVAL), with its target, tree and image
+fuzz_for() {   # fuzz_for <i> <scripts/fuzz args...>
+  local i=$1 n=${P_N[$1]} a=${P_A[$1]}; shift
+  local dir=""; [[ "$n" == */* ]] && dir=/${n%/*}
+  a=$(image_arm "$i")
+  local sif=${A_SIF[$a]} tree=${A_TREE[$a]}
+  mkdir -p "$CAMPAIGNS$dir"
+  G2F_EVAL="$CAMPAIGNS$dir" G2F_TARGET=${P_T[$i]} G2F_TARGETS=$tree G2F_SIF=$sif "$FUZZ" "$@"
+}
+# Creates (new, or reuse of its seed source) and submits campaign i; writes its launch.txt. Prints what happened.
+launch() {   # launch <i> <the model server it uses, or empty>
+  local i=$1 server=$2 n=${P_N[$1]} a=${P_A[$1]} src=${P_SRC[$1]} m secs from up="" out rc=0 ia
+  m=$(model_of "$i"); secs=${C[secs]}; [ "$a" = seeds ] && secs=${C[seed_secs]}
+  local -a flags=(--model "$m")
+  if afl_of "$i"; then flags+=(--afl)
+  elif [ "$a" = seeds ]; then flags+=(--scheduler "${C[scheduler]}")
+  else flags+=(--scheduler "${A_SCHED[$a]}"); fi
+  if [ ! -d "$CAMPAIGNS/$n" ]; then
+    if [ "$src" = new ]; then out=$(fuzz_for "$i" new "${n##*/}" --model "$m" 2>&1) || rc=$?
+    else
+      # reuse's source, relative to the campaign's own folder (G2F_EVAL)
+      [[ "$n" == */* ]] && up=$(echo "${n%/*}" | sed 's#[^/][^/]*#..#g')/
+      out=$(fuzz_for "$i" reuse "$up$src" "${n##*/}" --model "$m" 2>&1) || rc=$?
+    fi
+    [ "$rc" = 0 ] || { echo "$out" | sed "s#^#  $n: #"; return 0; }
+  fi
+  out=$(fuzz_for "$i" run "${n##*/}" "$secs" "${flags[@]}" 2>&1) || rc=$?
+  echo "$out" | sed "s#^#  $n: #"
+  [ "$rc" = 0 ] || return 0
+  {
+    echo "study: ${STUDY##*/}"
+    echo "arm: $a"
+    echo "options: $( [ "$a" = seeds ] && echo "(shared seed generation)" || echo "${A_OPTS[$a]}")"
+    echo "model: $m"
+    ia=$(image_arm "$i")
+    echo "target: ${P_T[$i]} (${A_TREE[$ia]})"
+    echo "rep: ${P_R[$i]}"
+    echo "fuzz secs: $secs"
+    echo "scheduler: $( afl_of "$i" && echo "none (--afl)" || { [ "$a" = seeds ] && echo "${C[scheduler]}" || echo "${A_SCHED[$a]}"; })"
+    echo "seeds: $( afl_of "$i" && echo "stock (--afl)" || { [ "$src" = new ] && echo "own seed generation" || echo "reused from $src"; })"
+    echo "image: $(cat "${A_SIF[$ia]}.version" 2>/dev/null)"
+    echo "server: ${server:-none (--afl)}"
+    echo "settings: G2F_SEEDGEN_MIN=$G2F_SEEDGEN_MIN${G2F_PARTITION+ G2F_PARTITION=$G2F_PARTITION}${G2F_ACCOUNT+ G2F_ACCOUNT=$G2F_ACCOUNT}"
+    echo "launched: $(date '+%F %T') by $USER"
+    echo "command: $COMMAND${SLURM_JOB_ID:+ (in Slurm job $SLURM_JOB_ID)}"
+  } > "$CAMPAIGNS/$n/launch.txt"
+}
+
+# How many of model $1's campaigns are queued or generating seeds (both call the LLM soon)
+seedgen_count() {
+  local i n=0
+  for i in "${!P_N[@]}"; do
+    [ "$(model_of "$i")" = "$1" ] && ! afl_of "$i" || continue
+    case "$(state "${P_N[$i]}")" in queued|"seed generation") n=$((n + 1)) ;; esac
+  done
+  echo "$n"
+}
+
+# One pass over the planned campaigns: launches what it can now. Sets LEFT (what still waits, and why), LAUNCHED,
+# and BLOCKED (how many wait on a model whose server the study gave up on)
+declare -A SHOWN=()   # the server each model's campaigns use, once printed
+start_pass() {
+  local i n s m why need
+  declare -A busy=() srv=() left=() desc=()
+  LEFT=() LAUNCHED=0 BLOCKED=0
+  for i in "${!P_N[@]}"; do
+    n=${P_N[$i]}; s=$(state "$n")
+    case "$s" in "not launched"|"not started") ;; *) continue ;; esac   # launched before: never twice
+    why="" m=""
+    if ! afl_of "$i"; then
+      m=$(model_of "$i")
+      if [ -z "${srv[$m]:-}" ]; then
+        server_info "$m"; srv[$m]=$S_STATE left[$m]=$S_LEFT desc[$m]=$S_DESC
+        if [ "$S_STATE" = ready ]; then mark_ready "$m" "$S_JOB"; fi
+        if [ "$S_STATE" = none ] && [ "$SERVERS" = 1 ] && [ -z "${GAVEUP[$m]:-}" ] && [ "$DRY" = 0 ]; then
+          if [ "$(failed_starts "$m")" -ge 3 ]; then
+            GAVEUP[$m]="its server failed 3 times in a row (see the lines above, and ~/llm/llm-serve-<job>.out for jobs in $SERVERS_FILE)"
+            echo "  $m server: giving up: ${GAVEUP[$m]}"
+          elif ! squeue_ok; then srv[$m]=noslurm
+          elif start_server "$m"; then srv[$m]=starting left[$m]=$(( $(server_hours "$m") * 3600 )) desc[$m]="the server it started"
+          else srv[$m]=failed; fi
+        elif [ "$S_STATE" = none ] && [ "$SERVERS" = 1 ] && [ "$DRY" = 1 ]; then start_server "$m"; srv[$m]=would
+        fi
+        [ -z "${GAVEUP[$m]:-}" ] || srv[$m]=gaveup
+        if [ "${srv[$m]}" = ready ] && [ "${SHOWN[$m]:-}" != "${desc[$m]}" ]; then
+          echo "  $m campaigns use ${desc[$m]}, $(hours "${left[$m]}") left"; SHOWN[$m]=${desc[$m]}
+        fi
+        # a dry run shows the plan anyway
+        if [ "$DRY" = 1 ]; then
+          case "${srv[$m]}" in
+            none) echo "note: no $m server is running (start one, or add --servers)"; left[$m]=99999999 ;;
+            starting) echo "note: the $m server (${desc[$m]}) is starting (a real start would wait for it)" ;;
+            would) left[$m]=$(( $(server_hours "$m") * 3600 )) ;;
+          esac
+          srv[$m]=ready
+        fi
+        busy[$m]=$(seedgen_count "$m")
+      fi
+      need=$(campaign_secs "$i")
+      case "${srv[$m]}" in
+        none) why="the $m server isn't running (scripts/fuzz llm start $(server_hours "$m") ${MGPU[$m]} --model $m, or start with --servers)" ;;
+        failed) why="the $m server didn't start (above); trying again at the next check" ;;
+        noslurm) why="Slurm didn't answer, so the $m server wasn't started; trying again at the next check" ;;
+        gaveup) why="gave up on the $m server: ${GAVEUP[$m]}"; BLOCKED=$((BLOCKED + 1)) ;;
+        *) if [ "${left[$m]}" -lt "$need" ]; then
+             why="the $m server (${desc[$m]}) has $(hours "${left[$m]}") left, and this campaign may run $(hours "$need"): waiting for it to end (with --servers the study then starts a fresh one)"
+           elif [ "${srv[$m]}" = starting ]; then why="the $m server is starting (queued or loading: scripts/fuzz llm status --model $m)"
+           elif [ "${P_SRC[$i]}" = new ] && [ "${busy[$m]}" -ge "${C[max_seedgen]}" ]; then why="seed-generation limit (${C[max_seedgen]} for $m)"
+           elif [ "${P_SRC[$i]}" != new ] && ! seeds_ready "${P_SRC[$i]}"; then why="waiting for seeds from ${P_SRC[$i]}"
+           fi ;;
+      esac
+    fi
+    if [ -n "$why" ]; then LEFT+=("$n: $why"); continue; fi
+    if [ "$DRY" = 1 ]; then echo "  would launch $n ($( afl_of "$i" && echo --afl || echo "${P_SRC[$i]}"))"
+    else launch "$i" "$( [ -z "$m" ] || echo "$m: ${desc[$m]}, $(hours "${left[$m]}") left at launch")"; fi
+    LAUNCHED=$((LAUNCHED + 1))
+    if ! afl_of "$i" && [ "${P_SRC[$i]}" = new ]; then busy[$m]=$(( ${busy[$m]} + 1 )); fi
+  done
+}
+
+# The driver: a Slurm job (1 CPU, up to STUDY_DRIVER_DAYS [7] days) running "start --wait" for this study
+# (--background); one per study, whoever started it
+driver_job() {   # the running driver of this study (its job carries --comment study=<the study's path>)
+  squeue -h -n "study-${STUDY##*/}" -o '%i|%k' 2>/dev/null < /dev/null |
+    awk -F'|' -v want="study=$STUDY" -v me="${SLURM_JOB_ID:-none}" '$2 == want && $1 != me { print $1; exit }' || true
+}
+start_driver() {
+  local a acct id; local -a opts=()
+  [ "$DRY" = 0 ] || die "--background and --dry don't mix (try --dry alone)"
+  for a in ${ARGS_IN[@]+"${ARGS_IN[@]}"}; do [ "$a" = --background ] || opts+=("$a"); done
+  [[ " ${opts[*]-} " == *" --wait "* ]] || opts+=(--wait)
+  acct=$("$FUZZ" account)
+  mkdir -p "$CAMPAIGNS"
+  id=$(sbatch --parsable --account "$acct" --partition "${G2F_PARTITION:-fairshare}" --cpus-per-task 1 --mem 2G \
+    --time "${STUDY_DRIVER_DAYS:-7}-00:00:00" --job-name "study-${STUDY##*/}" --comment "study=$STUDY" \
+    --output "$CAMPAIGNS/study-driver-%j.log" \
+    --wrap "$(printf '%q ' "$REPO/scripts/study" start "$REF" "${opts[@]}")")
+  id=${id%%;*}
+  echo "submitted the study driver: Slurm job $id, running: scripts/study start $REF ${opts[*]}"
+  echo "  log: ${CAMPAIGNS#"$REPO"/}/study-driver-$id.log   progress: scripts/study status $REF   stop it: scancel $id"
+}
+
+# STUDY_POLL_SECS [600] and STUDY_MAX_PASSES (no limit) are for scripts/tests/test_fuzz_cli.sh
+server_trouble="server isn't running|server didn't start|Slurm didn't answer|gave up on the"
+cmd_start() {
+  local l d passes=0 poll=${STUDY_POLL_SECS:-600} done_n
+  if [ "$DRY" = 0 ]; then
+    d=$(driver_job)
+    [ -z "$d" ] || die "the driver of ${STUDY##*/} is running (Slurm job $d) and launches its campaigns; let it work, or stop it first: scancel $d"
+  fi
+  if [ "$BACKGROUND" = 1 ]; then start_driver; return 0; fi
+  if [ "$WAIT" = 1 ] && [ "$DRY" = 0 ] && [ "$SERVERS" = 1 ]; then
+    trap stop_servers_on_exit EXIT; trap 'exit 143' TERM; trap 'exit 130' INT
+  fi
+  echo "== ${STUDY##*/}: ${#P_N[@]} campaigns, ${C[secs]} s each, seeds ${C[seeds]}, at most ${C[max_seedgen]} seed generations per model$( [ "$SERVERS" = 0 ] || echo ", servers started as needed")"
+  LEFT=() LAUNCHED=0 BLOCKED=0
+  while :; do
+    if ! jobs_now; then   # nothing is known this time: no launches, no results, no server changes
+      [ "$WAIT" = 1 ] && [ "$DRY" = 0 ] || die "squeue failed (Slurm busy?): try again in a minute"
+      echo "$(date '+%F %T') squeue failed: skipping this check"
+    else
+      start_pass
+      if [ "$LAUNCHED" -gt 0 ]; then jobs_now || true; fi
+      stop_done_servers
+      if [ "$WAIT" = 0 ] || [ "$DRY" = 1 ]; then break; fi
+      write_results
+      done_n=$(count_finished)
+      if [ "$done_n" = ${#P_N[@]} ]; then break; fi
+      if [ "$BLOCKED" -gt 0 ] && [ $((done_n + BLOCKED)) = ${#P_N[@]} ]; then
+        printf '%s\n' "${LEFT[@]}" | grep "gave up on the" | sed 's/^/  /'
+        die "every other campaign has finished; $BLOCKED wait on a server the study gave up on. Fix it, then: scripts/study start $REF --servers --wait"
+      fi
+      if [ "$SERVERS" = 0 ] && printf '%s\n' ${LEFT[@]+"${LEFT[@]}"} | grep -q "server isn't running"; then
+        printf '%s\n' "${LEFT[@]}" | grep "server isn't running" | sed 's/^/  /'
+        die "a model server isn't running: start it, or run start with --servers"
+      fi
+      echo "$(date '+%F %T') $done_n of ${#P_N[@]} finished, ${#LEFT[@]} still to launch; next check in $((poll / 60)) min"
+    fi
+    passes=$((passes + 1))
+    if [ -n "${STUDY_MAX_PASSES:-}" ] && [ "$passes" -ge "$STUDY_MAX_PASSES" ]; then echo "stopping after $passes checks (STUDY_MAX_PASSES)"; break; fi
+    sleep "$poll"
+  done
+  if [ "$WAIT" = 1 ] && [ "$DRY" = 0 ] && [ "$(count_finished)" = ${#P_N[@]} ]; then
+    trap - EXIT
+    write_results all
+    echo "all ${#P_N[@]} campaigns finished. Results: ${STUDY#"$REPO"/}/results/"
+  elif [ ${#LEFT[@]} -gt 0 ]; then
+    echo "not launched yet (${#LEFT[@]}):"; for l in "${LEFT[@]}"; do echo "  $l"; done
+    if [ "$DRY" = 1 ]; then echo "(dry run: nothing was started or launched)"
+    else echo "run start again later (it never launches a campaign twice), or add --wait (or --background)"; fi
+    # nothing launched and only servers are missing: say so with the exit code too
+    if [ "$LAUNCHED" = 0 ] && ! printf '%s\n' "${LEFT[@]}" | grep -qvE "$server_trouble"; then exit 1; fi
+  elif [ "$DRY" = 1 ]; then
+    echo "(dry run: nothing was started or launched)"
+  else
+    echo "all launched. Progress: scripts/study status $REF; when they're done: scripts/study results $REF"
+  fi
+}
+
+# === show, status, csv ==============================================================================================
+cmd_show() {
+  local i
+  echo "== ${STUDY##*/}: ${#P_N[@]} campaigns (study.conf: $CONF)"
+  {
+    printf 'campaign\tarm\ttarget\trep\tmodel\toptions\tseeds\n'
+    for i in "${!P_N[@]}"; do
+      printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "${P_N[$i]}" "${P_A[$i]}" "${P_T[$i]}" "${P_R[$i]}" "$(model_of "$i")" \
+        "$( [ "${P_A[$i]}" = seeds ] && echo "(seed generation, ${C[seed_secs]} s)" || echo "${A_OPTS[${P_A[$i]}]:--}")" \
+        "$( afl_of "$i" && echo stock || echo "${P_SRC[$i]}")"
+    done
+  } | column -t -s $'\t'
+}
+
+row() {   # one campaign's numbers, tab-separated
+  local i=$1 n=${P_N[$1]} c="$CAMPAIGNS/${P_N[$1]}" o
+  o=$(output "$n")
+  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$n" "${P_A[$i]}" "${P_T[$i]}" "${P_R[$i]}" "$(shown_state "$n")" \
+    "$(afl_stat "$o/fuzzer_stats" edges_found)" "$(afl_stat "$o/fuzzer_stats" saved_crashes)" \
+    "$(afl_stat "$o/fuzzer_stats" execs_per_sec)" "$(afl_stat "$o/fuzzer_stats" run_time)" \
+    "$(ls "$o/generators" 2>/dev/null | wc -l | tr -d ' ')" \
+    "$(grep -a -c 'Gen-M start' "$c/fuzz.log" 2>/dev/null || true)" \
+    "$(cat "$c/llm_calls.jsonl" 2>/dev/null | wc -l | tr -d ' ')"
+}
+HEADER="campaign\tarm\ttarget\trep\tstate\tedges\tcrashes\texecs/s\trun_s\tgenerators\tllm_steps\tllm_calls"
+
+cmd_status() {
+  local i d m st flag
+  echo "== ${STUDY##*/} ($CAMPAIGNS)"
+  jobs_now || die "squeue failed (Slurm busy?): try again in a minute"
+  d=$(driver_job)
+  if [ -n "$d" ]; then echo "driver: Slurm job $d is running start --wait (log: ${CAMPAIGNS#"$REPO"/}/study-driver-$d.log)"; fi
+  if [ -f "$SERVERS_FILE" ]; then
+    while read -r m d flag; do
+      [ -z "$flag" ] || continue
+      st=$(squeue -h -j "$d" -o %T 2>/dev/null < /dev/null || true)
+      if [ -n "$st" ]; then echo "server: $m, Slurm job $d ($st), started by this study"; fi
+    done < "$SERVERS_FILE"
+  fi
+  { echo -e "$HEADER"; for i in "${!P_N[@]}"; do row "$i"; done; } | column -t -s $'\t'
+}
+
+cmd_csv() { jobs_now || die "squeue failed (Slurm busy?): try again in a minute"; csv_rows "${!P_N[@]}"; }
+
+case "$cmd" in
+  start)  cmd_start ;;
+  status) cmd_status ;;
+  csv)    cmd_csv ;;
+  show)   cmd_show ;;
+  results) jobs_now || die "squeue failed (Slurm busy?): try again in a minute"; write_results all ;;
+esac

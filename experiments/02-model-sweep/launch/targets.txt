@@ -1,5 +1,5 @@
 # The 15 targets of 02-model-sweep: one name per line, from g2f-targets/paper (ls it for all 28).
-# Text after # is a note. launch/sweep runs them in this order.
+# Text after # is a note. scripts/study launches them in this order.
 #
 # target                          format             benchmark   why it is in
 jhead                           # jpg                UNIFUZZ     team reference; phase B/C baseline (Qwen3.8)

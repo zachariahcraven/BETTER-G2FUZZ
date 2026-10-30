@@ -10,10 +10,10 @@ What it is compared against (e.g. `01-baseline-replication` campaigns, by path).
 ## Layout
 | Folder | Holds |
 | --- | --- |
-| `launch/` | The exact commands that made every campaign (rerun from here) |
+| `launch/` | `study.conf`: the campaigns, launched by `scripts/study start NN-short-name` (rerun from here) |
 | `analysis/` | Scripts that turn `campaigns/` into `results/` |
 | `results/` | Tables and figures for the report |
-| `campaigns/` | Campaign data (git-ignored); names `<phase>-<target>-<arm>-r<rep>` |
+| `campaigns/` | Campaign data (git-ignored); names from `study.conf`'s `name` (default `<target>-<arm>-r<rep>`) |
 | `setup/` | Optional: checks that decided how to run the study (not results) |
 
 ## Results

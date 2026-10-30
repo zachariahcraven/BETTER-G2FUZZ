@@ -43,6 +43,13 @@ submitted phi-4 server job 950061 (h100, 48 h, account group-csci-591-automated-
 Starts a different model from `shared-models` (here on an H100 instead of a class A40), e.g. for the model sweep.
 
 ```console
+$ fuzz llm start 24 qc-h100 --model phi-4
+submitted phi-4 server job 950062 (qc-h100, 24 h, account priority-quantumcore). Ready ~5 min after it starts: scripts/fuzz llm status
+note: priority-quantumcore is the quantumcore group's account (4 GPUs for the whole group): use it only with their OK
+```
+Starts it on the quantumcore group's H100s instead (`qc-a40` for their A40s): only if you're in that account (partners aren't), with that group's OK.
+
+```console
 $ fuzz llm status
 Qwen3.8-27B-FP8-nothink, n59m742's server:
      JOBID     STATE        TIME   TIME_LEFT NODELIST
@@ -233,47 +240,83 @@ stopped: Qwen3.8-27B-FP8-nothink (job 950060)
 ```
 Frees the GPU when you're done; it refuses while anyone's campaigns still use the server.
 
-## 8. A study: the model sweep (one model against the 15 targets)
+## 8. Studies: scripts/study (here 02, the model sweep: each model against the 15 targets)
 
 ```console
-$ DRY=1 experiments/02-model-sweep/launch/sweep start phi-4
-note: the phi-4 server isn't ready (dry run goes on)
-== phi-4, rep 1, 21600 s each, scheduler ucb, at most 4 in seed generation
-  would launch jhead-r1 (21600 s)
-  would launch gdk-pixbuf-pixdata-r1 (21600 s)
+$ cp -r experiments/TEMPLATE experiments/03-ucb-vs-random && scripts/study show 03-ucb-vs-random
+== 03-ucb-vs-random: 33 campaigns (study.conf: /home/group/csci-591-automated-vulnerability-discovery/students/BETTERG2FUZZ/experiments/03-ucb-vs-random/launch/study.conf)
+campaign                         arm     target     rep  model            options                  seeds
+seeds/Qwen3.8-27B-FP8-jhead      seeds   jhead      -    Qwen3.8-27B-FP8  (seed generation, 60 s)  new
+jhead-ucb-r1                     ucb     jhead      1    Qwen3.8-27B-FP8  --scheduler ucb          seeds/Qwen3.8-27B-FP8-jhead
+jhead-random-r1                  random  jhead      1    Qwen3.8-27B-FP8  --scheduler random       seeds/Qwen3.8-27B-FP8-jhead
 …
 ```
-Shows what a sweep would launch without launching anything.
+Starts a new study from the template and lists the campaigns its `launch/study.conf` describes (edit that file, then check it again with `show`).
 
 ```console
-$ experiments/02-model-sweep/launch/sweep start phi-4 --wait
-== phi-4, rep 1, 21600 s each, scheduler ucb, at most 4 in seed generation
-  jhead-r1: no seeds yet: seed generation first (20 min to 2 h, depending on the target), then fuzzing
-  jhead-r1: generator scheduler: ucb (exploration 1.0)
-  jhead-r1: submitted Slurm job 951001 (fuzz 21600s, limit 690 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch jhead-r1
-…
-2026-10-30 09:10:00 waiting for seed generation to finish; still to launch: mp3gain mp42aac …
-```
-Launches all 15 campaigns of one model over a few hours, at most 4 seed generations at a time (run it in tmux; it never launches a campaign twice).
-
-```console
-$ experiments/02-model-sweep/launch/sweep status Qwen3.8-27B-FP8
-== Qwen3.8-27B-FP8, rep 1 (/home/group/csci-591-automated-vulnerability-discovery/students/BETTERG2FUZZ/experiments/02-model-sweep/campaigns/Qwen3.8-27B-FP8)
-target                         state         edges  crashes  execs/s  run_s  generators  llm_steps  llm_calls
-jhead                          not launched                                  0                      0
-gdk-pixbuf-pixdata             not launched                                  0                      0
+$ scripts/study show 02-model-sweep --only arm=Qwen3.8-27B-FP8
+== 02-model-sweep: 15 campaigns (study.conf: /home/group/csci-591-automated-vulnerability-discovery/students/BETTERG2FUZZ/experiments/02-model-sweep/launch/study.conf)
+campaign                                          arm              target                         rep  model            options                  seeds
+Qwen3.8-27B-FP8/jhead-r1                          Qwen3.8-27B-FP8  jhead                          1    Qwen3.8-27B-FP8  --model Qwen3.8-27B-FP8  new
+Qwen3.8-27B-FP8/gdk-pixbuf-pixdata-r1             Qwen3.8-27B-FP8  gdk-pixbuf-pixdata             1    Qwen3.8-27B-FP8  --model Qwen3.8-27B-FP8  new
 …
 ```
-Shows one line per target (state, coverage, crashes, LLM use) for a model's sweep.
+Lists one arm's campaigns (`--only arm=`, `target=` or `rep=` narrows any study command).
 
 ```console
-$ experiments/02-model-sweep/launch/sweep csv Qwen3.8-27B-FP8 0
-# (the launcher's 600 s test, rep 0; those campaigns are now in setup/sweep-test/)
-model,target,state,edges,crashes,execs/s,run_s,generators,llm_steps,llm_calls
-Qwen3.8-27B-FP8,jhead,done,498,18,2770.42,600,16,0,23
-Qwen3.8-27B-FP8,gdk-pixbuf-pixdata,done,1367,26,664.88,600,81,0,110
+$ scripts/study start 02-model-sweep --servers --dry
+== 02-model-sweep: 75 campaigns, 21600 s each, seeds fresh, at most 4 seed generations per model, servers started as needed
+  would start the Qwen3.8-27B-FP8 server (a40, 30 h)
+  would launch Qwen3.8-27B-FP8/jhead-r1 (new)
+  would start the phi-4 server (a40, 30 h)
+  would launch phi-4/jhead-r1 (new)
+…
+not launched yet (55):
+  Qwen3.8-27B-FP8/mp3gain-r1: seed-generation limit (4 for Qwen3.8-27B-FP8)
+…
+(dry run: nothing was started or launched)
 ```
-Prints the same table as CSV; redirect it to `experiments/02-model-sweep/results/<model>-r1.csv` when a model is done.
+Shows what a start would do (the servers it would start, the campaigns it would launch now) without doing any of it.
+
+```console
+$ scripts/study start 02-model-sweep --servers --background
+submitted the study driver: Slurm job 952100, running: scripts/study start 02-model-sweep --servers --wait
+  log: experiments/02-model-sweep/campaigns/study-driver-952100.log   progress: scripts/study status 02-model-sweep   stop it: scancel 952100
+```
+Runs the whole study from a small Slurm job: it starts each model's server when needed, launches the campaigns, stops a model's server once its campaigns are done, and writes the results.
+
+```console
+$ cat experiments/02-model-sweep/campaigns/study-driver-952100.log
+== 02-model-sweep: 75 campaigns, 21600 s each, seeds fresh, at most 4 seed generations per model, servers started as needed
+  Qwen3.8-27B-FP8 server: submitted Qwen3.8-27B-FP8-nothink server job 952101 (a40, 30 h, account priority-csci-591-automated-vulnerability-discovery). Ready ~5 min after it starts: scripts/fuzz llm status
+  phi-4 server: submitted phi-4 server job 952102 (a40, 30 h, account priority-csci-591-automated-vulnerability-discovery). Ready ~5 min after it starts: scripts/fuzz llm status
+…
+2026-10-30 09:10:00 0 of 75 finished, 75 still to launch; next check in 10 min
+  Qwen3.8-27B-FP8/jhead-r1: submitted Slurm job 952110 (fuzz 21600s, limit 690 min, account group-csci-591-automated-vulnerability-discovery). Watch it: scripts/fuzz watch jhead-r1
+…
+  Qwen3.8-27B-FP8 server: stopped: Qwen3.8-27B-FP8-nothink (job 952101)
+  wrote results/Qwen3.8-27B-FP8-r1.csv (15 campaigns of arm Qwen3.8-27B-FP8)
+```
+Shows what the driver did and when (it checks every 10 min); `scancel` it to stop, and `start` again picks up where it left off.
+
+```console
+$ scripts/study status 02-model-sweep --only arm=Qwen3.8-27B-FP8
+== 02-model-sweep (/home/group/csci-591-automated-vulnerability-discovery/students/BETTERG2FUZZ/experiments/02-model-sweep/campaigns)
+driver: Slurm job 952100 is running start --wait (log: experiments/02-model-sweep/campaigns/study-driver-952100.log)
+server: Qwen3.8-27B-FP8, Slurm job 952101 (RUNNING), started by this study
+campaign                                          arm              target                         rep  state            edges  crashes  execs/s  run_s  generators  llm_steps  llm_calls
+Qwen3.8-27B-FP8/jhead-r1                          Qwen3.8-27B-FP8  jhead                          1    fuzzing          498    18       912.40   3840   16          1          23
+Qwen3.8-27B-FP8/gdk-pixbuf-pixdata-r1             Qwen3.8-27B-FP8  gdk-pixbuf-pixdata             1    seed generation                                  0                      61
+…
+```
+Shows the driver, the servers it started and one line per campaign (state, coverage, crashes, LLM use) for any study.
+
+```console
+$ scripts/study results 02-model-sweep
+  wrote results/Qwen3.8-27B-FP8-r1.csv (15 campaigns of arm Qwen3.8-27B-FP8)
+  wrote results/campaigns.csv (75 campaigns)
+```
+Writes the study's CSVs into its `results/` by hand (the driver does it by itself as each model finishes; `scripts/study csv` prints the same table).
 
 ## 9. Maintenance
 

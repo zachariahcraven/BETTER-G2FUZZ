@@ -100,7 +100,7 @@ Campaign folders are shared: put your NetID (`$USER`) in each name.
 
 More: [Step II](#step-ii-run-a-campaign), [docs/EXAMPLE_RUN.md](docs/EXAMPLE_RUN.md) (a real run, start to finish).
 Every command with its output: [docs/notes.md](docs/notes.md). Studies (design, launch scripts, results):
-[experiments/](experiments/README.md).
+[experiments/](experiments/README.md); `scripts/study` launches a study's campaigns from its `launch/study.conf`.
 
 Branches: `dev` is the team's working branch (one shared copy on Tempest). `exploration` keeps the October 2026 experiments as a record. `main` tracks the upstream version.
 
@@ -206,6 +206,7 @@ mp42aac and pdftotext (about even with gpt-oss on jhead).
 | --- | --- |
 | `scripts/fuzz llm start [hours]` | 1 A40 on the class priority account: starts right away (default 24 h; the class has 2 GPUs) |
 | `scripts/fuzz llm start [hours] h100` | 1 H100 on `gpufairshare`: uses no class GPU, but may wait hours or days |
+| `scripts/fuzz llm start [hours] qc-h100` (or `qc-a40`) | 1 H100 (A40) on `gpupriority` with `priority-quantumcore`: the quantumcore group's account (4 H100), only for members of that account (partners aren't), with that group's OK. Never the default |
 | `scripts/fuzz llm status` | The team's server: owner, queued, loading or ready, time left |
 | `scripts/fuzz llm host` | The running server's `<node>:<port>` (e.g. for an SSH tunnel) |
 | `scripts/fuzz llm stop` | Stops your server. Refuses while anyone's campaigns run |
@@ -214,6 +215,7 @@ mp42aac and pdftotext (about even with gpt-oss on jhead).
 more). `new`/`reuse` record the model in the campaign's `model_setting.json`; `run` and `shell` then use that model's
 server, so each campaign keeps its model. `llm start|stop|status|host --model <folder>` act on that model's server:
 one server per model, so two models can run side by side on the class's two A40s.
+`scripts/study start <study> --servers` starts and stops a study's servers itself.
 
 ```bash
 scripts/fuzz llm start 24 --model phi-4

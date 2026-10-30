@@ -1,6 +1,6 @@
 #!/bin/bash
 # Serves one model from students/shared-models with vLLM on one GPU, for G2Fuzz jobs on Tempest (README.md, Tempest setup).
-# Start it with `scripts/fuzz llm start [hours] [a40|h100] [--model <folder>]`; runs then find it by themselves.
+# Start it with `scripts/fuzz llm start [hours] [gpu] [--model <folder>]`; runs then find it by themselves.
 # Stop: `scripts/fuzz llm stop`. Its log, llm-serve-<jobid>.out, goes to ~/llm. The vLLM image is shared too.
 # The model is G2F_SERVE_MODEL, a folder in shared-models (default Qwen3.8-27B-FP8), served under the same name;
 # Qwen keeps its old name, Qwen3.8-27B-FP8-nothink.

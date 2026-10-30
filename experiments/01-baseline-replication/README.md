@@ -15,7 +15,7 @@ scripts are in `build/targets/` (was `targets/paper/`); this study's scripts, lo
 | `g2503` | G2FUZZ-upgradedAFL | 5.03c | G2FUZZ |
 | `afl503` | G2FUZZ-upgradedAFL | 5.03c | AFL++(cmplog) |
 
-Model for the G2FUZZ arms: `Qwen3.8-27B-FP8-nothink` (vLLM). Why: [setup/model-bakeoff](setup/model-bakeoff/).
+Model for the G2FUZZ arms: `Qwen3.8-27B-FP8-nothink` (vLLM). Why: [setup/](setup/README.md#model-bake-off-2026-10-23).
 Each arm runs with its own repo's scripts and image; all campaign data is kept here in one place.
 
 ## Phases

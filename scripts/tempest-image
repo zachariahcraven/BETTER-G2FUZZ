@@ -22,8 +22,9 @@ docker info >/dev/null 2>&1 || die "Docker isn't running (macOS: colima start)"
 ssh -o BatchMode=yes -o ConnectTimeout=10 "$HOST" true 2>/dev/null ||
   die "can't ssh to $HOST. Connect the VPN (README.md, Tempest setup step 1)"
 if [ "${1:-}" != "--force" ]; then
-  jobs=$(ssh "$HOST" 'squeue -h -o %j' | grep -c '^g2f-' || true)   # all users: the image is shared
-  [ "$jobs" = 0 ] || die "$jobs campaign(s) queued or running on Tempest. Wait for them, or use --force"
+  # all users: the image is shared. A study driver (study-*) launches more campaigns with it later.
+  jobs=$(ssh "$HOST" 'squeue -h -o %j' | grep -c '^g2f-\|^study-' || true)
+  [ "$jobs" = 0 ] || die "$jobs campaign(s) or study driver(s) queued or running on Tempest. Wait for them, or use --force"
 fi
 
 version="$(git -C "$REPO" describe --always --dirty) built $(date '+%Y-%m-%d %H:%M')"

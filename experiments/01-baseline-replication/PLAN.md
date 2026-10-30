@@ -36,7 +36,7 @@ Approved 2026-10-23 (setup + phase B). Phase C needs its own approval.
 - MAGMA later: needs a post-hoc replay with a canary store and MAGMA's monitor; designed before phase C.
 
 ## Changes (dated)
-- 2026-10-23: model = Qwen3.8-27B-FP8-nothink after the bake-off ([setup/model-bakeoff](setup/model-bakeoff/)).
+- 2026-10-23: model = Qwen3.8-27B-FP8-nothink after the bake-off ([setup/](setup/README.md#model-bake-off-2026-10-23)).
 - 2026-10-23: LLM servers only on the quantumcore account; the class GPU account is left to teammates.
 - 2026-10-23: 8 GB per campaign for all four arms (the pilot's 4 GB ran out of memory on ~10 MB LLM PNG seeds).
 - 2026-10-23: phase B on the A100 only (+ H100 if it starts); an A40 was ~2.5x slower per call, which would let LLM

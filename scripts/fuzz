@@ -14,10 +14,12 @@
 #   results <name>                  Final summary: coverage, crashes, generators, LLM calls
 #   stop    <name>                  Stop a run (its files stay)
 #   list                            All campaigns: seeds, generators, run state
-#   llm     start [hours] [a40|h100] | stop | status | host   [--model M]   The team's model servers (vLLM),
-#                                   one per model: everyone's runs of that model use it (start refuses while one is up)
+#   llm     start [hours] [GPU] | stop | status | host   [--model M]   The team's model servers (vLLM), one per
+#                                   model: everyone's runs of that model use it (start refuses while one is up). GPU:
 #                                   a40 (default): 1 A40, gpupriority with the class priority account (starts fast)
 #                                   h100: 1 H100, gpufairshare queue (may wait hours or days)
+#                                   qc-a40, qc-h100: 1 A40 or H100, gpupriority with priority-quantumcore: only for
+#                                   members of that group's account (partners aren't), with their OK
 #                                   stop, status, host: without --model, all of yours / all / the first one
 #   account                         The Slurm account runs and the server use
 #   completion                      Tab completion (commands, campaign names, models) and a `fuzz` alias for bash.
@@ -185,14 +187,14 @@ slurm_account() {
   die "you're not in group-csci-591-automated-vulnerability-discovery (README.md, Tempest setup step 5). Set G2F_ACCOUNT to use another account"
 }
 
-# The team's llm-serve jobs (any user, on the class accounts) in the given states (e.g. RUNNING,PENDING), serving
+# The team's llm-serve jobs (any user, on the class accounts or quantumcore's priority one) in the given states (e.g. RUNNING,PENDING), serving
 # the given model (any if empty), one per line as "<jobid> <user> <model> <state> <node>" (no node while pending).
 # llm start tags each job with its model (--comment model=<name>); untagged ones are older Qwen servers.
 # A server's port comes from its job ID (the same formula as scripts/llm-serve.sbatch): llm_url <node> <jobid>
 llm_url() { echo "http://$1:$((20000 + $2 % 20000))/v1"; }
 llm_jobs() {
   slurm_account
-  squeue -h -n llm-serve -t "$1" -A "$ACCOUNT,priority-${ACCOUNT#group-}" -o '%i|%u|%k|%T|%N' 2>/dev/null |
+  squeue -h -n llm-serve -t "$1" -A "$ACCOUNT,priority-${ACCOUNT#group-},priority-quantumcore" -o '%i|%u|%k|%T|%N' 2>/dev/null |
     awk -F'|' -v want="${2:-}" -v legacy="$(served_name Qwen3.8-27B-FP8)" '
       { m = ($3 ~ /^model=/) ? substr($3, 7) : legacy }
       want == "" || m == want { print $1, $2, m, $4, $5 }'
@@ -553,19 +555,20 @@ cmd_llm() {
     stop)   llm_stop "$want" ;;
     status) llm_status "$want" ;;
     host)   llm_host "$want" ;;
-    *) die "usage: scripts/fuzz llm start [hours] [a40|h100] | stop | status | host  [--model <folder>]" ;;
+    *) die "usage: scripts/fuzz llm start [hours] [a40|h100|qc-a40|qc-h100] | stop | status | host  [--model <folder>]" ;;
   esac
 }
 
-# llm_start <hours> <a40|h100>: submits scripts/llm-serve.sbatch for MODEL, unless a server of it is up
+# llm_start <hours> <a40|h100|qc-a40|qc-h100>: submits scripts/llm-serve.sbatch for MODEL, unless a server of it is up
 llm_start() {
   local hours=$1 gpu=$2 j id owner acct
   case "$hours" in ''|0|*[!0-9]*) die "hours must be a whole number, e.g. 24 (up to 336)" ;; esac
   local -a where=()   # a40: the partition and GPU in scripts/llm-serve.sbatch (48 GB: all but Mistral fit in bf16)
   case "$gpu" in
-    a40) ;;
+    a40|qc-a40) ;;
     h100) where=(--partition gpufairshare --gres gpu:h100:1) ;;
-    *) die "GPU must be a40 or h100" ;;
+    qc-h100) where=(--gres gpu:h100:1) ;;   # gpupriority
+    *) die "GPU must be a40, h100, qc-a40 or qc-h100" ;;
   esac
   set_model "$MODEL"   # the server needs the weights in shared-models
   j=$(llm_job RUNNING,PENDING "$MODEL")
@@ -573,18 +576,20 @@ llm_start() {
     die "$owner's $MODEL server (job $id) is already up: runs use it. One server per model (scripts/fuzz llm status)"; }
   mkdir -p "$LLM_DIR"
   slurm_account
-  acct="$ACCOUNT"
-  if [ "$gpu" = a40 ]; then
-    acct="priority-${ACCOUNT#group-}"
+  case "$gpu" in a40) acct="priority-${ACCOUNT#group-}" ;; qc-*) acct=priority-quantumcore ;; *) acct="$ACCOUNT" ;; esac
+  if [ "$acct" != "$ACCOUNT" ]; then
     sacctmgr -nP show assoc user="$USER" format=account 2>/dev/null | grep -qx "$acct" ||
-      die "a40 needs the Slurm account $acct, which you're not in. Use: scripts/fuzz llm start $hours h100"
+      die "$gpu needs the Slurm account $acct, which you're not in. Use: scripts/fuzz llm start $hours h100"
   fi
   # --comment: the model, for llm_jobs. G2F_REPO: where llm-serve.sbatch finds scripts/chat-templates
   id=$(sbatch --parsable --account "$acct" "${where[@]}" --time $((hours * 60)) --chdir "$LLM_DIR" \
     --comment "model=$MODEL" --export "ALL,G2F_SERVE_MODEL=$MODEL_DIR,G2F_REPO=$REPO" "$REPO/scripts/llm-serve.sbatch")
   echo "submitted $MODEL server job ${id%%;*} ($gpu, ${hours} h, account $acct). Ready ~5 min after it starts: scripts/fuzz llm status"
-  if [ "$MODEL_DIR" = Mistral-Small-3.1-24B-Instruct-2503 ] && [ "$gpu" = a40 ]; then
+  if [ "$MODEL_DIR" = Mistral-Small-3.1-24B-Instruct-2503 ] && [[ "$gpu" == *a40 ]]; then
     echo "note: on an A40 Mistral is served in fp8 (its 45 GB of bf16 weights don't fit); h100 serves bf16"
+  fi
+  if [ "$acct" = priority-quantumcore ]; then
+    echo "note: priority-quantumcore is the quantumcore group's account (4 GPUs for the whole group): use it only with their OK"
   fi
 }
 
@@ -661,7 +666,7 @@ _g2f_fuzz() {
       watch|status|results|stop) [ "$nargs" = 0 ] && words=$(_g2f_dirs "$camps") ;;
       new)   words="--model" ;;
       llm)   if [ "$nargs" = 0 ]; then words="start stop status host --model"
-             elif [ "$sub" = start ] && [ "$nargs" = 2 ]; then words="a40 h100 --model"
+             elif [ "$sub" = start ] && [ "$nargs" = 2 ]; then words="a40 h100 qc-a40 qc-h100 --model"
              else words="--model"; fi ;;
     esac
   fi
