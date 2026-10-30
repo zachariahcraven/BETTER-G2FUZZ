@@ -4,21 +4,24 @@ A real run from 2026-10-21: target jhead, model `gpt-oss:120b`, 900 s with `--te
 Everything below is the actual output (`llm status` now also names the server's owner). About 30 minutes end to end.
 Since 2026-10-23 the team server is Qwen3.8 on one A40 (README.md, Tempest setup step 8): the commands are the same,
 `new` says `model Qwen3.8-27B-FP8-nothink`, and a ready server shows `ready: Qwen3.8-27B-FP8-nothink on <node>`.
+Since 2026-10-29: campaigns go in `experiments/practice/campaigns/` (this run's folder was `eval/example`), `run` also
+prints the generator scheduler (`ucb` by default; `--scheduler random` for upstream's), there is one server per model
+(`--model`), and seed generation takes 20 min to 2 h depending on the target.
 
 Before you start: [Tempest setup](../README.md#tempest-setup) steps 1–6 are done. Campaign folders are shared, so
 use your own name: the commands below say `$USER-example`; the output shows this run's name, `example` (that folder
 still exists).
 
-**Faster (~5 min):** reuse this run's seeds and generators, skipping seed generation (step 2's 11–20 min):
-`scripts/fuzz reuse example $USER-try && scripts/fuzz run $USER-try 300 --test`.
+**Faster (~40 min):** reuse this run's seeds and generators, skipping seed generation (step 2's 11–20 min):
+`scripts/fuzz reuse example $USER-try && scripts/fuzz run $USER-try 2400 --test` (each LLM step takes ~13 min on an A40).
 
 ```bash
-cd /home/group/csci-591-automated-vulnerability-discovery/students/WORKING-BETTERG2FUZZ
+cd /home/group/csci-591-automated-vulnerability-discovery/students/BETTERG2FUZZ
 ```
 
 ## 1. Check the team's model server
 
-One server per experiment, shared by everyone's runs. `scripts/fuzz llm status` says whether one is up. Start one
+One server per model, shared by everyone's runs of that model. `scripts/fuzz llm status` says whether one is up. Start one
 only if there's none ([step 8](../README.md#tempest-setup)). Two ways, same model:
 
 | | Command | GPU | Start |
@@ -45,7 +48,7 @@ ready: llm-serve: gpt-oss:120b loaded on gpu049 at Wed Oct 21 03:21:38 PM MDT 20
 
 ```console
 $ scripts/fuzz new $USER-example
-created eval/example (target jhead, model gpt-oss:120b)
+created experiments/practice/campaigns/example (target jhead, model gpt-oss:120b)
 next: scripts/fuzz run example [secs]
 $ scripts/fuzz run $USER-example 900 --test
 TEST MODE: llmGen-M after 10 s without new coverage (not for experiments)
@@ -104,10 +107,10 @@ generators        : 32
 llmGen-M steps    : 2
 LLM calls         : 61 (61 ok, 0 errors)
 generator lineage : {"xmp-5.py": ["xmp-31.py"], "jpg-9.py": ["jpg-32.py"]}
-crashes dir       : eval/example/jhead_output/default/crashes
+crashes dir       : experiments/practice/campaigns/example/jhead_output/default/crashes
 ```
 
-## 5. What the run left in `eval/example/`
+## 5. What the run left in `experiments/practice/campaigns/example/`
 
 | Path | What it is |
 | --- | --- |

@@ -1,5 +1,8 @@
 # Getting a Free CatChat API Key (MSU)
 
+> Not needed for `scripts/fuzz`: it runs on Tempest, which can't reach CatChat, and uses the team's own model server.
+> This page is for using CatChat's models elsewhere (e.g. trying prompts from your laptop).
+
 G2Fuzz uses MSU's CatChat API. It is free with a **Free Key**.
 Official docs: [CatChat API Access](https://www.montana.edu/uit/rci/catchat/api-access.html).
 
