@@ -44,6 +44,12 @@ cat > "$T/bin/sacctmgr" <<'EOF'
 { printf 'sacctmgr'; printf ' %q' "$@"; echo; } >> "$STUB_LOG"
 cat "$SCEN/accounts" 2>/dev/null; exit 0
 EOF
+# sacct: answers $SCEN/sacct_jobs (scripts/study status: why failed campaigns ended)
+cat > "$T/bin/sacct" <<'EOF'
+#!/bin/bash
+{ printf 'sacct'; printf ' %q' "$@"; echo; } >> "$STUB_LOG"
+cat "$SCEN/sacct_jobs" 2>/dev/null; exit 0
+EOF
 cat > "$T/bin/curl" <<'EOF'
 #!/bin/bash
 { printf 'curl'; printf ' %q' "$@"; echo; } >> "$STUB_LOG"
@@ -62,6 +68,10 @@ import os, re, sys
 with open(os.environ["STUB_LOG"], "a") as log:
     log.write("squeue " + " ".join(repr(a) for a in sys.argv[1:]) + "\n")
 if os.path.exists(os.environ["SCEN"] + "/squeue_fail"):
+    sys.stderr.write("slurm_load_jobs error: Socket timed out on send/recv operation\n"); sys.exit(1)
+# squeue_fail_new: fail scripts/study's state query (-j ... -o '%i %T') once it asks about a job submitted in this case
+if os.path.exists(os.environ["SCEN"] + "/squeue_fail_new") and "-j" in sys.argv and "%i %T" in sys.argv and \
+        any(int(j) >= 950001 for j in sys.argv[sys.argv.index("-j") + 1].split(",") if j.isdigit()):
     sys.stderr.write("slurm_load_jobs error: Socket timed out on send/recv operation\n"); sys.exit(1)
 keys = "iujTkNAoL"
 heads = {"i": "JOBID", "u": "USER", "j": "NAME", "T": "STATE", "k": "COMMENT", "N": "NODELIST", "A": "ACCOUNT",
@@ -97,7 +107,7 @@ EOF
 chmod +x "$T/bin"/*
 
 # Safety: every Slurm command must be one of the stubs above
-for c in sbatch squeue scancel sacctmgr srun curl date; do
+for c in sbatch squeue scancel sacctmgr sacct srun curl date; do
   got=$(env -i PATH="$T/bin:/usr/bin:/bin" bash -c "command -v $c")
   [ "$got" = "$T/bin/$c" ] || { echo "abort: $c resolves to $got, not the stub" >&2; exit 2; }
 done
@@ -151,7 +161,7 @@ setup_work() {
   mkdir -p "$W/repo/experiments/02-model-sweep/launch"
   cp "$REPO/experiments/02-model-sweep/launch/targets.txt" "$REPO/experiments/02-model-sweep/launch/study.conf" \
     "$W/repo/experiments/02-model-sweep/launch/"
-  local x; for x in 03-test 04-reuse 05-bad 06-badtarget 07-wait 08-trap 09-cont; do mkdir -p "$W/repo/experiments/$x/launch"; done
+  local x; for x in 03-test 04-reuse 05-bad 06-badtarget 07-wait 08-trap 09-cont 10-noseeds 11-acct 12-retry 13-dirty; do mkdir -p "$W/repo/experiments/$x/launch"; done
   printf '%s\n' "targets = jhead" "arms    = ucb: --scheduler ucb | random: --scheduler random" "        | afl: --afl" \
     "reps    = 2" "secs    = 600" "seeds   = shared   # one seed generation, reused by both G2FUZZ arms" \
     > "$W/repo/experiments/03-test/launch/study.conf"
@@ -170,6 +180,28 @@ setup_work() {
   printf '%s\n' "Qwen3.8-27B-FP8 948000" "Qwen3.8-27B-FP8 948000 ready" > "$W/repo/experiments/08-trap/campaigns/.study-servers"
   # 09: a | line continues targets
   printf '%s\n' "targets = jhead" "        | mp42aac" "arms = a: --afl" > "$W/repo/experiments/09-cont/launch/study.conf"
+  # 10: seed generation made no seeds twice: jhead with only the model's own 400s (a result: "no seeds"), mp42aac
+  # with a format failing for another reason (failed: launch it again)
+  printf '%s\n' "targets = jhead mp42aac" "arms = g2f: --scheduler ucb" "name = {target}-{arm}-r{rep}" > "$W/repo/experiments/10-noseeds/launch/study.conf"
+  local fmt err
+  for c in jhead-g2f-r1 mp42aac-g2f-r1; do
+    fresh_campaign "$W/repo/experiments/10-noseeds/campaigns/$c" Qwen3.8-27B-FP8-nothink; echo 6003 > "$W/repo/experiments/10-noseeds/campaigns/$c/slurm.jobid"
+    if [ "$c" = jhead-g2f-r1 ]; then fmt=jpg err="BadRequestError('context')"; else fmt=mp4 err="FileNotFoundError('tmp')"; fi
+    printf '%s\n' "Traceback ... (a generator's own error, shown to the LLM)" ">> Seed generation failed for format $fmt -> $err" \
+      "fuzz: program_gen exit 0" "fuzz: seed generation made no seeds" > "$W/repo/experiments/10-noseeds/campaigns/$c/seedgen.log"
+  done
+  printf '%s\n' '{"ts": 1, "model": "q", "secs": 9.0, "status": "ok", "finish": "length"}' '{"ts": 2, "model": "q", "secs": 300.0, "status": "BadRequestError"}' \
+    > "$W/repo/experiments/10-noseeds/campaigns/jhead-g2f-r1/llm_calls.jsonl"
+  printf '%s\n' '{"ts": 1, "model": "q", "secs": 1.0, "status": "APIConnectionError"}' '{"ts": 2, "model": "q", "secs": 9.0, "status": "ok", "finish": "stop"}' \
+    > "$W/repo/experiments/10-noseeds/campaigns/mp42aac-g2f-r1/llm_calls.jsonl"
+  # 11: account and partition from study.conf; 12: three failed server starts already recorded; 13: a -dirty image
+  printf '%s\n' "targets = jhead" "arms = ucb: --scheduler ucb | afl: --afl" "name = {target}-{arm}-r{rep}" \
+    "account = priority-quantumcore" "partition = priority" "gpu = qc-h100" > "$W/repo/experiments/11-acct/launch/study.conf"
+  printf '%s\n' "targets = jhead" "arms = ucb: --scheduler ucb" "name = {target}-{arm}-r{rep}" > "$W/repo/experiments/12-retry/launch/study.conf"
+  mkdir -p "$W/repo/experiments/12-retry/campaigns"
+  printf '%s\n' "Qwen3.8-27B-FP8 940001" "Qwen3.8-27B-FP8 940002" "Qwen3.8-27B-FP8 940003" > "$W/repo/experiments/12-retry/campaigns/.study-servers"
+  : > "$W/dirty.sif"; echo "e69d76a-dirty built 2026-10-30 01:00" > "$W/dirty.sif.version"
+  printf '%s\n' "targets = jhead" "arms = ucb: --scheduler ucb image=$W/dirty.sif" > "$W/repo/experiments/13-dirty/launch/study.conf"
 }
 
 # Scenarios: which jobs squeue shows, which accounts sacctmgr lists, whether the server answers
@@ -195,8 +227,11 @@ scenario() {
     qc)       echo "${srv/|$P|/|priority-quantumcore|}" > "$s/jobs" ;;   # the Qwen server on quantumcore's account
     driver)   printf '%s\n' "$srv" "948500|bob|study-03-test|RUNNING|study=$W/repo/experiments/03-test|cpu010|$G|x" > "$s/jobs" ;;
     otherdriver) printf '%s\n' "$srv" "948501|bob|study-03-test|RUNNING|study=/home/bob/copy/03-test|cpu011|$G|x" > "$s/jobs" ;;
+    driver10) printf '%s\n' "$srv" "948502|tester|study-10-noseeds|RUNNING|study=$W/repo/experiments/10-noseeds|cpu010|$G|x" > "$s/jobs" ;;
     short)    echo "$srv|1:00:00" > "$s/jobs" ;;   # the Qwen server has 1 h left
     sqfail)   echo "$srv" > "$s/jobs"; : > "$s/squeue_fail" ;;
+    sqfailnew) echo "$srv" > "$s/jobs"; : > "$s/squeue_fail_new" ;;
+    failinfo) echo "$srv" > "$s/jobs"; echo "6003|FAILED|1:0|00:20:00" > "$s/sacct_jobs" ;;   # sacct on job 6003
     allmodels)   # a ready server for each of study 02's 5 models
       local m i=0; : > "$s/jobs"; : > "$s/curl"
       for m in Qwen3.8-27B-FP8-nothink phi-4 starcoder2-15b-instruct-v0.1 DeepSeek-Coder-V2-Lite-Instruct Mistral-Small-3.1-24B-Instruct-2503; do
@@ -322,12 +357,16 @@ all_cases() {
   run_case llm_start_nopriority noprio -- llm start 2
   run_case llm_start_nopriority_h100 noprio -- llm start 2 h100
   run_case llm_start_mistral none -- llm start 2 --model Mistral-Small-3.1-24B-Instruct-2503
-  run_case llm_start_qc_h100 qcmember -- llm start 24 qc-h100 --model phi-4
-  run_case llm_start_qc_a40 qcmember -- llm start 2 qc-a40 --model Mistral-Small-3.1-24B-Instruct-2503
-  run_case llm_start_qc_notmember none -- llm start 2 qc-h100
-  run_case llm_start_qc_up qc -- llm start 2 a40
-  run_case llm_status_qc qc -- llm status
-  run_case run_qc_server qc -- run seeded 300
+  run_case llm_start_qc_h100 qcmember G2F_ACCOUNT=priority-quantumcore -- llm start 24 qc-h100 --model phi-4
+  run_case llm_start_qc_a40 qcmember G2F_ACCOUNT=priority-quantumcore -- llm start 2 qc-a40 --model Mistral-Small-3.1-24B-Instruct-2503
+  run_case llm_start_qc_notmember none G2F_ACCOUNT=priority-quantumcore -- llm start 2 qc-h100
+  run_case llm_start_qc_classacct qcmember -- llm start 2 qc-h100
+  run_case llm_start_qc_up qc G2F_ACCOUNT=priority-quantumcore -- llm start 2 qc-h100
+  run_case llm_start_class_beside_qc qc -- llm start 2 a40
+  run_case llm_start_prio_acct none G2F_ACCOUNT=priority-csci-591-automated-vulnerability-discovery -- llm start 2
+  run_case llm_status_qc qc G2F_ACCOUNT=priority-quantumcore -- llm status
+  run_case llm_status_qc_class qc -- llm status
+  run_case run_qc_server qc G2F_ACCOUNT=priority-quantumcore -- run seeded 300
   run_case llm_status_none none -- llm status
   run_case llm_status_default solo -- llm
   run_case llm_status_pending pending -- llm status
@@ -400,8 +439,9 @@ all_cases() {
   run_case study_02_servers_dry none -- @study start 02-model-sweep --servers --dry
   run_case study_servers none -- @study start 03-test --servers
   run_case study_servers_ready solo -- @study start 03-test --servers --only arm=ucb
-  run_case study_servers_qc qcmember -- @study start 02-model-sweep --only arm=phi-4 --secs 600 --servers --gpu qc-h100
-  run_case study_servers_noacct none -- @study start 02-model-sweep --only arm=phi-4 --servers --gpu qc-h100
+  run_case study_servers_qc qcmember G2F_ACCOUNT=priority-quantumcore G2F_PARTITION=priority -- @study start 02-model-sweep --only arm=phi-4 --secs 600 --servers --gpu qc-h100
+  run_case study_servers_noacct none G2F_ACCOUNT=priority-quantumcore -- @study start 02-model-sweep --only arm=phi-4 --servers --gpu qc-h100
+  run_case study_qc_needs_acct qcmember -- @study start 02-model-sweep --only arm=phi-4 --servers --gpu qc-h100 --dry
   run_case study_servers_retry none STUDY_POLL_SECS=0 STUDY_MAX_PASSES=9 -- @study start 03-test --servers --wait --only arm=ucb
   run_case study_badgpu solo -- @study show 03-test --gpu v100
   run_case study_background solo -- @study start 03-test --servers --background
@@ -417,13 +457,29 @@ all_cases() {
   run_case study_status_servers solo -- @study status 07-wait
   run_case study_short short -- @study start 03-test
   run_case study_trap solo STUDY_POLL_SECS=0 STUDY_MAX_PASSES=1 -- @study start 08-trap --servers --wait --only arm=ucb
-  run_case study_dry_noacct none -- @study start 02-model-sweep --only arm=phi-4 --servers --gpu qc-h100 --dry
+  run_case study_dry_noacct none G2F_ACCOUNT=priority-quantumcore -- @study start 02-model-sweep --only arm=phi-4 --servers --gpu qc-h100 --dry
   run_case study_sqfail_status sqfail -- @study status 07-wait
   run_case study_sqfail_wait sqfail STUDY_POLL_SECS=0 STUDY_MAX_PASSES=2 -- @study start 07-wait --wait
   run_case study_results_twice solo -- @twice @study results 07-wait
   run_case study_other_driver otherdriver -- @study start 03-test --only arm=afl
   run_case study_env solo G2F_UCB_EXPLORATION=0.5 G2F_CPUS=8 G2F_MEM=64G -- @study start 03-test --only arm=ucb
   run_case study_cont solo -- @study show 09-cont
+  run_case study_noseeds solo -- @study status 10-noseeds
+  run_case study_noseeds_csv solo -- @study csv 10-noseeds
+  run_case study_conf_acct qcmember -- @study start 11-acct --servers
+  run_case study_conf_acct_clash qcmember G2F_ACCOUNT=group-csci-591-automated-vulnerability-discovery -- @study start 11-acct
+  run_case study_conf_acct_status qcmember G2F_ACCOUNT=group-csci-591-automated-vulnerability-discovery -- @study status 11-acct
+  run_case study_sqfail_after_launch sqfailnew STUDY_POLL_SECS=0 STUDY_MAX_PASSES=1 -- @study start 07-wait --servers --wait
+  run_case study_gaveup_before none -- @study start 12-retry --servers
+  run_case study_retry_servers none -- @study start 12-retry --servers --retry-servers
+  run_case study_dirty_image solo -- @study start 13-dirty
+  run_case study_dirty_image_dry solo -- @study start 13-dirty --dry
+  # --retry-failed, failure reasons, other users' jobs
+  run_case study_retry_failed solo -- @study start 10-noseeds --retry-failed
+  run_case study_retry_failed_dry solo -- @study start 10-noseeds --retry-failed --dry
+  run_case study_retry_failed_driver driver10 -- @study start 10-noseeds --servers --background --retry-failed
+  run_case study_failed_reasons failinfo -- @study status 10-noseeds
+  run_case study_status_others two -- @study status 07-wait
 }
 
 for side in old new; do
@@ -487,6 +543,9 @@ contract "qc-h100: gpupriority H100 on priority-quantumcore" 'grep -q "^sbatch -
 contract "qc-a40: the A40 on priority-quantumcore (fp8 note)" 'grep -q "^sbatch --parsable --account priority-quantumcore --time 120 " "$N/llm_start_qc_a40/calls" && grep -q "served in fp8" "$N/llm_start_qc_a40/out"'
 contract "qc-*: refused without the account"            '[ "$(cat "$N/llm_start_qc_notmember/rc")" = 1 ] && grep -q "qc-h100 needs the Slurm account priority-quantumcore" "$N/llm_start_qc_notmember/err" && ! grep -q "^sbatch" "$N/llm_start_qc_notmember/calls"'
 contract "a quantumcore server counts as the model's"   '[ "$(cat "$N/llm_start_qc_up/rc")" = 1 ] && grep -q "^ready: Qwen3.8-27B-FP8-nothink on gpu027$" "$N/llm_status_qc/out"'
+contract "class campaigns never use quantumcore servers" 'grep -q "^no team LLM server" "$N/llm_status_qc_class/out" && grep -q "^sbatch --parsable --account $P " "$N/llm_start_class_beside_qc/calls"'
+contract "qc-* servers need the quantumcore account"     '[ "$(cat "$N/llm_start_qc_classacct/rc")" = 1 ] && grep -q "only found by campaigns on the quantumcore accounts" "$N/llm_start_qc_classacct/err" && ! grep -q "^sbatch" "$N/llm_start_qc_classacct/calls"'
+contract "a priority- account finds its own A40 account" 'grep -q "^sbatch --parsable --account $P " "$N/llm_start_prio_acct/calls"'
 contract "runs use a server on quantumcore"             'grep -qF "OPENAI_BASE_URL=http://gpu027:28000/v1" "$N/run_qc_server/gen/seeded/job.sbatch"'
 # scripts/study: --servers, --background, --wait, results
 contract "study 02 --servers --dry: 5 servers, 30 h"    '[ "$(grep -c "^  would start the .* server (a40, 30 h)$" "$N/study_02_servers_dry/out")" = 5 ] && [ "$(grep -c "would launch" "$N/study_02_servers_dry/out")" = 20 ] && ! grep -q "^sbatch" "$N/study_02_servers_dry/calls"'
@@ -514,8 +573,28 @@ contract "study: a failed squeue isn't \"no jobs\""      '[ "$(cat "$N/study_sqf
 contract "study results: rewrites only what changed"   'grep -q "results/g2f-r1.csv is up to date" "$N/study_results_twice/out" && [ "$(grep -c "wrote results/g2f-r1.csv" "$N/study_results_twice/out")" = 1 ]'
 contract "study: another study's driver doesn't block" '[ "$(grep -c "submitted Slurm job" "$N/study_other_driver/out")" = 2 ]'
 contract "study: shell settings can't change campaigns" 'grep -q -- "--cpus-per-task 2 --mem 8G" "$N/study_env/calls" && ! grep -q -- "--cpus-per-task 8" "$N/study_env/calls" && grep -q "G2F_UCB_EXPLORATION=1.0" "$N/study_env/tree"'
+contract "study: a qc-* gpu needs the quantumcore account" '[ "$(cat "$N/study_qc_needs_acct/rc")" = 1 ] && grep -q "campaigns must run on the quantumcore accounts too" "$N/study_qc_needs_acct/err"'
+contract "study.conf account/partition reach every job"  'grep -q -- "--account priority-quantumcore --partition priority" "$N/study_conf_acct/calls" && grep -q "^sbatch --parsable --account priority-quantumcore --gres gpu:h100:1 " "$N/study_conf_acct/calls" && grep -q "^settings: .*G2F_PARTITION=priority G2F_ACCOUNT=priority-quantumcore$" "$N/study_conf_acct/tree"'
+contract "study: env can't contradict study.conf's account" '[ "$(cat "$N/study_conf_acct_clash/rc")" = 1 ] && grep -q "study.conf says account = priority-quantumcore" "$N/study_conf_acct_clash/err"'
+# (STUDY_MAX_PASSES then ends the run on that stale check: a test-only path, so its closing results aren't checked)
+contract "study: a failed squeue after launching skips the check" 'grep -q "squeue failed after launching: skipping" "$N/study_sqfail_after_launch/out" && ! grep -q "^scancel" "$N/study_sqfail_after_launch/calls"'
+contract "study: gives up at once on recorded failures"  '[ "$(cat "$N/study_gaveup_before/rc")" = 1 ] && grep -q "giving up" "$N/study_gaveup_before/out" && ! grep -q "llm-serve.sbatch" "$N/study_gaveup_before/calls"'
+contract "study --retry-servers starts it again"         'grep -q "forgot earlier failed server starts" "$N/study_retry_servers/out" && [ "$(grep -c "llm-serve.sbatch" "$N/study_retry_servers/calls")" = 1 ]'
+contract "study: refuses an image of uncommitted code"   '[ "$(cat "$N/study_dirty_image/rc")" = 1 ] && grep -q "image doesn.t hold this checkout.s code" "$N/study_dirty_image/err" && ! grep -q "^sbatch" "$N/study_dirty_image/calls" && grep -q "note: a real start would refuse" "$N/study_dirty_image_dry/out"'
+contract "study csv: llm_cut is - when not logged"      'grep -q "^07-wait,jhead-g2f-r1,g2f,jhead,1,done,.*,2,1,0,-$" "$N/study_results/tree"'
+contract "run.sh logs program_gen's exit status"        'grep -qF "echo \"fuzz: program_gen exit \$?\" >> seedgen.log" "$N/run_seedgen/gen/fresh/run.sh"'
 contract "study: a | line continues targets"           'grep -q "^mp42aac-a-r1 " "$N/study_cont/out" && ! grep -q "|" "$N/study_cont/out"'
+contract "study: no seeds with the model answering"    'grep -q "^jhead-g2f-r1 .* no seeds " "$N/study_noseeds/out" && grep -q "^mp42aac-g2f-r1 .* failed " "$N/study_noseeds/out"'
+contract "study csv: LLM errors, 400s, cut-off answers" 'grep -q "^study,.*,llm_calls,llm_errors,llm_400,llm_cut$" "$N/study_noseeds_csv/out" && grep -q "^10-noseeds,jhead-g2f-r1,g2f,jhead,1,no seeds,.*,2,1,1,1$" "$N/study_noseeds_csv/out"'
 contract "study status shows the study's servers"       'grep -q "^server: Qwen3.8-27B-FP8, Slurm job 948000 (RUNNING), started by this study" "$N/study_status_servers/out"'
+# --retry-failed, failure reasons, other users' jobs, the gave-up hint (2026-10-30)
+contract "study: read-only commands take study.conf's account" '[ "$(cat "$N/study_conf_acct_status/rc")" = 0 ]'
+contract "study status: other users' jobs on its accounts"  'grep -q "^other users. jobs on group-csci-591-automated-vulnerability-discovery,priority-csci-591-automated-vulnerability-discovery: 1$" "$N/study_status_others/out" && grep -q "^  alice 948001 llm-serve RUNNING" "$N/study_status_others/out"'
+contract "study: the gave-up hint is a background command" 'grep -q "start 03-test --servers --only arm=ucb --background --retry-servers$" "$N/study_servers_retry/err"'
+contract "study --retry-failed: moves, launches again"   'grep -q "moved campaigns/mp42aac-g2f-r1 (failed, Slurm job 6003) to campaigns/.retried/mp42aac-g2f-r1.20270115-080000" "$N/study_retry_failed/tree" && grep -q "mp42aac-g2f-r1: submitted Slurm job" "$N/study_retry_failed/out" && ! grep -q "jhead-g2f-r1: submitted" "$N/study_retry_failed/out"'
+contract "study --retry-failed with the driver running" '[ "$(cat "$N/study_retry_failed_driver/rc")" = 0 ] && grep -q "moved campaigns/mp42aac-g2f-r1" "$N/study_retry_failed_driver/tree" && grep -q "driver (Slurm job 948502) launches them again" "$N/study_retry_failed_driver/out" && ! grep -q "^sbatch" "$N/study_retry_failed_driver/calls"'
+contract "study --retry-failed --dry moves nothing"      'grep -q "would move mp42aac-g2f-r1 (failed)" "$N/study_retry_failed_dry/out" && ! grep -q "retried" "$N/study_retry_failed_dry/tree"'
+contract "study status: why each campaign failed"        'grep -q "^  mp42aac-g2f-r1 (failed): Slurm FAILED (exit 1:0) after 00:20:00$" "$N/study_failed_reasons/out" && grep -q "add --retry-failed" "$N/study_failed_reasons/out"'
 contract "shell starts while the server loads"        'grep -q "^note: .*still loading" "$N/shell_loading/out" && grep -q "^srun" "$N/shell_loading/calls"'
 
 # Tab completion (current version): load what `completion` prints into a shell, then "press Tab" after the words

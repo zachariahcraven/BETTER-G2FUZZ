@@ -43,11 +43,11 @@ submitted phi-4 server job 950061 (h100, 48 h, account group-csci-591-automated-
 Starts a different model from `shared-models` (here on an H100 instead of a class A40), e.g. for the model sweep.
 
 ```console
-$ fuzz llm start 24 qc-h100 --model phi-4
+$ G2F_ACCOUNT=priority-quantumcore fuzz llm start 24 qc-h100 --model phi-4
 submitted phi-4 server job 950062 (qc-h100, 24 h, account priority-quantumcore). Ready ~5 min after it starts: scripts/fuzz llm status
 note: priority-quantumcore is the quantumcore group's account (4 GPUs for the whole group): use it only with their OK
 ```
-Starts it on the quantumcore group's H100s instead (`qc-a40` for their A40s): only if you're in that account (partners aren't), with that group's OK.
+Starts it on the quantumcore group's H100s instead (`qc-a40` for their A40s): only if you're in that account (partners aren't), with that group's OK; only campaigns run with the same `G2F_ACCOUNT` use it.
 
 ```console
 $ fuzz llm status
@@ -334,4 +334,4 @@ mac$ G2F_TEMPEST_HOST=tempest-nextgen scripts/tempest-image
 == converting it on a compute node
 g2fuzz.sif is now: 66033fa built 2026-10-29 15:03
 ```
-Rebuilds `g2fuzz.sif` from the Mac (VPN on, colima running) after a commit that changes `afl/` or `g2fuzz/`, such as the scheduler.
+Rebuilds `g2fuzz.sif` from the Mac (VPN on, colima running) after a commit that changes `afl/` or `g2fuzz/`, such as the scheduler; it refuses uncommitted changes or a HEAD that isn't origin/dev (`git pull`, commit and `git push` first).

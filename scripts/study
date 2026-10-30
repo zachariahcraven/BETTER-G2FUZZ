@@ -24,6 +24,9 @@
 #                     the servers it started once their model's campaigns are done
 #   --background      start: run start --wait (with the other options) as a small Slurm job, so nothing has to stay
 #                     open; log: the study's campaigns/study-driver-<job>.log; stop it: scancel <job>. One per study.
+#   --retry-servers   start: forget earlier failed server starts (after the study gave up on a model and it was fixed)
+#   --retry-failed    start: move each failed or cut-short campaign to campaigns/.retried/ (MOVED.txt there lists
+#                     them), so this start launches it again
 #
 # study.conf: one "key = value" per line, # starts a comment, a line starting with | continues the one above.
 #   targets       jhead mp42aac ...   or @targets.txt (a file next to study.conf: one name per line, # comments)
@@ -46,6 +49,9 @@
 #                   partner has), h100 (gpufairshare queue), qc-a40 or qc-h100 (only for members of priority-quantumcore,
 #                   another group's account: ask them first); an arm can name its own with gpu=<G>
 #   server_hours    how long a started server may run [fuzzing time + 3 h per round of seed generations + 12 h]
+#   account, partition  the Slurm account and partition of the study's campaigns, driver and servers [scripts/fuzz's:
+#                   the class account, fairshare]; G2F_ACCOUNT / G2F_PARTITION may only repeat them. A qc-* gpu needs
+#                   account = priority-quantumcore (campaigns use servers of their own account's family only)
 set -euo pipefail
 umask 002   # shared folder: teammates can write the campaigns
 
@@ -68,7 +74,7 @@ cmd="${1:-help}"; shift || true
 case "$cmd" in start|status|csv|show|results) ;; help|-h|--help) usage; exit 0 ;; *) die "unknown command '$cmd' (try: scripts/study help)" ;; esac
 [ -n "${1:-}" ] || die "which study? (a folder in experiments/: $(ls "$REPO/experiments" | grep -v '^README.md$' | xargs))"
 STUDY_ARG=$1; shift
-DRY=0 WAIT=0 SERVERS=0 BACKGROUND=0 ONLY=() O_SECS="" O_REPS="" O_MAX="" O_GPU=""
+DRY=0 WAIT=0 SERVERS=0 BACKGROUND=0 RETRY=0 RETRY_FAILED=0 ONLY=() O_SECS="" O_REPS="" O_MAX="" O_GPU=""
 COMMAND="scripts/study $cmd $STUDY_ARG $*"
 ARGS_IN=("$@")   # the options as given: --background reruns start with them
 while [ $# -gt 0 ]; do
@@ -77,6 +83,8 @@ while [ $# -gt 0 ]; do
     --wait) WAIT=1 ;;
     --servers) SERVERS=1 ;;
     --background) BACKGROUND=1 ;;
+    --retry-servers) RETRY=1 ;;
+    --retry-failed) RETRY_FAILED=1 ;;
     --only|--secs|--reps|--max-seedgen|--gpu)
       [ $# -ge 2 ] || die "$1 needs a value"
       case "$1" in --only) ONLY+=("$2") ;; --secs) O_SECS=$2 ;; --reps) O_REPS=$2 ;; --max-seedgen) O_MAX=$2 ;; --gpu) O_GPU=$2 ;; esac
@@ -98,7 +106,7 @@ REF=$STUDY; [ "$STUDY" != "$REPO/experiments/${STUDY##*/}" ] || REF=${STUDY##*/}
 # === study.conf =====================================================================================================
 declare -A C=([reps]=1 [secs]=21600 [model]=Qwen3.8-27B-FP8 [scheduler]=ucb [seeds]=fresh [name]='{target}-{arm}-r{rep}'
               [order]=target [max_seedgen]=4 [targets_tree]="$STUDENTS/g2f-targets/paper" [seed_secs]=60 [gpu]=a40
-              [server_hours]="")
+              [server_hours]="" [account]="" [partition]="")
 key=""
 while IFS= read -r line || [ -n "$line" ]; do
   line=${line%%#*}
@@ -112,7 +120,7 @@ while IFS= read -r line || [ -n "$line" ]; do
     die "$CONF: can't read this line: $line"
   key=${BASH_REMATCH[1]}
   case "$key" in
-    targets|arms|reps|secs|model|scheduler|seeds|name|order|max_seedgen|targets_tree|seed_secs|gpu|server_hours) C[$key]=${BASH_REMATCH[2]} ;;
+    targets|arms|reps|secs|model|scheduler|seeds|name|order|max_seedgen|targets_tree|seed_secs|gpu|server_hours|account|partition) C[$key]=${BASH_REMATCH[2]} ;;
     *) die "$CONF: unknown setting '$key'" ;;
   esac
 done < "$CONF"
@@ -129,6 +137,14 @@ PART_ARMS=0 PART_STUDY=0
 for o in ${ONLY[@]+"${ONLY[@]}"}; do PART_STUDY=1; [[ "$o" != target=* ]] || PART_ARMS=1; done
 gpu_ok() { case "$1" in a40|h100|qc-a40|qc-h100) ;; *) die "gpu must be a40, h100, qc-a40 or qc-h100 (got '$1')" ;; esac; }
 gpu_ok "${C[gpu]}"
+# account, partition: study.conf's, so a restart can't move the study elsewhere; for start the environment may only
+# repeat them (the other commands just use study.conf's)
+for k in account:G2F_ACCOUNT partition:G2F_PARTITION; do
+  v=${C[${k%%:*}]}; e=${k#*:}
+  [ -n "$v" ] || continue
+  if [ "$cmd" = start ] && [ -n "${!e:-}" ] && [ "${!e}" != "$v" ]; then die "$e=${!e}, but study.conf says ${k%%:*} = $v: unset $e (the study's own setting is used)"; fi
+  export "$e=$v"
+done
 [ -z "${C[server_hours]}" ] || [[ "${C[server_hours]}" =~ ^[0-9]+$ ]] || die "server_hours must be a whole number of hours"
 for k in secs max_seedgen seed_secs; do [[ "${C[$k]}" =~ ^[0-9]+$ ]] || die "$k must be a whole number (got '${C[$k]}')"; done
 case "${C[order]}" in target|rep) ;; *) die "order must be target or rep (got '${C[order]}')" ;; esac
@@ -186,7 +202,11 @@ for p in "${parts[@]}"; do
   [ -z "$O_GPU" ] || A_GPU[$a]=$O_GPU   # --gpu wins over an arm's own gpu=
   gpu_ok "${A_GPU[$a]}"
   [ -f "${A_SIF[$a]}" ] || die "arm $a: no image ${A_SIF[$a]}"
-  for t in "${TARGETS[@]}"; do [ -f "${A_TREE[$a]}/$t.afl" ] || die "no target '$t' in ${A_TREE[$a]} (ls it: *.afl)"; done
+  for t in "${TARGETS[@]}"; do
+    [ -f "${A_TREE[$a]}/$t.afl" ] || die "no target '$t' in ${A_TREE[$a]} (ls it: *.afl)"
+    [ -f "${A_TREE[$a]}/$t.cmp" ] || die "target $t in ${A_TREE[$a]} has no $t.cmp (the CmpLog build afl-fuzz -c needs)"
+    [ -n "$(ls -A "${A_TREE[$a]}/seeds/$t" 2>/dev/null)" ] || die "target $t has no stock seeds in ${A_TREE[$a]}/seeds/$t"
+  done
 done
 [ ${#ARMS[@]} -gt 0 ] || die "$CONF: no arms"
 # one server per model: where --servers starts it (the GPU of the model's arms)
@@ -279,7 +299,10 @@ jobs_now() {
   return 0
 }
 squeue_ok() { squeue -h -u "$USER" -o %i > /dev/null 2>&1 < /dev/null; }   # can Slurm be asked right now?
-# not launched, not started (folder, no job yet), queued, seed generation, fuzzing, done, done (short), failed
+# not launched, not started (folder, no job yet), queued, seed generation, fuzzing, done, done (short), no seeds,
+# failed. "no seeds": seed generation finished cleanly (program_gen exit 0; run.sh logs it since 2026-10-30), no
+# format failed for any reason but the model's own 400, the last LLM call was answered, and no seeds came out: a
+# result about that model, kept like done. Failed (crash, server gone, ...): move it, launch again.
 state() {
   local c="$CAMPAIGNS/$1" job
   [ -d "$c" ] || { echo "not launched"; return; }
@@ -289,6 +312,10 @@ state() {
   elif [ -n "$job" ] && [ -z "$(ls -A "$c/initial_seeds" 2>/dev/null)" ]; then echo "seed generation"
   elif [ -n "$job" ]; then echo "fuzzing"
   elif [ -f "$(output "$1")/fuzzer_stats" ]; then echo "done"
+  elif grep -q "seed generation made no seeds" "$c/seedgen.log" 2>/dev/null &&
+       grep -qx "fuzz: program_gen exit 0" "$c/seedgen.log" &&
+       ! grep "Seed generation failed for format" "$c/seedgen.log" | grep -qv "BadRequestError" &&
+       tail -1 "$c/llm_calls.jsonl" 2>/dev/null | grep -q '"status": "\(ok\|BadRequestError\)"'; then echo "no seeds"
   else echo "failed"; fi
 }
 output() { local c="$CAMPAIGNS/$1"; ls -d "$c"/*_output/default 2>/dev/null | head -1 || true; }
@@ -309,7 +336,7 @@ seeds_ready() {   # does campaign $1 (a path relative to campaigns/) have seeds 
   [ -n "$(ls -A "$c/initial_seeds" 2>/dev/null)" ] && [ -n "$(ls -A "$c"/*_output/default/generators 2>/dev/null)" ]
 }
 
-finished() { case "$(state "$1")" in done|failed) return 0 ;; *) return 1 ;; esac; }
+finished() { case "$(state "$1")" in done|failed|"no seeds") return 0 ;; *) return 1 ;; esac; }
 count_finished() { local i n=0; for i in "${!P_N[@]}"; do if finished "${P_N[$i]}"; then n=$((n + 1)); fi; done; echo "$n"; }
 
 # === Model servers (--servers) ======================================================================================
@@ -362,7 +389,7 @@ failed_starts() {
   if [ -f "$SERVERS_FILE" ]; then
     while read -r m id flag; do
       [ "$m" = "$1" ] || continue
-      if [ "$flag" = ready ]; then n=0
+      if [ "$flag" = ready ] || [ "$flag" = reset ]; then n=0
       elif ! grep -qx "$m $id ready" "$SERVERS_FILE" && [ -z "$(squeue -h -j "$id" -o %i 2>/dev/null < /dev/null || true)" ]; then
         n=$((n + 1))
       fi
@@ -485,11 +512,11 @@ launch() {   # launch <i> <the model server it uses, or empty>
       [[ "$n" == */* ]] && up=$(echo "${n%/*}" | sed 's#[^/][^/]*#..#g')/
       out=$(fuzz_for "$i" reuse "$up$src" "${n##*/}" --model "$m" 2>&1) || rc=$?
     fi
-    [ "$rc" = 0 ] || { echo "$out" | sed "s#^#  $n: #"; return 0; }
+    [ "$rc" = 0 ] || { echo "$out" | sed "s#^#  $n: #"; return 1; }
   fi
   out=$(fuzz_for "$i" run "${n##*/}" "$secs" "${flags[@]}" 2>&1) || rc=$?
   echo "$out" | sed "s#^#  $n: #"
-  [ "$rc" = 0 ] || return 0
+  [ "$rc" = 0 ] || return 1
   {
     echo "study: ${STUDY##*/}"
     echo "arm: $a"
@@ -575,7 +602,9 @@ start_pass() {
     fi
     if [ -n "$why" ]; then LEFT+=("$n: $why"); continue; fi
     if [ "$DRY" = 1 ]; then echo "  would launch $n ($( afl_of "$i" && echo --afl || echo "${P_SRC[$i]}"))"
-    else launch "$i" "$( [ -z "$m" ] || echo "$m: ${desc[$m]}, $(hours "${left[$m]}") left at launch")"; fi
+    elif ! launch "$i" "$( [ -z "$m" ] || echo "$m: ${desc[$m]}, $(hours "${left[$m]}") left at launch")"; then
+      LEFT+=("$n: launch failed (above); trying again at the next check"); continue
+    fi
     LAUNCHED=$((LAUNCHED + 1))
     if ! afl_of "$i" && [ "${P_SRC[$i]}" = new ]; then busy[$m]=$(( ${busy[$m]} + 1 )); fi
   done
@@ -590,7 +619,8 @@ driver_job() {   # the running driver of this study (its job carries --comment s
 start_driver() {
   local a acct id; local -a opts=()
   [ "$DRY" = 0 ] || die "--background and --dry don't mix (try --dry alone)"
-  for a in ${ARGS_IN[@]+"${ARGS_IN[@]}"}; do [ "$a" = --background ] || opts+=("$a"); done
+  # --retry-failed moved them already (here, before the driver)
+  for a in ${ARGS_IN[@]+"${ARGS_IN[@]}"}; do [ "$a" = --background ] || [ "$a" = --retry-failed ] || opts+=("$a"); done
   [[ " ${opts[*]-} " == *" --wait "* ]] || opts+=(--wait)
   acct=$("$FUZZ" account)
   mkdir -p "$CAMPAIGNS"
@@ -603,19 +633,101 @@ start_driver() {
   echo "  log: ${CAMPAIGNS#"$REPO"/}/study-driver-$id.log   progress: scripts/study status $REF   stop it: scancel $id"
 }
 
+# === Failed campaigns ===============================================================================================
+failed_list() {   # the failed and cut-short campaigns: "name|state|job" lines (needs jobs_now)
+  local i s
+  for i in "${!P_N[@]}"; do
+    s=$(shown_state "${P_N[$i]}")
+    case "$s" in failed|"done (short)") echo "${P_N[$i]}|$s|$(cat "$CAMPAIGNS/${P_N[$i]}/slurm.jobid" 2>/dev/null || true)" ;; esac
+  done
+}
+# --retry-failed: moves them into campaigns/.retried/<name>.<time> (recorded in MOVED.txt there), so start launches
+# them again; their data stays
+retry_failed() {
+  local n s id to k=0 stamp
+  jobs_now || die "squeue failed (Slurm busy?): try again in a minute"
+  stamp=$(date +%Y%m%d-%H%M%S)
+  while IFS='|' read -r n s id; do
+    [ -n "$n" ] || continue
+    to=".retried/$n.$stamp"
+    if [ "$DRY" = 1 ]; then echo "  would move $n ($s) to campaigns/$to and launch it again"; continue; fi
+    mkdir -p "$(dirname "$CAMPAIGNS/$to")"
+    mv "$CAMPAIGNS/$n" "$CAMPAIGNS/$to"
+    echo "$(date '+%F %T') $USER moved campaigns/$n ($s, Slurm job ${id:-none}) to campaigns/$to (scripts/study start --retry-failed)" >> "$CAMPAIGNS/.retried/MOVED.txt"
+    echo "  moved $n ($s) to campaigns/$to: launching it again"; k=$((k + 1))
+  done <<< "$(failed_list)"
+  [ "$DRY" = 1 ] || echo "--retry-failed: moved $k campaign(s) aside"
+}
+# status: why each one ended (Slurm's state, exit code and run time, from one sacct call)
+failed_reasons() {
+  local list n s id ids st ec el
+  list=$(failed_list); [ -n "$list" ] || return 0
+  declare -A why=()
+  ids=$(cut -d'|' -f3 <<< "$list" | grep . | paste -sd, - || true)
+  if [ -n "$ids" ]; then
+    while IFS='|' read -r id st ec el; do [ -z "$id" ] || why[$id]="Slurm $st (exit $ec) after $el"; done < <(
+      sacct -n -X -P -j "$ids" -o JobID,State,ExitCode,Elapsed 2>/dev/null < /dev/null || true)
+  fi
+  echo "failed or cut short ($(wc -l <<< "$list" | tr -d ' ')); logs: each campaign's slurm-<job>.out, seedgen.log, fuzz.log"
+  while IFS='|' read -r n s id; do
+    if [ -n "$id" ] && [ -n "${why[$id]:-}" ]; then echo "  $n ($s): ${why[$id]}"; else echo "  $n ($s): no Slurm record${id:+ of job $id}"; fi
+  done <<< "$list"
+  echo "  to run them again: add --retry-failed to the start command (e.g. scripts/study start $REF --servers --background --retry-failed)"
+}
+
+# Every arm's image must hold this checkout's committed g2fuzz/, afl/ and Dockerfile (its version names a commit
+# whose copies of them equal HEAD's, and nothing there is uncommitted). Prints the images; 1 if one doesn't.
+image_check() {
+  local a sif v c bad="" seen=" "
+  for a in "${ARMS[@]}"; do
+    sif=${A_SIF[$a]}; [[ "$seen" != *" $sif "* ]] || continue; seen+="$sif "
+    v=$(cat "$sif.version" 2>/dev/null || echo unknown); c=${v%% *}
+    echo "image: ${sif#"$REPO"/} ($v)"
+    if [[ "$c" == *-dirty ]]; then bad+="  ${sif#"$REPO"/} was built from uncommitted code\n"; continue; fi
+    git -C "$REPO" rev-parse -q --verify "$c^{commit}" > /dev/null 2>&1 || continue   # no git, or not a commit: can't tell
+    git -C "$REPO" diff --quiet "$c" HEAD -- g2fuzz afl build/Dockerfile.g2fuzz 2>/dev/null ||
+      bad+="  ${sif#"$REPO"/} ($c) is older than this checkout's g2fuzz/, afl/ or Dockerfile: rebuild it (scripts/tempest-image)\n"
+  done
+  [ -z "$(git -C "$REPO" status --porcelain -- g2fuzz afl build/Dockerfile.g2fuzz 2>/dev/null)" ] ||
+    bad+="  uncommitted changes in g2fuzz/, afl/ or build/Dockerfile.g2fuzz: no image holds them (commit, then rebuild)\n"
+  [ -n "$bad" ] || return 0
+  printf '%b' "$bad"; return 1
+}
+
 # STUDY_POLL_SECS [600] and STUDY_MAX_PASSES (no limit) are for scripts/tests/test_fuzz_cli.sh
 server_trouble="server isn't running|server didn't start|Slurm didn't answer|gave up on the"
 cmd_start() {
-  local l d passes=0 poll=${STUDY_POLL_SECS:-600} done_n
+  local l d a passes=0 poll=${STUDY_POLL_SECS:-600} done_n; local -a again=()
   if [ "$DRY" = 0 ]; then
     d=$(driver_job)
+    if [ -n "$d" ] && [ "$RETRY_FAILED" = 1 ]; then   # moved aside, they are "not launched": the driver relaunches them
+      retry_failed; echo "the driver (Slurm job $d) launches them again at its next check (every 10 min)"; return 0
+    fi
     [ -z "$d" ] || die "the driver of ${STUDY##*/} is running (Slurm job $d) and launches its campaigns; let it work, or stop it first: scancel $d"
   fi
+  # qc-* servers are found only by campaigns on the quantumcore accounts (scripts/fuzz: one account family per server)
+  local m
+  for m in "${!MGPU[@]}"; do
+    if [[ "${MGPU[$m]}" == qc-* ]] && [ "${G2F_ACCOUNT:-}" != priority-quantumcore ] && [ "${G2F_ACCOUNT:-}" != group-quantumcore ]; then
+      die "gpu ${MGPU[$m]} ($m): the campaigns must run on the quantumcore accounts too: account = priority-quantumcore and partition = priority in study.conf"
+    fi
+  done
+  if ! image_check; then
+    if [ "$DRY" = 1 ]; then echo "note: a real start would refuse: the image doesn't hold this checkout's code (above)"
+    else die "the image doesn't hold this checkout's code (above): commit, rebuild it (scripts/tempest-image), then start"; fi
+  fi
+  if [ "$RETRY_FAILED" = 1 ]; then retry_failed; fi
   if [ "$BACKGROUND" = 1 ]; then start_driver; return 0; fi
   if [ "$WAIT" = 1 ] && [ "$DRY" = 0 ] && [ "$SERVERS" = 1 ]; then
     trap stop_servers_on_exit EXIT; trap 'exit 143' TERM; trap 'exit 130' INT
   fi
+  if [ "$RETRY" = 1 ] && [ "$DRY" = 0 ]; then
+    mkdir -p "$CAMPAIGNS"
+    for m in "${!MGPU[@]}"; do echo "$m 0 reset" >> "$SERVERS_FILE"; done
+    echo "forgot earlier failed server starts (--retry-servers)"
+  fi
   echo "== ${STUDY##*/}: ${#P_N[@]} campaigns, ${C[secs]} s each, seeds ${C[seeds]}, at most ${C[max_seedgen]} seed generations per model$( [ "$SERVERS" = 0 ] || echo ", servers started as needed")"
+  echo "   account ${G2F_ACCOUNT:-$("$FUZZ" account 2>/dev/null || echo "?")}, partition ${G2F_PARTITION:-fairshare}"
   LEFT=() LAUNCHED=0 BLOCKED=0
   while :; do
     if ! jobs_now; then   # nothing is known this time: no launches, no results, no server changes
@@ -623,7 +735,13 @@ cmd_start() {
       echo "$(date '+%F %T') squeue failed: skipping this check"
     else
       start_pass
-      if [ "$LAUNCHED" -gt 0 ]; then jobs_now || true; fi
+      # the campaigns just launched aren't in JOB yet: without a fresh squeue every check below would be wrong
+      if [ "$LAUNCHED" -gt 0 ] && ! jobs_now; then
+        echo "$(date '+%F %T') squeue failed after launching: skipping the rest of this check"
+        if [ "$WAIT" = 0 ] || [ "$DRY" = 1 ]; then break; fi
+        passes=$((passes + 1)); if [ -n "${STUDY_MAX_PASSES:-}" ] && [ "$passes" -ge "$STUDY_MAX_PASSES" ]; then break; fi
+        sleep "$poll"; continue
+      fi
       stop_done_servers
       if [ "$WAIT" = 0 ] || [ "$DRY" = 1 ]; then break; fi
       write_results
@@ -631,7 +749,9 @@ cmd_start() {
       if [ "$done_n" = ${#P_N[@]} ]; then break; fi
       if [ "$BLOCKED" -gt 0 ] && [ $((done_n + BLOCKED)) = ${#P_N[@]} ]; then
         printf '%s\n' "${LEFT[@]}" | grep "gave up on the" | sed 's/^/  /'
-        die "every other campaign has finished; $BLOCKED wait on a server the study gave up on. Fix it, then: scripts/study start $REF --servers --wait"
+        # the command to give: in the driver ARGS_IN is its own (--wait, no --background)
+        for a in ${ARGS_IN[@]+"${ARGS_IN[@]}"}; do case "$a" in --wait|--background|--retry-servers) ;; *) again+=("$a") ;; esac; done
+        die "every other campaign has finished; $BLOCKED wait on a server the study gave up on. Fix it, then: scripts/study start $REF ${again[*]-} --background --retry-servers"
       fi
       if [ "$SERVERS" = 0 ] && printf '%s\n' ${LEFT[@]+"${LEFT[@]}"} | grep -q "server isn't running"; then
         printf '%s\n' "${LEFT[@]}" | grep "server isn't running" | sed 's/^/  /'
@@ -677,21 +797,33 @@ cmd_show() {
 row() {   # one campaign's numbers, tab-separated
   local i=$1 n=${P_N[$1]} c="$CAMPAIGNS/${P_N[$1]}" o
   o=$(output "$n")
-  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$n" "${P_A[$i]}" "${P_T[$i]}" "${P_R[$i]}" "$(shown_state "$n")" \
+  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$n" "${P_A[$i]}" "${P_T[$i]}" "${P_R[$i]}" "$(shown_state "$n")" \
     "$(afl_stat "$o/fuzzer_stats" edges_found)" "$(afl_stat "$o/fuzzer_stats" saved_crashes)" \
     "$(afl_stat "$o/fuzzer_stats" execs_per_sec)" "$(afl_stat "$o/fuzzer_stats" run_time)" \
     "$(ls "$o/generators" 2>/dev/null | wc -l | tr -d ' ')" \
     "$(grep -a -c 'Gen-M start' "$c/fuzz.log" 2>/dev/null || true)" \
-    "$(cat "$c/llm_calls.jsonl" 2>/dev/null | wc -l | tr -d ' ')"
+    "$(cat "$c/llm_calls.jsonl" 2>/dev/null | wc -l | tr -d ' ')" \
+    "$(grep -v -c '"status": "ok"' "$c/llm_calls.jsonl" 2>/dev/null || true)" \
+    "$(grep -c '"status": "BadRequestError"' "$c/llm_calls.jsonl" 2>/dev/null || true)" \
+    "$(if grep -q '"finish"' "$c/llm_calls.jsonl" 2>/dev/null; then grep -c '"finish": "length"' "$c/llm_calls.jsonl"; elif [ -s "$c/llm_calls.jsonl" ]; then echo -; fi)"
 }
-HEADER="campaign\tarm\ttarget\trep\tstate\tedges\tcrashes\texecs/s\trun_s\tgenerators\tllm_steps\tllm_calls"
+# llm_errors: calls that failed (any error); llm_400: of those, the server's 400 (mostly a prompt over the model's
+# context); llm_cut: answers cut off at the context limit (finish = length; "-": an image from before 2026-10-30, which
+# doesn't log it)
+HEADER="campaign\tarm\ttarget\trep\tstate\tedges\tcrashes\texecs/s\trun_s\tgenerators\tllm_steps\tllm_calls\tllm_errors\tllm_400\tllm_cut"
 
 cmd_status() {
-  local i d m st flag
+  local i d m st flag fam others
   echo "== ${STUDY##*/} ($CAMPAIGNS)"
   jobs_now || die "squeue failed (Slurm busy?): try again in a minute"
   d=$(driver_job)
   if [ -n "$d" ]; then echo "driver: Slurm job $d is running start --wait (log: ${CAMPAIGNS#"$REPO"/}/study-driver-$d.log)"; fi
+  # other users' jobs on the study's accounts (its group- and priority- pair): e.g. the quantumcore group's own work
+  fam=${G2F_ACCOUNT:-$("$FUZZ" account 2>/dev/null || true)}; fam=${fam#group-}; fam=${fam#priority-}; fam="group-$fam,priority-$fam"
+  others=$(squeue -h -A "$fam" -o '%u %i %j %T %P %b' 2>/dev/null < /dev/null | awk -v me="$USER" '$1 != me' || true)
+  if [ -n "$others" ]; then
+    echo "other users' jobs on $fam: $(wc -l <<< "$others" | tr -d ' ')"; head -5 <<< "$others" | sed 's/^/  /'
+  fi
   if [ -f "$SERVERS_FILE" ]; then
     while read -r m d flag; do
       [ -z "$flag" ] || continue
@@ -700,6 +832,7 @@ cmd_status() {
     done < "$SERVERS_FILE"
   fi
   { echo -e "$HEADER"; for i in "${!P_N[@]}"; do row "$i"; done; } | column -t -s $'\t'
+  failed_reasons
 }
 
 cmd_csv() { jobs_now || die "squeue failed (Slurm busy?): try again in a minute"; csv_rows "${!P_N[@]}"; }

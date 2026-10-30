@@ -496,9 +496,11 @@ def pip_debug_loop(dialog, MAX_TRY, model, temperature):
     try_cnt = 0
     while try_cnt < MAX_TRY:
         raw_llm = llm_messages(model, dialog, temperature)
-        code, msg = extract_res_for_pip(raw_llm) 
+        # BETTERG2FUZZ fix: extract_res_for_pip returns (result, valid), where result is the command when valid and
+        # the problem otherwise; upstream read it as (code, msg) and so ran any answer as a command
+        res, valid = extract_res_for_pip(raw_llm)
 
-        if code:
+        if valid:
             SUCCESS = 1
             break
         else:
@@ -506,17 +508,17 @@ def pip_debug_loop(dialog, MAX_TRY, model, temperature):
                 {"role": "assistant", "content": raw_llm}
             )
             dialog.append(
-                {"role": "user", "content": msg + " Please generate again."}
+                {"role": "user", "content": res + " Please generate again."}
             )
-            print(msg)
+            print(res)
 
         try_cnt += 1
     
     if SUCCESS:
-        return code, raw_llm
+        return res, raw_llm
     else:
         print("Can not finish this task.")
-        return None
+        return None, None
 
 def pip_debug(msg, MAX_TRY, model, temperature):
     global pip_debug_record
@@ -537,6 +539,9 @@ def pip_debug(msg, MAX_TRY, model, temperature):
         {"role": "user", "content": tmp}
     )
     code, raw_llm = pip_debug_loop(pip_debug, MAX_TRY, model, temperature)
+    if code is None:   # BETTERG2FUZZ fix: no usable pip command after MAX_TRY answers
+        pip_debug_record.append(msg)
+        return install_flag
 
     # install library via pip
     print("You should install:", code)
@@ -545,7 +550,7 @@ def pip_debug(msg, MAX_TRY, model, temperature):
         subprocess.check_call(cmd, timeout=120)
         install_flag = 1
         print(f"'{cmd}' successfully.")
-    except subprocess.CalledProcessError:
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError):   # BETTERG2FUZZ fix: + timeout, no such command
         print(f"'{cmd}' failed.")
 
     pip_debug_record.append(msg)

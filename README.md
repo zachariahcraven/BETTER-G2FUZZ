@@ -178,7 +178,7 @@ Don't switch its branch: that changes the code for everyone. Settings are automa
 
 | Variable | Default on Tempest |
 | --- | --- |
-| `G2F_ACCOUNT` | `group-csci-591-automated-vulnerability-discovery` (never another group's account) |
+| `G2F_ACCOUNT` | `group-csci-591-automated-vulnerability-discovery` (another group's only when you set it; campaigns then use that group's servers) |
 | `G2F_PARTITION` | `fairshare` |
 | `G2F_CPUS`, `G2F_MEM` | `2`, `8G` per job |
 | `G2F_BASE_URL`, `G2F_KEY` | the team's running `llm` server (step 8) |
@@ -192,7 +192,7 @@ mkdir -p ~/.docker/cli-plugins && ln -sf "$(brew --prefix)/bin/docker-buildx" ~/
 colima stop && colima start --vz-rosetta        # fast x86_64 builds
 ```
 
-After each code change, commit, then from the Mac repo (VPN on, ~10 min): `scripts/tempest-image`.
+After each code change, commit and push, then from the Mac repo (VPN on, ~10 min): `scripts/tempest-image`.
 It replaces `build/g2fuzz.sif` in the shared copy, writes the git version to `build/g2fuzz.sif.version`, and refuses while
 anyone's campaigns run. The image holds the code: `git pull` on Tempest alone changes nothing.
 
@@ -206,7 +206,7 @@ mp42aac and pdftotext (about even with gpt-oss on jhead).
 | --- | --- |
 | `scripts/fuzz llm start [hours]` | 1 A40 on the class priority account: starts right away (default 24 h; the class has 2 GPUs) |
 | `scripts/fuzz llm start [hours] h100` | 1 H100 on `gpufairshare`: uses no class GPU, but may wait hours or days |
-| `scripts/fuzz llm start [hours] qc-h100` (or `qc-a40`) | 1 H100 (A40) on `gpupriority` with `priority-quantumcore`: the quantumcore group's account (4 H100), only for members of that account (partners aren't), with that group's OK. Never the default |
+| `G2F_ACCOUNT=priority-quantumcore scripts/fuzz llm start [hours] qc-h100` (or `qc-a40`) | 1 H100 (A40) on `gpupriority` with `priority-quantumcore`: the quantumcore group's account (4 H100), only for members of that account (partners aren't), with that group's OK. Never the default. Campaigns use only servers of their own account's family, so run those campaigns with the same `G2F_ACCOUNT` (and `G2F_PARTITION=priority`) |
 | `scripts/fuzz llm status` | The team's server: owner, queued, loading or ready, time left |
 | `scripts/fuzz llm host` | The running server's `<node>:<port>` (e.g. for an SSH tunnel) |
 | `scripts/fuzz llm stop` | Stops your server. Refuses while anyone's campaigns run |

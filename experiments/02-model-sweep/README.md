@@ -1,7 +1,8 @@
 # 02 Model sweep
 
 **Question:** how much does the choice of LLM change what G2FUZZ finds, across 15 of the paper's targets?
-**Owner:** n59m742 (+ team). **Status:** planned. **Started:** 2026-10-29.
+**Owner:** n59m742 (+ team). **Status:** on hold (not started): [03-model-sweep-qc](../03-model-sweep-qc/) runs this
+design on quantumcore. **Planned:** 2026-10-29.
 
 ## Design
 - **Arms:** one per model in `students/shared-models`, G2FUZZ only, generator scheduler **`ucb`**
@@ -28,8 +29,7 @@ scripts/study status 02-model-sweep                         # any time: the driv
   One model only: add `--only arm=<model>`.
 - **Time:** about 12–14 h per model (seed generation 20 min to 2 h per target, then 6 h of fuzzing). The class has 2
   A40s, so two models run at once: **about 36–42 h for the whole study**, and teammates' servers on the class account
-  queue behind it. Only for members of `priority-quantumcore` (not partners), with that group's OK: `--gpu qc-h100`,
-  about 16–18 h on all 4 of its H100s.
+  queue behind it. On quantumcore's H100s instead (members only, with that group's OK): see 03, about 20–28 h.
 - A `failed` campaign (no fuzzer_stats) isn't retried by itself: read its `slurm-*.out` and `seedgen.log` and move it
   to `campaigns/<model>/failed/`; the driver then launches it again. `done (short)` in `status`: Slurm's limit cut it.
 - `scripts/fuzz status|results|watch` work on a campaign with

@@ -49,8 +49,10 @@ def select_parent_generator(
     if not math.isfinite(exploration) or exploration <= 0:
         raise ValueError("G2F_UCB_EXPLORATION must be a positive finite number")
 
-    generators = sorted(set(generators))
-    all_generators = generators
+    candidates = sorted(set(generators))
+    # Bookkeeping uses every generator in generator_dir, not just this step's candidates: a pattern step passes only
+    # one format's generators, and a snapshot of that subset would make the other formats look new at the next step
+    all_generators = _generator_files(generator_dir, candidates)
     state = _load_state(state_path)
     generator_states = state.setdefault("generators", {})
     invalid_generators = set(state.get("invalid_generators", []))
@@ -69,7 +71,7 @@ def select_parent_generator(
     invalid_generators = set(state.get("invalid_generators", []))
     generators = [
         generator
-        for generator in all_generators
+        for generator in candidates
         if generator not in invalid_generators
     ]
     if not generators:
@@ -123,6 +125,15 @@ def _save_state(state_path, state):
         except OSError:
             pass
         raise
+
+
+def _generator_files(generator_dir, candidates):
+    try:
+        names = os.listdir(generator_dir)
+    except OSError as error:
+        raise RuntimeError(f"cannot list generators {generator_dir}: {error}") from error
+    files = {name for name in names if os.path.isfile(os.path.join(generator_dir, name))}
+    return sorted(files | set(candidates))
 
 
 def _generator_from_seed_name(seed_name):

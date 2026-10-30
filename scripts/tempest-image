@@ -8,15 +8,22 @@
 #   and writes the git version to build/g2fuzz.sif.version (each run copies it to image-version.txt).
 #   Refuses while anyone's campaigns are queued or running, so one experiment never mixes code versions.
 #   --force replaces the image anyway (running jobs keep the image they started with).
+#   Refuses a checkout with uncommitted changes, or whose HEAD isn't its pushed upstream (origin/dev): commit AND
+#   push first, so the image's version names exactly the code inside it; G2F_ALLOW_DIRTY=1 builds anyway (practice
+#   only: the version then ends in -dirty).
 #
 # Settings: G2F_TEMPEST_HOST [tempest] (an ~/.ssh/config host),
 #           G2F_TEMPEST_REPO [the team's shared copy, /home/group/csci-591-automated-vulnerability-discovery/students/BETTERG2FUZZ]
+#           G2F_ACCOUNT, G2F_PARTITION [fairshare]  the Slurm job that converts the image (as for scripts/fuzz); a
+#           priority-* account needs its partition named (priority-quantumcore: G2F_PARTITION=priority)
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 HOST="${G2F_TEMPEST_HOST:-tempest}"
 REMOTE="${G2F_TEMPEST_REPO:-/home/group/csci-591-automated-vulnerability-discovery/students/BETTERG2FUZZ}"
 die() { echo "tempest-image: $*" >&2; exit 1; }
+case "${G2F_ACCOUNT:-}" in priority-*) [ -n "${G2F_PARTITION:-}" ] ||
+  die "G2F_ACCOUNT=$G2F_ACCOUNT needs G2F_PARTITION too (fairshare doesn't take it; priority-quantumcore: priority)" ;; esac
 
 docker info >/dev/null 2>&1 || die "Docker isn't running (macOS: colima start)"
 ssh -o BatchMode=yes -o ConnectTimeout=10 "$HOST" true 2>/dev/null ||
@@ -27,6 +34,16 @@ if [ "${1:-}" != "--force" ]; then
   [ "$jobs" = 0 ] || die "$jobs campaign(s) or study driver(s) queued or running on Tempest. Wait for them, or use --force"
 fi
 
+if [ "${G2F_ALLOW_DIRTY:-0}" != 1 ]; then
+  [ -z "$(git -C "$REPO" status --porcelain --untracked-files=no)" ] ||
+    die "uncommitted changes in $REPO: commit them first, so the image's version names its code (practice: G2F_ALLOW_DIRTY=1)"
+  # untracked files too where the image copies from (Dockerfile.g2fuzz: COPY afl/, g2fuzz/)
+  [ -z "$(git -C "$REPO" status --porcelain -- afl g2fuzz build/Dockerfile.g2fuzz)" ] ||
+    die "untracked files in afl/ or g2fuzz/ would go into the image: commit or remove them (practice: G2F_ALLOW_DIRTY=1)"
+  git -C "$REPO" fetch -q 2>/dev/null || die "can't fetch from the repo's remote (to check this checkout is up to date)"
+  [ "$(git -C "$REPO" rev-parse HEAD)" = "$(git -C "$REPO" rev-parse '@{upstream}' 2>/dev/null)" ] ||
+    die "HEAD isn't its upstream (origin/dev): git pull and git push first, so the image's version names a commit everyone has"
+fi
 version="$(git -C "$REPO" describe --always --dirty) built $(date '+%Y-%m-%d %H:%M')"
 case "$version" in *-dirty*) echo "note: uncommitted changes are in this image ($version)" ;; esac
 
@@ -43,7 +60,7 @@ set -e
 cd $REMOTE
 gunzip -f build/g2fuzz-amd64.tar.gz
 # < /dev/null: srun would otherwise read the rest of this script as its input
-srun -A "\$(scripts/fuzz account)" -p fairshare -c 4 --mem 8G -t 60 -J g2f-image \
+srun -A "\$(G2F_ACCOUNT=${G2F_ACCOUNT:-} scripts/fuzz account)" -p ${G2F_PARTITION:-fairshare} -c 4 --mem 8G -t 60 -J g2f-image \
   apptainer build --force build/g2fuzz.sif.new docker-archive:build/g2fuzz-amd64.tar < /dev/null
 mv build/g2fuzz.sif.new build/g2fuzz.sif && rm build/g2fuzz-amd64.tar
 echo "$version" > build/g2fuzz.sif.version
