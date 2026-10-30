@@ -32,6 +32,8 @@ case $MODEL in
   starcoder2-15b-instruct-v0.1)   # its own template refuses the system messages G2Fuzz sends
     [ -f "$TEMPLATES/starcoder2-instruct.jinja" ] || { echo "llm-serve: no $TEMPLATES/starcoder2-instruct.jinja (start it with scripts/fuzz)"; exit 1; }
     ARGS=(--max-model-len 16384 --chat-template /templates/starcoder2-instruct.jinja) ;;
+  gemma-4-31B-it)   # text only (it also takes images and audio)
+    ARGS+=(--limit-mm-per-prompt '{"image":0,"audio":0}') ;;
   Mistral-Small-3.1-24B-Instruct-2503)   # text only; 45 GB of bf16 weights don't fit an A40, so fp8 there
     ARGS+=(--limit-mm-per-prompt '{"image":0}')
     [ "$GPU_MIB" -lt 60000 ] && ARGS+=(--quantization fp8) ;;
