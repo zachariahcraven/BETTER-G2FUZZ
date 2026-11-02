@@ -161,7 +161,7 @@ setup_work() {
   mkdir -p "$W/repo/experiments/02-model-sweep/launch"
   cp "$REPO/experiments/02-model-sweep/launch/targets.txt" "$REPO/experiments/02-model-sweep/launch/study.conf" \
     "$W/repo/experiments/02-model-sweep/launch/"
-  local x; for x in 03-test 04-reuse 05-bad 06-badtarget 07-wait 08-trap 09-cont 10-noseeds 11-acct 12-retry 13-dirty; do mkdir -p "$W/repo/experiments/$x/launch"; done
+  local x; for x in 03-test 04-reuse 05-bad 06-badtarget 07-wait 08-trap 09-cont 10-noseeds 11-acct 12-retry 13-dirty 14-output; do mkdir -p "$W/repo/experiments/$x/launch"; done
   printf '%s\n' "targets = jhead" "arms    = ucb: --scheduler ucb | random: --scheduler random" "        | afl: --afl" \
     "reps    = 2" "secs    = 600" "seeds   = shared   # one seed generation, reused by both G2FUZZ arms" \
     > "$W/repo/experiments/03-test/launch/study.conf"
@@ -202,6 +202,9 @@ setup_work() {
   printf '%s\n' "Qwen3.8-27B-FP8 940001" "Qwen3.8-27B-FP8 940002" "Qwen3.8-27B-FP8 940003" > "$W/repo/experiments/12-retry/campaigns/.study-servers"
   : > "$W/dirty.sif"; echo "e69d76a-dirty built 2026-10-30 01:00" > "$W/dirty.sif.version"
   printf '%s\n' "targets = jhead" "arms = ucb: --scheduler ucb image=$W/dirty.sif" > "$W/repo/experiments/13-dirty/launch/study.conf"
+  # 14: AFL++ output in the campaign folders (G2F_OUTPUT=campaign)
+  printf '%s\n' "targets = jhead" "arms = ucb: --scheduler ucb | afl: --afl" "name = {target}-{arm}-r{rep}" "output = campaign" \
+    > "$W/repo/experiments/14-output/launch/study.conf"
 }
 
 # Scenarios: which jobs squeue shows, which accounts sacctmgr lists, whether the server answers
@@ -497,8 +500,15 @@ else
   fails=$((fails + 1))
 fi
 
+# G2F_OUTPUT=campaign (2026-11-01): the current version only, since the committed one has no such setting
+OUTDIR=$T/out/newonly SCRIPT=$T/fuzz.new
+run_case run_out_campaign base G2F_OUTPUT=campaign -- run fresh 900
+run_case run_out_campaign_afl base G2F_OUTPUT=campaign -- run fresh 120 --afl
+run_case run_out_bad base G2F_OUTPUT=tmpfs -- run seeded 300
+run_case study_out_campaign solo -- @study start 14-output
+
 # Contracts (on the current version)
-N=$T/out/new
+N=$T/out/new X=$T/out/newonly
 contract() { if eval "$2"; then echo "ok    $1"; else echo "FAIL  $1"; fails=$((fails + 1)); fi; }
 firstv() { grep -o -- '-V [0-9]*' "$1" | head -1; }
 contract "run.sh carries -V <secs> (G2FUZZ run)"      '[ "$(firstv "$N/run_seedgen/gen/fresh/run.sh")" = "-V 900" ]'
@@ -596,6 +606,14 @@ contract "study --retry-failed with the driver running" '[ "$(cat "$N/study_retr
 contract "study --retry-failed --dry moves nothing"      'grep -q "would move mp42aac-g2f-r1 (failed)" "$N/study_retry_failed_dry/out" && ! grep -q "retried" "$N/study_retry_failed_dry/tree"'
 contract "study status: why each campaign failed"        'grep -q "^  mp42aac-g2f-r1 (failed): Slurm FAILED (exit 1:0) after 00:20:00$" "$N/study_failed_reasons/out" && grep -q "add --retry-failed" "$N/study_failed_reasons/out"'
 contract "shell starts while the server loads"        'grep -q "^note: .*still loading" "$N/shell_loading/out" && grep -q "^srun" "$N/shell_loading/calls"'
+# G2F_OUTPUT=campaign: no node-disk copy, .cur_input in the job's memory folder (OURS-3)
+outc() { local d=$1; grep -qF -- '--bind "$shm" --env AFL_TMPDIR="$shm"' "$d/job.sbatch" && ! grep -q 'fast=\|copy_back' "$d/job.sbatch" &&
+  grep -q '^shm=/dev/shm/jobs/\$SLURM_JOB_ID' "$d/job.sbatch" && ! grep -q 'sync_out\|/host' "$d/run.sh"; }
+contract "G2F_OUTPUT=campaign: output in the campaign"   'outc "$X/run_out_campaign/gen/fresh" && [ "$(firstv "$X/run_out_campaign/gen/fresh/run.sh")" = "-V 900" ] && grep -q "OPENAI_BASE_URL=" "$X/run_out_campaign/gen/fresh/job.sbatch"'
+contract "G2F_OUTPUT=campaign: --afl runs too"           'outc "$X/run_out_campaign_afl/gen/fresh" && ! grep -q curl "$X/run_out_campaign_afl/gen/fresh/job.sbatch"'
+contract "G2F_OUTPUT: other values refused"              '[ "$(cat "$X/run_out_bad/rc")" = 1 ] && grep -q "G2F_OUTPUT must be node or campaign (got .tmpfs.)" "$X/run_out_bad/err" && ! grep -q "^sbatch" "$X/run_out_bad/calls"'
+contract "study output = campaign: every campaign, launch.txt" '[ "$(grep -c "submitted Slurm job" "$X/study_out_campaign/out")" = 2 ] && outc "$X/study_out_campaign/gen/jhead-ucb-r1" && outc "$X/study_out_campaign/gen/jhead-afl-r1" && [ "$(grep -c "^settings: G2F_SEEDGEN_MIN=300 G2F_OUTPUT=campaign$" "$X/study_out_campaign/tree")" = 2 ]'
+contract "G2F_OUTPUT=campaign files pass bash -n"        '! cat "$X"/*/syntax | grep -q FAIL && [ -s "$X/run_out_campaign/syntax" ]'
 
 # Tab completion (current version): load what `completion` prints into a shell, then "press Tab" after the words
 setup_work "$T/fuzz.new"; scenario base

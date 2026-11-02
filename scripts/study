@@ -52,6 +52,8 @@
 #   account, partition  the Slurm account and partition of the study's campaigns, driver and servers [scripts/fuzz's:
 #                   the class account, fairshare]; G2F_ACCOUNT / G2F_PARTITION may only repeat them. A qc-* gpu needs
 #                   account = priority-quantumcore (campaigns use servers of their own account's family only)
+#   output [node]   where afl-fuzz writes its output: node (the node's local disk) or campaign (the campaign folder,
+#                   with the file the target reads in the job's memory; scripts/fuzz's G2F_OUTPUT)
 set -euo pipefail
 umask 002   # shared folder: teammates can write the campaigns
 
@@ -62,7 +64,7 @@ SHARED_MODELS="$STUDENTS/shared-models"
 # A study decides these itself, so a setting left in your shell can't change it (the scripts/fuzz defaults:
 # ucb exploration 1.0, 2 CPUs and 8G per campaign)
 unset G2F_EVAL G2F_TARGET G2F_TARGETS G2F_SIF G2F_SEEDS G2F_BASE_URL G2F_MODEL G2F_GENERATOR_SCHEDULER \
-  G2F_UCB_EXPLORATION G2F_CPUS G2F_MEM
+  G2F_UCB_EXPLORATION G2F_CPUS G2F_MEM G2F_OUTPUT
 # only the job's time limit: a long seed generation must not cut the fuzzing short (fuzz time is unchanged)
 export G2F_SEEDGEN_MIN="${G2F_SEEDGEN_MIN:-300}"
 
@@ -106,7 +108,7 @@ REF=$STUDY; [ "$STUDY" != "$REPO/experiments/${STUDY##*/}" ] || REF=${STUDY##*/}
 # === study.conf =====================================================================================================
 declare -A C=([reps]=1 [secs]=21600 [model]=Qwen3.8-27B-FP8 [scheduler]=ucb [seeds]=fresh [name]='{target}-{arm}-r{rep}'
               [order]=target [max_seedgen]=4 [targets_tree]="$STUDENTS/g2f-targets/paper" [seed_secs]=60 [gpu]=a40
-              [server_hours]="" [account]="" [partition]="")
+              [server_hours]="" [account]="" [partition]="" [output]=node)
 key=""
 while IFS= read -r line || [ -n "$line" ]; do
   line=${line%%#*}
@@ -120,7 +122,7 @@ while IFS= read -r line || [ -n "$line" ]; do
     die "$CONF: can't read this line: $line"
   key=${BASH_REMATCH[1]}
   case "$key" in
-    targets|arms|reps|secs|model|scheduler|seeds|name|order|max_seedgen|targets_tree|seed_secs|gpu|server_hours|account|partition) C[$key]=${BASH_REMATCH[2]} ;;
+    targets|arms|reps|secs|model|scheduler|seeds|name|order|max_seedgen|targets_tree|seed_secs|gpu|server_hours|account|partition|output) C[$key]=${BASH_REMATCH[2]} ;;
     *) die "$CONF: unknown setting '$key'" ;;
   esac
 done < "$CONF"
@@ -149,6 +151,7 @@ done
 for k in secs max_seedgen seed_secs; do [[ "${C[$k]}" =~ ^[0-9]+$ ]] || die "$k must be a whole number (got '${C[$k]}')"; done
 case "${C[order]}" in target|rep) ;; *) die "order must be target or rep (got '${C[order]}')" ;; esac
 case "${C[seeds]}" in fresh|shared|reuse:?*) ;; *) die "seeds must be fresh, shared or reuse:<campaign> (got '${C[seeds]}')" ;; esac
+case "${C[output]}" in node|campaign) export G2F_OUTPUT=${C[output]} ;; *) die "output must be node or campaign (got '${C[output]}')" ;; esac
 model_ok() { [ -f "$SHARED_MODELS/$1/config.json" ] || die "no model '$1' in $SHARED_MODELS"; }
 
 # targets: a list, or @file next to study.conf
@@ -530,7 +533,7 @@ launch() {   # launch <i> <the model server it uses, or empty>
     echo "seeds: $( afl_of "$i" && echo "stock (--afl)" || { [ "$src" = new ] && echo "own seed generation" || echo "reused from $src"; })"
     echo "image: $(cat "${A_SIF[$ia]}.version" 2>/dev/null)"
     echo "server: ${server:-none (--afl)}"
-    echo "settings: G2F_SEEDGEN_MIN=$G2F_SEEDGEN_MIN${G2F_PARTITION+ G2F_PARTITION=$G2F_PARTITION}${G2F_ACCOUNT+ G2F_ACCOUNT=$G2F_ACCOUNT}"
+    echo "settings: G2F_SEEDGEN_MIN=$G2F_SEEDGEN_MIN${G2F_PARTITION+ G2F_PARTITION=$G2F_PARTITION}${G2F_ACCOUNT+ G2F_ACCOUNT=$G2F_ACCOUNT}$( [ "$G2F_OUTPUT" = node ] || echo " G2F_OUTPUT=$G2F_OUTPUT")"
     echo "launched: $(date '+%F %T') by $USER"
     echo "command: $COMMAND${SLURM_JOB_ID:+ (in Slurm job $SLURM_JOB_ID)}"
   } > "$CAMPAIGNS/$n/launch.txt"
@@ -624,10 +627,11 @@ start_driver() {
   [[ " ${opts[*]-} " == *" --wait "* ]] || opts+=(--wait)
   acct=$("$FUZZ" account)
   mkdir -p "$CAMPAIGNS"
+  # exec: the driver is the job's own process, so scancel's TERM runs its EXIT trap (which stops its servers)
   id=$(sbatch --parsable --account "$acct" --partition "${G2F_PARTITION:-fairshare}" --cpus-per-task 1 --mem 2G \
     --time "${STUDY_DRIVER_DAYS:-7}-00:00:00" --job-name "study-${STUDY##*/}" --comment "study=$STUDY" \
     --output "$CAMPAIGNS/study-driver-%j.log" \
-    --wrap "$(printf '%q ' "$REPO/scripts/study" start "$REF" "${opts[@]}")")
+    --wrap "exec $(printf '%q ' "$REPO/scripts/study" start "$REF" "${opts[@]}")")
   id=${id%%;*}
   echo "submitted the study driver: Slurm job $id, running: scripts/study start $REF ${opts[*]}"
   echo "  log: ${CAMPAIGNS#"$REPO"/}/study-driver-$id.log   progress: scripts/study status $REF   stop it: scancel $id"
@@ -727,7 +731,7 @@ cmd_start() {
     echo "forgot earlier failed server starts (--retry-servers)"
   fi
   echo "== ${STUDY##*/}: ${#P_N[@]} campaigns, ${C[secs]} s each, seeds ${C[seeds]}, at most ${C[max_seedgen]} seed generations per model$( [ "$SERVERS" = 0 ] || echo ", servers started as needed")"
-  echo "   account ${G2F_ACCOUNT:-$("$FUZZ" account 2>/dev/null || echo "?")}, partition ${G2F_PARTITION:-fairshare}"
+  echo "   account ${G2F_ACCOUNT:-$("$FUZZ" account 2>/dev/null || echo "?")}, partition ${G2F_PARTITION:-fairshare}$( [ "$G2F_OUTPUT" = node ] || echo ", AFL++ output in the campaign folders")"
   LEFT=() LAUNCHED=0 BLOCKED=0
   while :; do
     if ! jobs_now; then   # nothing is known this time: no launches, no results, no server changes

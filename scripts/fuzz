@@ -46,6 +46,10 @@
 #   G2F_MODEL [Qwen3.8-27B-FP8-nothink]  the model name new campaigns ask for; --model sets it from a shared folder
 #   G2F_GENERATOR_SCHEDULER [ucb]  the same as --scheduler (the option wins)
 #   G2F_UCB_EXPLORATION [1.0]  ucb's exploration constant (higher: tries less-used generators more)
+#   G2F_OUTPUT [node]  where afl-fuzz writes its output: node (the node's local disk, copied to the campaign folder
+#           every 30 s and at the end) or campaign (straight into the campaign folder, and the file the target reads,
+#           rewritten for every execution, into the job's memory folder: a full node disk can't stop it, OURS-3 in
+#           docs/KNOWN_BUGS.md)
 set -euo pipefail
 umask 002   # shared copy on Tempest: teammates can write the campaign folders
 
@@ -92,6 +96,7 @@ MODEL="${G2F_MODEL:-Qwen3.8-27B-FP8-nothink}"   # the name G2Fuzz asks the serve
 # Read by g2fuzz/generator_mutation.py in the LLM step; --cleanenv drops the host's, so prepare passes them on
 SCHED="${G2F_GENERATOR_SCHEDULER:-ucb}"   # ucb: this repo's scheduler; random: upstream's (run --scheduler sets it)
 UCB_C="${G2F_UCB_EXPLORATION:-1.0}"
+OUTPUT="${G2F_OUTPUT:-node}"   # node or campaign (write_job_sbatch)
 SHARED_MODELS=/home/group/csci-591-automated-vulnerability-discovery/students/shared-models
 
 # === 2. Models and targets ==========================================================================================
@@ -250,6 +255,7 @@ check_settings() {
   [ -s "$KEY" ] || die "API key missing or empty: $KEY"
   case "$SCHED" in random|ucb) ;; *) die "the scheduler must be ucb or random (got '$SCHED' from --scheduler or G2F_GENERATOR_SCHEDULER)" ;; esac
   [[ "$UCB_C" =~ ^[0-9]*\.?[0-9]+$ ]] && awk "BEGIN { exit !($UCB_C > 0) }" || die "G2F_UCB_EXPLORATION must be a positive number (got '$UCB_C')"
+  case "$OUTPUT" in node|campaign) ;; *) die "G2F_OUTPUT must be node or campaign (got '$OUTPUT')" ;; esac
   [ -f "$SIF" ] || die "image $SIF not found (README.md, Tempest setup step 7)"
 }
 
@@ -314,7 +320,8 @@ cmd_run() {
   TARGS=$(target_args)
   # AFL++ is 5-8x slower writing its output to the network home, so /eval/$OUT is the node's
   # local disk inside the container. /host is the campaign folder again; its $OUT copy is
-  # updated every 30 s and at the end, for watch/status/results.
+  # updated every 30 s and at the end, for watch/status/results. With G2F_OUTPUT=campaign it's the campaign
+  # folder's own $OUT, and only the file the target reads (afl-fuzz's .cur_input, the slow part) is in memory.
   mkdir -p "$d/$OUT"
   # which code the run used (scripts/tempest-image records it; empty for older images)
   cat "$SIF.version" > "$d/image-version.txt" 2>/dev/null || true
@@ -375,6 +382,7 @@ time_limit() { echo $(( ($1 + SEEDGEN * ${G2F_SEEDGEN_MIN:-120} * 60 + 1800 + 59
 # (scancel, time limit) stops AFL++ first so it writes its final stats ($body is afl-fuzz itself once the exec
 # has happened; before that it is the seed-generation subshell). The copy loop also stops its sleep, or Apptainer
 # waits for it (and bash prints "Terminated"). The quoted parts below are written exactly as they are.
+# With G2F_OUTPUT=campaign the output is already in the campaign folder: no copies.
 write_run_sh() {
   {
     cat <<'EOF'
@@ -382,20 +390,31 @@ write_run_sh() {
 # Written by scripts/fuzz run. Runs inside the image, in the campaign folder (/eval).
 cd /eval
 EOF
-    echo "sync_out() { cp -a -u /eval/$OUT/. /host/$OUT/ 2>/dev/null; }"
-    echo "cp -a /host/$OUT/. /eval/$OUT/ 2>/dev/null   # generators copied in by reuse"
-    cat <<'EOF'
+    if [ "$OUTPUT" = campaign ]; then
+      cat <<'EOF'
+trap 'kill -TERM $body 2>/dev/null; wait $body; printf "run.sh: stopped %(%F %T)T\n" -1 >> run.log; exit 143' TERM INT
+EOF
+      echo "( $2 ) &"
+      cat <<'EOF'
+body=$!; wait $body; rc=$?
+exit $rc
+EOF
+    else
+      echo "sync_out() { cp -a -u /eval/$OUT/. /host/$OUT/ 2>/dev/null; }"
+      echo "cp -a /host/$OUT/. /eval/$OUT/ 2>/dev/null   # generators copied in by reuse"
+      cat <<'EOF'
 ( trap 'kill $s 2>/dev/null; exit 0' TERM; while :; do sleep 30 & s=$!; wait $s; sync_out; done ) &
 syncer=$!
 stop_syncer() { kill $syncer && wait $syncer; } 2>/dev/null
 trap 'kill -TERM $body 2>/dev/null; wait $body; stop_syncer; sync_out; printf "run.sh: stopped %(%F %T)T, output copied (cp exit %s)\n" -1 $? >> run.log; exit 143' TERM INT
 EOF
-    echo "( $2 ) &"
-    cat <<'EOF'
+      echo "( $2 ) &"
+      cat <<'EOF'
 body=$!; wait $body; rc=$?
 stop_syncer; sync_out
 exit $rc
 EOF
+    fi
   } > "$1"
 }
 
@@ -404,6 +423,8 @@ EOF
 # outside the image: on scancel or the time limit, Slurm also stops the process that mounts the image, so the tools
 # inside it are already gone. AFL++ writes its files 0600 and folders 0700 (DEFAULT_PERMISSION), so the copy gives
 # the group full access.
+# G2F_OUTPUT=campaign: the campaign's own output folder, and AFL_TMPDIR is the job's memory folder, which Tempest
+# makes for each job (/dev/shm/jobs/<job>, counted in the job's memory; else one of its own, removed at the end).
 write_job_sbatch() {
   local d=$2
   {
@@ -412,6 +433,21 @@ write_job_sbatch() {
 # Written by scripts/fuzz run. Log: slurm-<jobid>.out in this folder.
 EOF
     [ "$AFL" = 1 ] || echo "curl -s -o /dev/null --max-time 20 $BASE_URL/models || { echo \"fuzz: can't reach $BASE_URL from \$(hostname)\"; exit 1; }"
+    if [ "$OUTPUT" = campaign ]; then
+      cat <<'EOF'
+shm=/dev/shm/jobs/$SLURM_JOB_ID; [ -d "$shm" ] && [ -w "$shm" ] || { shm=/dev/shm/g2f-$SLURM_JOB_ID; mkdir -p "$shm"; }   # memory: the file the target reads
+EOF
+      printf 'done_out() { [ "$shm" = /dev/shm/jobs/$SLURM_JOB_ID ] || rm -rf "$shm"; chmod -R g+rwX %q; echo "job.sbatch: output made group-writable"; }\n' "$d/$OUT"
+      printf 'apptainer exec'; printf ' %q' "${ARGS[@]}"
+      printf ' --bind "$shm" --env AFL_TMPDIR="$shm"'
+      printf ' %q' --env AFL_NO_UI=1 "$SIF" bash /eval/run.sh; echo ' &'
+      cat <<'EOF'
+pid=$!
+trap 'wait $pid; done_out; exit 143' TERM
+wait $pid; rc=$?; done_out; exit $rc
+EOF
+      return
+    fi
     cat <<'EOF'
 fast=${TMPDIR:-/tmp}/g2f-$SLURM_JOB_ID; mkdir -p "$fast"   # node-local disk for the AFL++ output
 EOF
