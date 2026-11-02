@@ -7,7 +7,8 @@ Start with the folder's `README.md`.
 | --- | --- | --- |
 | [01-baseline-replication](01-baseline-replication/) | Does G2FUZZ beat AFL++(cmplog) on the paper's targets with our setup? | done (phases B + C, 2026-10-26) |
 | [02-model-sweep](02-model-sweep/) | How much does the choice of LLM change what G2FUZZ finds on 15 targets? | on hold: 03 runs this design on quantumcore |
-| [03-model-sweep-qc](03-model-sweep-qc/) | 02's question and design, run on quantumcore's GPUs and CPUs | planned (2026-10-30) |
+| [03-model-sweep-qc](03-model-sweep-qc/) | 02's question and design, run on quantumcore's GPUs and CPUs | campaigns finished 2026-11-01; analysis to do |
+| [04-model-sweep-qc-24h](04-model-sweep-qc-24h/) | 03's design with 24 h campaigns (the paper's length), AFL++ output in the campaign folders | running (since 2026-11-01) |
 | [practice](practice/) | Practice and test runs; the `scripts/fuzz` default | always open |
 
 ## New study
