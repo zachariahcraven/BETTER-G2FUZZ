@@ -5,7 +5,7 @@
    Written by Andrea Fioraldi <andreafioraldi@gmail.com>
 
    Copyright 2015, 2016 Google Inc. All rights reserved.
-   Copyright 2019-2024 AFLplusplus Project. All rights reserved.
+   Copyright 2019-2026 AFLplusplus Project. All rights reserved.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,11 +13,14 @@
 
      https://www.apache.org/licenses/LICENSE-2.0
 
+   SPDX-License-Identifier: Apache-2.0
+
 */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdint.h>
 
 #include <iostream>
 #include <list>
@@ -28,14 +31,13 @@
 #include "llvm/Config/llvm-config.h"
 #include "llvm/ADT/Statistic.h"
 #include "llvm/IR/IRBuilder.h"
-#if LLVM_VERSION_MAJOR >= 11                        /* use new pass manager */
-  #include "llvm/Passes/PassPlugin.h"
-  #include "llvm/Passes/PassBuilder.h"
-  #include "llvm/IR/PassManager.h"
+#if defined(__has_include) && __has_include("llvm/Plugins/PassPlugin.h")
+  #include "llvm/Plugins/PassPlugin.h"
 #else
-  #include "llvm/IR/LegacyPassManager.h"
-  #include "llvm/Transforms/IPO/PassManagerBuilder.h"
+  #include "llvm/Passes/PassPlugin.h"
 #endif
+#include "llvm/Passes/PassBuilder.h"
+#include "llvm/IR/PassManager.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/raw_ostream.h"
@@ -47,96 +49,63 @@
 #include "llvm/Analysis/ValueTracking.h"
 
 #include "llvm/IR/IRBuilder.h"
-#if LLVM_VERSION_MAJOR >= 4 || \
-    (LLVM_VERSION_MAJOR == 3 && LLVM_VERSION_MINOR > 4)
-  #include "llvm/IR/Verifier.h"
-  #include "llvm/IR/DebugInfo.h"
-#else
-  #include "llvm/Analysis/Verifier.h"
-  #include "llvm/DebugInfo.h"
-  #define nullptr 0
-#endif
+#include "llvm/IR/Verifier.h"
+#include "llvm/IR/DebugInfo.h"
 
 #include <set>
 #include "afl-llvm-common.h"
+#include "cmplog.h"
 
 using namespace llvm;
 
 namespace {
 
-#if LLVM_VERSION_MAJOR >= 11                        /* use new pass manager */
 class CmplogSwitches : public PassInfoMixin<CmplogSwitches> {
 
  public:
-  CmplogSwitches() {
+  explicit CmplogSwitches(CompareObserverMode mode) : mode_(mode) {
 
-#else
-class CmplogSwitches : public ModulePass {
-
- public:
-  static char ID;
-  CmplogSwitches() : ModulePass(ID) {
-
-#endif
     initInstrumentList();
 
   }
 
-#if LLVM_VERSION_MAJOR >= 11                        /* use new pass manager */
   PreservedAnalyses run(Module &M, ModuleAnalysisManager &MAM);
-#else
-  bool runOnModule(Module &M) override;
-
-  #if LLVM_VERSION_MAJOR < 4
-  const char *getPassName() const override {
-
-  #else
-  StringRef getPassName() const override {
-
-  #endif
-    return "cmplog switch split";
-
-  }
-
-#endif
 
  private:
-  bool hookInstrs(Module &M);
+  CompareObserverMode mode_;
+  bool                hookInstrs(Module &M);
 
 };
 
 }  // namespace
 
-#if LLVM_MAJOR >= 11
 extern "C" ::llvm::PassPluginLibraryInfo LLVM_ATTRIBUTE_WEAK
 llvmGetPassPluginInfo() {
 
-  return {LLVM_PLUGIN_API_VERSION, "cmplogswitches", "v0.1",
-          /* lambda to insert our pass into the pass pipeline. */
-          [](PassBuilder &PB) {
+  return {
 
-  #if LLVM_VERSION_MAJOR <= 13
-            using OptimizationLevel = typename PassBuilder::OptimizationLevel;
-  #endif
-            PB.registerOptimizerLastEPCallback([](ModulePassManager &MPM,
-                                                  OptimizationLevel  OL
-  #if LLVM_VERSION_MAJOR >= 20
-                                                  ,
-                                                  ThinOrFullLTOPhase Phase
-  #endif
-                                               ) {
+      LLVM_PLUGIN_API_VERSION, "cmplogswitches", "v0.1",
+      /* lambda to insert our pass into the pass pipeline. */
+      [](PassBuilder &PB) {
 
-              MPM.addPass(CmplogSwitches());
+#if LLVM_VERSION_MAJOR <= 13
+        using OptimizationLevel = typename PassBuilder::OptimizationLevel;
+#endif
+        PB.registerOptimizerLastEPCallback([](ModulePassManager &MPM,
+                                              OptimizationLevel  OL
+#if LLVM_VERSION_MAJOR >= 20
+                                              ,
+                                              ThinOrFullLTOPhase Phase
+#endif
+                                           ) {
 
-            });
+          MPM.addPass(CmplogSwitches(getCompareObserverModeFromEnv()));
 
-          }};
+        });
+
+      }};
 
 }
-
-#else
-char CmplogSwitches::ID = 0;
-#endif
 
 template <class Iterator>
 Iterator Unique(Iterator first, Iterator last) {
@@ -157,6 +126,7 @@ bool CmplogSwitches::hookInstrs(Module &M) {
 
   std::vector<SwitchInst *> switches;
   LLVMContext              &C = M.getContext();
+  bool                      vp_mode = isValueProfileMode(mode_);
 
   Type        *VoidTy = Type::getVoidTy(C);
   IntegerType *Int8Ty = IntegerType::getInt8Ty(C);
@@ -164,89 +134,80 @@ bool CmplogSwitches::hookInstrs(Module &M) {
   IntegerType *Int32Ty = IntegerType::getInt32Ty(C);
   IntegerType *Int64Ty = IntegerType::getInt64Ty(C);
 
-#if LLVM_VERSION_MAJOR >= 9
-  FunctionCallee
+#if LLVM_MAJOR >= 20
+  Type *PtrTy = PointerType::getUnqual(C);
 #else
-  Constant *
-#endif
-      c1 = M.getOrInsertFunction("__cmplog_ins_hook1", VoidTy, Int8Ty, Int8Ty,
-                                 Int8Ty
-#if LLVM_VERSION_MAJOR < 5
-                                 ,
-                                 NULL
-#endif
-      );
-#if LLVM_VERSION_MAJOR >= 9
-  FunctionCallee cmplogHookIns1 = c1;
-#else
-  Function *cmplogHookIns1 = cast<Function>(c1);
+  Type *PtrTy = PointerType::get(Int8Ty, 0);
 #endif
 
-#if LLVM_VERSION_MAJOR >= 9
-  FunctionCallee
-#else
-  Constant *
-#endif
-      c2 = M.getOrInsertFunction("__cmplog_ins_hook2", VoidTy, Int16Ty, Int16Ty,
-                                 Int8Ty
-#if LLVM_VERSION_MAJOR < 5
-                                 ,
-                                 NULL
-#endif
-      );
-#if LLVM_VERSION_MAJOR >= 9
-  FunctionCallee cmplogHookIns2 = c2;
-#else
-  Function *cmplogHookIns2 = cast<Function>(c2);
+  FunctionCallee hookIns1 = nullptr;
+  FunctionCallee hookIns2 = nullptr;
+  FunctionCallee hookIns4 = nullptr;
+  FunctionCallee hookIns8 = nullptr;
+  FunctionCallee hookSwitch = nullptr;
+
+#if INTPTR_MAX != INT32_MAX
+  IntegerType   *Int128Ty = IntegerType::getInt128Ty(C);
+  FunctionCallee hookIns16 = nullptr;
+  FunctionCallee hookInsN = nullptr;
 #endif
 
-#if LLVM_VERSION_MAJOR >= 9
-  FunctionCallee
-#else
-  Constant *
-#endif
-      c4 = M.getOrInsertFunction("__cmplog_ins_hook4", VoidTy, Int32Ty, Int32Ty,
-                                 Int8Ty
-#if LLVM_VERSION_MAJOR < 5
-                                 ,
-                                 NULL
-#endif
-      );
-#if LLVM_VERSION_MAJOR >= 9
-  FunctionCallee cmplogHookIns4 = c4;
-#else
-  Function *cmplogHookIns4 = cast<Function>(c4);
+  if (vp_mode) {
+
+    hookIns1 = M.getOrInsertFunction("__valueprofile_hook1", VoidTy, Int8Ty,
+                                     Int8Ty, Int8Ty, Int64Ty);
+
+    hookIns2 = M.getOrInsertFunction("__valueprofile_hook2", VoidTy, Int16Ty,
+                                     Int16Ty, Int8Ty, Int64Ty);
+
+    hookIns4 = M.getOrInsertFunction("__valueprofile_hook4", VoidTy, Int32Ty,
+                                     Int32Ty, Int8Ty, Int64Ty);
+
+    hookIns8 = M.getOrInsertFunction("__valueprofile_hook8", VoidTy, Int64Ty,
+                                     Int64Ty, Int8Ty, Int64Ty);
+    hookSwitch = M.getOrInsertFunction("__valueprofile_switch", VoidTy, Int64Ty,
+                                       PtrTy, Int64Ty);
+
+#if INTPTR_MAX != INT32_MAX
+    hookIns16 = M.getOrInsertFunction("__valueprofile_hook16", VoidTy, Int128Ty,
+                                      Int128Ty, Int8Ty, Int64Ty);
+    hookInsN = M.getOrInsertFunction("__valueprofile_hookN", VoidTy, Int128Ty,
+                                     Int128Ty, Int8Ty, Int8Ty, Int64Ty);
 #endif
 
-#if LLVM_VERSION_MAJOR >= 9
-  FunctionCallee
-#else
-  Constant *
-#endif
-      c8 = M.getOrInsertFunction("__cmplog_ins_hook8", VoidTy, Int64Ty, Int64Ty,
-                                 Int8Ty
-#if LLVM_VERSION_MAJOR < 5
-                                 ,
-                                 NULL
-#endif
-      );
-#if LLVM_VERSION_MAJOR >= 9
-  FunctionCallee cmplogHookIns8 = c8;
-#else
-  Function *cmplogHookIns8 = cast<Function>(c8);
-#endif
+  } else {
 
-  GlobalVariable *AFLCmplogPtr = M.getNamedGlobal("__afl_cmp_map");
+    hookIns1 = M.getOrInsertFunction("__cmplog_ins_hook1", VoidTy, Int8Ty,
+                                     Int8Ty, Int8Ty);
 
-  if (!AFLCmplogPtr) {
+    hookIns2 = M.getOrInsertFunction("__cmplog_ins_hook2", VoidTy, Int16Ty,
+                                     Int16Ty, Int8Ty);
 
-    AFLCmplogPtr = new GlobalVariable(M, PointerType::get(Int8Ty, 0), false,
-                                      GlobalValue::ExternalWeakLinkage, 0,
-                                      "__afl_cmp_map");
+    hookIns4 = M.getOrInsertFunction("__cmplog_ins_hook4", VoidTy, Int32Ty,
+                                     Int32Ty, Int8Ty);
+
+    hookIns8 = M.getOrInsertFunction("__cmplog_ins_hook8", VoidTy, Int64Ty,
+                                     Int64Ty, Int8Ty);
+
+#if INTPTR_MAX != INT32_MAX
+    hookIns16 = M.getOrInsertFunction("__cmplog_ins_hook16", VoidTy, Int128Ty,
+                                      Int128Ty, Int8Ty);
+    hookInsN = M.getOrInsertFunction("__cmplog_ins_hookN", VoidTy, Int128Ty,
+                                     Int128Ty, Int8Ty, Int8Ty);
+#endif
 
   }
 
-  Constant *Null = Constant::getNullValue(PointerType::get(Int8Ty, 0));
+  GlobalVariable *AFLCmplogPtr =
+      getOrCreateExternalWeakPtrGlobal(M, PtrTy, "__afl_cmp_map");
+
+  GlobalVariable *AFLVpEnabledPtr = nullptr;
+  if (vp_mode) {
+
+    AFLVpEnabledPtr =
+        getOrCreateExternalPtrGlobal(M, PtrTy, "__afl_vp_enabled_ptr");
+
+  }
 
   /* iterate over all functions, bbs and instruction and add suitable calls */
   for (auto &F : M) {
@@ -258,6 +219,7 @@ bool CmplogSwitches::hookInstrs(Module &M) {
       SwitchInst *switchInst = nullptr;
       if ((switchInst = dyn_cast<SwitchInst>(BB.getTerminator()))) {
 
+        if (switchInst->getMetadata("afl.skip")) continue;
         if (switchInst->getNumCases() > 1) { switches.push_back(switchInst); }
 
       }
@@ -272,16 +234,50 @@ bool CmplogSwitches::hookInstrs(Module &M) {
   // Instrument switch values for cmplog
   if (switches.size()) {
 
+    constexpr uint64_t                   kVpSwitchSiteSalt = 0x53565350ULL;
+    DenseMap<const Function *, uint64_t> vp_site_fallback_ordinal;
+    DenseMap<const Function *, DenseMap<uint64_t, uint64_t>>
+        vp_site_debug_disambiguator;
+
     if (!be_quiet)
       errs() << "Hooking " << switches.size() << " switch instructions\n";
+
+    auto getHookInsertPoint = [&](Instruction *InsertBefore) -> Instruction * {
+
+      if (vp_mode) {
+
+        IRBuilder<> IRB2(InsertBefore->getParent());
+        IRB2.SetInsertPoint(InsertBefore);
+        Value *is_enabled = createValueProfileEnabledGuard(
+            IRB2, AFLVpEnabledPtr, PtrTy, Int8Ty);
+
+        Instruction *ThenTerm = SplitBlockAndInsertIfThen(
+            is_enabled, InsertBefore, false,
+            createValueProfileGuardWeights(M.getContext()));
+        markAflSyntheticBlock(ThenTerm->getParent());
+        return ThenTerm;
+
+      }
+
+      IRBuilder<> IRB2(InsertBefore->getParent());
+      IRB2.SetInsertPoint(InsertBefore);
+      Value *is_not_null =
+          createMapPtrNotNullGuard(IRB2, M, AFLCmplogPtr, PtrTy);
+
+      return SplitBlockAndInsertIfThen(is_not_null, InsertBefore, false);
+
+    };
 
     for (auto &SI : switches) {
 
       Value        *Val = SI->getCondition();
-      unsigned int  max_size = Val->getType()->getIntegerBitWidth(), cast_size;
+      unsigned int  orig_size = Val->getType()->getIntegerBitWidth();
+      unsigned int  max_size = orig_size, cast_size;
       unsigned char do_cast = 0;
+      uint64_t      site_disambiguator = 0;
+      uint64_t      case_index = 0;
 
-      if (!SI->getNumCases() || max_size < 16) {
+      if (!SI->getNumCases() || max_size < 13) {
 
         // if (!be_quiet) errs() << "skip trivial switch..\n";
         continue;
@@ -294,20 +290,6 @@ bool CmplogSwitches::hookInstrs(Module &M) {
         do_cast = 1;
 
       }
-
-      IRBuilder<> IRB2(SI->getParent());
-      IRB2.SetInsertPoint(SI);
-
-      LoadInst *CmpPtr = IRB2.CreateLoad(
-#if LLVM_VERSION_MAJOR >= 14
-          PointerType::get(Int8Ty, 0),
-#endif
-          AFLCmplogPtr);
-      CmpPtr->setMetadata(M.getMDKindID("nosanitize"), MDNode::get(C, None));
-      auto is_not_null = IRB2.CreateICmpNE(CmpPtr, Null);
-      auto ThenTerm = SplitBlockAndInsertIfThen(is_not_null, SI, false);
-
-      IRBuilder<> IRB(ThenTerm);
 
       if (max_size > 128) {
 
@@ -340,6 +322,74 @@ bool CmplogSwitches::hookInstrs(Module &M) {
 
       }
 
+      if (vp_mode) {
+
+        if (SI->getDebugLoc()) {
+
+          uint64_t debug_site_key = getValueProfileDebugSiteKey(*SI);
+          site_disambiguator =
+              vp_site_debug_disambiguator[SI->getFunction()][debug_site_key]++;
+
+        } else {
+
+          site_disambiguator = vp_site_fallback_ordinal[SI->getFunction()]++;
+
+        }
+
+      }
+
+      if (vp_mode && orig_size <= 64) {
+
+        IRBuilder<> IRB(getHookInsertPoint(SI));
+        Value      *SwitchVal64 = Val;
+        if (orig_size < 64) {
+
+          SwitchVal64 = IRB.CreateZExt(Val, Int64Ty, "afl.vp.sw64");
+
+        }
+
+        std::vector<uint64_t> case_values;
+        case_values.reserve(SI->getNumCases() + 2);
+        case_values.push_back(SI->getNumCases());
+        case_values.push_back(orig_size);
+
+        for (SwitchInst::CaseIt i = SI->case_begin(), e = SI->case_end();
+             i != e; ++i) {
+
+          ConstantInt *cint = i->getCaseValue();
+          if (!cint) continue;
+          case_values.push_back(
+              cint->getValue().zextOrTrunc(64).getZExtValue());
+
+        }
+
+        ArrayType *CasesTy =
+            ArrayType::get(Int64Ty, (unsigned)case_values.size());
+        std::vector<Constant *> case_consts;
+        case_consts.reserve(case_values.size());
+        for (uint64_t case_value : case_values) {
+
+          case_consts.push_back(ConstantInt::get(Int64Ty, case_value));
+
+        }
+
+        auto *CasesGV = new GlobalVariable(
+            M, CasesTy, true, GlobalValue::PrivateLinkage,
+            ConstantArray::get(CasesTy, case_consts), "__afl_vp_switch_cases");
+        CasesGV->setUnnamedAddr(GlobalValue::UnnamedAddr::Global);
+        CasesGV->setAlignment(Align(8));
+
+        uint64_t site_token = computeValueProfileSiteToken(
+            *SI, kVpSwitchSiteSalt, site_disambiguator, 0);
+        Value *CasesPtr = IRB.CreatePointerCast(CasesGV, PtrTy);
+        IRB.CreateCall(hookSwitch, {SwitchVal64, CasesPtr,
+                                    ConstantInt::get(Int64Ty, site_token)});
+        continue;
+
+      }
+
+      IRBuilder<> IRB(getHookInsertPoint(SI));
+
       Value *CompareTo = Val;
 
       if (do_cast) {
@@ -352,11 +402,7 @@ bool CmplogSwitches::hookInstrs(Module &M) {
       for (SwitchInst::CaseIt i = SI->case_begin(), e = SI->case_end(); i != e;
            ++i) {
 
-#if LLVM_VERSION_MAJOR < 5
-        ConstantInt *cint = i.getCaseValue();
-#else
         ConstantInt *cint = i->getCaseValue();
-#endif
 
         if (cint) {
 
@@ -375,7 +421,7 @@ bool CmplogSwitches::hookInstrs(Module &M) {
           if (new_param) {
 
             args.push_back(new_param);
-            ConstantInt *attribute = ConstantInt::get(Int8Ty, 1);
+            ConstantInt *attribute = ConstantInt::get(Int8Ty, CMP_ATTR_ICMP_EQ);
             args.push_back(attribute);
             if (cast_size != max_size) {
 
@@ -385,29 +431,38 @@ bool CmplogSwitches::hookInstrs(Module &M) {
 
             }
 
+            if (vp_mode) {
+
+              args.push_back(ConstantInt::get(
+                  Int64Ty, computeValueProfileSiteToken(*SI, kVpSwitchSiteSalt,
+                                                        site_disambiguator,
+                                                        case_index++)));
+
+            }
+
             switch (cast_size) {
 
               case 8:
-                IRB.CreateCall(cmplogHookIns1, args);
+                IRB.CreateCall(hookIns1, args);
                 break;
               case 16:
-                IRB.CreateCall(cmplogHookIns2, args);
+                IRB.CreateCall(hookIns2, args);
                 break;
               case 32:
-                IRB.CreateCall(cmplogHookIns4, args);
+                IRB.CreateCall(hookIns4, args);
                 break;
               case 64:
-                IRB.CreateCall(cmplogHookIns8, args);
+                IRB.CreateCall(hookIns8, args);
                 break;
               case 128:
-#ifdef WORD_SIZE_64
+#if INTPTR_MAX != INT32_MAX
                 if (max_size == 128) {
 
-                  IRB.CreateCall(cmplogHookIns16, args);
+                  IRB.CreateCall(hookIns16, args);
 
                 } else {
 
-                  IRB.CreateCall(cmplogHookInsN, args);
+                  IRB.CreateCall(hookInsN, args);
 
                 }
 
@@ -435,51 +490,31 @@ bool CmplogSwitches::hookInstrs(Module &M) {
 
 }
 
-#if LLVM_VERSION_MAJOR >= 11                        /* use new pass manager */
 PreservedAnalyses CmplogSwitches::run(Module &M, ModuleAnalysisManager &MAM) {
 
-#else
-bool CmplogSwitches::runOnModule(Module &M) {
+  bool vp_mode = isValueProfileMode(mode_);
 
-#endif
+  if (vp_mode) { markInstrumentedMarker(M, "__afl_vp_instrumented"); }
 
-  if (getenv("AFL_QUIET") == NULL)
-    printf("Running cmplog-switches-pass by andreafioraldi@gmail.com\n");
-  else
+  if (getenv("AFL_QUIET") != NULL) {
+
     be_quiet = 1;
+
+  } else if (vp_mode) {
+
+    printf("Running valueprofile-switches-pass by AFL++ team\n");
+
+  } else {
+
+    printf("Running cmplog-switches-pass by andreafioraldi@gmail.com\n");
+
+  }
+
   bool ret = hookInstrs(M);
+
   verifyModule(M);
-
-#if LLVM_VERSION_MAJOR >= 11                        /* use new pass manager */
-  if (ret == false)
-    return PreservedAnalyses::all();
-  else
-    return PreservedAnalyses();
-#else
-  return ret;
-#endif
+  if (ret || vp_mode) { return PreservedAnalyses::none(); }
+  return PreservedAnalyses::all();
 
 }
-
-#if LLVM_VERSION_MAJOR < 11                         /* use old pass manager */
-static void registerCmplogSwitchesPass(const PassManagerBuilder &,
-                                       legacy::PassManagerBase &PM) {
-
-  auto p = new CmplogSwitches();
-  PM.add(p);
-
-}
-
-static RegisterStandardPasses RegisterCmplogSwitchesPass(
-    PassManagerBuilder::EP_OptimizerLast, registerCmplogSwitchesPass);
-
-static RegisterStandardPasses RegisterCmplogSwitchesPass0(
-    PassManagerBuilder::EP_EnabledOnOptLevel0, registerCmplogSwitchesPass);
-
-  #if LLVM_VERSION_MAJOR >= 11
-static RegisterStandardPasses RegisterCmplogSwitchesPassLTO(
-    PassManagerBuilder::EP_FullLinkTimeOptimizationLast,
-    registerCmplogSwitchesPass);
-  #endif
-#endif
 

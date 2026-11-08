@@ -5,6 +5,11 @@ import random
 import re
 import tempfile
 
+try:
+    from py_utils.lineage import queue_names
+except ImportError:   # imported as a top-level module (tests)
+    from lineage import queue_names
+
 
 _DEFAULT_EXPLORATION = 1.0
 _SOURCE_RE = re.compile(r"(?:^|,)src:([0-9]+)(?:\+([0-9]+))?(?:,|$)")
@@ -145,7 +150,7 @@ def _generator_from_seed_name(seed_name):
 def _queue_entries(queue_dir):
     entries = []
     try:
-        names = os.listdir(queue_dir)
+        names = queue_names(queue_dir)   # ALFRED: LLM seeds arrive through AFL++'s sync (py_utils/lineage.py)
     except OSError as error:
         raise RuntimeError(f"cannot list AFL queue {queue_dir}: {error}") from error
     for name in names:

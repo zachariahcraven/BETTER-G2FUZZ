@@ -7,7 +7,7 @@ For the GCC-based instrumentation, see
 
 ## 1) Introduction
 
-! llvm_mode works with llvm versions 3.8 up to 17 - but 13+ is recommended !
+! llvm_mode works with llvm versions 14 up to 21 - but 18+ is recommended !
 
 The code in this directory allows you to instrument programs for AFL++ using
 true compiler-level instrumentation, instead of the more crude assembly-level
@@ -32,14 +32,18 @@ properties:
   will *not* work with GCC (see ../gcc_plugin/ for an alternative once it is
   available).
 
+For clarity, note that this approach _replaces_ using the variable
+[`AFL_INST_RATIO`](https://aflplus.plus/docs/env_variables/).
+
 The idea and much of the initial implementation came from Laszlo Szekeres.
 
 ## 2a) How to use this - short
 
-Set the `LLVM_CONFIG` variable to the clang version you want to use, e.g.:
+Rebuild afl++ with the `LLVM_CONFIG` variable set to the clang version
+you want to use, e.g.:
 
 ```
-LLVM_CONFIG=llvm-config-9 make
+LLVM_CONFIG=llvm-config-21 make
 ```
 
 In case you have your own compiled llvm version specify the full path:
@@ -53,13 +57,14 @@ old c++ libraries. In this case usually switching to gcc/g++ to compile
 llvm_mode will work:
 
 ```
-LLVM_CONFIG=llvm-config-7 REAL_CC=gcc REAL_CXX=g++ make
+LLVM_CONFIG=llvm-config-21 REAL_CC=gcc REAL_CXX=g++ make
 ```
 
 It is highly recommended to use the newest clang version you can put your hands
 on :)
 
-Then look at [README.persistent_mode.md](README.persistent_mode.md).
+Then look at [README.persistent_mode.md](README.persistent_mode.md).  It's worth
+checking whether your current build has already been built appropriately.
 
 ## 2b) How to use this - long
 
@@ -74,7 +79,8 @@ you installation is set up correctly :-)
 Unfortunately, some systems that do have clang come without llvm-config or the
 LLVM development headers; one example of this is FreeBSD. FreeBSD users will
 also run into problems with clang being built statically and not being able to
-load modules (you'll see "Service unavailable" when loading afl-llvm-pass.so).
+load modules (you'll see "Service unavailable" when loading
+SanitizerCoveragePCGUARD.so).
 
 To solve all your problems, you can grab pre-built binaries for your OS from:
 
@@ -126,16 +132,9 @@ Then there are different ways of instrumenting the target:
    is the best option you can use. To go with this option, use
    afl-clang-lto/afl-clang-lto++. See [README.lto.md](README.lto.md).
 
-2. Alternatively you can choose a completely different coverage method:
-
-2a. N-GRAM coverage - which combines the previous visited edges with the current
-    one. This explodes the map but on the other hand has proven to be effective
-    for fuzzing. See
-    [7) AFL++ N-Gram Branch Coverage](#7-afl-n-gram-branch-coverage).
-
-2b. Context sensitive coverage - which combines the visited edges with an
-    individual caller ID (the function that called the current one). See
-    [6) AFL++ Context Sensitive Branch Coverage](#6-afl-context-sensitive-branch-coverage).
+2. Context sensitive coverage - which combines the visited edges with the
+   calling context (the function that called the current one) - is available
+   in LTO mode. See [README.lto.md](README.lto.md).
 
 Then - additionally to one of the instrumentation options above - there is a
 very effective new instrumentation option called CmpLog as an alternative to
@@ -167,74 +166,63 @@ Adding `AFL_LLVM_DICT2FILE_NO_MAIN=1` will skip parsing `main()` which often
 does command line parsing which has string comparisons that are not helpful
 for fuzzing.
 
-## 6) AFL++ Context Sensitive Branch Coverage
+Context sensitive (CTX) and caller (CALLER) branch coverage are available in
+LTO mode (afl-clang-lto). See [README.lto.md](README.lto.md).
 
-### What is this?
+## 6) AFL++ Path Coverage (Ball-Larus)
 
-This is an LLVM-based implementation of the context sensitive branch coverage.
+Setting `AFL_LLVM_PATH` (or `AFL_LLVM_LTO_PATH` / `AFL_LLVM_PATH_MODE`)
+adds Ball-Larus per-function path coverage on top of the default edge
+coverage. Each acyclic path through a function (loops are treated as a
+single iteration; back-edges stripped) gets its own bitmap slot. The
+runtime cost per function exit is one map increment. Three levels:
 
-Basically every function gets its own ID and, every time when an edge is logged,
-all the IDs in the callstack are hashed and combined with the edge transition
-hash to augment the classic edge coverage with the information about the calling
-context.
+- `=1` (relaxed): collapses every "guard-only" basic block (no calls,
+  stores, or atomics — just pure condition checks) via `max()` instead of
+  `sum()` during path counting, so short-circuit `&&`/`||` chains and
+  switches-on-loaded-value do not multiply path counts. Smallest map.
+- `=2` (restricted): collapses only 2-successor guard-only BBs (preserves
+  switches/indirectbr).
+- `=3` (strict): full Ball-Larus, every IR-level acyclic path is a unique
+  slot.
 
-So if both function A and function B call a function C, the coverage collected
-in C will be different.
+Functions with more than 100,000 paths that cannot be reduced by
+collapsing multi-way branches are skipped with a warning. Single-path
+(straight-line) functions and functions without any return point are
+also skipped. Functions that call `setjmp` / `sigsetjmp` / a callee
+marked `returns_twice` are skipped because the path-id register lives
+on the stack and `longjmp` would leave it indeterminate. Functions
+that are part of a C++20 coroutine (ramp + post-split `.resume` /
+`.destroy` companions) are skipped because the path-id register would
+be spilled into the coroutine frame and reloaded after the frame is
+freed in the destroy path. The 100,000 cap can be raised or lowered
+with `AFL_LLVM_PATH_MAX_PATHS=N` (`N >= 2`).
 
-In math the coverage is collected as follows: `map[current_location_ID ^
-previous_location_ID >> 1 ^ hash_callstack_IDs] += 1`
+An empty value (`AFL_LLVM_PATH=`) is rejected — set the variable
+explicitly to `1`/`2`/`3`/`0`.
 
-The callstack hash is produced XOR-ing the function IDs to avoid explosion with
-recursive functions.
+**Stability note:** path IDs are deterministic within a single build but
+not stable across LLVM major versions. Both the back-edge DFS order and
+SwitchInst case iteration are LLVM-version-sensitive, so two binaries
+built with different toolchains can assign different bitmap slots to the
+same source path. Do not cross-merge corpora based on PATH coverage.
 
-### Usage
+This works under both `afl-clang-fast` (PCGUARD) and `afl-clang-lto`. The
+LTO build additionally composes with `AFL_LLVM_LTO_CALLER` to track
+`(call_site, path)` tuples — see
+[README.lto.md](README.lto.md).
 
-Set the `AFL_LLVM_INSTRUMENT=CTX` or `AFL_LLVM_CTX=1` environment variable.
-
-It is highly recommended to increase the MAP_SIZE_POW2 definition in config.h to
-at least 18 and maybe up to 20 for this as otherwise too many map collisions
-occur.
-
-### Caller Branch Coverage
-
-If the context sensitive coverage introduces too may collisions and becoming
-detrimental, the user can choose to augment edge coverage with just the called
-function ID, instead of the entire callstack hash.
-
-In math the coverage is collected as follows: `map[current_location_ID ^
-previous_location_ID >> 1 ^ previous_callee_ID] += 1`
-
-Set the `AFL_LLVM_INSTRUMENT=CALLER` or `AFL_LLVM_CALLER=1` environment
-variable.
-
-## 7) AFL++ N-Gram Branch Coverage
-
-### Source
-
-This is an LLVM-based implementation of the n-gram branch coverage proposed in
-the paper
-["Be Sensitive and Collaborative: Analyzing Impact of Coverage Metrics in Greybox Fuzzing"](https://www.usenix.org/system/files/raid2019-wang-jinghan.pdf)
-by Jinghan Wang, et. al.
-
-Note that the original implementation (available
-[here](https://github.com/bitsecurerlab/afl-sensitive)) is built on top of AFL's
-QEMU mode. This is essentially a port that uses LLVM vectorized instructions
-(available from llvm versions 4.0.1 and higher) to achieve the same results when
-compiling source code.
-
-In math the branch coverage is performed as follows: `map[current_location ^
-prev_location[0] >> 1 ^ prev_location[1] >> 1 ^ ... up to n-1`] += 1`
-
-### Usage
-
-The size of `n` (i.e., the number of branches to remember) is an option that is
-specified either in the `AFL_LLVM_INSTRUMENT=NGRAM-{value}` or the
-`AFL_LLVM_NGRAM_SIZE` environment variable. Good values are 2, 4, or 8, valid
-are 2-16.
-
-It is highly recommended to increase the MAP_SIZE_POW2 definition in config.h to
-at least 18 and maybe up to 20 for this as otherwise too many map collisions
-occur.
+Some numbers:
+|TARGET|CALLER DEPTH|PATH LEVEL|MAP SIZE||
+|------|------------|----------|--------|-|
+|libjpeg|-|-|22041||
+|libjpeg|-|1|262705|x12|
+|libjpeg|-|2|379697|x18|
+|libjpeg|-|3|1154201|x50|
+|libjpeg|1|-|42161|x2|
+|libjpeg|1|1|477009|x22|
+|libjpeg|1|2|863505|x40|
+|libjpeg|1|3|1977785|hits limits|
 
 ## 8) NeverZero counters
 
@@ -270,8 +258,8 @@ then this can give a small performance boost.
 
 Please note that the default counter implementations are not thread safe!
 
-Support for thread safe counters in mode LLVM CLASSIC can be activated with
-setting `AFL_LLVM_THREADSAFE_INST=1`.
+Support for thread safe counters can be activated with setting
+`AFL_LLVM_THREADSAFE_INST=1`.
 
 ## 8) Source code coverage through instrumentation
 

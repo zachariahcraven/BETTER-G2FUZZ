@@ -2,27 +2,25 @@
 
 ## Must
 
- - afl_fsrv_deinit cmplog
- - ijon support?
- - check for null ptr for xml/curl/g_ string transform functions
+ - hand the shared maps to the target as an inherited fd instead of a name or
+   a SysV id, so they can be unlinked at creation and nothing survives a
+   SIGKILLed tool: fuzzer does shm_open -> ftruncate -> mmap -> shm_unlink and
+   exports the fd number (keep clear of FORKSRV_FD 198/199), afl-compiler-rt
+   mmap()s that fd and falls back to shm_open(path)/shmat(id) when the env var
+   is missing (targets built by an older afl-cc). This is what MacOS, the BSDs
+   and the USEMMAP builds need - they cannot attach after IPC_RMID/shm_unlink,
+   so AFL_SHM_AUTO_RECLAIM in afl-sharedmem.c is Linux only. It also moves
+   MacOS off SysV and its kern.sysv.shmseg ceiling. Android needs nothing, its
+   ashmem shim is already fd based.
+ - remove -n mode
+ - find a solution that SAYF now prints to stderr (help!)
  - hardened_usercopy=0 page_alloc.shuffle=0
- - add value_profile but only enable after 15 minutes without finds
- - cmplog max items env?
- - adapt MOpt to new mutation engine
-   - Update afl->pending_not_fuzzed for MOpt
- - cmplog rtn sanity check on fixed length? currently we ignore the length
- - afl-showmap -f support
- - afl-fuzz multicore wrapper script
- - when trimming then perform crash detection
-
 
 ## Should
 
- - afl-crash-analysis
  - cmplog: add loop count resolving (byte -> loop cnt change, calc special values)
  - support persistent and deferred fork server in afl-showmap?
  - better autodetection of shifting runtime timeout values
- - afl-plot to support multiple plot_data
  - parallel builds for source-only targets
  - get rid of check_binary, replace with more forkserver communication
  - first fuzzer should be a main automatically? not sure.
@@ -37,10 +35,10 @@
 ## Further down the road
 
 QEMU mode/FRIDA mode:
- - non colliding instrumentation
+ - non colliding instrumentation (done for qemu! frida todo)
  - rename qemu specific envs to AFL_QEMU (AFL_ENTRYPOINT, AFL_CODE_START/END,
    AFL_COMPCOV_LEVEL?)
- - add AFL_QEMU_EXITPOINT (maybe multiple?)
+ - support multiple AFL_QEMU_EXITPOINT
 
 ## Ideas
 

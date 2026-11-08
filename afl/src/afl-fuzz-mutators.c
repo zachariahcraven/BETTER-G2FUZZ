@@ -10,13 +10,15 @@
                         Dominik Maier <mail@dmnk.co>
 
    Copyright 2016, 2017 Google Inc. All rights reserved.
-   Copyright 2019-2024 AFLplusplus Project. All rights reserved.
+   Copyright 2019-2026 AFLplusplus Project. All rights reserved.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at:
 
      https://www.apache.org/licenses/LICENSE-2.0
+
+   SPDX-License-Identifier: Apache-2.0
 
    This is the real deal: the program takes an instrumented binary and
    attempts a variety of basic fuzzing tricks, paying close attention to
@@ -31,12 +33,12 @@ struct custom_mutator *load_custom_mutator(afl_state_t *, const char *);
 struct custom_mutator *load_custom_mutator_py(afl_state_t *, char *);
 #endif
 
-void run_afl_custom_queue_new_entry(afl_state_t *afl, struct queue_entry *q,
-                                    u8 *fname, u8 *mother_fname) {
+u8 run_afl_custom_queue_new_entry(afl_state_t *afl, struct queue_entry *q,
+                                  u8 *fname, u8 *mother_fname) {
+
+  u8 updated = 0;
 
   if (afl->custom_mutators_count) {
-
-    u8 updated = 0;
 
     LIST_FOREACH(&afl->custom_mutator_list, struct custom_mutator, {
 
@@ -68,6 +70,8 @@ void run_afl_custom_queue_new_entry(afl_state_t *afl, struct queue_entry *q,
 
   }
 
+  return updated;
+
 }
 
 void setup_custom_mutators(afl_state_t *afl) {
@@ -78,12 +82,6 @@ void setup_custom_mutators(afl_state_t *afl) {
   u32                    prev_mutator_count = 0;
 
   if (fn) {
-
-    if (afl->limit_time_sig && afl->limit_time_sig != -1)
-      FATAL(
-          "MOpt and custom mutator are mutually exclusive. We accept pull "
-          "requests that integrates MOpt with the optional mutators "
-          "(custom/redqueen/...).");
 
     u8 *fn_token = (u8 *)strsep((char **)&fn, ";:,");
 
@@ -123,15 +121,6 @@ void setup_custom_mutators(afl_state_t *afl) {
 
   if (module_name) {
 
-    if (afl->limit_time_sig) {
-
-      FATAL(
-          "MOpt and Python mutator are mutually exclusive. We accept pull "
-          "requests that integrates MOpt with the optional mutators "
-          "(custom/redqueen/...).");
-
-    }
-
     struct custom_mutator *m = load_custom_mutator_py(afl, module_name);
     afl->custom_mutators_count++;
     list_append(&afl->custom_mutator_list, m);
@@ -147,6 +136,28 @@ void setup_custom_mutators(afl_state_t *afl) {
 
 #endif
 
+  if (unlikely(afl->afl_env.afl_post_process_keep_original &&
+               afl->custom_mutators_count)) {
+
+    u8 has_post_process = 0;
+
+    LIST_FOREACH(&afl->custom_mutator_list, struct custom_mutator, {
+
+      if (el->afl_custom_post_process) { has_post_process = 1; }
+
+    });
+
+    if (has_post_process) {
+
+      WARNF(
+          "AFL_POST_PROCESS_KEEP_ORIGINAL is set: the post-processed output "
+          "is executed against the target but never saved to the queue, "
+          "only the pre-post-process input is.");
+
+    }
+
+  }
+
 }
 
 void destroy_custom_mutators(afl_state_t *afl) {
@@ -157,12 +168,20 @@ void destroy_custom_mutators(afl_state_t *afl) {
 
       if (!el->data) { FATAL("Deinitializing NULL mutator"); }
       if (el->afl_custom_deinit) el->afl_custom_deinit(el->data);
+      if (el->name_short) free(el->name_short);
       if (el->dh) dlclose(el->dh);
 
       if (el->post_process_buf) {
 
         afl_free(el->post_process_buf);
         el->post_process_buf = NULL;
+
+      }
+
+      if (el->post_process_buf_scratch) {
+
+        afl_free(el->post_process_buf_scratch);
+        el->post_process_buf_scratch = NULL;
 
       }
 
@@ -195,7 +214,33 @@ struct custom_mutator *load_custom_mutator(afl_state_t *afl, const char *fn) {
   ACTF("Loading custom mutator library from '%s'...", fn);
 
   dh = dlopen(fn, RTLD_NOW);
-  if (!dh) FATAL("%s", dlerror());
+
+  if (!dh) {
+
+    u8 *err = (u8 *)dlerror();
+
+    /* A mutator built with an instrumenting compiler needs symbols that live
+       in the target, not in afl-fuzz, and the bare symbol name does not say
+       so. Building targets and mutators in one shell with an exported CC is
+       all it takes. */
+
+    if (err && (strstr((char *)err, "__afl_") ||
+                strstr((char *)err, "__sanitizer_cov"))) {
+
+      WARNF(
+          "this library looks AFL-instrumented: the missing symbol lives in an "
+          "instrumented\n    target, not in afl-fuzz. Build the mutator with a "
+          "plain compiler (cc/clang),\n    not with afl-clang-fast or "
+          "afl-gcc-fast, and check with\n    'nm -D --undefined-only %s | grep "
+          "-E \"__afl_|__sanitizer_\"' that nothing is left.",
+          fn);
+
+    }
+
+    FATAL("%s", err ? (char *)err : "dlopen failed");
+
+  }
+
   mutator->dh = dh;
 
   /* Mutator */
@@ -451,7 +496,10 @@ struct custom_mutator *load_custom_mutator(afl_state_t *afl, const char *fn) {
 }
 
 u8 trim_case_custom(afl_state_t *afl, struct queue_entry *q, u8 *in_buf,
-                    struct custom_mutator *mutator) {
+                    struct custom_mutator *mutator, vp_trim_hooks_t *vp_hooks,
+                    u64 *trim_start_us) {
+
+  vp_trim_guard_t *vp_guard = vp_hooks ? vp_hooks->guard : NULL;
 
   u8  fault = 0;
   u32 trim_exec = 0;
@@ -462,12 +510,13 @@ u8 trim_case_custom(afl_state_t *afl, struct queue_entry *q, u8 *in_buf,
   u8 val_buf[STRINGIFY_VAL_SIZE_MAX];
 
   afl->stage_name = afl->stage_name_buf;
-  afl->bytes_trim_in += q->len;
+  afl->stage_short = "ptrim";
+  afl->stage_cur_byte = -1;
 
   /* Initialize trimming in the custom mutator */
   afl->stage_cur = 0;
   s32 retval = mutator->afl_custom_init_trim(mutator->data, in_buf, q->len);
-  if (unlikely(retval) < 0) {
+  if (unlikely(retval < 0)) {
 
     FATAL("custom_init_trim error ret: %d", retval);
 
@@ -479,14 +528,15 @@ u8 trim_case_custom(afl_state_t *afl, struct queue_entry *q, u8 *in_buf,
 
   if (afl->not_on_tty && afl->debug) {
 
-    SAYF("[Custom Trimming] START: Max %u iterations, %u bytes", afl->stage_max,
-         q->len);
+    DEBUGF("[Custom Trimming] START: Max %u iterations, %u bytes\n",
+           afl->stage_max, q->len);
 
   }
 
   while (afl->stage_cur < afl->stage_max) {
 
     u8 *retbuf = NULL;
+    u8  vp_ok = 1;
 
     sprintf(afl->stage_name_buf, "ptrim %s",
             u_stringify_int(val_buf, trim_exec));
@@ -539,19 +589,45 @@ u8 trim_case_custom(afl_state_t *afl, struct queue_entry *q, u8 *in_buf,
 
       } else {
 
+        if (unlikely(vp_guard)) { vp_hooks->before_exec(vp_guard); }
+
         fault = fuzz_run_target(afl, &afl->fsrv, afl->fsrv.exec_tmout);
         ++afl->trim_execs;
 
-        if (afl->stop_soon || fault == FSRV_RUN_ERROR) { goto abort_trimming; }
+        if (afl->stop_soon || fault == FSRV_RUN_ERROR) {
+
+          if (unlikely(vp_guard)) { vp_hooks->after_exec(vp_guard); }
+
+          goto abort_trimming;
+
+        }
 
         classify_counts(&afl->fsrv);
         cksum = hash64(afl->fsrv.trace_bits, afl->fsrv.map_size, HASH_CONST);
+        if (cksum == q->exec_cksum && unlikely(vp_guard)) {
+
+          vp_ok = vp_hooks->preserved(vp_guard);
+
+        }
 
       }
 
     }
 
-    if (likely(retlen && cksum == q->exec_cksum)) {
+    if (unlikely(vp_guard && retlen)) { vp_hooks->after_exec(vp_guard); }
+
+    u8 *save_buf = NULL;
+
+    if (unlikely(retlen &&
+                 (fault != afl->crash_mode || cksum != q->exec_cksum))) {
+
+      save_buf = afl_realloc(AFL_BUF_PARAM(trim_scratch), retlen);
+      if (unlikely(!save_buf)) { PFATAL("alloc"); }
+      memcpy(save_buf, retbuf, retlen);
+
+    }
+
+    if (likely(retlen && cksum == q->exec_cksum && vp_ok)) {
 
       /* Let's save a clean trace, which will be needed by
          update_bitmap_score once we're done with the trimming stuff.
@@ -576,12 +652,20 @@ u8 trim_case_custom(afl_state_t *afl, struct queue_entry *q, u8 *in_buf,
       memcpy(out_buf, retbuf, retlen);
 
       /* Tell the custom mutator that the trimming was successful */
-      afl->stage_cur = mutator->afl_custom_post_trim(mutator->data, 1);
+      s32 retval2 = mutator->afl_custom_post_trim(mutator->data, 1);
+      if (unlikely(retval2 < 0)) {
+
+        FATAL("Error ret in custom_post_trim: %d", retval2);
+
+      }
+
+      afl->stage_cur = retval2;
 
       if (afl->not_on_tty && afl->debug) {
 
-        SAYF("[Custom Trimming] SUCCESS: %u/%u iterations (now at %u bytes)",
-             afl->stage_cur, afl->stage_max, out_len);
+        DEBUGF(
+            "[Custom Trimming] SUCCESS: %u/%u iterations (now at %u bytes)\n",
+            afl->stage_cur, afl->stage_max, out_len);
 
       }
 
@@ -601,10 +685,19 @@ u8 trim_case_custom(afl_state_t *afl, struct queue_entry *q, u8 *in_buf,
 
       if (afl->not_on_tty && afl->debug) {
 
-        SAYF("[Custom Trimming] FAILURE: %u/%u iterations", afl->stage_cur,
-             afl->stage_max);
+        DEBUGF("[Custom Trimming] FAILURE: %u/%u iterations\n", afl->stage_cur,
+               afl->stage_max);
 
       }
+
+    }
+
+    if (unlikely(save_buf)) {
+
+      update_trim_time(afl, trim_start_us);
+      afl->queued_discovered +=
+          save_if_interesting(afl, save_buf, retlen, fault);
+      *trim_start_us = get_cur_time_us();
 
     }
 
@@ -623,9 +716,15 @@ u8 trim_case_custom(afl_state_t *afl, struct queue_entry *q, u8 *in_buf,
 
     unlink(q->fname);                                      /* ignore errors */
 
-    fd = open(q->fname, O_WRONLY | O_CREAT | O_EXCL, DEFAULT_PERMISSION);
+    fd = open(q->fname, O_WRONLY | O_CREAT | O_EXCL, afl->perm);
 
     if (fd < 0) { PFATAL("Unable to create '%s'", q->fname); }
+
+    if (afl->chown_needed) {
+
+      if (fchown(fd, -1, afl->fsrv.gid) == -1) { PFATAL("fchown() failed"); }
+
+    }
 
     ck_write(fd, out_buf, out_len, q->fname);
     close(fd);
@@ -642,14 +741,13 @@ u8 trim_case_custom(afl_state_t *afl, struct queue_entry *q, u8 *in_buf,
 
   if (afl->not_on_tty && afl->debug) {
 
-    SAYF("[Custom Trimming] DONE: %u bytes -> %u bytes", orig_len, q->len);
+    OKF("[Custom Trimming] DONE: %u bytes -> %u bytes", orig_len, q->len);
 
   }
 
 abort_trimming:
 
   if (out_buf) afl_free(out_buf);
-  afl->bytes_trim_out += q->len;
   return fault;
 
 }

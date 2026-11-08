@@ -64,7 +64,7 @@ SHARED_MODELS="$STUDENTS/shared-models"
 # A study decides these itself, so a setting left in your shell can't change it (the scripts/fuzz defaults:
 # ucb exploration 1.0, 2 CPUs and 8G per campaign)
 unset G2F_EVAL G2F_TARGET G2F_TARGETS G2F_SIF G2F_SEEDS G2F_BASE_URL G2F_MODEL G2F_GENERATOR_SCHEDULER \
-  G2F_UCB_EXPLORATION G2F_CPUS G2F_MEM G2F_OUTPUT
+  G2F_UCB_EXPLORATION G2F_CPUS G2F_MEM G2F_OUTPUT G2F_LLM_MODE
 # only the job's time limit: a long seed generation must not cut the fuzzing short (fuzz time is unchanged)
 export G2F_SEEDGEN_MIN="${G2F_SEEDGEN_MIN:-300}"
 
@@ -801,20 +801,23 @@ cmd_show() {
 row() {   # one campaign's numbers, tab-separated
   local i=$1 n=${P_N[$1]} c="$CAMPAIGNS/${P_N[$1]}" o
   o=$(output "$n")
-  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$n" "${P_A[$i]}" "${P_T[$i]}" "${P_R[$i]}" "$(shown_state "$n")" \
+  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$n" "${P_A[$i]}" "${P_T[$i]}" "${P_R[$i]}" "$(shown_state "$n")" \
     "$(afl_stat "$o/fuzzer_stats" edges_found)" "$(afl_stat "$o/fuzzer_stats" saved_crashes)" \
     "$(afl_stat "$o/fuzzer_stats" execs_per_sec)" "$(afl_stat "$o/fuzzer_stats" run_time)" \
     "$(ls "$o/generators" 2>/dev/null | wc -l | tr -d ' ')" \
-    "$(grep -a -c 'Gen-M start' "$c/fuzz.log" 2>/dev/null || true)" \
+    "$(grep -a -c 'Gen-M start' "$( [ -f "$c/llm-worker.log" ] && echo "$c/llm-worker.log" || echo "$c/fuzz.log")" 2>/dev/null || true)" \
     "$(cat "$c/llm_calls.jsonl" 2>/dev/null | wc -l | tr -d ' ')" \
     "$(grep -v -c '"status": "ok"' "$c/llm_calls.jsonl" 2>/dev/null || true)" \
     "$(grep -c '"status": "BadRequestError"' "$c/llm_calls.jsonl" 2>/dev/null || true)" \
-    "$(if grep -q '"finish"' "$c/llm_calls.jsonl" 2>/dev/null; then grep -c '"finish": "length"' "$c/llm_calls.jsonl"; elif [ -s "$c/llm_calls.jsonl" ]; then echo -; fi)"
+    "$(if grep -q '"finish"' "$c/llm_calls.jsonl" 2>/dev/null; then grep -c '"finish": "length"' "$c/llm_calls.jsonl"; elif [ -s "$c/llm_calls.jsonl" ]; then echo -; fi)" \
+    "$( [ -d "$(dirname "$o")/llm/queue" ] && { ls "$(dirname "$o")/llm/queue" | grep -c '^id:' || true; })" \
+    "$( [ -d "$(dirname "$o")/llm/queue" ] && { ls "$o/queue" 2>/dev/null | grep -c ',sync:llm,' || true; })"
 }
 # llm_errors: calls that failed (any error); llm_400: of those, the server's 400 (mostly a prompt over the model's
 # context); llm_cut: answers cut off at the context limit (finish = length; "-": an image from before 2026-10-30, which
-# doesn't log it)
-HEADER="campaign\tarm\ttarget\trep\tstate\tedges\tcrashes\texecs/s\trun_s\tgenerators\tllm_steps\tllm_calls\tllm_errors\tllm_400\tllm_cut"
+# doesn't log it); llm_seeds, llm_kept: Alfred's LLM worker: seeds it handed to AFL++, and how many AFL++ kept (they
+# reached new coverage; empty for --afl arms and campaigns from before Alfred)
+HEADER="campaign\tarm\ttarget\trep\tstate\tedges\tcrashes\texecs/s\trun_s\tgenerators\tllm_steps\tllm_calls\tllm_errors\tllm_400\tllm_cut\tllm_seeds\tllm_kept"
 
 cmd_status() {
   local i d m st flag fam others

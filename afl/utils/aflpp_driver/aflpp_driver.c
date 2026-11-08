@@ -44,6 +44,7 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -52,9 +53,6 @@ extern "C" {
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/mman.h>
-#ifndef __HAIKU__
-  #include <sys/syscall.h>
-#endif
 
 #include "config.h"
 #include "types.h"
@@ -63,6 +61,53 @@ extern "C" {
 #ifdef _DEBUG
   #include "hash.h"
 #endif
+
+#if defined(__APPLE__) && defined(__MACH__)
+  #define SECTION_RODATA                          \
+    __attribute__((used, retain)) __attribute__(( \
+        section("__RODATA,__"                     \
+                "rodata")))
+#else
+  #define SECTION_RODATA \
+    __attribute__((used, retain)) __attribute__((section(".rodata")))
+#endif
+
+#if !defined(__has_attribute)
+  #define __has_attribute(x) 0
+#endif
+
+/* Portable "no ASan" attribute */
+#if defined(__clang__)
+  #if __has_attribute(no_sanitize)
+    #define NOASAN __attribute__((no_sanitize("address")))
+  #elif __has_attribute(no_sanitize_address)
+    #define NOASAN __attribute__((no_sanitize_address))
+  #else
+    #define NOASAN
+  #endif
+#elif defined(__GNUC__)
+  /* GCC: uses no_sanitize_address */
+  #if __has_attribute(no_sanitize_address) || (__GNUC__ >= 5)
+    #define NOASAN __attribute__((no_sanitize_address))
+  #else
+    #define NOASAN
+  #endif
+#else
+  #define NOASAN
+#endif
+
+#if defined(__GNUC__) || defined(__clang__)
+  #define FORCEINLINE __attribute__((always_inline)) inline
+#else
+  #define FORCEINLINE inline
+#endif
+
+// lowers to inline memset, no libc call to interpose
+static FORCEINLINE NOASAN void *memset_noasan(void *dst, int c, size_t n) {
+
+  return __builtin_memset(dst, c, n);
+
+}
 
 // AFL++ shared memory fuzz cases
 int                   __afl_sharedmem_fuzzing = 1;
@@ -84,36 +129,20 @@ __attribute__((weak)) void    LLVMFuzzerCleanup(void);
 __attribute__((weak)) int     LLVMFuzzerRunDriver(
         int *argc, char ***argv, int (*callback)(const uint8_t *data, size_t size));
 
-// Default nop ASan hooks for manual poisoning when not linking the ASan
-// runtime
+// ASan manual poisoning hooks, if present
 // https://github.com/google/sanitizers/wiki/AddressSanitizerManualPoisoning
 __attribute__((weak)) void __asan_poison_memory_region(
-    void const volatile *addr, size_t size) {
-
-  (void)addr;
-  (void)size;
-
-}
-
+    void const volatile *addr, size_t size);
 __attribute__((weak)) void __asan_unpoison_memory_region(
-    void const volatile *addr, size_t size) {
-
-  (void)addr;
-  (void)size;
-
-}
-
+    void const volatile *addr, size_t size);
 __attribute__((weak)) void *__asan_region_is_poisoned(void *beg, size_t size);
 
 // Notify AFL about persistent mode.
-__attribute__((section(".rodata"), used,
-               retain)) static const char AFL_PERSISTENT[] =
-    "##SIG_AFL_PERSISTENT##";
-int __afl_persistent_loop(unsigned int);
+SECTION_RODATA static const char AFL_PERSISTENT[] = "##SIG_AFL_PERSISTENT##";
+int                              __afl_persistent_loop(unsigned int);
 
 // Notify AFL about deferred forkserver.
-__attribute__((section(".rodata"), used,
-               retain)) static const char AFL_DEFER_FORKSVR[] =
+SECTION_RODATA static const char AFL_DEFER_FORKSVR[] =
     "##SIG_AFL_DEFER_FORKSRV##";
 void __afl_manual_init();
 
@@ -189,16 +218,25 @@ static void dup_and_close_stderr() {
   int output_fileno = fileno(output_file);
   int output_fd = dup(output_fileno);
   if (output_fd <= 0) abort();
-  FILE *new_output_file = fdopen(output_fd, "w");
-  if (!new_output_file) abort();
-  if (!__sanitizer_set_report_fd) return;
-  __sanitizer_set_report_fd((void *)(long int)output_fd);
+  if (__sanitizer_set_report_fd) {
+
+    __sanitizer_set_report_fd((void *)(long int)output_fd);
+
+  } else {
+
+    close(output_fd);
+
+  }
+
   discard_output(output_fileno);
 
 }
 
-// Close stdout and/or stderr if user asks for it.
-static void maybe_close_fd_mask() {
+// Close stdout and/or stderr if the user asks for it, but only while actually
+// fuzzing and not when AFL_DEBUG or AFL_CRASH_TRACES need the output visible.
+static void maybe_close_fd_mask(bool in_afl) {
+
+  if (!in_afl || getenv("AFL_DEBUG") || getenv("AFL_CRASH_TRACES")) return;
 
   char *fd_mask_str = getenv("AFL_DRIVER_CLOSE_FD_MASK");
   if (!fd_mask_str) return;
@@ -213,6 +251,9 @@ static void maybe_close_fd_mask() {
 __attribute__((weak)) size_t LLVMFuzzerMutate(uint8_t *Data, size_t Size,
                                               size_t MaxSize) {
 
+  (void)(Data);
+  (void)(Size);
+  (void)(MaxSize);
   // assert(false && "LLVMFuzzerMutate should not be called from afl_driver");
   return 0;
 
@@ -224,9 +265,9 @@ static int ExecuteFilesOnyByOne(int argc, char **argv,
                                                 size_t         size)) {
 
   unsigned char *buf = (unsigned char *)malloc(MAX_FILE);
+  bool           have_asan = __asan_region_is_poisoned;
 
-  __asan_poison_memory_region(buf, MAX_FILE);
-  ssize_t prev_length = 0;
+  if (have_asan) { __asan_poison_memory_region(buf, MAX_FILE); }
 
   for (int i = 1; i < argc; i++) {
 
@@ -236,29 +277,32 @@ static int ExecuteFilesOnyByOne(int argc, char **argv,
 
     if (fd == -1) { continue; }
 
+    /* Unpoison so ASan's read() interceptor does not flag the write into
+       our deliberately-poisoned scratch buffer; the unused tail is
+       re-poisoned after the read. */
+    if (have_asan) { __asan_unpoison_memory_region(buf, MAX_FILE); }
+
 #ifndef __HAIKU__
-    ssize_t length = syscall(SYS_read, fd, buf, MAX_FILE);
+    ssize_t length = read(fd, buf, MAX_FILE);
 #else
     ssize_t length = _kern_read(fd, buf, MAX_FILE);
 #endif  // HAIKU
 
     if (length > 0) {
 
-      if (length < prev_length) {
+      if (have_asan) {
 
-        __asan_poison_memory_region(buf + length, prev_length - length);
-
-      } else {
-
-        __asan_unpoison_memory_region(buf + prev_length, length - prev_length);
+        __asan_poison_memory_region(buf + length, MAX_FILE - length);
 
       }
-
-      prev_length = length;
 
       printf("Reading %zu bytes from %s\n", length, argv[i]);
       callback(buf, length);
       printf("Execution successful.\n");
+
+    } else if (have_asan) {
+
+      __asan_poison_memory_region(buf, MAX_FILE);
 
     }
 
@@ -334,7 +378,10 @@ __attribute__((weak)) int LLVMFuzzerRunDriver(
 
   }
 
-  bool in_afl = !(!getenv(SHM_FUZZ_ENV_VAR) || !getenv(SHM_ENV_VAR) ||
+  /* The shared maps arrive either by name or - with a tool that unlinks them
+     at creation - as an inherited descriptor, so accept both. */
+  bool in_afl = !((!getenv(SHM_FUZZ_ENV_VAR) && !getenv(SHM_FUZZ_FD_ENV_VAR)) ||
+                  (!getenv(SHM_ENV_VAR) && !getenv(SHM_FD_ENV_VAR)) ||
                   fcntl(FORKSRV_FD, F_GETFD) == -1 ||
                   fcntl(FORKSRV_FD + 1, F_GETFD) == -1);
 
@@ -342,7 +389,7 @@ __attribute__((weak)) int LLVMFuzzerRunDriver(
 
   output_file = stderr;
   maybe_duplicate_stderr();
-  maybe_close_fd_mask();
+  maybe_close_fd_mask(in_afl);
 
   if (LLVMFuzzerInitialize) {
 
@@ -391,11 +438,12 @@ __attribute__((weak)) int LLVMFuzzerRunDriver(
 
   __afl_manual_init();
 
-  __asan_poison_memory_region(__afl_fuzz_ptr, MAX_FILE);
   size_t prev_length = 0;
 
   // for speed only insert asan functions if the target is linked with asan
   if (unlikely(__asan_region_is_poisoned)) {
+
+    __asan_poison_memory_region(__afl_fuzz_ptr, MAX_FILE);
 
     while (__afl_persistent_loop(N)) {
 
@@ -419,7 +467,7 @@ __attribute__((weak)) int LLVMFuzzerRunDriver(
 
         if (unlikely(callback(__afl_fuzz_ptr, length) == -1)) {
 
-          memset(__afl_area_ptr, 0, __afl_map_size);
+          memset_noasan(__afl_area_ptr, 0, __afl_map_size);
           __afl_area_ptr[0] = 1;
 
         }
@@ -434,7 +482,7 @@ __attribute__((weak)) int LLVMFuzzerRunDriver(
 
       if (unlikely(callback(__afl_fuzz_ptr, *__afl_fuzz_len) == -1)) {
 
-        memset(__afl_area_ptr, 0, __afl_map_size);
+        memset_noasan(__afl_area_ptr, 0, __afl_map_size);
         __afl_area_ptr[0] = 1;
 
       }

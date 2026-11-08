@@ -26,7 +26,7 @@ except ImportError:
 
 REPO = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 INTS = {"rep", "edges", "crashes", "run_s", "generators", "llm_steps", "llm_calls", "llm_errors", "llm_400",
-        "llm_cut"}
+        "llm_cut", "llm_seeds", "llm_kept"}
 MODELS = ["arm", "target", "done", "no_seeds", "short", "edges_median", "edges_min", "edges_max", "edges_vs_afl",
           "crashes_median", "execs/s_median"]
 SAVED = ["campaign", "arm", "target", "rep", "found_s", "execs", "op", "src", "bytes", "sha1", "file"]

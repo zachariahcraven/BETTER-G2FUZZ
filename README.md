@@ -3,7 +3,7 @@
 Fork of [G2FUZZ](https://github.com/G2FUZZ/G2FUZZ) ([paper](https://arxiv.org/abs/2501.19282)) for a research project at
 Montana State University. Goal: replace G2Fuzz's random generator selection with a multi-armed bandit scheduler.
 
-G2FUZZ has an LLM write Python generators for an input format, fuzzes their output with AFL++ 4.32c, and has the
+G2FUZZ has an LLM write Python generators for an input format, fuzzes their output with AFL++ (4.32c upstream; 5.03c in Alfred, docs/ALFRED.md), and has the
 LLM mutate the generators when coverage stalls.
 
 ## How it fits together
@@ -347,7 +347,7 @@ source scripts/enable-completion      # adds one line to ~/.bashrc (only once) a
 | Where the scheduler is called (generator and mutator selection) | `g2fuzz/generator_mutation.py` |
 | Seed generation | `g2fuzz/program_gen.py` |
 | LLM calls, retries, logging | `g2fuzz/py_utils/llm_utils.py` |
-| When `llmGen-M` triggers | `afl/src/afl-fuzz.c` (search `G2F:`) |
+| When `llmGen-M` triggers | `g2fuzz/llm_worker.py` (Alfred; upstream: `afl/src/afl-fuzz.c`, see docs/ALFRED.md) |
 | Image contents | `build/Dockerfile.g2fuzz` |
 
 **Change `scripts/fuzz`** (no image rebuild needed): run `scripts/tests/test_fuzz_cli.sh` on Tempest before committing.

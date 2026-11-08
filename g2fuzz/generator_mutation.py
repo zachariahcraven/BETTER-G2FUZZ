@@ -267,6 +267,7 @@ if __name__ == "__main__":
     from py_utils.func import *
     from py_utils.llm_analysis import *
     from py_utils.llm_utils import *
+    from py_utils.lineage import queue_names
 
     output_path = args.output
 
@@ -309,7 +310,7 @@ if __name__ == "__main__":
     if relationship:
         # get successfully mutation
         mutation_pattern = []
-        file_names = list_files(os.path.join(output_path, "queue"))
+        file_names = queue_names(os.path.join(output_path, "queue"))   # ALFRED: py_utils/lineage.py
         roots = build_tree(file_names)
         for root in roots:
             num_nodes = print_tree(root)

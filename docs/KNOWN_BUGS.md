@@ -1,19 +1,20 @@
 # Known bugs
 
-Bugs found in the code our studies run: upstream G2FUZZ and its AFL++ 4.32c, then our own. Each entry says where the
+Bugs found in the code our studies run: upstream G2FUZZ and its AFL++ 4.32c, then our own. This is Alfred's copy
+(docs/ALFRED.md): the Status column notes where Alfred's changes should remove a bug; none is verified yet. Each entry says where the
 bug is, how it was found, what it does to results, and whether it's fixed. New ones go at the end of their section.
 
 | ID | Where | What | Status |
 |---|---|---|---|
-| [G2F-1](#g2f-1-in-run-seeds-skip-afls-size-checks) | `afl/src/afl-fuzz.c` `run_gen_seeds()` | in-run generator seeds skip AFL++'s size checks; afl-fuzz segfaults on ones over 1 MiB, or runs out of memory on a 1 GB one | **open** (03 and 04 run with it) |
+| [G2F-1](#g2f-1-in-run-seeds-skip-afls-size-checks) | `afl/src/afl-fuzz.c` `run_gen_seeds()` | in-run generator seeds skip AFL++'s size checks; afl-fuzz segfaults on ones over 1 MiB, or runs out of memory on a 1 GB one | **open** (03 and 04 run with it). Alfred: gone by design (seeds come in through AFL++'s sync), to verify on campaigns |
 | [G2F-2](#g2f-2-pip_debug-runs-any-answer-as-a-pip-command) | `g2fuzz/py_utils/func.py` `pip_debug_loop()` | any LLM answer is run as a pip command | fixed 2026-10-30 (255c12b) |
-| [G2F-3](#g2f-3-afl-fuzz-heap-corruption-in-g2fuzz-runs) | afl-fuzz, G2FUZZ arms only (not located) | heap corruption: glibc stops afl-fuzz mid-run or as it exits | **open** (cause not found) |
-| [AFL-1](#afl-1-afl-fuzz-432c-fuzzes-the-cmplog-binary) | `afl/src/afl-fuzz.c` (AFL++ 4.32c) | fuzzes with the CmpLog binary, not the target | open (fixed upstream in 5.03c) |
-| [AFL-2](#afl-2-afl-showmap-432c-aborts-on-maps-over-64k) | `afl-showmap` (AFL++ 4.32c) | aborts on coverage maps over 64K | worked around |
+| [G2F-3](#g2f-3-afl-fuzz-heap-corruption-in-g2fuzz-runs) | afl-fuzz, G2FUZZ arms only (not located) | heap corruption: glibc stops afl-fuzz mid-run or as it exits | **open** (cause not found). Alfred: upstream's patch is gone; to check with a vorbis G2FUZZ campaign |
+| [AFL-1](#afl-1-afl-fuzz-432c-fuzzes-the-cmplog-binary) | `afl/src/afl-fuzz.c` (AFL++ 4.32c) | fuzzes with the CmpLog binary, not the target | open (fixed upstream in 5.03c). Alfred: runs 5.03c; to verify |
+| [AFL-2](#afl-2-afl-showmap-432c-aborts-on-maps-over-64k) | `afl-showmap` (AFL++ 4.32c) | aborts on coverage maps over 64K | worked around. Alfred: 5.03c resizes the map; to verify, then drop the workaround |
 | [OURS-1](#ours-1-ucb-snapshot-held-one-formats-generators) | `g2fuzz/py_utils/generator_scheduler.py` | UCB snapshot held only one format's generators | fixed 2026-10-30 (255c12b) |
 | [OURS-2](#ours-2-scancel-skipped-the-study-drivers-cleanup) | `scripts/study` `start --background` | `scancel` of the driver left its LLM servers running | fixed 2026-10-30 (uncommitted) |
 | [OURS-3](#ours-3-output-on-the-nodes-shared-disk) | `scripts/fuzz run` (each campaign's `job.sbatch`) | AFL++ output is on the node's shared `/tmp`; when it fills, every campaign there stops | **open** (03 and 04 run with it) |
-| [OURS-4](#ours-4-the-kernels-file-name-cache-counts-against-a-campaigns-memory) | each campaign's 8 GB (`scripts/fuzz run`) | the libpcap target's temp files fill it with kernel cache; a 24 h run can be killed for memory | **open** (found in 04) |
+| [OURS-4](#ours-4-the-kernels-file-name-cache-counts-against-a-campaigns-memory) | each campaign's 8 GB (`scripts/fuzz run`) | the libpcap target's temp files fill it with kernel cache; a 24 h run can be killed for memory | **open** (found in 04). Alfred: libpcap gets 16G by default (headroom, not a fix) |
 
 ## Upstream G2FUZZ
 

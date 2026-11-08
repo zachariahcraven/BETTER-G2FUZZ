@@ -506,6 +506,9 @@ run_case run_out_campaign base G2F_OUTPUT=campaign -- run fresh 900
 run_case run_out_campaign_afl base G2F_OUTPUT=campaign -- run fresh 120 --afl
 run_case run_out_bad base G2F_OUTPUT=tmpfs -- run seeded 300
 run_case study_out_campaign solo -- @study start 14-output
+# G2F_LLM_MODE (Alfred, 2026-11-08): the committed version may not have it either
+run_case run_llm_continuous base G2F_LLM_MODE=continuous -- run seeded 300
+run_case run_llm_badmode base G2F_LLM_MODE=sometimes -- run seeded 300
 
 # Contracts (on the current version)
 N=$T/out/new X=$T/out/newonly
@@ -591,11 +594,17 @@ contract "study: a failed squeue after launching skips the check" 'grep -q "sque
 contract "study: gives up at once on recorded failures"  '[ "$(cat "$N/study_gaveup_before/rc")" = 1 ] && grep -q "giving up" "$N/study_gaveup_before/out" && ! grep -q "llm-serve.sbatch" "$N/study_gaveup_before/calls"'
 contract "study --retry-servers starts it again"         'grep -q "forgot earlier failed server starts" "$N/study_retry_servers/out" && [ "$(grep -c "llm-serve.sbatch" "$N/study_retry_servers/calls")" = 1 ]'
 contract "study: refuses an image of uncommitted code"   '[ "$(cat "$N/study_dirty_image/rc")" = 1 ] && grep -q "image doesn.t hold this checkout.s code" "$N/study_dirty_image/err" && ! grep -q "^sbatch" "$N/study_dirty_image/calls" && grep -q "note: a real start would refuse" "$N/study_dirty_image_dry/out"'
-contract "study csv: llm_cut is - when not logged"      'grep -q "^07-wait,jhead-g2f-r1,g2f,jhead,1,done,.*,2,1,0,-$" "$N/study_results/tree"'
+contract "study csv: llm_cut is - when not logged"      'grep -q "^07-wait,jhead-g2f-r1,g2f,jhead,1,done,.*,2,1,0,-,,$" "$N/study_results/tree"'
 contract "run.sh logs program_gen's exit status"        'grep -qF "echo \"fuzz: program_gen exit \$?\" >> seedgen.log" "$N/run_seedgen/gen/fresh/run.sh"'
+# Alfred (2026-11-08): stock afl-fuzz in both arms; G2FUZZ runs start the LLM worker beside it
+contract "G2FUZZ run.sh starts the LLM worker"           'grep -qF "{ python /AFLplusplus/g2fuzz/llm_worker.py --afl-out jhead_output/default --sync-dir jhead_output/llm > llm-worker.log 2>&1 & } && exec afl-fuzz " "$N/run_seedgen/gen/fresh/run.sh" && ! grep -q -- " -k " "$N/run_seedgen/gen/fresh/run.sh"'
+contract "--afl run.sh has no LLM worker"                '! grep -q llm_worker "$N/run_afl_stock/gen/fresh/run.sh" && ! grep -q G2F_PLATEAU "$N/run_afl_stock/gen/fresh/run.sh"'
+contract "both arms: same afl-fuzz settings"             '[ "$(grep -c "export AFL_SYNC_TIME=1 AFL_IGNORE_SEED_PROBLEMS=1 && .*exec afl-fuzz -i initial_seeds -o jhead_output -c /targets/jhead.cmp -m 1024 -V" "$N/run_seedgen/gen/fresh/run.sh" "$N/run_afl_stock/gen/fresh/run.sh" | grep -c ":1$")" = 2 ]'
+contract "G2FUZZ jobs pass the LLM mode (stall)"         'grep -qF "G2F_LLM_MODE=stall\\," "$N/run_seedgen/gen/fresh/job.sbatch" && ! grep -q G2F_LLM_MODE "$N/run_afl_stock/gen/fresh/job.sbatch"'
+contract "study 02: libpcap campaigns get 16G (OURS-4)"  '[ "$(grep -c -- "--job-name alfred-[^ ]*libpcap_fuzz_both[^ ]* --cpus-per-task 2 --mem 16G" "$N/study_02_all/calls")" = 5 ] && [ "$(grep -c -- "--mem 8G" "$N/study_02_all/calls")" = 70 ]'
 contract "study: a | line continues targets"           'grep -q "^mp42aac-a-r1 " "$N/study_cont/out" && ! grep -q "|" "$N/study_cont/out"'
 contract "study: no seeds with the model answering"    'grep -q "^jhead-g2f-r1 .* no seeds " "$N/study_noseeds/out" && grep -q "^mp42aac-g2f-r1 .* failed " "$N/study_noseeds/out"'
-contract "study csv: LLM errors, 400s, cut-off answers" 'grep -q "^study,.*,llm_calls,llm_errors,llm_400,llm_cut$" "$N/study_noseeds_csv/out" && grep -q "^10-noseeds,jhead-g2f-r1,g2f,jhead,1,no seeds,.*,2,1,1,1$" "$N/study_noseeds_csv/out"'
+contract "study csv: LLM errors, 400s, cut-off answers" 'grep -q "^study,.*,llm_calls,llm_errors,llm_400,llm_cut,llm_seeds,llm_kept$" "$N/study_noseeds_csv/out" && grep -q "^10-noseeds,jhead-g2f-r1,g2f,jhead,1,no seeds,.*,2,1,1,1,,$" "$N/study_noseeds_csv/out"'
 contract "study status shows the study's servers"       'grep -q "^server: Qwen3.8-27B-FP8, Slurm job 948000 (RUNNING), started by this study" "$N/study_status_servers/out"'
 # --retry-failed, failure reasons, other users' jobs, the gave-up hint (2026-10-30)
 contract "study: read-only commands take study.conf's account" '[ "$(cat "$N/study_conf_acct_status/rc")" = 0 ]'
@@ -614,6 +623,21 @@ contract "G2F_OUTPUT=campaign: --afl runs too"           'outc "$X/run_out_campa
 contract "G2F_OUTPUT: other values refused"              '[ "$(cat "$X/run_out_bad/rc")" = 1 ] && grep -q "G2F_OUTPUT must be node or campaign (got .tmpfs.)" "$X/run_out_bad/err" && ! grep -q "^sbatch" "$X/run_out_bad/calls"'
 contract "study output = campaign: every campaign, launch.txt" '[ "$(grep -c "submitted Slurm job" "$X/study_out_campaign/out")" = 2 ] && outc "$X/study_out_campaign/gen/jhead-ucb-r1" && outc "$X/study_out_campaign/gen/jhead-afl-r1" && [ "$(grep -c "^settings: G2F_SEEDGEN_MIN=300 G2F_OUTPUT=campaign$" "$X/study_out_campaign/tree")" = 2 ]'
 contract "G2F_OUTPUT=campaign files pass bash -n"        '! cat "$X"/*/syntax | grep -q FAIL && [ -s "$X/run_out_campaign/syntax" ]'
+contract "G2F_LLM_MODE=continuous reaches the job"       'grep -qF "G2F_LLM_MODE=continuous\\," "$X/run_llm_continuous/gen/seeded/job.sbatch"'
+contract "G2F_LLM_MODE: other values refused"            '[ "$(cat "$X/run_llm_badmode/rc")" = 1 ] && grep -q "G2F_LLM_MODE must be stall or continuous (got .sometimes.)" "$X/run_llm_badmode/err" && ! grep -q "^sbatch" "$X/run_llm_badmode/calls"'
+# status/results of an Alfred campaign: steps from llm-worker.log, the worker's seeds and how many AFL++ kept
+setup_work "$T/fuzz.new"; scenario base
+o=$E/src/jhead_output; mkdir -p "$o/llm/queue"; rm "$E/src/fuzz.log"
+printf '%s\n' "Fuzzing test case #1" "Fuzzing test case #2" > "$E/src/fuzz.log"
+printf '%s\n' "x G2F: LLM step after 300s without finds (+60s per step)" "x ==== Gen-M start ==== step 1" "x ==== Gen-M end ==== step 1" \
+  "x ==== Gen-M start ==== step 2" > "$E/src/llm-worker.log"
+for i in 0 1 2; do echo s > "$o/llm/queue/id:00000$i,orig:jpg-3_$i.jpg"; done
+echo q > "$o/default/queue/id:000002,sync:llm,src:000001,time:9000,execs:99,+cov"
+fz() { env -i PATH="$T/bin:/usr/bin:/bin" HOME="$W/home" USER=tester LANG=C LC_ALL=C TZ=UTC SCEN="$W/scen" STUB_LOG=/dev/null \
+  bash "$W/repo/scripts/fuzz" "$@" 2>&1; }
+fz status src > "$T/alfred_status.out"; fz results src > "$T/alfred_results.out"
+contract "status: steps from llm-worker.log"             'grep -q "^llmGen-M     2 steps$" "$T/alfred_status.out" && grep -q "LLM step after 420s without one" "$T/alfred_status.out"'
+contract "status/results: the worker's seeds"            'grep -q "^LLM seeds    3 handed to AFL++, 1 kept$" "$T/alfred_status.out" && grep -q "^LLM seeds         : 3 handed to AFL++, 1 kept$" "$T/alfred_results.out" && grep -q "^llmGen-M steps    : 2$" "$T/alfred_results.out"'
 
 # Tab completion (current version): load what `completion` prints into a shell, then "press Tab" after the words
 setup_work "$T/fuzz.new"; scenario base

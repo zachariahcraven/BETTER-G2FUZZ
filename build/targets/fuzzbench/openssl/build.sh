@@ -38,7 +38,10 @@ fi
 FB_CFLAGS="-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -pthread -Wl,--no-as-needed -Wl,-ldl -Wl,-lm -Wno-unused-command-line-argument"
 
 AFL_DRIVER=/usr/local/lib/afl/libAFLDriver.a
-ASAN_FUZZER=/usr/lib/llvm-16/lib/clang/16/lib/linux/libclang_rt.fuzzer-x86_64.a
+# clang's own libFuzzer, from whichever LLVM the image has (the file name depends on the runtime layout)
+RES=$(clang --print-resource-dir)
+ASAN_FUZZER=$RES/lib/linux/libclang_rt.fuzzer-x86_64.a
+[ -f "$ASAN_FUZZER" ] || ASAN_FUZZER=$RES/lib/x86_64-unknown-linux-gnu/libclang_rt.fuzzer.a
 [ -f "$AFL_DRIVER" ]   || paper_die "AFL++ driver not found: $AFL_DRIVER"
 [ -f "$ASAN_FUZZER" ]  || paper_die "clang libFuzzer not found: $ASAN_FUZZER"
 

@@ -18,7 +18,7 @@ Just type "make" in the individual subdirectories.
 
 Use with e.g.
 
-`AFL_CUSTOM_MUTATOR_LIBRARY=custom_mutators/radamsa/radamsa-mutator.so afl-fuzz ....`
+`AFL_CUSTOM_MUTATOR_LIBRARY=custom_mutators/autotokens/autotokens.so afl-fuzz ....`
 
 and add `AFL_CUSTOM_MUTATOR_ONLY=1` if you only want to use the custom mutator.
 
@@ -51,14 +51,15 @@ Note that this custom mutator is not very good though!
 
 ### Other Mutators
 
-atnwalk and gramatron are grammar custom mutators. Example grammars are
+Nautilus, atnwalk and gramatron are grammar custom mutators. Example grammars are
 provided.
 
-honggfuzz, libfuzzer and  libafl are partial implementations based on the
+honggfuzz and libfuzzer are partial implementations based on the
 mutator implementations of the respective fuzzers. 
 More for playing than serious usage.
 
-radamsa is slow and not very good.
+LibAFL_base is an exmaple how to use LibAFL as mutator for AFL++.
+You can also take a look at the libafl_nautilus custom mutator for this purpose.
 
 ## 3rd Party Custom Mutators
 

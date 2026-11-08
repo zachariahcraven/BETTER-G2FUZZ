@@ -48,6 +48,11 @@ fairly broad use of environment variables instead:
     compilation tools, rather than the default 'clang', or 'gcc' binaries
     in your `$PATH`.
 
+  - Setting `AFL_COMPILER_LAUNCHER` lets you prepend a command to the compiler
+    invocation. This is useful for tools like `ccache` that can speed up
+    compilation by caching object files. For example, setting
+    `AFL_COMPILER_LAUNCHER=ccache` will prepend `ccache` to all compiler calls.
+
   - Most AFL tools do not print any output if stdout/stderr are redirected. If
     you want to get the output into a file, then set the `AFL_DEBUG` environment
     variable. This is sadly necessary for various build processes which fail
@@ -78,7 +83,14 @@ fairly broad use of environment variables instead:
     Setting `AFL_INST_RATIO` to 0 is a valid choice. This will instrument only
     the transitions between function entry points, but not individual branches.
 
-    Note that this is an outdated variable. Only LLVM CLASSIC pass can use this.
+    Note that this is an outdated variable. Only the GCC plugin instrumentation
+    honors it.
+
+  - Setting `AFL_INPUT_PLACEHOLDER` to a string allows you to use that string 
+    as a placeholder instead of "@@" in the target command line arguments.
+    Use this when "@@" conflicts with the parameters of your program.
+    For eg. `AFL_INPUT_PLACEHOLDER=NEW_PLACEHOLDER afl-fuzz -i in -o out --
+    ./targetProgram NEW_PLACEHOLDER`
 
   - `AFL_NO_BUILTIN` causes the compiler to generate code suitable for use with
     libtokencap.so (but perhaps running a bit slower than without the flag).
@@ -86,7 +98,7 @@ fairly broad use of environment variables instead:
   - `AFL_PATH` can be used to point a directory that contains LLVM/GCC plugins
     for AFL++, AFL++'s runtime objects and QEMU/Frida support files.
 
-  - Setting `AFL_QUIET` will prevent afl-as and afl-cc banners from being
+  - Setting `AFL_QUIET` will prevent afl-cc banners from being
     displayed during compilation, in case you find them distracting.
 
   - Setting `AFL_USE_...` automatically enables supported sanitizers - provided
@@ -95,7 +107,6 @@ fairly broad use of environment variables instead:
       detection)
     - `AFL_USE_CFISAN=1` - activates the Control Flow Integrity sanitizer (e.g.
       type confusion vulnerabilities)
-    - `AFL_CFISAN_VERBOSE=1` - outputs detailed information when control flow integrity violations occur, instead of simply terminating with "Illegal Instruction"
     - `AFL_USE_LSAN` - activates the leak sanitizer. To perform a leak check
       within your program at a certain point (such as at the end of an
       `__AFL_LOOP()`), you can run the macro  `__AFL_LEAK_CHECK();` which will
@@ -106,20 +117,16 @@ fairly broad use of environment variables instead:
     - `AFL_USE_TSAN=1` - activates the thread sanitizer to find thread race
       conditions
     - `AFL_USE_UBSAN=1` - activates the undefined behavior sanitizer
-    - `AFL_UBSAN_VERBOSE=1` - outputs detailed diagnostic information when undefined behavior is detected, instead of simply terminating with "Illegal Instruction"
     . `AFL_USE_RTSAN` . activates the realtime sanitizer (realtime violations in deterministic run time constraints). (clang 20 minimum)
 
-    - Note: both `AFL_CFISAN_VERBOSE=1` and `AFL_UBSAN_VERBOSE=1` are disabled by default as verbose output can significantly slow down fuzzing performance. Use these options only during debugging or when additional crash diagnostics are required
-
-  - `TMPDIR` is used by afl-as for temporary files; if this variable is not set,
-    the tool defaults to /tmp.
+  - `AFL_LLVM_ONLY_FSRV`/`AFL_GCC_ONLY_FSRV` will inject forkserver but not pc instrumentation. Please note this is different compared to `AFL_LLVM_DISABLE_INSTRUMENTATION`, which will totally disable forkserver implementation. This env is pretty useful in two cases:
+    - [SAND](./SAND.md). In this case, the binaries built in this way will serve as extra oracles. Check the corresponding documents for details.
+    - Compatible with LibAFL ForkserverExecutor implementation and thus faster to repeatedly run, compared to simple CommandExecutor.
 
 ## 2) Settings for LLVM and LTO: afl-clang-fast / afl-clang-fast++ / afl-clang-lto / afl-clang-lto++
 
 The native instrumentation helpers (instrumentation and gcc_plugin) accept a
 subset of the settings discussed in section 1, with the exception of:
-
-  - `AFL_AS`, since this toolchain does not directly invoke GNU `as`.
 
   - `AFL_INST_RATIO`, as we use collision free instrumentation by default. Not
     all passes support this option though as it is an outdated feature.
@@ -129,10 +136,7 @@ subset of the settings discussed in section 1, with the exception of:
     afl-fuzz' `-x` option.
 
   - An option to `AFL_LLVM_DICT2FILE` is `AFL_LLVM_DICT2FILE_NO_MAIN=1` which
-    skill not parse `main()`.
-
-  - `TMPDIR` and `AFL_KEEP_ASSEMBLY`, since no temporary assembly files are
-    created.
+    will not parse `main()`.
 
   - LLVM modes compiling C++ will normally set rpath in the binary if LLVM is
     not in a usual location (/usr or /lib). Setting `AFL_LLVM_NO_RPATH=1`
@@ -150,18 +154,180 @@ instrumentation mode:
 Available options:
 
   - CLANG - outdated clang instrumentation
-  - CLASSIC - classic AFL (map[cur_loc ^ prev_loc >> 1]++) (default)
-
-    You can also specify CTX and/or NGRAM, separate the options with a comma ","
-    then, e.g.: `AFL_LLVM_INSTRUMENT=CLASSIC,CTX,NGRAM-4`
-
-    Note: It is actually not a good idea to use both CTX and NGRAM. :)
-  - CTX - context sensitive instrumentation
+  - CTX - context sensitive instrumentation (LTO mode only, see README.lto.md)
+  - CALLER - single caller context instrumentation (LTO mode only)
   - GCC - outdated gcc instrumentation
   - LTO - LTO instrumentation
   - NATIVE - clang's original pcguard based instrumentation
-  - NGRAM-x - deeper previous location coverage (from NGRAM-2 up to NGRAM-16)
   - PCGUARD - our own pcguard based instrumentation (default)
+
+#### Bug-pass oracles
+
+Setting any `AFL_LLVM_BUG*` variable during compilation enables
+`afl-llvm-bug-pass.so`, which adds runtime oracles for arithmetic-bound and
+logical-OOB bugs that ASan does not catch (the CVE-2023-4863 / libwebp-Huffman
+class).
+
+  - `AFL_LLVM_BUG=1` — enable all bug-pass modes (`SCALAR`, `BUDGET`,
+    `SIZEFILL`, `SLACK`, `ALLOCSIZE`, and `ALLOCSIZE_DERIVE`). The
+    size-derive mode only emits entries when a CmpLog map is available
+    (needs a CmpLog binary for main fuzzing, so `-c 0`, not only
+    `-c target.cmplog`).
+  - `AFL_LLVM_BUG_SCALAR=1` — max-value-per-arithmetic-site coverage and
+    per-loop iteration counts. Treats internal scalar growth as a fitness
+    signal in addition to edge coverage. Useful for finding inputs that
+    drive computed sizes/lengths to corner cases.
+  - `AFL_LLVM_BUG_BUDGET=1` — at every call site of the form `ptr += func()`
+    (or `ptr = gep(ptr, func())`), enforce that during the call all writes
+    via the pointer arg lie in `[ptr, ptr + return_value)`. Catches functions
+    that write beyond what they claim to consume. This mode needs to see the
+    callee body in the same LLVM module to instrument its stores; use LTO for
+    cross-translation-unit APIs or expect those calls to be missed.
+
+    **Interaction with `AFL_LLVM_BUG_SIZEFILL`:** when both are enabled,
+    BUDGET additionally matches the out-param shape `void fill(buf,
+    size_t *out_n); fill(p, &n); p += n;` (iconv-style streaming-parser
+    APIs). The size value used for the budget check is the loaded
+    `*out_n` rather than a return value. The validation hand-off is via
+    the same `findOutSizeParam` precondition machinery SIZEFILL uses on
+    its own call sites — so the FP surface is paired with SIZEFILL's
+    existing one. Enabling BUDGET alone leaves the original
+    `ptr = gep(ptr, return_value)` shape as the only matched pattern.
+  - `AFL_LLVM_BUG_SIZEFILL=1` — at every call site to a function that has a
+    "NULL-means-size-only" sentinel parameter, verify the returned size and
+    actual writes both fit the caller's known buffer. Like `BUDGET`, the
+    store-tracking part is intra-module unless the target is built with LTO.
+
+    **Interaction with `AFL_LLVM_BUG_ALLOCSIZE`:** SIZEFILL alone derives
+    the per-call write-cap from the caller-buffer signature size plus a
+    64 KiB unrelated-store slack window (so an adjacent unrelated store
+    inside the callee won't trip a spurious abort). When ALLOCSIZE is
+    *also* enabled at compile time AND the buffer was registered by the
+    ALLOCSIZE runtime (heap/calloc/realloc/posix_memalign/mmap/custom-
+    allocator), the cap is tightened to the buffer's exact remaining
+    extent. Users hitting an FP from SIZEFILL alone — typically a
+    parser writing to an adjacent allocation within the 64 KiB slack —
+    can usually silence it by also building with
+    `AFL_LLVM_BUG_ALLOCSIZE=1`. Recommended canonical combination for
+    SIZEFILL precision:
+    `AFL_LLVM_BUG_SIZEFILL=1 AFL_LLVM_BUG_ALLOCSIZE=1`.
+  - `AFL_LLVM_BUG_ALLOCSIZE` — enable the AllocSizeOracle pass: every call to
+    `malloc`, `calloc`, `realloc`, `posix_memalign`, and `free` is rewritten
+    to a tracked variant that records `(base, size, alloc_site_id)` in a
+    runtime shadow table. Every store whose pointer base traces back to a
+    tracked allocation emits one runtime hook with three feedback channels:
+      1. **Headroom** (max-rule) — `__afl_bug_map[hash(site)]` holds the
+         highest "closeness to end" seen across the run, so the fuzzer
+         rewards inputs that approach but don't yet exceed the buffer.
+      2. **Proximity bucket** — a synthetic edge `hash(site, log2(remaining))`
+         joining the bug-map; turns "wrote into the last 8/16/32/… bytes
+         of buffer X" into a discoverable coverage event.
+      3. **Soft-OOB tripwire** — `abort()`s with a diagnostic when a store
+         hits or exceeds the recorded end, before ASan's
+         shadow check would (useful for custom allocators ASan doesn't
+         poison).
+    Cost is one shadow lookup + one subtract + 2–3 max-rule writes per
+    qualifying store. Combine with `AFL_LLVM_BUG_BUDGET=1` and
+    `AFL_LLVM_BUG_SIZEFILL=1` to layer the aborting oracles.
+
+    **Interaction with `AFL_LLVM_BUG_SIZEFILL`:** when both modes are
+    enabled, SIZEFILL uses the ALLOCSIZE shadow to derive an exact
+    per-call write-cap (the buffer's remaining extent), eliminating
+    SIZEFILL's 64 KiB unrelated-store slack window. This both tightens
+    SIZEFILL's tripwire (catches OOB at the buffer end precisely) and
+    suppresses FPs from unrelated nearby allocations. See the
+    `AFL_LLVM_BUG_SIZEFILL` entry above for details. The shadow itself
+    spans up to 4 × 16 GiB windows pinned to live allocation bases —
+    under glibc ASLR you typically need 1 (heap-only) or 2 (heap +
+    mmap arena). When the cap is reached the runtime prints a one-shot
+    `[afl-bug] ALLOCSIZE: shadow window cap reached` warning and
+    subsequent allocations outside existing windows are silently
+    untracked; pin the target's allocator with `MALLOC_ARENA_MAX=1`
+    (glibc) to mitigate.
+
+    Coexistence with ASAN: when the target also links the AddressSanitizer
+    runtime, `ALLOCSIZE` and `ALLOCSIZE_DERIVE` are disabled at startup by
+    the bug-pass runtime — ASAN already enforces byte-granular OOB and
+    reserves part of the address space for its shadow, so running both at
+    once produces conflicting verdicts. The runtime emits a one-shot
+    stderr note `[afl-bug] ASAN detected; ALLOCSIZE/DERIVE modes disabled
+    to avoid double-instrumentation` and continues with the remaining
+    modes (SCALAR/BUDGET/SIZEFILL/SLACK) enabled. For ALLOCSIZE runs,
+    build the target without `AFL_USE_ASAN`.
+  - `AFL_LLVM_BUG_ALLOCSIZE_STACK` — controls stack-alloca tracking.
+    Default on when `AFL_LLVM_BUG_ALLOCSIZE=1` is set; opt out with
+    `AFL_LLVM_BUG_ALLOCSIZE_STACK=0` for targets where the overhead is
+    problematic (deep recursion, hot helpers with many large stack
+    locals). When enabled, the pass walks each instrumented function's
+    entry-block allocas; allocas whose static size is a multiple of
+    the 64-byte shadow granule AND ≥ 64 bytes are registered via
+    `__afl_alloc_register` after the alloca (or after `llvm.lifetime.start`
+    when present) and unregistered before every `ReturnInst`/`ResumeInst`
+    (or before `llvm.lifetime.end`). The pass forces alignment 64 on
+    registered allocas so the painted shadow granules cover exactly the
+    alloca — adjacent stack slots cannot trigger granule-aliasing FPs.
+    Per-function cap: 16 instrumented allocas (more emit a one-shot
+    `[afl-bug] ALLOCSIZE: stack cap reached` note and are skipped). Stack
+    buffers < 64 bytes are not covered — pair with `-fsanitize=address`
+    when fine-grained stack-OOB matters.
+  - `AFL_LLVM_BUG_ALLOCSIZE_FUNCS` — comma-separated list of custom
+    allocator function names that the pass should treat as additional
+    allocator entry points (e.g., `WebPSafeMalloc,WebPSafeCalloc`). The
+    pass inserts a post-call `__afl_alloc_register` and uses the widest
+    integer argument of the callee as the size. Pair with
+    `AFL_LLVM_BUG_ALLOCSIZE=1`. Note: targets must export the named
+    function (non-static / extern linkage) so LLVM's IPO does not strip
+    the size argument; static helpers can be specialized away by `-O3`.
+  - `AFL_LLVM_BUG_ALLOCSIZE_FREE_FUNCS` — comma-separated list of the
+    matching custom-free function names for the allocators listed in
+    `AFL_LLVM_BUG_ALLOCSIZE_FUNCS`. Each free is rewritten to
+    `__afl_track_free` so the runtime can drop the registration. Use a
+    parallel ordering (same index = matching pair) when both are sets.
+  - `AFL_LLVM_BUG_SLACK=1` — per-icmp instrumentation: at every signed/
+    unsigned integer comparison the pass records `|op0 - op1|` mapped MIN-
+    style (inverse-bucket) onto the shared bug map. Smaller slack = tighter
+    match = more interesting. Helps the fuzzer drive multiple validation
+    predicates toward their tight edges simultaneously (the libwebp
+    CVE-2023-4863 pattern). Cheap; can be combined with any other mode.
+  - `AFL_LLVM_BUG_SCALAR_SLICE=1` — restrict SCALAR's arithmetic-site
+    instrumentation to BinaryOperators that flow into a memory-size sink
+    (allocator size args, GEP indices, memcpy/memset lengths). Implies
+    `AFL_LLVM_BUG_SCALAR=1`. Off by default; turning it on silences pure-
+    compute accumulators (hash builders, non-memory counters) but cuts
+    SCALAR map pollution on very large targets at the cost of pure-
+    compute coverage signal.
+  - `AFL_LLVM_BUG_ALLOCSIZE_DERIVE` — enables `ALLOCSIZE` and, at every
+    `__afl_alloc_unregister` (free of a tracked allocation), logs
+    `(record.size, record.max_observed_off)` into a CmpLog routine slot
+    keyed by `(alloc-site ID, log2(record.size))`. It needs a CmpLog
+    binary (or `AFL_CMPLOG_DEBUG=1`) for the cmp_map to be allocated.
+    Pair with `afl-fuzz -l 2z` to confirm the feature is in use; the
+    fuzzer's existing CmpLog RTN dictionary mining harvests the entries
+    automatically. This mode is also included by `AFL_LLVM_BUG=1`.
+
+    The log-size component of the slot key spreads entries from a hot
+    allocator (called from inner loops with varied sizes) across
+    multiple CmpLog slots — without it, the slot's `CMP_MAP_RTN_H` hit
+    cap saturates fast and every later size from that site is dropped.
+    A site that allocates one fixed size still maps to one slot.
+
+The runtime keeps its own private max-value bug-map (`MAP_SIZE_BUG`,
+16384 u32 slots), separate from the IJON map, and reports oracle violations
+to stderr followed by `abort()`.
+
+Recommended usage:
+
+  - Use normal coverage binaries as the main campaign baseline.
+  - Add `SCALAR` and/or `SLACK` when you want extra guidance toward arithmetic
+    bounds, tight comparisons, and computed-size corner cases.
+  - Use `BUDGET`, `SIZEFILL`, and `ALLOCSIZE` as oracle builds for bug-finding
+    or confirmation runs; they intentionally abort on detected contract
+    violations.
+  - Use `AFL_LLVM_BUG_ALLOCSIZE_DERIVE=1` (or `AFL_LLVM_BUG=1` when you want
+    every bug-pass mode) with `afl-fuzz -l 2Z` as a CmpLog assistant build for
+    mining allocation-size values.
+  - Prefer LTO for `BUDGET` and `SIZEFILL` campaigns when the checked APIs are
+    split across translation units.
 
 #### CMPLOG
 
@@ -170,19 +336,24 @@ produce a CmpLog binary.
 
 For afl-gcc-fast, set `AFL_GCC_CMPLOG=1` instead.
 
+Value-profile compare-observer builds run a small mem2reg promotion before
+compare hook insertion so `-O0` builds expose canonical loop counters to
+loop-control filtering. Above `-O0` the promotion skips `optnone` functions; at
+`-O0` it does not, because Clang marks every function `optnone` there and
+skipping them would disable the promotion entirely. Set
+`AFL_LLVM_NO_COMPARE_MEM2REG=1` to disable this promotion.
+
 For more information, see
 [instrumentation/README.cmplog.md](../instrumentation/README.cmplog.md).
 
 #### CTX
 
 Setting `AFL_LLVM_CTX` or `AFL_LLVM_INSTRUMENT=CTX` activates context sensitive
-branch coverage - meaning that each edge is additionally combined with its
-caller. It is highly recommended to increase the `MAP_SIZE_POW2` definition in
-config.h to at least 18 and maybe up to 20 for this as otherwise too many map
-collisions occur.
+branch coverage in LTO mode (afl-clang-lto) - meaning that each edge is
+additionally combined with its caller.
 
 For more information, see
-[instrumentation/README.llvm.md#6) AFL++ Context Sensitive Branch Coverage](../instrumentation/README.llvm.md#6-afl-context-sensitive-branch-coverage).
+[instrumentation/README.lto.md](../instrumentation/README.lto.md).
 
 #### INSTRUMENT LIST (selectively instrument files and functions)
 
@@ -247,9 +418,13 @@ use (which only ever the author of this LTO implementation will use). These are
 used if several separated instrumentations are performed which are then later
 combined.
 
-  - `AFL_LLVM_LTO_CALLER` activates collision free CALLER instrumentation
-  - `AFL_LLVM_LTO_CALLER` sets the maximum number of single block functions
-    to dig deeper into a real function. Default 0.
+  - `AFL_LLVM_LTO_CALLER` activates collision free CALLER instrumentation.
+    `AFL_LLVM_LTO_CTX` is a synonym; `AFL_LLVM_CALLER` / `AFL_LLVM_CTX` also
+    enable it.
+  - `AFL_LLVM_LTO_CALLER_DEPTH` sets the maximum number of single-caller
+    functions to walk up the call chain through to find a useful context
+    split point. Default 0. Synonyms (checked in this precedence order):
+    `AFL_LLVM_LTO_CTX_DEPTH`, `AFL_LLVM_CALLER_DEPTH`, `AFL_LLVM_CTX_DEPTH`.
   - `AFL_LLVM_DOCUMENT_IDS=file` will document to a file which edge ID was given
     to which function. This helps to identify functions with variable bytes or
     which functions were touched by an input.
@@ -260,23 +435,43 @@ combined.
   - `AFL_LLVM_MAP_ADDR` sets the fixed map address to a different address than
     the default `0x10000`. A value of 0 or empty sets the map address to be
     dynamic (the original AFL way, which is slower).
-  - `AFL_LLVM_MAP_DYNAMIC` sets the shared memory address to be dynamic.
   - `AFL_LLVM_LTO_SKIPINIT` skips adding initialization code. Some global vars
     (e.g. the highest location ID) are not injected. Needed to instrument with
     [WAFL](https://github.com/fgsect/WAFL.git).
   For more information, see
   [instrumentation/README.lto.md](../instrumentation/README.lto.md).
 
-#### NGRAM
+#### PATH (LTO and PCGUARD)
 
-Setting `AFL_LLVM_INSTRUMENT=NGRAM-{value}` or `AFL_LLVM_NGRAM_SIZE` activates
-ngram prev_loc coverage. Good values are 2, 4, or 8 (any value between 2 and 16
-is valid). It is highly recommended to increase the `MAP_SIZE_POW2` definition
-in config.h to at least 18 and maybe up to 20 for this as otherwise too many map
-collisions occur.
+Setting `AFL_LLVM_PATH` (or `AFL_LLVM_LTO_PATH` / `AFL_LLVM_PATH_MODE`)
+under `afl-clang-lto` **or** `afl-clang-fast` (PCGUARD) enables
+Ball-Larus per-function path coverage in addition to the default edge
+coverage. Loops are treated as a single iteration (back-edges stripped).
+Functions with more than 100,000 acyclic paths that cannot be reduced
+by collapsing multi-way branches are skipped with a warning. The LTO
+build additionally composes with `AFL_LLVM_LTO_CALLER` to track
+`(call_site, path)` tuples.
 
-For more information, see
-[instrumentation/README.llvm.md#7) AFL++ N-Gram Branch Coverage](../instrumentation/README.llvm.md#7-afl-n-gram-branch-coverage).
+Levels:
+- `=1` — **relaxed**: every "guard-only" basic block (only loads/casts/
+  GEPs/cmps/phis/freezes/allocas/plain arithmetic + a terminator — no
+  calls/stores/atomics) collapses via `max()` instead of `sum()`.
+  Short-circuit `&&`/`||` and switches on a bare loaded value collapse to
+  one decision. Smallest map. An *empty* value (`AFL_LLVM_PATH=`) is
+  rejected — set explicitly to `1`/`2`/`3`/`0`.
+- `=2` — **restricted**: like `=1` but only 2-successor guard-only BBs
+  collapse; switches/indirectbr keep their full multiplying effect.
+- `=3` — **strict** Ball-Larus: every IR-level acyclic path is a unique
+  slot.
+
+`AFL_LLVM_PATH_MAX_PATHS=N` overrides the default 100,000-path cap above
+which a function is skipped (`N >= 2`). Useful for tightening or relaxing
+the cutoff on a per-target basis.
+
+See [instrumentation/README.lto.md](../instrumentation/README.lto.md)
+and
+[instrumentation/README.llvm.md](../instrumentation/README.llvm.md)
+for details.
 
 #### NOT_ZERO
 
@@ -290,27 +485,101 @@ For more information, see
     If the target performs only a few loops, then this will give a small
     performance boost.
 
+#### Dense instrumentation (LLVM PCGUARD and LTO mode)
+
+By default the coverage instrumentation prunes basic blocks whose execution is
+already implied by an instrumented successor or predecessor (full dominators
+and full post-dominators). Setting `AFL_LLVM_DENSE=1` during compilation
+disables that pruning and instruments every basic block. In LTO mode the same
+thing can also be spelled `-mllvm -lto-coverage-prune-blocks=0`.
+
+This gives a finer partition at the cost of a much larger map - on libraw the
+map grows from 25462 to 38672 entries (+51.9%) for about 5% less throughput.
+Most of the added entries carry no independent signal, so this is a research
+knob: only useful if your target is far below the map size limit and you have
+measured that the extra granularity helps.
+
+#### Clamp instrumentation (LLVM PCGUARD and LTO mode)
+
+At -O2 and above the optimizer turns `MIN()`, `MAX()`, `LIM()` and plain
+`if (x > n) x = n;` into `llvm.smin`/`smax`/`umin`/`umax`/`abs` intrinsics,
+which are branchless and therefore invisible to the edge map. Setting
+`AFL_LLVM_MINMAX=1` during compilation scores each of them like a compare.
+
+On libraw this adds 10.3% map entries, but 45% of the sites are in demosaic and
+postprocessing code that runs per pixel, and there it costs 21% throughput. The
+sites that pay off are the length, count and index guards in parsers, which are
+cold. So this is worth turning on for a parser, and worth measuring first for
+anything doing bulk pixel or signal math.
+
+#### Fused condition instrumentation (LLVM PCGUARD and LTO mode)
+
+`if (a && b)` with a cheap second operand is speculated by SimplifyCFG into a
+single `and i1` feeding one branch, so the map only records whether the compound
+condition held, never which half failed. Setting `AFL_LLVM_FUSED=1` during
+compilation scores each half separately, which gives the fuzzer a gradient for
+solving multi-clause conditions.
+
+On libraw this adds 7.5% map entries for no measurable throughput cost, and its
+sites are mostly in parser code, so it is the cheapest of these three knobs.
+
+#### Vector decision instrumentation (LLVM PCGUARD and LTO mode)
+
+Scalar `select`s are instrumented by default and scalar min/max with
+`AFL_LLVM_MINMAX=1`, their vector counterparts are not instrumented at all.
+Setting `AFL_LLVM_VECTORS=1` during compilation instruments them one guard pair
+per lane, so a `select` on a `<8 x i1>` condition costs 16 map entries instead
+of 0. Vector min/max additionally needs `AFL_LLVM_MINMAX=1`. A bare vector
+compare is never instrumented in either mode - only the `select` or min/max
+intrinsic it feeds is.
+
+Vector decisions come from auto-vectorized loops, where all lanes almost always
+agree and the value being clamped is a pixel rather than a length or an index.
+In PCGUARD mode the pass runs at `OptimizerEarly`, before the loop and SLP
+vectorizers, so auto-vectorized loops hold no vector IR yet and this knob only
+reaches vectors that are explicit in the source (vector extensions, intrinsics,
+`__builtin_elementwise_*`). On libraw there are none at all and the map size is
+unchanged. LTO mode instruments fully optimized IR after the vectorizer and does
+see them. Measure before you keep it on.
+
 #### Thread safe instrumentation counters (in all modes)
 
 Setting `AFL_LLVM_THREADSAFE_INST` will inject code that implements thread safe
 counters. The overhead is a little bit higher compared to the older non-thread
 safe case. Note that this disables neverzero (see NOT_ZERO).
 
-## 3) Settings for GCC / GCC_PLUGIN modes
+#### Deny exec* calls
 
-There are a few specific features that are only available in GCC and GCC_PLUGIN
-mode.
+Setting `AFL_LLVM_DENY_EXEC=1` during compilation will cause the instrumented
+binary to abort when any `exec*` family function is called. This is useful to
+prevent coverage map corruption that can occur when a target calls `exec*`
+functions, as the exec'd process will inherit the instrumentation but may not
+be the intended fuzzing target. Only enable this if your target should never
+call exec functions during normal operation.
 
-  - GCC mode only: Setting `AFL_KEEP_ASSEMBLY` prevents afl-as from deleting
-    instrumented assembly files. Useful for troubleshooting problems or
-    understanding how the tool works.
+#### Abort on entry of non-instrumented functions
 
-    To get them in a predictable place, try something like:
+When you build with an `AFL_LLVM_ALLOWLIST` or `AFL_LLVM_DENYLIST` (see INSTRUMENT
+LIST above), additionally setting `AFL_LLVM_ABORTLIST=1` inserts an `abort()`
+call at the entry of every function that the allow/deny list excluded from
+instrumentation. Reaching such a function then crashes the target. This is
+useful to catch test cases that escape the intended fuzzing scope. It only
+affects functions skipped because of the allow/deny list. Functions that run
+automatically rather than through the fuzzing entry point are left untouched,
+so they cannot crash the target before, around or after the forkserver:
+compiler/sanitizer internals, `available_externally` definitions, constructors
+and destructors (C++ ctors/dtors and `__attribute__((constructor))`/
+`((destructor))` functions), ifunc resolvers (run by the dynamic loader during
+relocation), exit/teardown callbacks registered with `atexit`, `at_quick_exit`,
+`__cxa_atexit`, `__cxa_thread_atexit[_impl]` or `pthread_key_create`, the
+`LLVMFuzzerInitialize` one-time harness setup function, and anything those reach
+through direct calls. It has no effect (and warns) if no allow/deny list is in
+use.
 
-    ```
-    mkdir assembly_here
-    TMPDIR=$PWD/assembly_here AFL_KEEP_ASSEMBLY=1 make clean all
-    ```
+
+## 3) Settings for GCC_PLUGIN mode
+
+There are a few specific features that are only available in GCC_PLUGIN mode.
 
   - GCC_PLUGIN mode only: Setting `AFL_GCC_INSTRUMENT_FILE` or
     `AFL_GCC_ALLOWLIST` with a filename will only instrument those files that
@@ -322,10 +591,10 @@ mode.
     [instrumentation/README.instrument_list.md](../instrumentation/README.instrument_list.md)
     for more information.
 
-    Setting `AFL_GCC_DISABLE_VERSION_CHECK=1` will disable the GCC plugin 
+    Setting `AFL_GCC_DISABLE_VERSION_CHECK=1` will disable the GCC plugin
     version check if the target GCC plugin differs from the system-installed
-    version, resolving issues caused by version mismatches between GCC and 
-    the plugin. 
+    version, resolving issues caused by version mismatches between GCC and
+    the plugin.
 
     Setting `AFL_GCC_OUT_OF_LINE=1` will instruct afl-gcc-fast to instrument the
     code with calls to an injected subroutine instead of the much more efficient
@@ -344,8 +613,8 @@ The following environment variables are for a compiled AFL++ target.
 
   - Setting `AFL_OLD_FORKSERVER` will use the old AFL vanilla forkserver.
     This makes only sense when you
-      a) compile in a classic colliding coverage mode (e.g.
-         AFL_LLVM_INSTRUMENT=CLASSIC) or if the map size of the target is
+      a) compile in a classic colliding coverage mode (e.g. with the gcc
+         plugin, afl-gcc-fast) or if the map size of the target is
          below MAP_SIZE (65536 by default), AND
       b) you want to use this compiled AFL++ target with a different tool
          that expects vanilla AFL behaviour, e.g. symcc, symqemu, nautilus, etc.
@@ -367,10 +636,38 @@ checks or alter some of the more exotic semantics of the tool:
     processing the first queue entry; and `AFL_BENCH_UNTIL_CRASH` causes it to
     exit soon after the first crash is found.
 
+  - Setting `AFL_ALLOW_CORES` will allow writing core files on crashes.
+    Not recommended unless you have crashes that do not reproduce stand-alone.
+
   - `AFL_CMPLOG_ONLY_NEW` will only perform the expensive cmplog feature for
     newly found test cases and not for test cases that are loaded on startup
     (`-i in`). This is an important feature to set when resuming a fuzzing
     session.
+
+  - Value-profile guidance is controlled by command-line options:
+      - `-r 0`: enable runtime value profiling from startup.
+      - `-r N`: enable runtime value profiling after `N` seconds without new
+        edge coverage, then keep it enabled for the rest of the run.
+      - `-r -1`: enable runtime value profiling once the queue is starved and
+        no new edge coverage was found for a while, then keep it enabled for
+        the rest of the run.
+    Value profiling may help when compare operands are transformed in ways
+    that make direct solve attempts less effective.
+    Notes:
+      - Value profiling requires binaries compiled with
+        `AFL_LLVM_VALUE_PROFILE=1`.
+      - Value profiling and CmpLog are alternative compare-observer
+        instrumentation modes for a single compile. Build a separate CmpLog
+        binary and pass it with `-c` if you want to use CmpLog in the same
+        fuzzing session.
+      - Runtime value profiling requires an LLVM-instrumented main target and
+        is not supported with `-n`, QEMU, Frida, Unicorn, CoreSight, or Nyx
+        execution modes.
+      - Routine-compare VP features record separate matched-prefix and
+        whole-buffer hamming-distance signals. Substring routines (`strstr`,
+        `strcasestr`, `memmem` and similar) record the minimum of both metrics
+        over every candidate offset in the haystack, so a successful match
+        records distance 0.
 
   - `AFL_IGNORE_SEED_PROBLEMS` will skip over crashes and timeouts in the seeds
     instead of exiting.
@@ -380,6 +677,35 @@ checks or alter some of the more exotic semantics of the tool:
     return code (i.e. `exit(-1)` got called), will be treated as if a crash had
     occurred. This may be beneficial if you look for higher-level faulty
     conditions in which your target still exits gracefully.
+
+  - Setting `AFL_CRASH_TRACES` makes afl-fuzz capture the crashing execution's
+    stdout/stderr (e.g. the AddressSanitizer report and stack trace) live and,
+    for each *saved unique* crash, write it to a text file named like the crash
+    input with `.txt` appended (e.g. `crashes/id:000000,sig:06,....txt`).
+    Because the trace comes from the run that actually crashed (not a re-run),
+    it is captured even for crashes that do not reproduce. The capture buffer is
+    cleared before every execution, so the `.txt` holds only the crashing run's
+    own output (no output accumulated from previous runs) and is written in
+    full (no size limit). Sanitizer reports are symbolized (`symbolize=1`) when
+    you have not exported your own `*_OPTIONS` and a symbolizer (e.g.
+    `llvm-symbolizer`) is on `PATH`. The feature is disabled by default (no
+    effect when unset); when enabled it adds one inexpensive truncate per
+    execution. On Linux it also forces core dumps on (raising `RLIMIT_CORE`)
+    and, for each saved signal crash, moves the kernel-written core file beside
+    the crash input as `<crash>.core` (e.g. `crashes/id:000000,sig:06,....core`).
+    This needs a file-based `core_pattern`: at startup afl-fuzz inspects
+    `/proc/sys/kernel/core_pattern` and, if it pipes to a handler or is
+    otherwise unusable, tries to set it to `core` (requires root); if that
+    fails afl-fuzz aborts, unless `AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES` is set,
+    in which case it warns and continues without `.core` files. The global
+    `core_pattern` is not restored on exit, and for sanitizer targets the
+    sanitizer's default `disable_coredump=1` is overridden. Notes: a bare
+    `SIGSEGV` with the sanitizer's default
+    `handle_segv=0` produces no report, so the `.txt` then just records the
+    signal; Nyx mode is excluded (it writes its own `.log`); and in
+    split-sanitizer (SAND) mode a crash detected only by the separate sanitizer
+    binary may not have a report in the captured output (the report comes from
+    that other binary).
 
   - Setting `AFL_CUSTOM_MUTATOR_LIBRARY` to a shared library with
     afl_custom_fuzz() creates additional mutations through this library. If
@@ -395,9 +721,6 @@ checks or alter some of the more exotic semantics of the tool:
     function after the target has been restarted. (This is needed for e.g. TCP
     services.)
 
-  - Setting `AFL_CYCLE_SCHEDULES` will switch to a different schedule every time
-    a cycle is finished.
-
   - Setting `AFL_DEBUG_CHILD` will not suppress the child output. This lets you
     see all output of the child, making setup issues obvious. For example, in an
     unicornafl harness, you might see python stacktraces. You may also see other
@@ -411,6 +734,19 @@ checks or alter some of the more exotic semantics of the tool:
   - Setting `AFL_DISABLE_REDUNDANT` disables any queue items that are redundant.
     This can be useful with huge queues.
 
+  - `AFL_STARVED_MINIMIZE_QUEUE` minimizes the queue once afl-fuzz has been in
+    starve mode - which it enters after 5 million executions without a new edge
+    - for another 5 million executions without a new edge. Every enabled queue
+    entry is executed again to score it freshly, then all entries that are not
+    needed to reach the coverage of the whole queue are disabled, the same
+    selection `afl-cmin` performs. Entries that were never fuzzed are always
+    kept. The coverage that is lost this way is reset in the virgin bitmap, so
+    it can be found again - by smaller and faster inputs, hopefully. With `-B`
+    the bitmap is left untouched, because it is an explicit baseline of coverage
+    that shall not be rediscovered. How often the queue was really minimized -
+    which requires that entries were actually disabled - is reported as
+    `starve_minimized` in the `fuzzer_stats` file.
+
   - Setting `AFL_KEEP_TIMEOUTS` will keep longer running inputs if they reach
     new coverage
 
@@ -420,7 +756,7 @@ checks or alter some of the more exotic semantics of the tool:
   - `AFL_EXIT_ON_SEED_ISSUES` will restore the vanilla afl-fuzz behavior which
     does not allow crashes or timeout seeds in the initial -i corpus.
 
-  - `AFL_CRASHING_SEEDS_AS_NEW_CRASH` will treat crashing seeds as new crash. these 
+  - `AFL_CRASHING_SEEDS_AS_NEW_CRASH` will treat crashing seeds as new crash. these
     crashes will be written to crashes folder as op:dry_run, and orig:<seed_file_name>.
 
   - `AFL_EXIT_ON_TIME` causes afl-fuzz to terminate if no new paths were found
@@ -510,8 +846,9 @@ checks or alter some of the more exotic semantics of the tool:
     used directly.
 
   - Setting `AFL_NO_AFFINITY` disables attempts to bind to a specific CPU core
-    on Linux systems. This slows things down, but lets you run more instances of
-    afl-fuzz than would be prudent (if you really want to).
+    on Linux systems (and disables the performance-core scheduling preference on
+    macOS). This slows things down, but lets you run more instances of afl-fuzz
+    than would be prudent (if you really want to).
 
   - `AFL_NO_ARITH` causes AFL++ to skip most of the deterministic arithmetics.
     This can be useful to speed up the fuzzing of text-based file formats.
@@ -541,6 +878,10 @@ checks or alter some of the more exotic semantics of the tool:
     the snapshot lkm is loaded.
 
   - `AFL_NO_FASTRESUME` will not try to read or write a fast resume file.
+
+  - `AFL_FORCE_FASTRESUME` on the other hand will load the fast resume file
+    (if it exists) even if the target binary was changed. Note that the
+    coverage map size must be exactly the same for this to work.
 
   - Setting `AFL_NO_UI` inhibits the UI altogether and just periodically prints
     some basic stats. This behavior is also automatically triggered when the
@@ -573,13 +914,22 @@ checks or alter some of the more exotic semantics of the tool:
     without disrupting the afl-fuzz process itself. This is useful, among other
     things, for bootstrapping libdislocator.so.
 
-  - In QEMU mode (-Q), setting `AFL_QEMU_CUSTOM_BIN` will cause afl-fuzz to skip
-    prepending `afl-qemu-trace` to your command line. Use this if you wish to
-    use a custom afl-qemu-trace or if you need to modify the afl-qemu-trace
-    arguments.
-
   - `AFL_SHA1_FILENAMES` causes AFL++ to generate files named by the SHA1 hash
     of their contents, rather than use the standard `id:000000,...` names.
+    Warning: this disables any syncing to any AFL instances!
+
+  - `AFL_SHM_KEEP_NAME` keeps the POSIX shared memory objects (the coverage,
+    CmpLog, value profile, state and shared memory test case maps) reachable
+    under their name for the whole session. Only relevant where those maps are
+    POSIX shared memory - macOS and any build with `USEMMAP`, i.e. not the
+    default Linux build, which uses SysV segments. Normally each map is
+    `shm_unlink()`ed the moment it is created and only handed to the target as
+    an inherited file descriptor, so a SIGKILLed fuzzer cannot leave anything
+    behind in `/dev/shm`. Set this if the target was built by an afl-cc that
+    predates the descriptor handover and can therefore only `shm_open()` the
+    name - the trade-off is that the maps leak if the fuzzer is SIGKILLed.
+    Rebuilding the target is the better fix. It also applies to afl-showmap,
+    afl-tmin, afl-analyze, afl-cmin and afl-merge.
 
   - `AFL_SHUFFLE_QUEUE` randomly reorders the input queue on startup. Requested
     by some users for unorthodox parallelized fuzzing setups, but not advisable
@@ -617,7 +967,7 @@ checks or alter some of the more exotic semantics of the tool:
     note that time is halved for -M main nodes.
 
   - `AFL_NO_SYNC` disables any syncing whatsoever and takes priority on all
-    other syncing parameters.
+    other syncing parameters, including a sync forced with `SIGUSR2`.
 
   - Setting `AFL_TARGET_ENV` causes AFL++ to set extra environment variables for
     the target binary. Example: `AFL_TARGET_ENV="VAR1=1 VAR2='a b c'" afl-fuzz
@@ -630,9 +980,14 @@ checks or alter some of the more exotic semantics of the tool:
     the format is different from `AFL_TARGET_ENV`) to apply the environment
     variables to the target and not QEMU.
 
+  - `AFL_TESTCACHE_ENTRIES` is obsolete and ignored. The test case cache is
+    bounded by `AFL_TESTCACHE_SIZE` alone.
+
   - `AFL_TESTCACHE_SIZE` allows you to override the size of `#define
     TESTCASE_CACHE` in config.h. Recommended values are 50-250MB - or more if
-    your fuzzing finds a huge amount of paths for large inputs.
+    your fuzzing finds a huge amount of paths for large inputs. The cache
+    holds the queue entries with the highest selection probability per byte,
+    so a larger value keeps paying off.
 
   - `AFL_TMPDIR` is used to write the `.cur_input` file to if it exists, and in
     the normal output directory otherwise. You would use this to point to a
@@ -641,6 +996,11 @@ checks or alter some of the more exotic semantics of the tool:
 
   - Setting `AFL_TRY_AFFINITY` tries to attempt binding to a specific CPU core
     on Linux systems, but will not terminate if that fails.
+
+  - By default on Linux, persistent mode uses shared memory and futexes for
+    child synchronization. This reduces the overhead of communication between
+    afl-fuzz and the persistent target child. Setting `AFL_OLD_CHILD_SYNC`
+    restores the old file descriptor based persistent synchronization behavior.
 
   - The following environment variables are only needed if you implemented
     your own forkserver or persistent mode, or if __AFL_LOOP or __AFL_INIT
@@ -664,9 +1024,68 @@ checks or alter some of the more exotic semantics of the tool:
     Note that will not be exact and with slow targets it can take seconds
     until there is a slice for the time test.
 
+  - When using `AFL_PRELOAD` with a preload that disable `fork()` calls in
+    the target, the forkserver becomes unable to fork.
+    To overcome this issue, the `AFL_PRELOAD_DISCRIMINATE_FORKSERVER_PARENT`
+    permits to be able to check in the preloaded library if the environment
+    variable `AFL_FORKSERVER_PARENT` is set, to be able to use vanilla
+    `fork()` in the forkserver, and the placeholder in the target.
+    Here is a POC :
+    ```C
+    // AFL_PRELOAD_DISCRIMINATE_FORKSERVER_PARENT=1 afl-fuzz ...
+    pid_t fork(void)
+    {
+        if (getenv("AFL_FORKSERVER_PARENT") == NULL)
+            return 0; // We are in the target
+        else
+            return real_fork(); // We are in the forkserver
+    }
+    ```
+
+  - `AFL_FORKSRV_UID` allows you to specify the UID that should be used when
+    running the fork server. When setting this variable, user should ensure
+    afl-fuzz binary has enough privileges to modify the UID (e.g. CAP\_SETUID
+    capability in Linux system).
+
+  - `AFL_FORKSRV_GID` allows you to specify the GID and the supplementary group
+    IDs that should be used when running the fork server. When setting this
+    variable, user should ensure afl-fuzz binary has enough privileges to
+    modify the GIDs (e.g. CAP\_SETGID capability in Linux system).
+
+  - When both `AFL_FORKSRV_UID` and `AFL_FORKSRV_GID` are set, afl-fuzz binary
+    and the fork server no longer share any IDs. Thus, afl-fuzz binary changes
+    the group owner of the created files to ensure that the fork server can
+    still access them. In such case, user should ensure afl-fuzz binary has
+    enough privileges to modify the ownership of entities (e.g. CAP\_CHOWN
+    capability in Linux system).
+
+  - Setting `AFL_FRAMESHIFT_DISABLE` will disable the frameshift analysis stage.
+    Frameshift automatically discovers size/offset fields in structured inputs
+    and keeps them consistent as mutations insert or delete bytes. Disabling it
+    may be useful for targets that do not consume structured binary formats, or
+    when you want to avoid the overhead of the analysis entirely.
+
+  - `AFL_FRAMESHIFT_MAX_OVERHEAD` controls the maximum fraction of total fuzzing
+    time that frameshift analysis is allowed to consume. The value is a float
+    between `0.0` and `1.0` (default `0.10`, i.e. 10%). It is enforced as a token
+    bucket: credit accrues as this fraction of the total run time and each
+    analysis slice spends from it. A new slice is admitted only when enough
+    credit remains for a minimally useful slice, and its deadline is capped to
+    the remaining credit, so a single slice cannot overshoot the configured
+    overhead by a full analysis budget.
+
+  - Normally a `README.txt` is written to the `crashes/` directory when a first
+    crash is found. Setting `AFL_NO_CRASH_README` will prevent this. Useful when
+    counting crashes based on a file count in that directory.
+
 ## 6) Settings for afl-qemu-trace
 
 The QEMU wrapper used to instrument binary-only code supports several settings:
+
+  - Setting `AFL_QEMU_CUSTOM_BIN` will cause afl-fuzz to skip prepending
+    `afl-qemu-trace` to your command line. Use this if you wish to use a
+    custom afl-qemu-trace or if you need to modify the afl-qemu-trace
+    arguments.
 
   - Setting `AFL_COMPCOV_LEVEL` enables the CompareCoverage tracing of all cmp
     and sub in x86 and x86_64 and memory comparison functions (e.g., strcmp,
@@ -691,8 +1110,10 @@ The QEMU wrapper used to instrument binary-only code supports several settings:
     inside any dynamically linked libraries (notably including glibc).
 
   - You can use `AFL_QEMU_INST_RANGES=0xaaaa-0xbbbb,0xcccc-0xdddd` to just
-    instrument specific memory locations, e.g. a specific library.
-    Excluding ranges takes priority over any included ranges or `AFL_INST_LIBS`.
+    instrument specific memory locations, e.g. a specific library. You may
+    also provide the filename of the library. Excluding ranges takes priority
+    over any included ranges or `AFL_INST_LIBS`. See
+    [qemu_mode/README.md#partial-instrumenation](../qemu_mode/README.md#6-partial-instrumentation)).
 
   - You can use `AFL_QEMU_EXCLUDE_RANGES=0xaaaa-0xbbbb,0xcccc-0xdddd` to **NOT**
     instrument specific memory locations, e.g. a specific library.
@@ -728,15 +1149,17 @@ The QEMU wrapper used to instrument binary-only code supports several settings:
   - With `AFL_USE_QASAN`, you can enable QEMU AddressSanitizer for dynamically
     linked binaries.
 
+  - Using AFL_QEMU_IJON=test.conf allows qemu to call the ijon function, 
+    which allows aflpp to additionally gain awareness of 
+    changes in key variables of the target program, 
+    which is an excellent supplement to coverage-only feedback.(see
+    [qemu_mode/README.md](../qemu_mode/README.md) for more details).
+
   - The underlying QEMU binary will recognize any standard "user space
     emulation" variables (e.g., `QEMU_STACK_SIZE`), but there should be no
     reason to touch them.
 
-  - Normally a `README.txt` is written to the `crashes/` directory when a first
-    crash is found. Setting `AFL_NO_CRASH_README` will prevent this. Useful when
-    counting crashes based on a file count in that directory.
-
-## 8) Settings for afl-frida-trace
+## 7) Settings for afl-frida-trace
 
 The FRIDA wrapper used to instrument binary-only code supports many of the same
 options as `afl-qemu-trace`, but also has a number of additional advanced
@@ -826,25 +1249,35 @@ support.
   dump you must set a sufficient timeout (using `-t`) to avoid `afl-fuzz`
   killing the process whilst it is being dumped.
 
-## 9) Settings for afl-cmin
+## 8) Settings for afl-cmin and afl-merge
 
-The corpus minimization script offers very little customization:
+`afl-cmin` (and its `afl-merge` symlink) offers very little customization:
 
-  - `AFL_ALLOW_TMP` permits this and some other scripts to run in /tmp. This is
-    a modest security risk on multi-user systems with rogue users, but should be
-    safe on dedicated fuzzing boxes.
+  - `AFL_MAP_SIZE` (alias `AFL_MAPSIZE`) sets the coverage map size instead of
+    detecting it from the target. The value is validated and rounded up to a
+    multiple of 64, exactly as for the other tools.
 
-  - `AFL_KEEP_TRACES` makes the tool keep traces and other metadata used for
-    minimization and normally deleted at exit. The files can be found in the
-    `<out_dir>/.traces/` directory.
+  - `AFL_SHA1_FILENAMES` names the output files after the SHA-1 of their
+    contents instead of keeping the original file name.
 
-  - Setting `AFL_PATH` offers a way to specify the location of afl-showmap and
-    afl-qemu-trace (the latter only in `-Q` mode).
+  - `AFL_INPUT_PLACEHOLDER` replaces `@@` as the input file placeholder in the
+    target command line.
 
-  - `AFL_PRINT_FILENAMES` prints each filename to stdout, as it gets processed.
-    This can help when embedding `afl-cmin` or `afl-showmap` in other scripts.
+  - Setting `AFL_PATH` offers a way to specify the location of afl-qemu-trace
+    (`-Q` mode) and libnyx.so (`-X` mode).
 
-## 10) Settings for afl-tmin
+  - `AFL_SKIP_BIN_CHECK` skips the instrumentation check of the target binary.
+
+  Temporary files (the test case handed to the target and the per-worker trace
+  logs) are kept in a private directory below the output directory that is
+  removed again when the run ends, also when it fails.
+
+  The script variants (`afl-cmin.py`, `afl-cmin.bash`) collect coverage with
+  `afl-showmap` and additionally honor `AFL_ALLOW_TMP`, `AFL_KEEP_TRACES`
+  (leaving `<out_dir>/.traces/` in place) and `AFL_CMIN_ALLOW_ANY`, plus every
+  `afl-showmap` variable such as `AFL_PRINT_FILENAMES`.
+
+## 9) Settings for afl-tmin
 
 Virtually nothing to play with. Well, in QEMU mode (`-Q`), `AFL_PATH` will be
 searched for afl-qemu-trace. In addition to this, `TMPDIR` may be used if a
@@ -855,12 +1288,12 @@ to match when minimizing crashes. This will make minimization less useful, but
 may prevent the tool from "jumping" from one crashing condition to another in
 very buggy software. You probably want to combine it with the `-e` flag.
 
-## 11) Settings for afl-analyze
+## 10) Settings for afl-analyze
 
 You can set `AFL_ANALYZE_HEX` to get file offsets printed as hexadecimal instead
 of decimal.
 
-## 12) Settings for libdislocator
+## 11) Settings for libdislocator
 
 The library honors these environment variables:
 
@@ -882,12 +1315,12 @@ The library honors these environment variables:
   - `AFL_LD_VERBOSE` causes the library to output some diagnostic messages that
     may be useful for pinpointing the cause of any observed issues.
 
-## 13) Settings for libtokencap
+## 12) Settings for libtokencap
 
 This library accepts `AFL_TOKEN_FILE` to indicate the location to which the
 discovered tokens should be written.
 
-## 14) Third-party variables set by afl-fuzz & other tools
+## 13) Third-party variables set by afl-fuzz & other tools
 
 Several variables are not directly interpreted by afl-fuzz, but are set to
 optimal values if not already present in the environment:

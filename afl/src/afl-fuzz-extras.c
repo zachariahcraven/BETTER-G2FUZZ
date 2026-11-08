@@ -9,13 +9,15 @@
                         Andrea Fioraldi <andreafioraldi@gmail.com>
 
    Copyright 2016, 2017 Google Inc. All rights reserved.
-   Copyright 2019-2024 AFLplusplus Project. All rights reserved.
+   Copyright 2019-2026 AFLplusplus Project. All rights reserved.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at:
 
      https://www.apache.org/licenses/LICENSE-2.0
+
+   SPDX-License-Identifier: Apache-2.0
 
    This is the real deal: the program takes an instrumented binary and
    attempts a variety of basic fuzzing tricks, paying close attention to
@@ -238,6 +240,8 @@ void load_extras_file(afl_state_t *afl, u8 *fname, u32 *min_len, u32 *max_len,
           "Keyword too big in line %u (%s, limit is %s)", cur_line,
           stringify_mem_size(val_bufs[0], sizeof(val_bufs[0]), klen),
           stringify_mem_size(val_bufs[1], sizeof(val_bufs[1]), MAX_DICT_FILE));
+      ck_free(afl->extras[afl->extras_cnt].data);
+      afl->extras[afl->extras_cnt].data = NULL;
       continue;
 
     }
@@ -748,9 +752,15 @@ void save_auto(afl_state_t *afl) {
 
     s32 fd;
 
-    fd = open(fn, O_WRONLY | O_CREAT | O_TRUNC, DEFAULT_PERMISSION);
+    fd = open(fn, O_WRONLY | O_CREAT | O_TRUNC, afl->perm);
 
     if (fd < 0) { PFATAL("Unable to create '%s'", fn); }
+
+    if (afl->chown_needed) {
+
+      if (fchown(fd, -1, afl->fsrv.gid) == -1) { PFATAL("fchown() failed"); }
+
+    }
 
     ck_write(fd, afl->a_extras[i].data, afl->a_extras[i].len, fn);
 
