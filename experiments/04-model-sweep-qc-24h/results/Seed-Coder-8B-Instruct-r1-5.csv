@@ -1,0 +1,76 @@
+study,campaign,arm,target,rep,state,edges,crashes,execs/s,run_s,generators,llm_steps,llm_calls,llm_errors,llm_400,llm_cut
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/jhead-r1,Seed-Coder-8B-Instruct,jhead,1,done,621,179,1280.57,86400,46,29,112,1,1,1
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/jhead-r2,Seed-Coder-8B-Instruct,jhead,2,done,627,266,1393.44,86400,41,24,125,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/jhead-r3,Seed-Coder-8B-Instruct,jhead,3,done,601,107,879.29,86400,50,28,144,1,1,1
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/jhead-r4,Seed-Coder-8B-Instruct,jhead,4,done,668,278,1495.84,86400,41,28,142,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/jhead-r5,Seed-Coder-8B-Instruct,jhead,5,done,670,285,1030.35,86400,47,26,108,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/gdk-pixbuf-pixdata-r1,Seed-Coder-8B-Instruct,gdk-pixbuf-pixdata,1,done,2251,34,489.98,86400,114,21,301,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/gdk-pixbuf-pixdata-r2,Seed-Coder-8B-Instruct,gdk-pixbuf-pixdata,2,done,2196,22,342.62,86400,104,23,301,1,1,1
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/gdk-pixbuf-pixdata-r3,Seed-Coder-8B-Instruct,gdk-pixbuf-pixdata,3,done,5548,23,352.26,86400,130,33,343,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/gdk-pixbuf-pixdata-r4,Seed-Coder-8B-Instruct,gdk-pixbuf-pixdata,4,done,2332,30,420.57,86400,105,21,318,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/gdk-pixbuf-pixdata-r5,Seed-Coder-8B-Instruct,gdk-pixbuf-pixdata,5,done,2237,61,407.90,86400,112,24,244,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/imginfo-r1,Seed-Coder-8B-Instruct,imginfo,1,done,2108,15,1000.79,86400,116,25,296,1,1,1
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/imginfo-r2,Seed-Coder-8B-Instruct,imginfo,2,done,2100,10,704.00,86400,83,17,213,1,1,1
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/imginfo-r3,Seed-Coder-8B-Instruct,imginfo,3,done,2936,48,438.42,86400,100,20,229,2,2,2
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/imginfo-r4,Seed-Coder-8B-Instruct,imginfo,4,done,2125,12,1282.79,86400,101,22,195,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/imginfo-r5,Seed-Coder-8B-Instruct,imginfo,5,done,2103,6,633.91,86400,83,18,171,2,2,1
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/tiffsplit-r1,Seed-Coder-8B-Instruct,tiffsplit,1,done,1885,237,863.30,86400,57,18,202,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/tiffsplit-r2,Seed-Coder-8B-Instruct,tiffsplit,2,done,1845,248,1059.04,86400,37,16,135,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/tiffsplit-r3,Seed-Coder-8B-Instruct,tiffsplit,3,done,1885,278,473.69,86400,46,15,177,1,1,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/tiffsplit-r4,Seed-Coder-8B-Instruct,tiffsplit,4,done,1825,284,814.76,86400,36,13,87,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/tiffsplit-r5,Seed-Coder-8B-Instruct,tiffsplit,5,done,1875,263,856.18,86400,43,16,162,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/mp3gain-r1,Seed-Coder-8B-Instruct,mp3gain,1,done,876,96,55.62,86400,49,21,388,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/mp3gain-r2,Seed-Coder-8B-Instruct,mp3gain,2,done,895,103,197.15,86400,37,28,345,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/mp3gain-r3,Seed-Coder-8B-Instruct,mp3gain,3,done,875,107,83.56,86400,38,27,179,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/mp3gain-r4,Seed-Coder-8B-Instruct,mp3gain,4,done,899,115,183.24,86400,47,31,257,0,0,1
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/mp3gain-r5,Seed-Coder-8B-Instruct,mp3gain,5,done,876,92,77.71,86408,45,23,247,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/mp42aac-r1,Seed-Coder-8B-Instruct,mp42aac,1,done,1243,153,1469.84,86400,31,7,116,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/mp42aac-r2,Seed-Coder-8B-Instruct,mp42aac,2,done,1220,193,1453.64,86400,26,8,161,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/mp42aac-r3,Seed-Coder-8B-Instruct,mp42aac,3,done,1432,275,1068.43,86400,20,13,274,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/mp42aac-r4,Seed-Coder-8B-Instruct,mp42aac,4,done,1442,231,1181.68,86400,20,14,225,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/mp42aac-r5,Seed-Coder-8B-Instruct,mp42aac,5,done,1370,209,1301.80,86400,37,12,254,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/pdftotext-r1,Seed-Coder-8B-Instruct,pdftotext,1,done,6810,229,218.11,86400,57,10,172,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/pdftotext-r2,Seed-Coder-8B-Instruct,pdftotext,2,done,6117,36,236.64,86400,67,9,173,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/pdftotext-r3,Seed-Coder-8B-Instruct,pdftotext,3,done,6070,65,188.20,86400,53,8,144,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/pdftotext-r4,Seed-Coder-8B-Instruct,pdftotext,4,done,5754,72,172.76,86400,27,9,80,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/pdftotext-r5,Seed-Coder-8B-Instruct,pdftotext,5,done,5627,82,202.24,86400,84,7,182,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/bloaty_fuzz_target-r1,Seed-Coder-8B-Instruct,bloaty_fuzz_target,1,done,8555,28,488.71,86400,32,5,86,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/bloaty_fuzz_target-r2,Seed-Coder-8B-Instruct,bloaty_fuzz_target,2,done,8678,48,748.14,86400,46,10,115,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/bloaty_fuzz_target-r3,Seed-Coder-8B-Instruct,bloaty_fuzz_target,3,done,8685,38,678.89,86400,31,12,93,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/bloaty_fuzz_target-r4,Seed-Coder-8B-Instruct,bloaty_fuzz_target,4,done,8485,14,448.87,86400,36,6,77,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/bloaty_fuzz_target-r5,Seed-Coder-8B-Instruct,bloaty_fuzz_target,5,done,8585,37,763.03,86400,42,12,81,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/freetype2_ftfuzzer-r1,Seed-Coder-8B-Instruct,freetype2_ftfuzzer,1,no seeds,,,,,31,,159,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/freetype2_ftfuzzer-r2,Seed-Coder-8B-Instruct,freetype2_ftfuzzer,2,no seeds,,,,,21,,122,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/freetype2_ftfuzzer-r3,Seed-Coder-8B-Instruct,freetype2_ftfuzzer,3,done,9011,0,8099.30,86400,27,4,146,1,1,1
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/freetype2_ftfuzzer-r4,Seed-Coder-8B-Instruct,freetype2_ftfuzzer,4,done,8963,0,8062.28,86400,28,6,175,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/freetype2_ftfuzzer-r5,Seed-Coder-8B-Instruct,freetype2_ftfuzzer,5,done,8732,0,8376.26,86400,26,6,146,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/lcms_cms_transform_fuzzer-r1,Seed-Coder-8B-Instruct,lcms_cms_transform_fuzzer,1,done,1521,0,4544.12,86400,61,35,116,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/lcms_cms_transform_fuzzer-r2,Seed-Coder-8B-Instruct,lcms_cms_transform_fuzzer,2,done,643,0,13079.38,86400,75,47,154,1,1,2
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/lcms_cms_transform_fuzzer-r3,Seed-Coder-8B-Instruct,lcms_cms_transform_fuzzer,3,done,1500,0,2177.65,86400,75,28,128,2,2,2
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/lcms_cms_transform_fuzzer-r4,Seed-Coder-8B-Instruct,lcms_cms_transform_fuzzer,4,done,1296,0,7253.03,86400,62,35,112,1,1,1
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/lcms_cms_transform_fuzzer-r5,Seed-Coder-8B-Instruct,lcms_cms_transform_fuzzer,5,done,1591,0,4654.17,86400,53,31,151,2,2,2
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/libpcap_fuzz_both-r1,Seed-Coder-8B-Instruct,libpcap_fuzz_both,1,done,2254,0,5190.70,86400,38,15,132,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/libpcap_fuzz_both-r2,Seed-Coder-8B-Instruct,libpcap_fuzz_both,2,done,2060,0,2642.79,86400,48,12,118,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/libpcap_fuzz_both-r3,Seed-Coder-8B-Instruct,libpcap_fuzz_both,3,done,1903,0,2439.83,86400,47,16,127,1,1,1
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/libpcap_fuzz_both-r4,Seed-Coder-8B-Instruct,libpcap_fuzz_both,4,done,2051,0,2621.97,86400,42,10,83,0,0,1
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/libpcap_fuzz_both-r5,Seed-Coder-8B-Instruct,libpcap_fuzz_both,5,done,2326,0,5571.01,86400,66,13,139,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/vorbis_decode_fuzzer-r1,Seed-Coder-8B-Instruct,vorbis_decode_fuzzer,1,done (short),1075,0,1273.38,26274,25,12,218,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/vorbis_decode_fuzzer-r2,Seed-Coder-8B-Instruct,vorbis_decode_fuzzer,2,done (short),1074,0,1540.65,6643,21,1,115,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/vorbis_decode_fuzzer-r3,Seed-Coder-8B-Instruct,vorbis_decode_fuzzer,3,done,1072,0,557.52,86400,53,37,240,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/vorbis_decode_fuzzer-r4,Seed-Coder-8B-Instruct,vorbis_decode_fuzzer,4,done (short),1087,0,477.98,64684,40,30,142,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/vorbis_decode_fuzzer-r5,Seed-Coder-8B-Instruct,vorbis_decode_fuzzer,5,done,1067,0,625.85,86400,41,37,216,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/woff2_convert_woff2ttf_fuzzer-r1,Seed-Coder-8B-Instruct,woff2_convert_woff2ttf_fuzzer,1,done,2382,0,492.44,86400,41,36,300,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/woff2_convert_woff2ttf_fuzzer-r2,Seed-Coder-8B-Instruct,woff2_convert_woff2ttf_fuzzer,2,no seeds,,,,,20,,108,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/woff2_convert_woff2ttf_fuzzer-r3,Seed-Coder-8B-Instruct,woff2_convert_woff2ttf_fuzzer,3,done,2321,0,318.29,86400,25,11,159,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/woff2_convert_woff2ttf_fuzzer-r4,Seed-Coder-8B-Instruct,woff2_convert_woff2ttf_fuzzer,4,done,2386,0,309.84,86400,27,10,163,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/woff2_convert_woff2ttf_fuzzer-r5,Seed-Coder-8B-Instruct,woff2_convert_woff2ttf_fuzzer,5,no seeds,,,,,20,,107,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/libpng_read_fuzzer-r1,Seed-Coder-8B-Instruct,libpng_read_fuzzer,1,done,1560,3,1212.27,86400,43,1,74,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/libpng_read_fuzzer-r2,Seed-Coder-8B-Instruct,libpng_read_fuzzer,2,done,1580,5,11007.51,86400,55,19,104,1,1,1
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/libpng_read_fuzzer-r3,Seed-Coder-8B-Instruct,libpng_read_fuzzer,3,done,1569,2,10653.63,86400,49,21,113,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/libpng_read_fuzzer-r4,Seed-Coder-8B-Instruct,libpng_read_fuzzer,4,done,1521,0,220.14,86400,30,1,46,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/libpng_read_fuzzer-r5,Seed-Coder-8B-Instruct,libpng_read_fuzzer,5,done,1565,1,11111.25,86400,28,18,63,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/sndfile_fuzzer-r1,Seed-Coder-8B-Instruct,sndfile_fuzzer,1,done,3337,44,678.22,86400,72,6,319,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/sndfile_fuzzer-r2,Seed-Coder-8B-Instruct,sndfile_fuzzer,2,done,3490,47,697.28,86400,79,6,226,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/sndfile_fuzzer-r3,Seed-Coder-8B-Instruct,sndfile_fuzzer,3,done,3343,44,600.41,86400,74,10,280,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/sndfile_fuzzer-r4,Seed-Coder-8B-Instruct,sndfile_fuzzer,4,done,3459,49,563.05,86400,74,12,255,0,0,0
+04-model-sweep-qc-24h,Seed-Coder-8B-Instruct/sndfile_fuzzer-r5,Seed-Coder-8B-Instruct,sndfile_fuzzer,5,done,3420,43,658.67,86400,71,6,280,0,0,0

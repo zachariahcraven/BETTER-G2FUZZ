@@ -13,14 +13,14 @@
 #   only: the version then ends in -dirty).
 #
 # Settings: G2F_TEMPEST_HOST [tempest] (an ~/.ssh/config host),
-#           G2F_TEMPEST_REPO [the team's shared copy, /home/group/csci-591-automated-vulnerability-discovery/students/BETTERG2FUZZ]
+#           G2F_TEMPEST_REPO [the team's shared copy, /home/group/csci-591-automated-vulnerability-discovery/students/alfred]
 #           G2F_ACCOUNT, G2F_PARTITION [fairshare]  the Slurm job that converts the image (as for scripts/fuzz); a
 #           priority-* account needs its partition named (priority-quantumcore: G2F_PARTITION=priority)
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 HOST="${G2F_TEMPEST_HOST:-tempest}"
-REMOTE="${G2F_TEMPEST_REPO:-/home/group/csci-591-automated-vulnerability-discovery/students/BETTERG2FUZZ}"
+REMOTE="${G2F_TEMPEST_REPO:-/home/group/csci-591-automated-vulnerability-discovery/students/alfred}"
 die() { echo "tempest-image: $*" >&2; exit 1; }
 case "${G2F_ACCOUNT:-}" in priority-*) [ -n "${G2F_PARTITION:-}" ] ||
   die "G2F_ACCOUNT=$G2F_ACCOUNT needs G2F_PARTITION too (fairshare doesn't take it; priority-quantumcore: priority)" ;; esac

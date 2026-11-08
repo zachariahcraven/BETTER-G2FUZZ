@@ -55,6 +55,7 @@ core.*
 experiments/**/campaigns/
 experiments/**/analysis/logs/
 experiments/**/results/coverage/edges/
+experiments/**/results/*-crashes.tar.xz
 
 # ---- Editors / OS ----
 .DS_Store

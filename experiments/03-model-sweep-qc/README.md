@@ -61,7 +61,8 @@ scripts/study status 03-model-sweep-qc                         # progress, other
 - **The study gave up on a model's server:** add `--retry-servers`.
 - **The quantumcore group needs its resources:** `scancel -u $USER -A priority-quantumcore`. Later: the run command plus
   `--retry-failed`.
-- **Results:** the driver writes `results/<model>-r1-5.csv` as each model finishes.
+- **Results:** the driver writes `results/<model>-r1-5.csv` as each model finishes
+  ([columns](../README.md#results-columns)).
 - **Before the first run:** `start` refuses an image that doesn't hold this checkout's code. After committing and
   pushing, run `scripts/tempest-image` from a Mac.
 - **How it was run:** not with `scripts/study` itself but with n59m742's private copy of it (`~/g2f-03-driver/study`,
@@ -124,3 +125,5 @@ scripts/study status 03-model-sweep-qc                         # progress, other
 
 ## Results
 Filled in when the study ends.
+- Every campaign, crash, hang and rerun, with the column key: `results/03-model-sweep-qc.xlsx`
+  (`scripts/results-xlsx 03-model-sweep-qc --inputs`, which also packs the crashing inputs for a GitHub release).
