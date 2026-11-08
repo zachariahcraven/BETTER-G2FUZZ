@@ -11,7 +11,7 @@
 # Layout in the image: /AFLplusplus is afl/ (AFL++), /AFLplusplus/g2fuzz is g2fuzz/ (afl-fuzz -k).
 #
 # Build from the repo root:
-#   docker build -f build/Dockerfile.g2fuzz -t g2fuzz:dev .
+#   docker build -f build/Dockerfile.g2fuzz -t alfred:dev .
 #
 # The API key is never baked in; mount it at runtime (scripts/fuzz does this):
 #   -v ~/.secrets/catchat.key:/eval/openai_key.txt:ro

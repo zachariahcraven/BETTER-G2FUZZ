@@ -44,7 +44,7 @@
 #   name [{target}-{arm}-r{rep}]  campaign names; {model} works too; a / makes a subfolder ({arm}/{target}-r{rep})
 #   order [target]  target: one target's campaigns, then the next; rep: rep 1 of every target, then rep 2, ...
 #   max_seedgen [4] campaigns of one model in seed generation at once (more push LLM calls past the 300 s limit)
-#   targets_tree [students/g2f-targets/paper]
+#   targets_tree [students/g2f-targets-alfred/paper]
 #   gpu [a40]       where --servers starts a model's server: a40 (the default: the class priority account, which every
 #                   partner has), h100 (gpufairshare queue), qc-a40 or qc-h100 (only for members of priority-quantumcore,
 #                   another group's account: ask them first); an arm can name its own with gpu=<G>
@@ -107,7 +107,7 @@ REF=$STUDY; [ "$STUDY" != "$REPO/experiments/${STUDY##*/}" ] || REF=${STUDY##*/}
 
 # === study.conf =====================================================================================================
 declare -A C=([reps]=1 [secs]=21600 [model]=Qwen3.8-27B-FP8 [scheduler]=ucb [seeds]=fresh [name]='{target}-{arm}-r{rep}'
-              [order]=target [max_seedgen]=4 [targets_tree]="$STUDENTS/g2f-targets/paper" [seed_secs]=60 [gpu]=a40
+              [order]=target [max_seedgen]=4 [targets_tree]="$STUDENTS/g2f-targets-alfred/paper" [seed_secs]=60 [gpu]=a40
               [server_hours]="" [account]="" [partition]="" [output]=node)
 key=""
 while IFS= read -r line || [ -n "$line" ]; do
@@ -567,7 +567,7 @@ start_pass() {
         if [ "$S_STATE" = ready ]; then mark_ready "$m" "$S_JOB"; fi
         if [ "$S_STATE" = none ] && [ "$SERVERS" = 1 ] && [ -z "${GAVEUP[$m]:-}" ] && [ "$DRY" = 0 ]; then
           if [ "$(failed_starts "$m")" -ge 3 ]; then
-            GAVEUP[$m]="its server failed 3 times in a row (see the lines above, and ~/llm/llm-serve-<job>.out for jobs in $SERVERS_FILE)"
+            GAVEUP[$m]="its server failed 3 times in a row (see the lines above, and ~/llm-alfred/llm-serve-<job>.out for jobs in $SERVERS_FILE)"
             echo "  $m server: giving up: ${GAVEUP[$m]}"
           elif ! squeue_ok; then srv[$m]=noslurm
           elif start_server "$m"; then srv[$m]=starting left[$m]=$(( $(server_hours "$m") * 3600 )) desc[$m]="the server it started"
@@ -616,7 +616,7 @@ start_pass() {
 # The driver: a Slurm job (1 CPU, up to STUDY_DRIVER_DAYS [7] days) running "start --wait" for this study
 # (--background); one per study, whoever started it
 driver_job() {   # the running driver of this study (its job carries --comment study=<the study's path>)
-  squeue -h -n "study-${STUDY##*/}" -o '%i|%k' 2>/dev/null < /dev/null |
+  squeue -h -n "alfred-study-${STUDY##*/}" -o '%i|%k' 2>/dev/null < /dev/null |
     awk -F'|' -v want="study=$STUDY" -v me="${SLURM_JOB_ID:-none}" '$2 == want && $1 != me { print $1; exit }' || true
 }
 start_driver() {
@@ -629,7 +629,7 @@ start_driver() {
   mkdir -p "$CAMPAIGNS"
   # exec: the driver is the job's own process, so scancel's TERM runs its EXIT trap (which stops its servers)
   id=$(sbatch --parsable --account "$acct" --partition "${G2F_PARTITION:-fairshare}" --cpus-per-task 1 --mem 2G \
-    --time "${STUDY_DRIVER_DAYS:-7}-00:00:00" --job-name "study-${STUDY##*/}" --comment "study=$STUDY" \
+    --time "${STUDY_DRIVER_DAYS:-7}-00:00:00" --job-name "alfred-study-${STUDY##*/}" --comment "study=$STUDY" \
     --output "$CAMPAIGNS/study-driver-%j.log" \
     --wrap "exec $(printf '%q ' "$REPO/scripts/study" start "$REF" "${opts[@]}")")
   id=${id%%;*}

@@ -8,7 +8,7 @@
 # $G2F_TARGETS_ROOT/logs/. A project whose test fails is not copied into the tree.
 set -euo pipefail
 HERE=$(cd "$(dirname "$0")" && pwd); REPO=$(cd "$HERE/../.." && pwd)
-ROOT=${G2F_TARGETS_ROOT:-/home/group/csci-591-automated-vulnerability-discovery/students/g2f-targets}
+ROOT=${G2F_TARGETS_ROOT:-/home/group/csci-591-automated-vulnerability-discovery/students/g2f-targets-alfred}
 G=/home/group/csci-591-automated-vulnerability-discovery/students
 # the run images every target is tested in: this repo's build/g2fuzz.sif (until 2026-10-29 also the exp workspace's, now archived)
 RUN_SIFS=${RUN_SIFS:-"$REPO/build/g2fuzz.sif"}
@@ -36,7 +36,7 @@ for bp in "$@"; do
   # one test command per run image; all must pass before the copy into the tree
   tests=""; for s in $RUN_SIFS; do tests+="BENCH=$b SIF=$s bash $HERE/test_paper_targets.sh $st $V $p >> $log.test 2>&1 && "; done
   sbatch --parsable -A group-csci-591-automated-vulnerability-discovery -p fairshare -c 16 --mem 32G -t 08:00:00 \
-    -J "g2f-build-$V-$b-$p" -o "$log.out" --wrap "set -e
+    -J "alfred-build-$V-$b-$p" -o "$log.out" --wrap "set -e
     if [ -e '$st' ]; then mv '$st' '$st'.old-\$(date +%s); fi; mkdir -p '$st'
     apptainer exec --cleanenv -B /home/group --env RUN_LIBS=$RUN_LIBS,G2F_BUILDER=$(basename "$bsif")@\$(sha256sum < '$bsif' | cut -c1-12) \
       '$bsif' bash '$HERE/$b/$p/build.sh' $V '$st'

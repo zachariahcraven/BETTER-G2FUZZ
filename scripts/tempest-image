@@ -29,8 +29,8 @@ docker info >/dev/null 2>&1 || die "Docker isn't running (macOS: colima start)"
 ssh -o BatchMode=yes -o ConnectTimeout=10 "$HOST" true 2>/dev/null ||
   die "can't ssh to $HOST. Connect the VPN (README.md, Tempest setup step 1)"
 if [ "${1:-}" != "--force" ]; then
-  # all users: the image is shared. A study driver (study-*) launches more campaigns with it later.
-  jobs=$(ssh "$HOST" 'squeue -h -o %j' | grep -c '^g2f-\|^study-' || true)
+  # all users: the image is shared. A study driver (alfred-study-*) launches more campaigns with it later.
+  jobs=$(ssh "$HOST" 'squeue -h -o %j' | grep -c '^alfred-' || true)
   [ "$jobs" = 0 ] || die "$jobs campaign(s) or study driver(s) queued or running on Tempest. Wait for them, or use --force"
 fi
 
@@ -49,10 +49,10 @@ case "$version" in *-dirty*) echo "note: uncommitted changes are in this image (
 
 echo "== building the x86_64 image"
 docker buildx build --platform linux/amd64 -f "$REPO/build/Dockerfile.g2fuzz" \
-  --label "g2f.version=$version" -t g2fuzz:amd64 --load "$REPO"
+  --label "g2f.version=$version" -t alfred:amd64 --load "$REPO"
 
 echo "== copying it to $HOST (about 600 MB)"
-docker save g2fuzz:amd64 | gzip -1 | ssh "$HOST" "cat > $REMOTE/build/g2fuzz-amd64.tar.gz"
+docker save alfred:amd64 | gzip -1 | ssh "$HOST" "cat > $REMOTE/build/g2fuzz-amd64.tar.gz"
 
 echo "== converting it on a compute node"
 ssh "$HOST" "bash -l -s" <<EOF
@@ -60,7 +60,7 @@ set -e
 cd $REMOTE
 gunzip -f build/g2fuzz-amd64.tar.gz
 # < /dev/null: srun would otherwise read the rest of this script as its input
-srun -A "\$(G2F_ACCOUNT=${G2F_ACCOUNT:-} scripts/fuzz account)" -p ${G2F_PARTITION:-fairshare} -c 4 --mem 8G -t 60 -J g2f-image \
+srun -A "\$(G2F_ACCOUNT=${G2F_ACCOUNT:-} scripts/fuzz account)" -p ${G2F_PARTITION:-fairshare} -c 4 --mem 8G -t 60 -J alfred-image \
   apptainer build --force build/g2fuzz.sif.new docker-archive:build/g2fuzz-amd64.tar < /dev/null
 mv build/g2fuzz.sif.new build/g2fuzz.sif && rm build/g2fuzz-amd64.tar
 echo "$version" > build/g2fuzz.sif.version

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# enable-completion: turn on Tab completion and the `fuzz` alias for scripts/fuzz in your bash (Tempest).
+# enable-completion: turn on Tab completion and the `alfred` alias for Alfred's scripts/fuzz in your bash (Tempest).
 # Adds one line to ~/.bashrc that runs `scripts/fuzz completion` in every new shell. Running it again changes nothing.
 #
 # Usage: scripts/enable-completion           then open a new shell (or: source ~/.bashrc)
@@ -14,12 +14,12 @@ line="eval \"\$($(printf %q "$fuzz_path") completion)\""
 if grep -qxF "$line" ~/.bashrc 2>/dev/null; then
   echo "enable-completion: already in ~/.bashrc"
 else
-  printf '\n# scripts/fuzz: Tab completion + the fuzz alias (added by scripts/enable-completion)\n%s\n' "$line" >> ~/.bashrc
+  printf '\n# Alfred scripts/fuzz: Tab completion + the alfred alias (added by scripts/enable-completion)\n%s\n' "$line" >> ~/.bashrc
   echo "enable-completion: added to ~/.bashrc: $line"
 fi
 
 if [ "${BASH_SOURCE[0]}" != "$0" ]; then   # sourced: turn it on in this shell too
-  eval "$("$fuzz_path" completion)" && echo "enable-completion: on in this shell too (try: fuzz run <Tab>)"
+  eval "$("$fuzz_path" completion)" && echo "enable-completion: on in this shell too (try: alfred run <Tab>)"
 else
   echo "enable-completion: open a new shell, or run: source ~/.bashrc"
 fi

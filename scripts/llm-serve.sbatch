@@ -1,11 +1,11 @@
 #!/bin/bash
 # Serves one model from students/shared-models with vLLM on one GPU, for G2Fuzz jobs on Tempest (README.md, Tempest setup).
 # Start it with `scripts/fuzz llm start [hours] [gpu] [--model <folder>]`; runs then find it by themselves.
-# Stop: `scripts/fuzz llm stop`. Its log, llm-serve-<jobid>.out, goes to ~/llm. The vLLM image is shared too.
+# Stop: `scripts/fuzz llm stop`. Its log, llm-serve-<jobid>.out, goes to ~/llm-alfred. The vLLM image is shared too.
 # The model is G2F_SERVE_MODEL, a folder in shared-models (default Qwen3.8-27B-FP8), served under the same name;
 # Qwen keeps its old name, Qwen3.8-27B-FP8-nothink.
 # Thinking off: our G2Fuzz build gives up on an LLM call after 300 s (G2F_LLM_TIMEOUT), and a thinking model's long answers hit that.
-#SBATCH -J llm-serve
+#SBATCH -J alfred-llm-serve
 #SBATCH -p gpupriority
 #SBATCH --gres=gpu:a40:1
 #SBATCH -c 8
@@ -17,7 +17,7 @@ MODEL=${G2F_SERVE_MODEL:-Qwen3.8-27B-FP8} NAME=${G2F_SERVE_MODEL:-Qwen3.8-27B-FP
 SIF=$MODELS/containers/vllm-v0.31.0.sif
 TEMPLATES=${G2F_REPO:-/nonexistent}/scripts/chat-templates   # scripts/fuzz passes G2F_REPO (sbatch runs a copy of this file)
 PORT=$((20000 + SLURM_JOB_ID % 20000))   # scripts/fuzz computes the same port from the job ID
-LLM_DIR="${LLM_DIR:-$HOME/llm}"
+LLM_DIR="${LLM_DIR:-$HOME/llm-alfred}"
 cd "$LLM_DIR" || exit 1
 [ -f "$MODELS/$MODEL/config.json" ] || { echo "llm-serve: no model $MODEL in $MODELS"; exit 1; }
 GPU_MIB=$(nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits | head -1)

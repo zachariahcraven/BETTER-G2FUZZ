@@ -2,11 +2,11 @@
 # packages that benchmark's own build environment installs, because autotools/cmake builds switch features
 # on when they find a library (e.g. libsndfile + libflac). Base: the g2fuzz image, so the compilers are the
 # same AFL++ 4.32c / LLVM 16 that fuzz the targets.
-#   docker buildx build --platform linux/amd64 -f build/Dockerfile.targets --build-arg BASE=g2fuzz:amd64 \
-#     --target <unifuzz|fuzzbench|magma-libpng|magma-libtiff|magma-poppler|magma-libsndfile> -t g2f-builder:<stage> --load .
+#   docker buildx build --platform linux/amd64 -f build/Dockerfile.targets --build-arg BASE=alfred:amd64 \
+#     --target <unifuzz|fuzzbench|magma-libpng|magma-libtiff|magma-poppler|magma-libsndfile> -t alfred-builder:<stage> --load .
 # Binaries must still run in the plain g2fuzz image: build.sh copies libraries the run image lacks into
 # OUT/lib and sets RPATH $ORIGIN/lib (patchelf); build/targets/test_paper_targets.sh checks it with ldd.
-ARG BASE=g2fuzz:amd64
+ARG BASE=alfred:amd64
 
 FROM ${BASE} AS common
 # Build tools only (no libraries whose presence changes what a target compiles in)

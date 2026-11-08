@@ -22,7 +22,7 @@
 #                                   members of that group's account (partners aren't), with their OK
 #                                   stop, status, host: without --model, all of yours / all / the first one
 #   account                         The Slurm account runs and the server use
-#   completion                      Tab completion (commands, campaign names, models) and a `fuzz` alias for bash.
+#   completion                      Tab completion (commands, campaign names, models) and an `alfred` alias for bash.
 #                                   Turn it on with one line in ~/.bashrc: eval "$(<repo>/scripts/fuzz completion)"
 #
 #   --model M  a model folder in students/shared-models (e.g. phi-4; list: ls that folder). A campaign keeps the
@@ -42,7 +42,7 @@
 #   G2F_SIF [<repo>/build/g2fuzz.sif]   G2F_PARTITION [fairshare]   G2F_CPUS [2]   G2F_MEM [8G]
 #   G2F_SEEDGEN_MIN [120]  minutes of seed generation the job's time limit allows for (G2FUZZ runs without seeds)
 #   G2F_ACCOUNT [group-csci-591-automated-vulnerability-discovery, else group-mattrevelle]
-#   G2F_BASE_URL [the team's running `llm` server]   G2F_KEY [~/llm/dummy.key, made if missing]   G2F_LLM_DIR [~/llm]
+#   G2F_BASE_URL [the team's running `llm` server]   G2F_KEY [~/llm-alfred/dummy.key, made if missing]   G2F_LLM_DIR [~/llm-alfred]
 #   G2F_MODEL [Qwen3.8-27B-FP8-nothink]  the model name new campaigns ask for; --model sets it from a shared folder
 #   G2F_GENERATOR_SCHEDULER [ucb]  the same as --scheduler (the option wins)
 #   G2F_UCB_EXPLORATION [1.0]  ucb's exploration constant (higher: tries less-used generators more)
@@ -85,7 +85,7 @@ ACCOUNT="${G2F_ACCOUNT:-}"
 PARTITION="${G2F_PARTITION:-fairshare}"
 CPUS="${G2F_CPUS:-2}"
 MEM="${G2F_MEM:-8G}"
-LLM_DIR="${G2F_LLM_DIR:-$HOME/llm}"
+LLM_DIR="${G2F_LLM_DIR:-$HOME/llm-alfred}"
 BASE_URL="${G2F_BASE_URL:-}"     # empty: prepare finds the team's `llm` server
 # The team's server takes any key; G2Fuzz only needs the file to exist.
 KEY="${G2F_KEY:-$LLM_DIR/dummy.key}"
@@ -202,7 +202,7 @@ account_family() { local b=${ACCOUNT#group-}; b=${b#priority-}; echo "group-$b,p
 llm_url() { echo "http://$1:$((20000 + $2 % 20000))/v1"; }
 llm_jobs() {
   slurm_account
-  squeue -h -n llm-serve -t "$1" -A "$(account_family)" -o '%i|%u|%k|%T|%N' 2>/dev/null |
+  squeue -h -n alfred-llm-serve -t "$1" -A "$(account_family)" -o '%i|%u|%k|%T|%N' 2>/dev/null |
     awk -F'|' -v want="${2:-}" -v legacy="$(served_name Qwen3.8-27B-FP8)" '
       { m = ($3 ~ /^model=/) ? substr($3, 7) : legacy }
       want == "" || m == want { print $1, $2, m, $4, $5 }'
@@ -291,7 +291,7 @@ container_args() {
         --bind "$KEY:/eval/openai_key.txt:ro"
         --env "${extra_env}OPENAI_BASE_URL=$BASE_URL,PIP_USER=1,PYTHONUSERBASE=/eval/.pyuser")
   [ -n "${G2F_TARGETS:-}" ] && ARGS+=(--bind "$(cd "$G2F_TARGETS" && pwd):/targets:ro")
-  SLURM=(--job-name "g2f-$1" --cpus-per-task "$CPUS" --mem "$MEM")
+  SLURM=(--job-name "alfred-$1" --cpus-per-task "$CPUS" --mem "$MEM")
   [ -n "$ACCOUNT" ] && SLURM+=(--account "$ACCOUNT")
   [ -n "$PARTITION" ] && SLURM+=(--partition "$PARTITION")
   return 0
@@ -308,7 +308,7 @@ cmd_run() {
   local name="${POS[0]}" secs="${POS[1]:-3600}" d="$EVAL/${POS[0]}" mins id
   case "$secs" in ''|*[!0-9]*) die "secs must be whole seconds, e.g. 900" ;; esac
   prepare "$name"
-  active "$name" && die "g2f-$name is already queued or running (scripts/fuzz watch $name)"
+  active "$name" && die "alfred-$name is already queued or running (scripts/fuzz watch $name)"
   [ -d "$d/$OUT/default/queue" ] && die "$EVR/$name was already fuzzed; afl-fuzz won't overwrite it. Use: scripts/fuzz reuse $name"
   seed_step "$d"   # sets SEED_CMD (what runs before fuzzing) and SEEDGEN (1: seed generation first)
   if [ "$AFL" = 0 ]; then
@@ -646,7 +646,7 @@ llm_stop() {
   while read -r u o; do
     m=$(campaign_model "$(dirname "$o")"); m=${m:-$(served_name Qwen3.8-27B-FP8)}
     [[ "$models" == *" $m "* ]] && busy="$busy $u"
-  done < <(squeue -h -A "$(account_family)" -o '%u %o' 2>/dev/null | awk -v e="$EVAL/" 'index($2, e) == 1 || $2 ~ /\/experiments\/.*\/campaigns\// { print $1, $2 }')
+  done < <(squeue -h -A "$(account_family)" -o '%u %o' 2>/dev/null | awk -v e="$EVAL/" -v r="$REPO/experiments/" 'index($2, e) == 1 || (index($2, r) == 1 && $2 ~ /\/campaigns\//) { print $1, $2 }')
   busy=$(xargs -n1 <<< "$busy" | sort -u | xargs)
   [ -z "$busy" ] || die "campaigns of $busy are still queued or running on it. Stop them first, or: scancel $ids"
   # shellcheck disable=SC2086
@@ -675,19 +675,19 @@ llm_host() {
 }
 
 # === 9. completion ==================================================================================================
-# Prints bash Tab completion for scripts/fuzz, plus a `fuzz` alias (it wins over any other `fuzz` on your PATH).
+# Prints bash Tab completion for scripts/fuzz, plus an `alfred` alias (it wins over any other `alfred` on your PATH).
 # A script can't change the shell that runs it, so the shell evaluates what this prints: one line in ~/.bashrc,
 #   eval "$(<repo>/scripts/fuzz completion)"
 # Tab only reads folder names (campaigns; models in shared-models), so it stays instant. Campaign names come from
 # G2F_EVAL if it is set in your shell, else experiments/practice/campaigns.
 cmd_completion() {
-  printf '_g2f_fuzz_path=%q _g2f_models=%q\n' "$REPO/scripts/fuzz" "$SHARED_MODELS"
+  printf '_alfred_fuzz_path=%q _alfred_models=%q\n' "$REPO/scripts/fuzz" "$SHARED_MODELS"
   cat <<'EOF'
-alias fuzz="$_g2f_fuzz_path"
-_g2f_dirs() { local d; for d in "$1"/*/; do [ -d "$d" ] && basename "$d"; done; }   # folder names in <dir>
-_g2f_fuzz() {
+alias alfred="$_alfred_fuzz_path"
+_alfred_dirs() { local d; for d in "$1"/*/; do [ -d "$d" ] && basename "$d"; done; }   # folder names in <dir>
+_alfred_fuzz() {
   local cur=${COMP_WORDS[COMP_CWORD]} prev=${COMP_WORDS[COMP_CWORD-1]} cmd="" sub="" nargs=0 i w words=""
-  local camps=${G2F_EVAL:-${_g2f_fuzz_path%/scripts/fuzz}/experiments/practice/campaigns}
+  local camps=${G2F_EVAL:-${_alfred_fuzz_path%/scripts/fuzz}/experiments/practice/campaigns}
   # the command, its first argument, and how many arguments come after it (--model/--scheduler and values don't count)
   for ((i = 1; i < COMP_CWORD; i++)); do
     w=${COMP_WORDS[i]}
@@ -697,15 +697,15 @@ _g2f_fuzz() {
       *) if [ -z "$cmd" ]; then cmd=$w; else [ -z "$sub" ] && sub=$w; nargs=$((nargs + 1)); fi ;;
     esac
   done
-  if [ "$prev" = --model ]; then words=$(_g2f_dirs "$_g2f_models")
+  if [ "$prev" = --model ]; then words=$(_alfred_dirs "$_alfred_models")
   elif [ "$prev" = --scheduler ]; then words="ucb random"
   else
     case $cmd in
       "") words="new reuse run shell watch status results stop list llm account completion help --model" ;;
-      run)   if [ "$nargs" = 0 ]; then words=$(_g2f_dirs "$camps"); else words="--test --afl --model --scheduler"; fi ;;
-      shell) if [ "$nargs" = 0 ]; then words=$(_g2f_dirs "$camps"); else words="--test --model --scheduler"; fi ;;
-      reuse) if [ "$nargs" = 0 ]; then words=$(_g2f_dirs "$camps"); else words="--model"; fi ;;
-      watch|status|results|stop) [ "$nargs" = 0 ] && words=$(_g2f_dirs "$camps") ;;
+      run)   if [ "$nargs" = 0 ]; then words=$(_alfred_dirs "$camps"); else words="--test --afl --model --scheduler"; fi ;;
+      shell) if [ "$nargs" = 0 ]; then words=$(_alfred_dirs "$camps"); else words="--test --model --scheduler"; fi ;;
+      reuse) if [ "$nargs" = 0 ]; then words=$(_alfred_dirs "$camps"); else words="--model"; fi ;;
+      watch|status|results|stop) [ "$nargs" = 0 ] && words=$(_alfred_dirs "$camps") ;;
       new)   words="--model" ;;
       llm)   if [ "$nargs" = 0 ]; then words="start stop status host --model"
              elif [ "$sub" = start ] && [ "$nargs" = 2 ]; then words="a40 h100 qc-a40 qc-h100 --model"
@@ -714,7 +714,7 @@ _g2f_fuzz() {
   fi
   COMPREPLY=($(compgen -W "$words" -- "$cur"))
 }
-complete -F _g2f_fuzz fuzz scripts/fuzz ./scripts/fuzz "$_g2f_fuzz_path"
+complete -F _alfred_fuzz alfred scripts/fuzz ./scripts/fuzz "$_alfred_fuzz_path"
 EOF
 }
 

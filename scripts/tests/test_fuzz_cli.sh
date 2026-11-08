@@ -209,7 +209,7 @@ setup_work() {
 
 # Scenarios: which jobs squeue shows, which accounts sacctmgr lists, whether the server answers
 scenario() {
-  local s=$W/scen srv="948000|tester|llm-serve|RUNNING|model=Qwen3.8-27B-FP8-nothink|gpu027|$P|$W/home/llm/llm-serve.sbatch"
+  local s=$W/scen srv="948000|tester|alfred-llm-serve|RUNNING|model=Qwen3.8-27B-FP8-nothink|gpu027|$P|$W/home/llm/llm-serve.sbatch"
   local runs="7001|tester|g2f-busy|RUNNING|(null)|cpu001|$G|$E/busy/job.sbatch
 7002|tester|g2f-queued|PENDING|(null)|(None)|$G|$E/queued/job.sbatch"
   printf '%s\n' "$G" "$P" > "$s/accounts"
@@ -217,20 +217,20 @@ scenario() {
   case "$1" in
     base)     printf '%s\n' "$srv" "$runs" > "$s/jobs" ;;
     solo)     echo "$srv" > "$s/jobs" ;;
-    pending)  printf '%s\n' "948000|tester|llm-serve|PENDING|model=Qwen3.8-27B-FP8-nothink|(None)|$P|x" "$runs" > "$s/jobs" ;;
+    pending)  printf '%s\n' "948000|tester|alfred-llm-serve|PENDING|model=Qwen3.8-27B-FP8-nothink|(None)|$P|x" "$runs" > "$s/jobs" ;;
     none)     : > "$s/jobs" ;;
     other)    echo "${srv/|tester|/|alice|}" > "$s/jobs" ;;
     loading)  echo "$srv" > "$s/jobs"; rm "$s/curl" ;;
-    two)      printf '%s\n' "$srv" "948001|alice|llm-serve|RUNNING|model=phi-4|gpu028|$P|x" > "$s/jobs" ;;
-    untagged) echo "948000|tester|llm-serve|RUNNING|(null)|gpu027|$P|x" > "$s/jobs" ;;
+    two)      printf '%s\n' "$srv" "948001|alice|alfred-llm-serve|RUNNING|model=phi-4|gpu028|$P|x" > "$s/jobs" ;;
+    untagged) echo "948000|tester|alfred-llm-serve|RUNNING|(null)|gpu027|$P|x" > "$s/jobs" ;;
     noprio)   : > "$s/jobs"; echo "$G" > "$s/accounts" ;;
     noacct)   : > "$s/jobs"; : > "$s/accounts" ;;
     revelle)  : > "$s/jobs"; echo group-mattrevelle > "$s/accounts" ;;
     qcmember) : > "$s/jobs"; echo priority-quantumcore >> "$s/accounts" ;;
     qc)       echo "${srv/|$P|/|priority-quantumcore|}" > "$s/jobs" ;;   # the Qwen server on quantumcore's account
-    driver)   printf '%s\n' "$srv" "948500|bob|study-03-test|RUNNING|study=$W/repo/experiments/03-test|cpu010|$G|x" > "$s/jobs" ;;
-    otherdriver) printf '%s\n' "$srv" "948501|bob|study-03-test|RUNNING|study=/home/bob/copy/03-test|cpu011|$G|x" > "$s/jobs" ;;
-    driver10) printf '%s\n' "$srv" "948502|tester|study-10-noseeds|RUNNING|study=$W/repo/experiments/10-noseeds|cpu010|$G|x" > "$s/jobs" ;;
+    driver)   printf '%s\n' "$srv" "948500|bob|alfred-study-03-test|RUNNING|study=$W/repo/experiments/03-test|cpu010|$G|x" > "$s/jobs" ;;
+    otherdriver) printf '%s\n' "$srv" "948501|bob|alfred-study-03-test|RUNNING|study=/home/bob/copy/03-test|cpu011|$G|x" > "$s/jobs" ;;
+    driver10) printf '%s\n' "$srv" "948502|tester|alfred-study-10-noseeds|RUNNING|study=$W/repo/experiments/10-noseeds|cpu010|$G|x" > "$s/jobs" ;;
     short)    echo "$srv|1:00:00" > "$s/jobs" ;;   # the Qwen server has 1 h left
     sqfail)   echo "$srv" > "$s/jobs"; : > "$s/squeue_fail" ;;
     sqfailnew) echo "$srv" > "$s/jobs"; : > "$s/squeue_fail_new" ;;
@@ -238,7 +238,7 @@ scenario() {
     allmodels)   # a ready server for each of study 02's 5 models
       local m i=0; : > "$s/jobs"; : > "$s/curl"
       for m in Qwen3.8-27B-FP8-nothink phi-4 starcoder2-15b-instruct-v0.1 DeepSeek-Coder-V2-Lite-Instruct Mistral-Small-3.1-24B-Instruct-2503; do
-        echo "94800$i|tester|llm-serve|RUNNING|model=$m|gpu02$i|$P|x" >> "$s/jobs"; printf '{"id":"%s"} ' "$m" >> "$s/curl"; i=$((i + 1))
+        echo "94800$i|tester|alfred-llm-serve|RUNNING|model=$m|gpu02$i|$P|x" >> "$s/jobs"; printf '{"id":"%s"} ' "$m" >> "$s/curl"; i=$((i + 1))
       done ;;
     *) echo "unknown scenario $1" >&2; exit 2 ;;
   esac
@@ -565,7 +565,7 @@ contract "study --gpu qc-h100 starts it on quantumcore" 'grep -q "^sbatch --pars
 contract "study: a server that can't start is reported" '[ "$(cat "$N/study_servers_noacct/rc")" = 1 ] && grep -q "the phi-4 server didn.t start (above); trying again" "$N/study_servers_noacct/out" && ! grep -q "^sbatch" "$N/study_servers_noacct/calls"'
 contract "study: gives up on a model after 3 failures"   '[ "$(cat "$N/study_servers_retry/rc")" = 1 ] && [ "$(grep -c "llm-serve.sbatch" "$N/study_servers_retry/calls")" = 3 ] && grep -q "giving up: its server failed 3 times in a row" "$N/study_servers_retry/out" && grep -q "3 wait on a server the study gave up on" "$N/study_servers_retry/err"'
 contract "study: bad --gpu refused"                      '[ "$(cat "$N/study_badgpu/rc")" = 1 ] && grep -q "gpu must be a40, h100, qc-a40 or qc-h100" "$N/study_badgpu/err"'
-contract "study --background submits the driver"        'grep "^sbatch" "$N/study_background/calls" | grep -q -- "--account $G --partition fairshare --cpus-per-task 1 --mem 2G --time 7-00:00:00 --job-name study-03-test .*study.*start.*03-test.*--servers.*--wait" && [ "$(grep -c "^sbatch" "$N/study_background/calls")" = 1 ]'
+contract "study --background submits the driver"        'grep "^sbatch" "$N/study_background/calls" | grep -q -- "--account $G --partition fairshare --cpus-per-task 1 --mem 2G --time 7-00:00:00 --job-name alfred-study-03-test .*study.*start.*03-test.*--servers.*--wait" && [ "$(grep -c "^sbatch" "$N/study_background/calls")" = 1 ]'
 contract "study: --background --dry refused"             '[ "$(cat "$N/study_background_dry/rc")" = 1 ] && ! grep -q "^sbatch" "$N/study_background_dry/calls"'
 contract "study: no start while the driver runs"         '[ "$(cat "$N/study_driver_running/rc")" = 1 ] && grep -q "driver of 03-test is running (Slurm job 948500)" "$N/study_driver_running/err" && ! grep -q "^sbatch" "$N/study_driver_running/calls" && [ "$(cat "$N/study_driver_dry/rc")" = 0 ]'
 contract "study status shows the driver"                 'grep -q "^driver: Slurm job 948500 is running" "$N/study_driver_status/out"'
@@ -599,7 +599,7 @@ contract "study csv: LLM errors, 400s, cut-off answers" 'grep -q "^study,.*,llm_
 contract "study status shows the study's servers"       'grep -q "^server: Qwen3.8-27B-FP8, Slurm job 948000 (RUNNING), started by this study" "$N/study_status_servers/out"'
 # --retry-failed, failure reasons, other users' jobs, the gave-up hint (2026-10-30)
 contract "study: read-only commands take study.conf's account" '[ "$(cat "$N/study_conf_acct_status/rc")" = 0 ]'
-contract "study status: other users' jobs on its accounts"  'grep -q "^other users. jobs on group-csci-591-automated-vulnerability-discovery,priority-csci-591-automated-vulnerability-discovery: 1$" "$N/study_status_others/out" && grep -q "^  alice 948001 llm-serve RUNNING" "$N/study_status_others/out"'
+contract "study status: other users' jobs on its accounts"  'grep -q "^other users. jobs on group-csci-591-automated-vulnerability-discovery,priority-csci-591-automated-vulnerability-discovery: 1$" "$N/study_status_others/out" && grep -q "^  alice 948001 alfred-llm-serve RUNNING" "$N/study_status_others/out"'
 contract "study: the gave-up hint is a background command" 'grep -q "start 03-test --servers --only arm=ucb --background --retry-servers$" "$N/study_servers_retry/err"'
 contract "study --retry-failed: moves, launches again"   'grep -q "moved campaigns/mp42aac-g2f-r1 (failed, Slurm job 6003) to campaigns/.retried/mp42aac-g2f-r1.20270115-080000" "$N/study_retry_failed/tree" && grep -q "mp42aac-g2f-r1: submitted Slurm job" "$N/study_retry_failed/out" && ! grep -q "jhead-g2f-r1: submitted" "$N/study_retry_failed/out"'
 contract "study --retry-failed with the driver running" '[ "$(cat "$N/study_retry_failed_driver/rc")" = 0 ] && grep -q "moved campaigns/mp42aac-g2f-r1" "$N/study_retry_failed_driver/tree" && grep -q "driver (Slurm job 948502) launches them again" "$N/study_retry_failed_driver/out" && ! grep -q "^sbatch" "$N/study_retry_failed_driver/calls"'
@@ -619,7 +619,7 @@ contract "G2F_OUTPUT=campaign files pass bash -n"        '! cat "$X"/*/syntax | 
 setup_work "$T/fuzz.new"; scenario base
 tab() {   # tab <word> ...: what Tab offers for the last word ("" = Tab after a space)
   env -i PATH="$T/bin:/usr/bin:/bin" HOME="$W/home" USER=tester bash -c \
-    'eval "$(bash "$1" completion)"; shift; COMP_WORDS=("$@"); COMP_CWORD=$(($# - 1)); _g2f_fuzz; echo "${COMPREPLY[*]}"' \
+    'eval "$(bash "$1" completion)"; shift; COMP_WORDS=("$@"); COMP_CWORD=$(($# - 1)); _alfred_fuzz; echo "${COMPREPLY[*]}"' \
     _ "$W/repo/scripts/fuzz" "$@"
 }
 contract "Tab: fuzz <Tab> lists the commands"          '[[ " $(tab fuzz "") " == *" run "*" llm "*" completion "* ]]'
@@ -638,7 +638,7 @@ cp "$REPO/scripts/enable-completion" "$W/repo/scripts/"
 en() { env -i PATH="$T/bin:/usr/bin:/bin" HOME="$W/home" USER=tester bash "$@"; }
 en "$W/repo/scripts/enable-completion" > /dev/null; en "$W/repo/scripts/enable-completion" > "$T/enable2.out"
 contract "enable-completion adds its line once"          '[ "$(grep -c "completion)\"$" "$W/home/.bashrc")" = 1 ] && grep -q "already in" "$T/enable2.out"'
-contract "sourced, it turns on alias + completion"      '[[ "$(en -ic "source $W/repo/scripts/enable-completion >/dev/null; type -t fuzz; complete -p fuzz" 2>/dev/null)" == alias*"complete -F _g2f_fuzz fuzz"* ]]'
-contract "a new shell gets them from ~/.bashrc"          '[[ "$(en -ic "type -t fuzz" 2>/dev/null)" == alias ]]'
+contract "sourced, it turns on alias + completion"      '[[ "$(en -ic "source $W/repo/scripts/enable-completion >/dev/null; type -t alfred; complete -p alfred" 2>/dev/null)" == alias*"complete -F _alfred_fuzz alfred"* ]]'
+contract "a new shell gets them from ~/.bashrc"          '[[ "$(en -ic "type -t alfred" 2>/dev/null)" == alias ]]'
 
 [ "$fails" = 0 ] && echo "PASS ($ncases cases)" || { echo "FAILED ($fails problems)"; exit 1; }
