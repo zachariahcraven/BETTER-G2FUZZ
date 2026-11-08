@@ -1,0 +1,221 @@
+#!/usr/bin/env python3
+# results-xlsx: a finished study's results as one spreadsheet, results/<study>.xlsx: a "column definitions" sheet
+# (the key in experiments/README.md, "Results columns"), then models (a summary per model and target), campaigns
+# (results/campaigns.csv), crashes and hangs (every input AFL++ saved as one) and reruns (.retried/MOVED.txt).
+#
+# Usage: scripts/results-xlsx NN-name [--inputs]   (or experiments/NN-name)
+#   --inputs  also pack the crashing inputs into results/<study>-crashes.tar.xz, for a GitHub release
+#
+# Needs openpyxl: python3 -m pip install --user openpyxl
+import csv
+import glob
+import hashlib
+import os
+import re
+import signal
+import statistics
+import subprocess
+import sys
+
+try:
+    from openpyxl import Workbook
+    from openpyxl.styles import Alignment, Font
+    from openpyxl.utils import get_column_letter
+except ImportError:
+    sys.exit("results-xlsx: needs openpyxl: python3 -m pip install --user openpyxl")
+
+REPO = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+INTS = {"rep", "edges", "crashes", "run_s", "generators", "llm_steps", "llm_calls", "llm_errors", "llm_400",
+        "llm_cut"}
+MODELS = ["arm", "target", "done", "no_seeds", "short", "edges_median", "edges_min", "edges_max", "edges_vs_afl",
+          "crashes_median", "execs/s_median"]
+SAVED = ["campaign", "arm", "target", "rep", "found_s", "execs", "op", "src", "bytes", "sha1", "file"]
+CRASHES = SAVED[:4] + ["crash", "signal"] + SAVED[4:]
+HANGS = SAVED[:4] + ["hang"] + SAVED[4:]
+RERUNS = ["moved", "campaign", "arm", "target", "rep", "first_job", "ended", "first_run_s", "why", "bug",
+          "rerun_state", "first_run"]
+# a line of .retried/MOVED.txt: <date> <time> <user> moved campaigns/<campaign> (<how it ended>, Slurm job <id>) to
+# campaigns/<first run> (<how>[; first failure: <why>])
+MOVED = re.compile(r"^(\S+ \S+) \S+ moved campaigns/(\S+) \((.*), Slurm job (\d+)\) to campaigns/(\S+) \((.*)\)$")
+
+
+def die(msg):
+    sys.exit(f"results-xlsx: {msg}")
+
+
+def key():   # the tables under "Results columns" in experiments/README.md: {column: meaning}
+    rows, inside = {}, False
+    with open(os.path.join(REPO, "experiments", "README.md")) as f:
+        for line in f:
+            if line.startswith("## "):
+                inside = line.strip() == "## Results columns"
+            elif inside and line.startswith("| `"):
+                name, meaning = [c.strip() for c in line.strip().strip("|").split("|", 1)]
+                rows[name.strip("`")] = re.sub(r"`([^`]*)`", r"\1", meaning)
+    return rows
+
+
+def num(s):
+    return int(s) if s.isdigit() else None
+
+
+def stat(fuzzer_stats, field):
+    try:
+        with open(fuzzer_stats) as f:
+            return next((num(line.split(":", 1)[1].strip()) for line in f if line.split(":")[0].strip() == field),
+                        None)
+    except OSError:
+        return None
+
+
+def saved_rows(campaigns, row, kind):   # one campaign's crashes or hangs, from AFL++'s file names
+    out = []   # (id:N,sig:N,src:N,time:<ms>,execs:N,op:...; hangs have no sig)
+    for d in sorted(glob.glob(os.path.join(campaigns, row["campaign"], "*_output", "default", kind))):
+        for name in sorted(os.listdir(d)):
+            if not name.startswith("id:"):   # README.txt
+                continue
+            f = dict(p.split(":", 1) for p in name.split(",") if ":" in p)
+            with open(os.path.join(d, name), "rb") as fh:
+                body = fh.read()
+            first = [row["campaign"], row["arm"], row["target"], int(row["rep"]), num(f["id"])]
+            if kind == "crashes":
+                sig = num(f.get("sig", ""))
+                try:
+                    first.append(f"{signal.Signals(sig).name} ({sig})")
+                except ValueError:
+                    first.append(str(sig))
+            ms = num(f.get("time", ""))
+            out.append(first + [None if ms is None else round(ms / 1000), num(f.get("execs", "")), f.get("op"),
+                                f.get("src"), len(body), hashlib.sha1(body).hexdigest(),
+                                os.path.relpath(os.path.join(d, name), campaigns)])
+    return out
+
+
+def model_rows(data):   # per arm and target, over the campaigns that fuzzed the full time
+    groups = {}
+    for r in data:
+        groups.setdefault((r["arm"], r["target"]), []).append(r)
+    afl = {t: statistics.median(int(r["edges"]) for r in rs if r["state"] == "done")
+           for (a, t), rs in groups.items() if a == "afl" and any(r["state"] == "done" for r in rs)}
+    out = []
+    for (a, t), rs in sorted(groups.items(), key=lambda g: (g[0][0] != "afl", g[0][0].lower(), g[0][1])):
+        done = [r for r in rs if r["state"] == "done"]
+        edges = [int(r["edges"]) for r in done]
+        med = statistics.median(edges) if edges else None
+        out.append([a, t, len(done), sum(r["state"] == "no seeds" for r in rs),
+                    sum(r["state"] == "done (short)" for r in rs), med, min(edges, default=None),
+                    max(edges, default=None), round(med / afl[t], 3) if med is not None and afl.get(t) else None,
+                    statistics.median(int(r["crashes"]) for r in done) if done else None,
+                    round(statistics.median(float(r["execs/s"]) for r in done), 2) if done else None])
+    return out
+
+
+def rerun_rows(campaigns, state):   # .retried/MOVED.txt, one row per failed run moved aside
+    out = []
+    try:
+        lines = open(os.path.join(campaigns, ".retried", "MOVED.txt")).read().splitlines()
+    except OSError:
+        return out
+    for line in lines:
+        m = MOVED.match(line)
+        if not m:
+            die(f"campaigns/.retried/MOVED.txt: can't read: {line}")
+        moved, camp, ended, job, first, how = m.groups()
+        # the note after "...--retry-failed; ": "first failure: <cause>" (04), or the cause itself (03)
+        why = how.split("; ", 1)[1] if "; " in how else ""
+        why = why[len("first failure: "):] if why.startswith("first failure: ") else why
+        bugs = set(re.findall(r"\b(G2F-\d+|OURS-\d+)\b", f"{ended} {why}"))
+        if "disk (/tmp) filled up" in why:   # 03's notes for OURS-3 describe it without naming it
+            bugs.add("OURS-3")
+        bugs = sorted(bugs) + (["seed timeout"] if "over 1000 ms" in why else [])
+        arm, run = camp.split("/", 1)
+        target, rep = run.rsplit("-r", 1)
+        out.append([moved, camp, arm, target, num(rep), num(job), ended,
+                    stat(next(iter(glob.glob(os.path.join(campaigns, first, "*_output", "default", "fuzzer_stats"))),
+                              ""), "run_time"),
+                    why, ", ".join(bugs), state.get(camp), first])
+    return out
+
+
+def sheet(wb, title, header, rows):
+    ws = wb.create_sheet(title)
+    ws.append(header)
+    for c in ws[1]:
+        c.font = Font(bold=True)
+    for r in rows:
+        ws.append(r)
+    ws.freeze_panes = "A2"
+    ws.auto_filter.ref = ws.dimensions
+    for i, h in enumerate(header, 1):
+        longest = max(len(str(ws.cell(r, i).value or "")) for r in range(1, ws.max_row + 1))
+        ws.column_dimensions[get_column_letter(i)].width = min(longest + 2, 48)
+    return ws
+
+
+args = [a for a in sys.argv[1:] if a != "--inputs"]
+if len(args) != 1:
+    die("usage: scripts/results-xlsx NN-name [--inputs]")
+study = os.path.basename(os.path.normpath(args[0]))
+results = os.path.join(REPO, "experiments", study, "results")
+campaigns = os.path.join(REPO, "experiments", study, "campaigns")
+src, out = os.path.join(results, "campaigns.csv"), os.path.join(results, f"{study}.xlsx")
+if not os.path.isfile(src):
+    die(f"no {os.path.relpath(src, REPO)}: the driver writes it when the study ends (scripts/study results {study})")
+with open(src, newline="") as f:
+    header, *data = list(csv.reader(f))
+meaning = key()
+sheets = [("models", MODELS), ("campaigns", header), ("crashes", CRASHES), ("hangs", HANGS), ("reruns", RERUNS)]
+missing = sorted({h for _, cols in sheets for h in cols if h not in meaning})
+if missing:
+    die(f"experiments/README.md (Results columns) doesn't define: {', '.join(missing)}")
+rows = [dict(zip(header, r)) for r in data]
+crashes = [c for r in rows for c in saved_rows(campaigns, r, "crashes")]
+hangs = [h for r in rows for h in saved_rows(campaigns, r, "hangs")]
+reruns = rerun_rows(campaigns, {r["campaign"]: r["state"] for r in rows})
+
+wb = Workbook()
+defs = wb.active
+defs.title = "column definitions"
+defs["A1"] = "Column name definitions"
+defs["A1"].font = Font(bold=True, size=12)
+defs["A2"] = (f"{study}: {len(data)} campaigns (results/campaigns.csv), the {len(crashes)} crashes and {len(hangs)} "
+              f"hangs AFL++ saved in them, and {len(reruns)} failed runs that were run again")
+defs["A2"].font = Font(italic=True)
+r = 4
+for title, cols in sheets:   # one block per sheet, as in FWP's estimate workbooks
+    defs.cell(r, 1, f"{title} worksheet").font = Font(bold=True)
+    defs.merge_cells(start_row=r, start_column=1, end_row=r, end_column=2)
+    for h in cols:
+        r += 1
+        defs.cell(r, 1, h).alignment = Alignment(vertical="top")
+        defs.cell(r, 2, meaning[h]).alignment = Alignment(wrap_text=True, vertical="top")
+    r += 2
+defs.column_dimensions["A"].width = 16
+defs.column_dimensions["B"].width = 100
+
+ws = sheet(wb, "models", MODELS, model_rows(rows))
+for r in range(2, ws.max_row + 1):
+    ws.cell(r, MODELS.index("edges_vs_afl") + 1).number_format = "0.000"
+# numbers as numbers, so they sort and filter; blank stays empty, "-" stays text
+ws = sheet(wb, "campaigns", header, [[None if v == "" else int(v) if h in INTS and v.isdigit()
+                                      else float(v) if h == "execs/s" else v for h, v in zip(header, row)]
+                                     for row in data])
+for r in range(2, ws.max_row + 1):
+    ws.cell(r, header.index("execs/s") + 1).number_format = "0.00"
+sheet(wb, "crashes", CRASHES, crashes)
+sheet(wb, "hangs", HANGS, hangs)
+sheet(wb, "reruns", RERUNS, reruns)
+
+wb.save(out)
+os.chmod(out, 0o664)   # the group's files stay group-writable (docs/GROUP_PERMISSIONS.md)
+print(f"wrote {os.path.relpath(out, REPO)}: {len(data)} campaigns, {len(crashes)} crashes, {len(hangs)} hangs, "
+      f"{len(reruns)} reruns")
+
+if "--inputs" in sys.argv:   # the crashing inputs, at the crashes sheet's paths
+    tar = os.path.join(results, f"{study}-crashes.tar.xz")
+    files = "".join(c[-1] + "\0" for c in crashes)
+    subprocess.run(["tar", "--null", "-T", "-", "-cJf", tar], cwd=campaigns, input=files.encode(), check=True,
+                   env=dict(os.environ, XZ_OPT="-6 -T4"))
+    os.chmod(tar, 0o664)
+    print(f"wrote {os.path.relpath(tar, REPO)}: {len(crashes)} crashing inputs, "
+          f"{os.path.getsize(tar) / 1e6:.1f} MB (git-ignored: attach it to a GitHub release)")

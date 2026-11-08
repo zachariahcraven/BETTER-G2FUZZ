@@ -2,8 +2,8 @@
 
 **Question:** [03](../03-model-sweep-qc/README.md)'s, at the paper's length: 24 h of fuzzing per campaign instead
 of 6 h. Do 03's ranking of the models, and how they compare with plain AFL++, still hold at 24 h?
-**Owner:** n59m742. **Status:** running (launched 2026-11-01 23:43, when 03's driver ended, by starter job 992371;
-driver job 993456). **Started:** 2026-11-01.
+**Owner:** n59m742. **Status:** campaigns finished; analysis to do (launched 2026-11-01 23:43, when 03's driver
+ended, by starter job 992371; driver job 993456 ended 2026-11-07 12:26, all 675 finished). **Started:** 2026-11-01.
 
 ## Design
 - **Two differences from 03:** the time, `secs = 86400` (03: 21600), and where AFL++ writes its output,
@@ -62,6 +62,10 @@ driver job 993456). **Started:** 2026-11-01.
   - A `failed` or `done (short)` campaign is run again once (`--retry-failed`); its first run stays in
     `campaigns/.retried/`.
   - A campaign that fails twice is excluded and listed.
+    Excluded: Qwen3.8-27B-FP8/vorbis_decode_fuzzer-r2, -r4 and -r5, Seed-Coder-8B-Instruct/vorbis_decode_fuzzer-r1,
+    -r2 and -r4, and Mistral-Small-3.1-24B-Instruct-2503/vorbis_decode_fuzzer-r3 and -r5
+    ([G2F-1](../../docs/KNOWN_BUGS.md#g2f-1-in-run-seeds-skip-afls-size-checks) twice each, except Seed-Coder r4's rerun and Mistral r3's first run:
+    [G2F-3](../../docs/KNOWN_BUGS.md#g2f-3-afl-fuzz-heap-corruption-in-g2fuzz-runs); 2026-11-03 to 06).
 - **Pinned:**
   - Everything else: the image (its commit), vLLM 0.31.0 (`shared-models/containers`), the weights' revisions
     (`shared-models/REVISIONS.txt` or each model's `.cache` metadata), and G2FUZZ's temperatures.
@@ -80,7 +84,8 @@ scripts/study status 04-model-sweep-qc-24h                         # progress, o
 - **The study gave up on a model's server:** add `--retry-servers`.
 - **The quantumcore group needs its resources:** `scancel -u $USER -A priority-quantumcore`. Later: the run command plus
   `--retry-failed`.
-- **Results:** the driver writes `results/<model>-r1-5.csv` as each model finishes.
+- **Results:** the driver writes `results/<model>-r1-5.csv` as each model finishes
+  ([columns](../README.md#results-columns)).
 - **Before the first run:** `start` refuses an image that doesn't hold this checkout's code. After committing and
   pushing, run `scripts/tempest-image` from a Mac.
 - **How it was run:** not with `scripts/study` itself but with n59m742's private copy of it (`~/g2f-04-driver/study`,
@@ -142,6 +147,16 @@ scripts/study status 04-model-sweep-qc-24h                         # progress, o
   - Putting all of AFL++'s output in memory (`/dev/shm`) was considered (2026-11-01) and not done. Those files count
     against each campaign's 8 GB, which can't grow without fewer campaigns running at once.
   - With the output elsewhere than 03's, execs/s compare within this study only (as above, for the shared nodes).
+  - On NFS a file deleted while still open stays in its folder (as `.nfs…`) until it's closed. In one gpt-oss
+    campaign that let G2FUZZ queue, again and again, a seed file a leftover ffmpeg kept writing, until afl-fuzz ran
+    out of memory at 1.08 GB ([G2F-1](../../docs/KNOWN_BUGS.md#g2f-1-in-run-seeds-skip-afls-size-checks)).
+- **Memory and the libpcap target**
+  ([OURS-4](../../docs/KNOWN_BUGS.md#ours-4-the-kernels-file-name-cache-counts-against-a-campaigns-memory), found in
+  04): the kernel's cache of the libpcap harness's temp files counts against each campaign's 8 GB, so a libpcap
+  campaign can be killed for memory late in its 24 h. Such a stop is run again and, like a full disk, doesn't count
+  toward the two-failure limit (decided 2026-11-02, after the first one).
 
 ## Results
 Filled in when the study ends.
+- Every campaign, crash, hang and rerun, with the column key: `results/04-model-sweep-qc-24h.xlsx`
+  (`scripts/results-xlsx 04-model-sweep-qc-24h --inputs`, which also packs the crashing inputs for a GitHub release).

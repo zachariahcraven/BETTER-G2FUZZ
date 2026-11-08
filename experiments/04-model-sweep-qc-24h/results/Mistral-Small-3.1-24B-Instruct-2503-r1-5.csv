@@ -1,0 +1,76 @@
+study,campaign,arm,target,rep,state,edges,crashes,execs/s,run_s,generators,llm_steps,llm_calls,llm_errors,llm_400,llm_cut
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/jhead-r1,Mistral-Small-3.1-24B-Instruct-2503,jhead,1,done,617,257,1523.54,86400,40,22,91,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/jhead-r2,Mistral-Small-3.1-24B-Instruct-2503,jhead,2,done,614,172,1102.03,86400,56,32,108,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/jhead-r3,Mistral-Small-3.1-24B-Instruct-2503,jhead,3,done,626,232,1410.14,86400,51,28,104,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/jhead-r4,Mistral-Small-3.1-24B-Instruct-2503,jhead,4,done,627,239,1884.06,86400,53,27,101,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/jhead-r5,Mistral-Small-3.1-24B-Instruct-2503,jhead,5,done,669,239,946.84,86400,58,31,112,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/gdk-pixbuf-pixdata-r1,Mistral-Small-3.1-24B-Instruct-2503,gdk-pixbuf-pixdata,1,done,5548,18,370.48,86400,141,32,273,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/gdk-pixbuf-pixdata-r2,Mistral-Small-3.1-24B-Instruct-2503,gdk-pixbuf-pixdata,2,done,2235,68,397.17,86400,111,22,242,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/gdk-pixbuf-pixdata-r3,Mistral-Small-3.1-24B-Instruct-2503,gdk-pixbuf-pixdata,3,done,2197,50,412.86,86400,133,26,270,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/gdk-pixbuf-pixdata-r4,Mistral-Small-3.1-24B-Instruct-2503,gdk-pixbuf-pixdata,4,done,2181,31,395.87,86400,119,23,281,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/gdk-pixbuf-pixdata-r5,Mistral-Small-3.1-24B-Instruct-2503,gdk-pixbuf-pixdata,5,done,2259,23,418.76,86400,115,18,250,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/imginfo-r1,Mistral-Small-3.1-24B-Instruct-2503,imginfo,1,done,2109,8,982.53,86400,99,21,181,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/imginfo-r2,Mistral-Small-3.1-24B-Instruct-2503,imginfo,2,done,2111,8,1004.66,86400,96,24,176,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/imginfo-r3,Mistral-Small-3.1-24B-Instruct-2503,imginfo,3,done,2049,7,842.44,86400,105,21,209,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/imginfo-r4,Mistral-Small-3.1-24B-Instruct-2503,imginfo,4,done,2106,17,897.24,86400,101,27,194,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/imginfo-r5,Mistral-Small-3.1-24B-Instruct-2503,imginfo,5,done,3467,64,651.70,86400,86,14,165,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/tiffsplit-r1,Mistral-Small-3.1-24B-Instruct-2503,tiffsplit,1,done,1840,208,618.31,86400,59,16,163,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/tiffsplit-r2,Mistral-Small-3.1-24B-Instruct-2503,tiffsplit,2,done,1833,165,847.73,86400,65,20,243,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/tiffsplit-r3,Mistral-Small-3.1-24B-Instruct-2503,tiffsplit,3,done,1965,277,571.37,86400,71,18,210,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/tiffsplit-r4,Mistral-Small-3.1-24B-Instruct-2503,tiffsplit,4,done,1841,255,523.69,86400,61,16,198,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/tiffsplit-r5,Mistral-Small-3.1-24B-Instruct-2503,tiffsplit,5,done,1829,176,738.23,86400,66,21,223,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/mp3gain-r1,Mistral-Small-3.1-24B-Instruct-2503,mp3gain,1,done,902,125,225.79,86400,50,25,365,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/mp3gain-r2,Mistral-Small-3.1-24B-Instruct-2503,mp3gain,2,done,880,118,250.77,86400,61,39,310,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/mp3gain-r3,Mistral-Small-3.1-24B-Instruct-2503,mp3gain,3,done,884,103,345.27,86400,62,34,280,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/mp3gain-r4,Mistral-Small-3.1-24B-Instruct-2503,mp3gain,4,done,874,69,216.66,86400,36,23,292,1,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/mp3gain-r5,Mistral-Small-3.1-24B-Instruct-2503,mp3gain,5,done,868,73,44.19,86400,39,21,361,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/mp42aac-r1,Mistral-Small-3.1-24B-Instruct-2503,mp42aac,1,no seeds,,,,,28,,112,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/mp42aac-r2,Mistral-Small-3.1-24B-Instruct-2503,mp42aac,2,done,1252,102,1510.98,86400,41,7,243,2,2,2
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/mp42aac-r3,Mistral-Small-3.1-24B-Instruct-2503,mp42aac,3,done,1393,176,1299.54,86400,33,11,216,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/mp42aac-r4,Mistral-Small-3.1-24B-Instruct-2503,mp42aac,4,done,1412,216,1011.38,86400,50,13,153,3,3,3
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/mp42aac-r5,Mistral-Small-3.1-24B-Instruct-2503,mp42aac,5,done,1272,170,1436.40,86400,47,12,154,1,1,1
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/pdftotext-r1,Mistral-Small-3.1-24B-Instruct-2503,pdftotext,1,done,6829,156,239.17,86400,90,7,392,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/pdftotext-r2,Mistral-Small-3.1-24B-Instruct-2503,pdftotext,2,done,7102,169,204.58,86400,55,6,236,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/pdftotext-r3,Mistral-Small-3.1-24B-Instruct-2503,pdftotext,3,done,6986,145,210.92,86400,64,5,209,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/pdftotext-r4,Mistral-Small-3.1-24B-Instruct-2503,pdftotext,4,done,5934,67,186.15,86400,55,7,279,1,1,1
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/pdftotext-r5,Mistral-Small-3.1-24B-Instruct-2503,pdftotext,5,done,5999,61,185.55,86400,51,8,205,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/bloaty_fuzz_target-r1,Mistral-Small-3.1-24B-Instruct-2503,bloaty_fuzz_target,1,done,8631,26,504.05,86400,48,4,153,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/bloaty_fuzz_target-r2,Mistral-Small-3.1-24B-Instruct-2503,bloaty_fuzz_target,2,done,8644,37,639.66,86400,40,7,169,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/bloaty_fuzz_target-r3,Mistral-Small-3.1-24B-Instruct-2503,bloaty_fuzz_target,3,done,8732,46,688.68,86400,60,12,165,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/bloaty_fuzz_target-r4,Mistral-Small-3.1-24B-Instruct-2503,bloaty_fuzz_target,4,done,8666,54,694.81,86400,53,8,168,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/bloaty_fuzz_target-r5,Mistral-Small-3.1-24B-Instruct-2503,bloaty_fuzz_target,5,done,8748,43,676.97,86400,66,11,150,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/freetype2_ftfuzzer-r1,Mistral-Small-3.1-24B-Instruct-2503,freetype2_ftfuzzer,1,done,9476,0,7775.74,86400,30,5,404,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/freetype2_ftfuzzer-r2,Mistral-Small-3.1-24B-Instruct-2503,freetype2_ftfuzzer,2,done,9161,0,8498.18,86400,18,5,596,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/freetype2_ftfuzzer-r3,Mistral-Small-3.1-24B-Instruct-2503,freetype2_ftfuzzer,3,no seeds,,,,,34,,278,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/freetype2_ftfuzzer-r4,Mistral-Small-3.1-24B-Instruct-2503,freetype2_ftfuzzer,4,no seeds,,,,,26,,224,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/freetype2_ftfuzzer-r5,Mistral-Small-3.1-24B-Instruct-2503,freetype2_ftfuzzer,5,done,8771,0,7364.76,86400,38,7,386,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/lcms_cms_transform_fuzzer-r1,Mistral-Small-3.1-24B-Instruct-2503,lcms_cms_transform_fuzzer,1,done,1535,0,5963.93,86400,89,33,176,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/lcms_cms_transform_fuzzer-r2,Mistral-Small-3.1-24B-Instruct-2503,lcms_cms_transform_fuzzer,2,done,1597,0,3131.02,86400,102,37,167,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/lcms_cms_transform_fuzzer-r3,Mistral-Small-3.1-24B-Instruct-2503,lcms_cms_transform_fuzzer,3,done,1587,0,4057.45,86400,71,32,141,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/lcms_cms_transform_fuzzer-r4,Mistral-Small-3.1-24B-Instruct-2503,lcms_cms_transform_fuzzer,4,done,1562,0,2742.51,86400,87,25,141,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/lcms_cms_transform_fuzzer-r5,Mistral-Small-3.1-24B-Instruct-2503,lcms_cms_transform_fuzzer,5,done,658,0,13682.34,86400,94,43,181,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/libpcap_fuzz_both-r1,Mistral-Small-3.1-24B-Instruct-2503,libpcap_fuzz_both,1,done,2202,0,2551.44,86400,54,9,133,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/libpcap_fuzz_both-r2,Mistral-Small-3.1-24B-Instruct-2503,libpcap_fuzz_both,2,done,2062,0,2541.69,86400,58,17,152,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/libpcap_fuzz_both-r3,Mistral-Small-3.1-24B-Instruct-2503,libpcap_fuzz_both,3,done,2096,0,2657.51,86400,55,8,125,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/libpcap_fuzz_both-r4,Mistral-Small-3.1-24B-Instruct-2503,libpcap_fuzz_both,4,done,2012,0,5125.86,86400,60,16,159,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/libpcap_fuzz_both-r5,Mistral-Small-3.1-24B-Instruct-2503,libpcap_fuzz_both,5,done,2160,0,4464.71,86400,63,11,110,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/vorbis_decode_fuzzer-r1,Mistral-Small-3.1-24B-Instruct-2503,vorbis_decode_fuzzer,1,done,1078,0,648.27,86400,54,28,208,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/vorbis_decode_fuzzer-r2,Mistral-Small-3.1-24B-Instruct-2503,vorbis_decode_fuzzer,2,done,1085,0,400.04,86400,63,35,236,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/vorbis_decode_fuzzer-r3,Mistral-Small-3.1-24B-Instruct-2503,vorbis_decode_fuzzer,3,done (short),1062,0,2562.27,5028,29,1,144,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/vorbis_decode_fuzzer-r4,Mistral-Small-3.1-24B-Instruct-2503,vorbis_decode_fuzzer,4,done,1096,0,104.48,86400,38,22,182,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/vorbis_decode_fuzzer-r5,Mistral-Small-3.1-24B-Instruct-2503,vorbis_decode_fuzzer,5,done (short),1087,0,1333.81,9859,34,2,170,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/woff2_convert_woff2ttf_fuzzer-r1,Mistral-Small-3.1-24B-Instruct-2503,woff2_convert_woff2ttf_fuzzer,1,done,2410,0,435.86,86400,34,13,119,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/woff2_convert_woff2ttf_fuzzer-r2,Mistral-Small-3.1-24B-Instruct-2503,woff2_convert_woff2ttf_fuzzer,2,done,2409,0,606.14,86400,53,25,166,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/woff2_convert_woff2ttf_fuzzer-r3,Mistral-Small-3.1-24B-Instruct-2503,woff2_convert_woff2ttf_fuzzer,3,no seeds,,,,,25,,101,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/woff2_convert_woff2ttf_fuzzer-r4,Mistral-Small-3.1-24B-Instruct-2503,woff2_convert_woff2ttf_fuzzer,4,done,2395,0,447.13,86400,40,15,170,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/woff2_convert_woff2ttf_fuzzer-r5,Mistral-Small-3.1-24B-Instruct-2503,woff2_convert_woff2ttf_fuzzer,5,done,2505,0,488.95,86400,41,11,173,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/libpng_read_fuzzer-r1,Mistral-Small-3.1-24B-Instruct-2503,libpng_read_fuzzer,1,done,1551,5,4741.42,86400,57,15,111,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/libpng_read_fuzzer-r2,Mistral-Small-3.1-24B-Instruct-2503,libpng_read_fuzzer,2,done,1561,9,5363.63,86400,64,16,121,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/libpng_read_fuzzer-r3,Mistral-Small-3.1-24B-Instruct-2503,libpng_read_fuzzer,3,done,1557,2,7937.09,86400,56,14,119,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/libpng_read_fuzzer-r4,Mistral-Small-3.1-24B-Instruct-2503,libpng_read_fuzzer,4,done,1457,3,730.72,86400,47,1,95,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/libpng_read_fuzzer-r5,Mistral-Small-3.1-24B-Instruct-2503,libpng_read_fuzzer,5,done,1586,3,9304.28,86400,63,21,115,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/sndfile_fuzzer-r1,Mistral-Small-3.1-24B-Instruct-2503,sndfile_fuzzer,1,done,3496,41,615.91,86400,76,11,315,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/sndfile_fuzzer-r2,Mistral-Small-3.1-24B-Instruct-2503,sndfile_fuzzer,2,done,3360,43,286.54,86400,79,15,334,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/sndfile_fuzzer-r3,Mistral-Small-3.1-24B-Instruct-2503,sndfile_fuzzer,3,done,3447,41,484.14,86400,76,10,326,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/sndfile_fuzzer-r4,Mistral-Small-3.1-24B-Instruct-2503,sndfile_fuzzer,4,done,3301,39,493.21,86400,78,15,309,0,0,0
+04-model-sweep-qc-24h,Mistral-Small-3.1-24B-Instruct-2503/sndfile_fuzzer-r5,Mistral-Small-3.1-24B-Instruct-2503,sndfile_fuzzer,5,done,3406,40,513.77,86400,77,8,296,0,0,0
