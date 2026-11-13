@@ -1,0 +1,229 @@
+#!/usr/bin/env python3
+"""lineage: where each queue entry came from (the paper's Table 13 method), per campaign and per arm.
+
+Usage (on Tempest, after `scripts/study results <study>`; it lists queue folders and reads small logs only):
+  scripts/lineage <study> [--out-csv FILE] [--out FILE]
+    reads <study>/results/campaigns.csv for the campaigns, writes results/lineage.csv (one row per campaign) and
+    results/lineage.md (per arm), and prints the latter
+
+Every queue entry is traced through its first parent (src:A or src:A+B -> A) to a root, and counted under the root's
+origin:
+  stock          a stock seed (initial_seeds/ without a generator name)
+  setup-e0       a seed-generation seed from the first round (Input Generator Synthesis)
+  setup-rfdm     a seed-generation seed from a later round (Rare-Feature Directed Mutation; seedgen.log's epochs)
+  setup-readded  (upstream only) a setup seed queued again by a stall step
+  run-<mutator>  a stall step's seed: Alfred's sync:llm imports (the mutator from llm/steps.jsonl), or upstream's
+                 in-run seeds (from mutate_log's cur_mutator lines)
+  sync-other     an import from another sync instance
+  unknown        anything else (should be 0)
+Per origin: roots, descendants (the paper's "new paths found by mutating seeds from each component"), descendants
+that brought new coverage (+cov), generators, and descendants per generator. Caveats: a splice counts for its first
+parent only; seeds that arrive later have less time to have descendants; Alfred keeps only stall seeds that reach new
+coverage (each import is itself a +cov entry, counted as a root, not a descendant).
+"""
+import argparse
+import csv
+import os
+import re
+import sys
+import json
+
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+GEN = re.compile(r"^(.+-\d+)_\d+")
+MOVED = re.compile(r"---- Moved \S+ to \S*/gen_seeds/(\S+)")
+CLASSES = ["stock", "setup-e0", "setup-rfdm", "setup-readded", "run-feature", "run-structure", "run-pattern",
+           "run-rare", "run-web", "run-unknown", "sync-other", "unknown"]
+
+
+def setup_map(log):
+    """generator -> setup-e0 / setup-rfdm, from seedgen.log's epoch markers and mv_files lines"""
+    m, epoch = {}, 0
+    try:
+        f = open(log, errors="replace")
+    except OSError:
+        return m
+    with f:
+        for line in f:
+            if line.startswith("++++ 2.1 CUR EPOCH:"):
+                epoch = int(line.split(":")[1])
+            elif line.startswith("*" * 12 + " "):     # the next format: its epochs start again
+                epoch = 0
+            elif line.startswith("---- Moved"):
+                g = MOVED.search(line)
+                k = GEN.match(g.group(1)) if g else None
+                if k and k.group(1) not in m:
+                    m[k.group(1)] = "setup-e0" if epoch == 0 else "setup-rfdm"
+    return m
+
+
+def run_map_upstream(log):
+    """generator -> run-<mutator>, from upstream's mutate_log"""
+    m, mut = {}, None
+    try:
+        f = open(log, errors="replace")
+    except OSError:
+        return m
+    with f:
+        for line in f:
+            if line.startswith("cur_mutator:"):
+                mut = line.split(":", 1)[1].strip()
+            elif line.startswith("---- Moved") and mut:
+                g = MOVED.search(line)
+                k = GEN.match(g.group(1)) if g else None
+                if k and k.group(1) not in m:
+                    m[k.group(1)] = "run-" + mut
+    return m
+
+
+def alfred_sync(out):
+    """(llm queue id -> run-<mutator>, number of steps) for an Alfred campaign, or None for an upstream one"""
+    sync = os.path.join(os.path.dirname(out), "llm")
+    steps_file = os.path.join(sync, "steps.jsonl")
+    if not os.path.isfile(steps_file):
+        return None
+    gen_mut = {}
+    with open(steps_file) as f:
+        for line in f:
+            try:
+                s = json.loads(line)
+            except ValueError:
+                continue
+            if s.get("generator"):
+                gen_mut[s["generator"]] = s.get("mutator") or "unknown"
+    ids = {}
+    try:
+        for n in os.listdir(os.path.join(sync, "queue")):
+            mm = re.match(r"id:(\d+),orig:(.*)", n)
+            if mm:
+                g = GEN.match(mm.group(2))
+                ids[int(mm.group(1))] = "run-" + (gen_mut.get(g.group(1), "unknown") if g else "unknown")
+    except OSError:
+        pass
+    return ids, gen_mut
+
+
+def campaign(cdir, target):
+    out = os.path.join(cdir, target + "_output", "default")
+    q = os.path.join(out, "queue")
+    if not os.path.isdir(q):
+        return None
+    smap = setup_map(os.path.join(cdir, "seedgen.log"))
+    alf = alfred_sync(out)
+    rmap = run_map_upstream(os.path.join(out, "mutate_log")) if alf is None else {}
+    parsed = []
+    for n in os.listdir(q):
+        if not n.startswith("id:"):
+            continue
+        parts = n.split(",")
+        try:
+            i = int(parts[0][3:])
+        except ValueError:
+            continue
+        kv = dict(p.split(":", 1) for p in parts[1:] if ":" in p)
+        parsed.append((i, kv, n.endswith("+cov")))
+    parsed.sort(key=lambda t: t[0])
+    stats = {c: [0, 0, 0, set()] for c in CLASSES}   # roots, descendants, +cov descendants, generators
+    root = {}
+    for i, kv, cov in parsed:
+        c = None
+        if "orig" in kv:
+            k = GEN.match(kv["orig"])
+            if not k:
+                c = "stock"
+            else:
+                g = k.group(1)
+                if g in smap:
+                    c = smap[g]
+                    if kv.get("execs", "0") != "0":
+                        c = "setup-readded"
+                elif g in rmap:
+                    c = rmap[g]
+                else:
+                    c = "unknown"
+                stats.get(c, stats["unknown"])[3].add(g)
+        elif "sync" in kv:
+            if kv["sync"] == "llm" and alf is not None:
+                c = alf[0].get(int(kv.get("src", "-1")), "run-unknown")
+            else:
+                c = "sync-other"
+        if c is not None:
+            c = c if c in stats else "run-unknown" if c.startswith("run-") else "unknown"
+            root[i] = c
+            stats[c][0] += 1
+        elif "src" in kv:
+            p = int(kv["src"].split("+")[0])
+            c = root.get(p, "unknown")
+            root[i] = c
+            stats[c][1] += 1
+            stats[c][2] += 1 if cov else 0
+        else:
+            root[i] = "unknown"
+            stats["unknown"][1] += 1
+    row = {"queue": len(parsed), "alfred": int(alf is not None)}
+    if alf is not None:
+        gens_run = {}
+        for g, m in alf[1].items():
+            gens_run["run-" + m] = gens_run.get("run-" + m, 0) + 1
+    for c in CLASSES:
+        r, d, cv, gs = stats[c]
+        if c.startswith("setup-") and c != "setup-readded":
+            ng = sum(1 for v in smap.values() if v == c)
+        elif c.startswith("run-"):
+            ng = gens_run.get(c, 0) if alf is not None else sum(1 for v in rmap.values() if v == c)
+        else:
+            ng = 0
+        row.update({c + "_roots": r, c + "_desc": d, c + "_cov": cv, c + "_gens": ng})
+    return row
+
+
+def main():
+    ap = argparse.ArgumentParser(description="Queue lineage by seed origin (Table 13), per campaign and per arm.")
+    ap.add_argument("study")
+    ap.add_argument("--out-csv")
+    ap.add_argument("--out")
+    a = ap.parse_args()
+    study = os.path.abspath(a.study if os.path.isdir(a.study) else os.path.join(REPO, "experiments", a.study))
+    csv_path = os.path.join(study, "results", "campaigns.csv")
+    if not os.path.isfile(csv_path):
+        sys.exit(f"lineage: no {csv_path} (run: scripts/study results {os.path.basename(study)})")
+    out_rows = []
+    for r in csv.DictReader(open(csv_path)):
+        if r["arm"] == "seeds" or r["state"] not in ("done", "done (short)"):
+            continue
+        row = campaign(os.path.join(study, "campaigns", r["campaign"]), r["target"])
+        if row is None:
+            continue
+        out_rows.append({"campaign": r["campaign"], "arm": r["arm"], "target": r["target"], **row})
+    if not out_rows:
+        sys.exit("lineage: no finished campaigns with a queue")
+    out_csv = a.out_csv or os.path.join(study, "results", "lineage.csv")
+    with open(out_csv, "w", newline="") as f:
+        w = csv.DictWriter(f, list(out_rows[0].keys()))
+        w.writeheader()
+        w.writerows(out_rows)
+
+    L = [f"# Lineage: {os.path.basename(study)}", "",
+         "Queue entries by the origin of their root seed (`scripts/lineage`, the paper's Table 13 method). desc: entries "
+         "descended from those roots; +cov: of them, entries with new coverage; per gen: descendants per generator.", ""]
+    for arm in dict.fromkeys(r["arm"] for r in out_rows):
+        rs = [r for r in out_rows if r["arm"] == arm]
+        D = sum(r[c + "_desc"] for r in rs for c in CLASSES)
+        L += [f"## {arm} ({len(rs)} campaigns, {D:,} descendants)", "",
+              "| origin | roots | descendants | share | +cov | generators | per generator |", "|---|---|---|---|---|---|---|"]
+        for c in CLASSES:
+            ro, d = sum(r[c + "_roots"] for r in rs), sum(r[c + "_desc"] for r in rs)
+            cv, g = sum(r[c + "_cov"] for r in rs), sum(r[c + "_gens"] for r in rs)
+            if ro or d:
+                L.append(f"| {c} | {ro:,} | {d:,} | {100 * d / max(D, 1):.1f}% | {cv:,} | {g:,} | "
+                         f"{(f'{d / g:.1f}' if g else '–')} |")
+        L.append("")
+    text = "\n".join(L)
+    out = a.out or os.path.join(study, "results", "lineage.md")
+    with open(out, "w") as f:
+        f.write(text)
+    print(text)
+    print(f"(wrote {out} and {out_csv})")
+
+
+if __name__ == "__main__":
+    main()

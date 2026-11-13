@@ -14,6 +14,15 @@ from .llm_utils import *
 
 CURRENT_TIME = time.time()
 
+# ALFRED: how generator code runs (2026-11-11).
+# SANDBOX: run it in py_utils/sandbox.py (no network, its own /tmp and /dev/shm). The web stall mutator turns it on
+# for the generators it makes; G2F_SANDBOX_ALL=1 turns it on for every generator (seed generation too). Without a
+# working sandbox, sandboxed code doesn't run at all.
+# ALLOW_PIP: self_debug may pip-install a missing module (upstream). The web stall mutator turns it off: a web page
+# could otherwise steer the code to import, and so install, any package.
+SANDBOX = os.environ.get("G2F_SANDBOX_ALL") == "1"
+ALLOW_PIP = True
+
 class ExecutionStatus(IntEnum):
     SUCCESS = auto()
     EXCEPTION = auto()
@@ -93,6 +102,18 @@ def run_cmd(
 def validate_status_process(
     g_code, python="python", device="cpu", verbose=False, output_path=None
 ) -> (ExecutionStatus, str):
+    if SANDBOX:   # ALFRED: the code goes in the campaign (the sandbox has its own empty /tmp), at a relative path
+        from py_utils import sandbox   # that still contains /tmp/tmp, which extract_error_info looks for
+        if not sandbox.available():
+            print("ALFRED sandbox unavailable (%s): generator not run" % sandbox.why)
+            return ExecutionStatus.EXCEPTION, "ALFRED sandbox unavailable: generator not run"
+        base = output_path or "."
+        rel = os.path.join(".sandbox", "tmp", "tmp{}.py".format(CURRENT_TIME))
+        os.makedirs(os.path.join(base, ".sandbox", "tmp"), exist_ok=True)
+        with open(os.path.join(base, rel), "w") as f:
+            f.write(g_code)
+        print("----> output_path:", output_path, "(sandboxed)")
+        return run_cmd(sandbox.wrap([python, rel]), verbose=verbose, cwd=base)
     with open("/tmp/tmp{}.py".format(CURRENT_TIME), "w") as f:
         f.write(g_code)
     # print("/tmp/tmp{}.py".format(CURRENT_TIME))
@@ -526,6 +547,10 @@ def pip_debug(msg, MAX_TRY, model, temperature):
     install_flag = 0 # 0 represents installing failed, 1 represents installing successfully
 
     if msg in pip_debug_record: # indicate that has processed this msg before and failed to solved it. If we solved the msg successfully, we should not meet it again.
+        return install_flag
+    if not ALLOW_PIP:   # ALFRED: web-informed code installs nothing
+        print("pip install skipped: not allowed for this generator (ALFRED web mutator)")
+        pip_debug_record.append(msg)
         return install_flag
 
     pip_debug_prompt_init = "```\n<MSG>\n```\nPlease use Markdown syntax to represent the command. Please ensure that there is only one command. To solve the above issue using Python's package manager pip, you should run the following command in the command-line interface:"

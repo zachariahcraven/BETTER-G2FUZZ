@@ -59,6 +59,10 @@ def fake_step(out):
     with open(os.path.join(seeds, f"jpg-{n + 3}_4,x.jpg"), "wb") as f:
         f.write(b"comma")
     os.makedirs(os.path.join(seeds, "subdir"), exist_ok=True)
+    # what generator_mutation.py prints: the mutator it picked, then mv_files's lines for the new generator's seeds
+    print("mutators: ['feature', 'structure']\ncur_mutator: structure", flush=True)
+    print(f"---- Moved {out}/tmp/a.jpg to {seeds}/jpg-{n + 3}_1.jpg", flush=True)
+    print('---- step: {"feature": "Progressive scan %d", "mutator": "not this", "web": "generator"}' % n, flush=True)
     print("fake step done", flush=True)
     time.sleep(float(os.environ.get("FAKE_STEP_SECS", "0")))
 
@@ -113,6 +117,12 @@ class WorkerTest(unittest.TestCase):
         self.assertGreaterEqual(len(steps), 2, steps)
         first = steps[0]
         self.assertEqual((first["seeds"], first["published"], first["empty"], first["too_big"]), (4, 2, 1, 1))
+        self.assertEqual(first["mutator"], "structure")                 # read from the step's part of mutate_log
+        self.assertEqual(first["generator"], "jpg-3")
+        self.assertEqual(first["web"], "generator")                     # the step line is merged in, but it
+        self.assertEqual(first["mutator"], "structure")                 # can't overwrite mutator or generator
+        self.assertNotEqual(first["feature"], steps[1]["feature"])
+        self.assertNotEqual(steps[1]["generator"], "jpg-3", "each step must read only its own output")
         queue = sorted(os.listdir(os.path.join(sync, "queue")))
         self.assertTrue(queue[0].startswith("id:000000,orig:jpg-"), queue)
         self.assertFalse(any(",x" in q.split("orig:")[1] for q in queue), "comma kept in a seed name")

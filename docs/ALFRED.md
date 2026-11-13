@@ -83,3 +83,136 @@ its queue and fuzzes each at once. Alfred instead:
   the LLM): afl-fuzz 5.03c reported `autoconfiguring for "-S default"`, the worker handed over 24 seeds in 8 steps,
   AFL++ kept 2 (`id:000073,sync:llm,src:000004` and `id:000074,sync:llm,src:000009,+cov`), lineage mapped them to
   `jpg-21` and `jpg-23`, and the worker exited with afl-fuzz.
+
+## Tweak switches, rounds and their tools (2026-11-09)
+Alfred improves in 6 h rounds ([ALFRED-ROUNDS.md](ALFRED-ROUNDS.md): the acceptance rule, the switches, the backlog
+and the rounds log).
+- **Switches:** `scripts/fuzz run --set NAME=VALUE`, or a study arm's `set:NAME=VALUE`.
+  - `scripts/fuzz tweaks` lists the allowed names, values and when each acts.
+  - A campaign records its switches in its `tweaks` file, which `status` and `results` print, and `launch.txt` has
+    them too.
+  - A setup switch needs seed generation, so `scripts/study` refuses it with shared or reused seeds.
+- **New switches:**
+  - `G2F_STALL_MUTATORS` (the `rare` stall mutator, in `generator_mutation.py`).
+  - `G2F_RFDM_ALL_FORMATS` (in `program_gen.py`).
+  - Together with the worker's existing `G2F_LLM_MODE`, `G2F_PLATEAU_SEC` and `G2F_BACKOFF_SEC`.
+- **What `program_gen.py` and the worker now record:**
+  - `program_gen.py` also writes each format's own `feature_pool-<format>.json`.
+  - The worker records each step's mutator and new generator in `llm/steps.jsonl`.
+- **`scripts/compare <study>`:**
+  - The rule's decisions; per target, medians, A12 and exact Mann–Whitney p.
+  - LLM use, kept seeds per mutator, and failures and bug signs.
+  - The failure signs: aborts and heap errors at the end of `fuzz.log`, worker tracebacks, OOM kills, and queue files
+    over 1 MiB.
+  - Plain Python 3, no scipy.
+- **`scripts/lineage <study>`:**
+  - Each queue entry is traced to its root seed: stock, setup round 0, setup Rare-Feature, or a stall step by mutator.
+  - It reads Alfred's `sync:llm` imports and upstream's in-place seeds, so it also gives the final study's Table 13.
+  - On 04's gpt-oss-20b campaigns it reproduces the 2026-11-08 analysis exactly.
+- **Two accounts:** `STUDY_EXTRA_ACCOUNT`, `STUDY_EXTRA_MAX` and `STUDY_MAIN_MAX` for `scripts/study start`, ported
+  from the private driver 04/05 used.
+  - Quantumcore first; the class priority account takes the overflow.
+  - Its G2FUZZ campaigns get the server's address.
+- **Tests:**
+  - `g2fuzz/tests/test_mutators.py`: the mutator sets, the setup rounds, and the `rare` mutator end to end against a
+    fake LLM server. Run it in the image, which has openai.
+  - `test_llm_worker.py`: the recorded mutator.
+  - `scripts/tests/test_fuzz_cli.sh`: 27 new contracts for `--set`/`set:` and the extra account.
+
+
+## The web stall mutator (2026-11-11)
+`G2F_STALL_MUTATORS=web` (alone, or with others). A stall step that targets a feature no generator has yet, like
+`rare`, but takes the feature from documents found on the web at that stall, not from the model's memory. The aim is
+fresh, rare features as a long campaign goes on, which a one-time scrape can't give: it runs dry, and the model then
+invents near-copies of features it already has.
+
+**One step** (`generator_mutation.py` `mutation_web`, research in `g2fuzz/py_utils/web_step.py`):
+1. **Pick a parent** generator (the scheduler) and its format.
+2. **Write queries.** The LLM writes new search queries from:
+   - the features already covered (the setup's `feature_pool-<format>.json` plus web features with a generator);
+   - the queries already tried;
+   - a search angle, the least used of eight (optional parts of the spec, extensions, deprecated features, CVEs and
+     crafted files, parser bugs, encodings and metadata, versions, library edge cases).
+3. **Search.** Each step uses the two least-used sources that aren't rate-limited. All of them are free and need
+   no key (`py_utils/web_search.py`, `G2F_WEB_SOURCES`):
+   - Wikipedia (article text);
+   - NVD's CVE API (descriptions);
+   - Stack Overflow;
+   - GitHub issues;
+   - links: up to two pages linked from documents read earlier, only where robots.txt allows.
+4. **Read only new documents.** Every document read is remembered, so no later step reads it again, and its links
+   join the reading list.
+5. **Find features.** The LLM gets an excerpt of each new document: the paragraphs with the most format detail and
+   the fewest covered features, at most 12,000 characters in all. It names uncovered features, each with a sentence
+   quoted from its document.
+6. **Check them.**
+   - **Grounded:** a feature is dropped unless its quote is really in the excerpt.
+   - **New:** it is dropped if it matches a known feature, first by word overlap, then by asking the LLM. The
+     document is then linked to the feature it matched, so covered features collect their documents too.
+7. **Make the generator.** As `rare` does, the parent generator is extended with one new feature. The prompt carries:
+   - the feature's description;
+   - the quoted sentences and the part of the document around them;
+   - the image's installed Python packages.
+   If this stall found nothing new, a feature found earlier and not yet targeted is used (each gets 2 tries).
+
+**The campaign's memory:**
+- **`<target>_output/default/web_ledger.json`** (`py_utils/web_ledger.py`):
+  - every feature, with its documents (url and quote) and its state: candidate, targeted with its generator,
+    failed, covered by seed generation;
+  - the rejected features and why;
+  - every document, with its source, query and step, and the features it gave;
+  - the reading list of links;
+  - every query, with its new documents;
+  - per-source cooldowns.
+- **`web_docs/`** holds the excerpts the LLM read.
+- **Campaigns never share** a ledger, so repetitions stay independent. `scripts/fuzz reuse` copies the setup's
+  feature lists, never a ledger.
+- **Not repeatable exactly:** the web changes, and the ledger is the record of what each campaign saw. The shared
+  rate limits (one address for all of Tempest) are the only link between campaigns. A rate-limited source cools down
+  (GitHub about 10 searches a minute, NVD 5 per 30 s, Stack Exchange 300 a day) and the other sources go on.
+
+**Safety:** web text reaches prompts whose answers run as Python, so a page could carry instructions. Three layers:
+- **Prompts:** web text is marked as reference data, not instructions, in every prompt.
+- **The sandbox** (`py_utils/sandbox.py`): a web-informed generator runs only there, or not at all.
+  - `unshare` gives it new user, network and mount namespaces: only loopback, and fresh `/tmp` and `/dev/shm`.
+  - It can't reach the internet, the node's shared `/tmp` and `/dev/shm` (other jobs' files), or the worker and
+    afl-fuzz.
+  - `pip install` is off for it, so a page can't get a package installed.
+  - Checked on Tempest compute nodes (Apptainer 1.5.4) on 2026-11-11.
+- **Every campaign container** (all arms, `scripts/fuzz`) has:
+  - `--no-mount home,cwd,tmp`, so it never sees your home folder (ssh keys, other repos) or the folder the job
+    started in;
+  - its own `/tmp` (`${TMPDIR:-/tmp}/alfred-tmp-<job>`, removed at the end), instead of the node's.
+  - Before this, a generator could write anywhere in your home folder, and campaigns on one node shared `/tmp`.
+    For example, 04's mp3gain generators download ffmpeg into it, so a later campaign could find it there.
+- **`G2F_SANDBOX_ALL=1`** sandboxes every generator. It's a setup-time switch to test as a round. In 04, 3.7% of
+  gpt-oss-20b's generators used the network, 40% on mp3gain (ffmpeg downloads).
+
+**What `scripts/compare` and `scripts/lineage` add:**
+- `compare`'s web table, per arm:
+  - steps and queries (failed);
+  - documents read and features found;
+  - generators made and failed;
+  - rejects (ungrounded, duplicate) and links queued;
+  - queries and new documents per source.
+- `lineage`'s `run-web` class.
+- The worker's `steps.jsonl` records each rare or web step's feature and search numbers.
+
+**`scripts/web-check [FORMAT ...]`** runs two web steps with fixed queries and no LLM, and prints what each source
+returned. Run it on the nodes a round uses before launching one. On 2026-11-11, from the Mac and from a compute node
+inside the image, all four sources answered: 14 documents for png and for tiff, and pages from the reading list in
+step 2.
+
+**Tests:**
+- **`g2fuzz/tests/test_web.py`** (21 tests): a fake web (Wikipedia, NVD, Stack Exchange, GitHub, a spec site with
+  robots.txt) and a fake LLM. It covers:
+  - the ledger, the parsers and robots.txt;
+  - rate limits, grounding, duplicates and excerpts;
+  - two stalls in a row (new documents, no repeats);
+  - the sandbox (no network; private `/tmp`);
+  - the mutator end to end (its generator's seed records no network), and a step that refuses to run without the
+    sandbox.
+  - All pass in the image on a Tempest compute node. Plain Docker on the Mac can't start the sandbox, so its tests
+    are skipped there.
+- **`scripts/tests/test_fuzz_cli.sh`:** contracts for the new switches, the container mounts and private `/tmp`,
+  and `reuse` copying the feature lists.

@@ -1,0 +1,439 @@
+#!/usr/bin/env python3
+"""compare: one Alfred round's arms against its control, by docs/ALFRED-ROUNDS.md's acceptance rule.
+
+Usage (on Tempest, after `scripts/study results <study>`):
+  scripts/compare <study> [--control ARM] [--no-triage] [--out FILE]
+    <study>      a folder in experiments/ (or a path to one); reads its results/campaigns.csv
+    --control    the arm the others are compared with [control]
+    --no-triage  skip reading the campaigns' logs (the failure table then has only results/campaigns.csv's numbers)
+    --out        where the report goes [<study>/results/compare.md]; it is printed too
+
+For each arm against the control:
+  per target: the median `edges` (afl-fuzz's own count: compare within one study, one image and one target build),
+              the ratio of medians, Vargha-Delaney A12 and the exact two-sided Mann-Whitney U p on the reps;
+  overall:    targets better and worse, and the exact one-sided Wilcoxon signed-rank p on the per-target log ratios
+              (H1: the arm beats the control), counting each target once;
+  decision:   keep / borderline / drop by the rule below; an --afl arm is a baseline and gets none.
+LLM use per arm (medians), the kept seeds per stall mutator (llm/steps.jsonl and the queue's sync:llm entries), and
+the failures and bug signs found in each campaign's files.
+
+Rule (docs/ALFRED-ROUNDS.md, fixed before round A01):
+  keep        the arm's median beats the control's on at least 60% of the targets (9 of 15), Wilcoxon p < 0.05,
+              no target significantly worse (Mann-Whitney p < 0.05 and A12 <= 0.29), and no new kind of failure
+  borderline  0.05 <= p < 0.2 and no target significantly worse: test it again once, with new seeds
+  drop        anything else
+Campaigns that are "no seeds" count with 0 edges (a G2FUZZ result: the model made no seeds); failed ones are left out
+and listed (retry them first: scripts/study start <study> --retry-failed).
+"""
+import argparse
+import csv
+import datetime
+import itertools
+import json
+import math
+import os
+import re
+import statistics
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "g2fuzz"))
+from py_utils.web_ledger import summarize  # noqa: E402  (plain Python: no LLM client)
+
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ALPHA, BORDER, SIG, A12_WORSE, A12_BETTER, SHARE = 0.05, 0.2, 0.05, 0.29, 0.71, 0.6
+MIB = 1024 * 1024
+GEN = re.compile(r"^(.+-\d+)_\d+")
+TAIL = 2 * MIB   # fuzz.log can be tens of MB; an abort or a heap error ends afl-fuzz, so its last 2 MiB tell
+SIGNS = {   # failure kinds: where to look (fuzz.log: its end only), and the byte patterns that count
+    "afl-fuzz abort": ("fuzz.log", [b"PROGRAM ABORT"]),
+    "heap error": ("fuzz.log", [b"malloc(): ", b"double free", b"corrupted size", b"corrupted double-linked",
+                                b"free(): invalid", b"munmap_chunk(): invalid"]),
+    "worker traceback": ("llm-worker.log", [b"Traceback (most recent call last)"]),
+    "OOM kill": ("slurm-*.out", [b"oom_kill", b"OUT_OF_MEMORY"]),
+    "time limit": ("slurm-*.out", [b"DUE TO TIME LIMIT"]),
+}
+
+
+# --- statistics (exact, stdlib only) ---------------------------------------------------------------------------
+def ranks(vals):
+    """Mid-ranks (ties share the average rank), as 01-baseline-replication/analysis/03-stats.py."""
+    order = sorted(range(len(vals)), key=lambda i: vals[i])
+    r = [0.0] * len(vals)
+    i = 0
+    while i < len(order):
+        j = i
+        while j + 1 < len(order) and vals[order[j + 1]] == vals[order[i]]:
+            j += 1
+        for k in range(i, j + 1):
+            r[order[k]] = (i + j) / 2 + 1
+        i = j + 1
+    return r
+
+
+def mwu_a12(x, y):
+    """(A12 of x over y, exact two-sided Mann-Whitney p), as 03-stats.py: full enumeration of the C(n+m, n) label
+    assignments of the pooled values (exact given the ties); a normal approximation past 200,000 of them."""
+    n, m = len(x), len(y)
+    if n == 0 or m == 0:
+        return None, None
+    pooled = list(x) + list(y)
+    rk = ranks(pooled)
+    u_obs = sum(rk[:n]) - n * (n + 1) / 2
+    a12 = u_obs / (n * m)
+    dev = abs(u_obs - n * m / 2)
+    if math.comb(n + m, n) > 200000:
+        sd = math.sqrt(n * m * (n + m + 1) / 12)
+        return a12, (math.erfc(dev / sd / math.sqrt(2)) if sd else 1.0)
+    total = more = 0
+    for idx in itertools.combinations(range(n + m), n):
+        total += 1
+        if abs(sum(rk[i] for i in idx) - n * (n + 1) / 2 - n * m / 2) >= dev - 1e-9:
+            more += 1
+    return a12, more / total
+
+
+def wilcoxon_greater(d):
+    """Exact one-sided Wilcoxon signed-rank p for H1: d > 0 (zeros dropped, tied |d| share mid-ranks), from the
+    distribution of W+ over all 2^n signs, counted by dynamic programming on doubled ranks."""
+    d = [v for v in d if v != 0]
+    if not d:
+        return 1.0
+    r2 = [int(round(2 * r)) for r in ranks([abs(v) for v in d])]
+    w = sum(r for r, v in zip(r2, d) if v > 0)
+    dist = {0: 1}
+    for r in r2:
+        nxt = dict(dist)
+        for s, c in dist.items():
+            nxt[s + r] = nxt.get(s + r, 0) + c
+        dist = nxt
+    return sum(c for s, c in dist.items() if s >= w) / 2 ** len(d)
+
+
+# --- reading a campaign ----------------------------------------------------------------------------------------
+def count_patterns(path, patterns, tail=None):
+    """Occurrences of the patterns (each under 64 bytes) in the file, or in its last `tail` bytes."""
+    n = 0
+    try:
+        with open(path, "rb") as f:
+            if tail:
+                f.seek(max(0, os.path.getsize(path) - tail))
+            prev = b""
+            while True:
+                chunk = f.read(8 * MIB)
+                if not chunk:
+                    break
+                buf = prev + chunk   # prev: the last 63 bytes again, for a match across the boundary
+                n += sum(buf.count(p) for p in patterns) - sum(prev.count(p) for p in patterns)
+                prev = buf[-63:]
+    except OSError:
+        pass
+    return n
+
+
+def files(cdir, pattern):
+    if "*" not in pattern:
+        return [os.path.join(cdir, pattern)]
+    pre, suf = pattern.split("*")
+    try:
+        return [os.path.join(cdir, f) for f in os.listdir(cdir) if f.startswith(pre) and f.endswith(suf)]
+    except OSError:
+        return []
+
+
+def triage(cdir, target):
+    out = {k: sum(count_patterns(f, pats, TAIL if where == "fuzz.log" else None) for f in files(cdir, where))
+           for k, (where, pats) in SIGNS.items()}
+    big = 0
+    try:
+        for e in os.scandir(os.path.join(cdir, target + "_output", "default", "queue")):
+            if e.is_file() and e.stat().st_size > MIB:
+                big += 1
+    except OSError:
+        pass
+    out["queue file >1 MiB"] = big
+    return out
+
+
+def mutator_yield(cdir, target):
+    """{mutator: [steps, handed, kept]} from llm/steps.jsonl and the default queue's sync:llm imports."""
+    sync = os.path.join(cdir, target + "_output", "llm")
+    res, gen_mut = {}, {}
+    try:
+        with open(os.path.join(sync, "steps.jsonl")) as f:
+            for line in f:
+                s = json.loads(line)
+                m = s.get("mutator") or "unknown"
+                r = res.setdefault(m, [0, 0, 0])
+                r[0] += 1
+                r[1] += s.get("published", 0)
+                if s.get("generator"):
+                    gen_mut[s["generator"]] = m
+    except (OSError, ValueError):
+        return res
+    orig = {}
+    try:
+        for n in os.listdir(os.path.join(sync, "queue")):
+            mm = re.match(r"id:(\d+),orig:(.*)", n)
+            if mm:
+                orig[int(mm.group(1))] = mm.group(2)
+    except OSError:
+        pass
+    try:
+        for n in os.listdir(os.path.join(cdir, target + "_output", "default", "queue")):
+            mm = re.match(r"id:\d+,sync:llm,src:(\d+)", n)
+            if not mm:
+                continue
+            g = GEN.match(orig.get(int(mm.group(1)), ""))
+            m = gen_mut.get(g.group(1)) if g else None
+            res.setdefault(m or "unknown", [0, 0, 0])[2] += 1
+    except OSError:
+        pass
+    return res
+
+
+def web_summary(cdir, target):
+    """The web stall mutator's numbers for one campaign (its web_ledger.json), or None if it has none."""
+    try:
+        with open(os.path.join(cdir, f"{target}_output", "default", "web_ledger.json")) as f:
+            return summarize(json.load(f))
+    except (OSError, ValueError):
+        return None
+
+
+def num(v):
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
+
+
+def fmt(v, nd=0):
+    if v is None:
+        return "–"
+    if isinstance(v, float) and nd:
+        return f"{v:.{nd}f}"
+    return f"{v:,.0f}" if isinstance(v, float) else str(v)
+
+
+def pfmt(p):
+    return "–" if p is None else ("<0.001" if p < 0.001 else f"{p:.3f}")
+
+
+def main():
+    ap = argparse.ArgumentParser(description="Compare a round's arms with its control (docs/ALFRED-ROUNDS.md).")
+    ap.add_argument("study")
+    ap.add_argument("--control", default="control")
+    ap.add_argument("--no-triage", action="store_true")
+    ap.add_argument("--out")
+    a = ap.parse_args()
+    study = a.study if os.path.isdir(a.study) else os.path.join(REPO, "experiments", a.study)
+    study = os.path.abspath(study)
+    csv_path = os.path.join(study, "results", "campaigns.csv")
+    if not os.path.isfile(csv_path):
+        sys.exit(f"compare: no {csv_path} (run: scripts/study results {os.path.basename(study)})")
+    rows = list(csv.DictReader(open(csv_path)))
+    arms = list(dict.fromkeys(r["arm"] for r in rows if r["arm"] != "seeds"))
+    if a.control not in arms:
+        sys.exit(f"compare: no arm '{a.control}' in {csv_path} (arms: {' '.join(arms)}; pick one with --control)")
+    camps = os.path.join(study, "campaigns")
+    afl_arms = set()
+    for arm in arms:
+        cs = [r for r in rows if r["arm"] == arm]
+        if cs and all(open(os.path.join(camps, r["campaign"], "mode")).read().strip() == "afl++-cmplog"
+                      if os.path.isfile(os.path.join(camps, r["campaign"], "mode")) else False for r in cs):
+            afl_arms.add(arm)
+    targets = list(dict.fromkeys(r["target"] for r in rows if r["arm"] in arms))
+
+    edges = {}        # (arm, target) -> [edges]
+    left_out = []
+    for r in rows:
+        if r["arm"] not in arms:
+            continue
+        if r["state"] == "done":
+            e = num(r["edges"])
+        elif r["state"] == "no seeds":
+            e = 0.0
+        else:
+            left_out.append(f"{r['campaign']} ({r['state']})")
+            continue
+        if e is not None:
+            edges.setdefault((r["arm"], r["target"]), []).append(e)
+
+    L = []
+    w = L.append
+    w(f"# Compare: {os.path.basename(study)} (control: {a.control})")
+    w("")
+    w(f"Made {datetime.datetime.now():%Y-%m-%d %H:%M} by `scripts/compare` from `results/campaigns.csv` ({len(rows)} rows). "
+      "Metric: afl-fuzz's `edges` at the end of each campaign. Rule: `docs/ALFRED-ROUNDS.md`.")
+    if left_out:
+        w("")
+        w(f"Left out ({len(left_out)}, not done; retry them first): " + ", ".join(left_out))
+
+    # failures first: the decision needs them
+    fails = {}
+    for arm in arms:
+        f = fails.setdefault(arm, {"not done": 0, "no seeds": 0, "llm_400": 0, "llm_cut": 0})
+        for r in rows:
+            if r["arm"] != arm:
+                continue
+            if r["state"] not in ("done", "no seeds"):
+                f["not done"] += 1
+            if r["state"] == "no seeds":
+                f["no seeds"] += 1
+            f["llm_400"] += int(num(r.get("llm_400")) or 0)
+            f["llm_cut"] += int(num(r.get("llm_cut")) or 0)
+            if not a.no_triage:
+                for k, v in triage(os.path.join(camps, r["campaign"]), r["target"]).items():
+                    f[k] = f.get(k, 0) + (1 if v else 0)        # campaigns with this sign
+    kinds = [k for k in ["not done", "no seeds", *SIGNS, "queue file >1 MiB"] if any(fails[x].get(k) for x in arms)]
+
+    decisions, per_target = {}, {}
+    for arm in arms:
+        if arm == a.control:
+            continue
+        rows_t, logs = [], []
+        better = worse = sig_better = sig_worse = 0
+        for t in targets:
+            x, y = edges.get((arm, t), []), edges.get((a.control, t), [])
+            if not x or not y:
+                rows_t.append((t, len(x), len(y), None, None, None, None, None))
+                continue
+            mx, my = statistics.median(x), statistics.median(y)
+            a12, p = mwu_a12(x, y)
+            ratio = mx / my if my else None
+            if mx > my:
+                better += 1
+            elif mx < my:
+                worse += 1
+            if p is not None and p < SIG and a12 >= A12_BETTER:
+                sig_better += 1
+            if p is not None and p < SIG and a12 <= A12_WORSE:
+                sig_worse += 1
+            if mx > 0 and my > 0:
+                logs.append(math.log(mx / my))
+            rows_t.append((t, len(x), len(y), my, mx, ratio, a12, p))
+        per_target[arm] = rows_t
+        n_t = sum(1 for rt in rows_t if rt[3] is not None)
+        pw = wilcoxon_greater(logs) if logs else None
+        new_kinds = [k for k in kinds if fails[arm].get(k, 0) > fails[a.control].get(k, 0) and not fails[a.control].get(k)]
+        med_ratio = math.exp(statistics.median(logs)) if logs else None
+        if arm in afl_arms:
+            dec = "baseline (no decision)"
+        elif n_t and better >= math.ceil(SHARE * n_t) and pw is not None and pw < ALPHA and sig_worse == 0 and not new_kinds:
+            dec = "**keep**"
+        elif pw is not None and pw < BORDER and sig_worse == 0:
+            dec = "borderline: test again with new seeds" + (f" (and check: {', '.join(new_kinds)})" if new_kinds else "")
+        else:
+            dec = "drop"
+        decisions[arm] = (n_t, better, worse, med_ratio, pw, sig_better, sig_worse, new_kinds, dec)
+
+    w("")
+    w("## Decisions")
+    w("")
+    w("| arm | targets | better | worse | median ratio | Wilcoxon p (arm > control) | sig. better | sig. worse | new failure kinds | decision |")
+    w("|---|---|---|---|---|---|---|---|---|---|")
+    for arm, (n_t, b, wo, mr, pw, sb, sw, nk, dec) in decisions.items():
+        w(f"| {arm} | {n_t} | {b} | {wo} | {fmt(mr, 3)} | {pfmt(pw)} | {sb} | {sw} | {', '.join(nk) or '–'} | {dec} |")
+
+    for arm, rows_t in per_target.items():
+        w("")
+        w(f"## {arm} vs {a.control}, per target")
+        w("")
+        w(f"| target | reps (arm/control) | {a.control} median | {arm} median | ratio | A12 | p |")
+        w("|---|---|---|---|---|---|---|")
+        for t, nx, ny, my, mx, ratio, a12, p in rows_t:
+            mark = ""
+            if p is not None and p < SIG:
+                mark = " ↑" if a12 >= A12_BETTER else (" ↓" if a12 <= A12_WORSE else "")
+            w(f"| {t} | {nx}/{ny} | {fmt(my)} | {fmt(mx)} | {fmt(ratio, 3)} | {fmt(a12, 2)} | {pfmt(p)}{mark} |")
+
+    w("")
+    w("## LLM use (medians per campaign)")
+    w("")
+    w("| arm | campaigns | LLM steps | seeds handed to AFL++ | kept by AFL++ | kept per step | LLM calls | errors |")
+    w("|---|---|---|---|---|---|---|---|")
+    for arm in arms:
+        rs = [r for r in rows if r["arm"] == arm]
+        def med(k):
+            v = [num(r.get(k)) for r in rs if num(r.get(k)) is not None]
+            return statistics.median(v) if v else None
+        st, kp = med("llm_steps"), med("llm_kept")
+        w(f"| {arm} | {len(rs)} | {fmt(st)} | {fmt(med('llm_seeds'))} | {fmt(kp)} | "
+          f"{fmt(kp / st, 2) if st and kp is not None else '–'} | {fmt(med('llm_calls'))} | {fmt(med('llm_errors'))} |")
+
+    if not a.no_triage:
+        w("")
+        w("## Kept seeds per stall mutator (all campaigns of the arm)")
+        w("")
+        w("| arm | mutator | steps | seeds handed | kept | kept per step |")
+        w("|---|---|---|---|---|---|")
+        for arm in arms:
+            if arm in afl_arms:
+                continue
+            tot = {}
+            for r in rows:
+                if r["arm"] == arm:
+                    for m, v in mutator_yield(os.path.join(camps, r["campaign"]), r["target"]).items():
+                        t = tot.setdefault(m, [0, 0, 0])
+                        for i in range(3):
+                            t[i] += v[i]
+            for m, (s, h, k) in sorted(tot.items()):
+                w(f"| {arm} | {m} | {s} | {h} | {k} | {fmt(k / s, 2) if s else '–'} |")
+            if not tot:
+                w(f"| {arm} | (no llm/steps.jsonl: not an Alfred campaign, or no LLM step ran) | | | | |")
+
+        web = {}
+        for arm in arms:
+            for r in rows:
+                if r["arm"] == arm:
+                    sm = web_summary(os.path.join(camps, r["campaign"]), r["target"])
+                    if sm:
+                        t = web.setdefault(arm, {"campaigns": 0, "by_source": {}})
+                        t["campaigns"] += 1
+                        for k, v in sm.items():
+                            if k == "by_source":
+                                for src, (nq, nd) in v.items():
+                                    b = t["by_source"].setdefault(src, [0, 0])
+                                    b[0] += nq
+                                    b[1] += nd
+                            else:
+                                t[k] = t.get(k, 0) + v
+        if web:
+            w("")
+            w("## Web stall mutator (sums over the arm's campaigns, from each web_ledger.json)")
+            w("")
+            w("| arm | campaigns | web steps | queries (failed) | documents read | features found | got a generator "
+              "| generator failed | waiting | rejected: ungrounded / duplicate | links queued |")
+            w("|---|---|---|---|---|---|---|---|---|---|---|")
+            for arm, t in web.items():
+                w(f"| {arm} | {t['campaigns']} | {t['steps']} | {t['queries']} ({t['query_errors']}) | {t['docs']} | "
+                  f"{t['features']} | {t['targeted']} | {t['failed']} | {t['candidates']} | "
+                  f"{t['ungrounded']} / {t['duplicates']} | {t['frontier']} |")
+            w("")
+            for arm, t in web.items():
+                w(f"- {arm}, per source (queries or pages → new documents): " + "; ".join(
+                    f"{src} {nq} → {nd}" for src, (nq, nd) in sorted(t["by_source"].items())))
+
+    w("")
+    w("## Failures and bug signs (campaigns with each)" + (" — from results/campaigns.csv only (--no-triage)" if a.no_triage else ""))
+    w("")
+    cols = ["not done", "no seeds", *([] if a.no_triage else [*SIGNS, "queue file >1 MiB"]), "llm_400", "llm_cut"]
+    w("| arm | " + " | ".join(cols) + " |")
+    w("|---|" + "---|" * len(cols))
+    for arm in arms:
+        w(f"| {arm} | " + " | ".join(str(fails[arm].get(c, 0)) for c in cols) + " |")
+    w("")
+    w("llm_400 and llm_cut are call counts (summed); the other columns count campaigns. Heap errors and afl-fuzz "
+      "aborts: KNOWN_BUGS G2F-3; queue files over 1 MiB: G2F-1 (Alfred should have none); OOM kills: OURS-4.")
+
+    text = "\n".join(L) + "\n"
+    out = a.out or os.path.join(study, "results", "compare.md")
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    with open(out, "w") as f:
+        f.write(text)
+    sys.stdout.write(text)
+    print(f"\n(wrote {os.path.relpath(out, REPO) if out.startswith(REPO) else out})")
+
+
+if __name__ == "__main__":
+    main()

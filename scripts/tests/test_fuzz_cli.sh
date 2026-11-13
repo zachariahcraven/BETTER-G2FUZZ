@@ -39,10 +39,14 @@ if [ "$(basename "$0")" = sbatch ]; then
 fi
 EOF
 done
+# sacctmgr: the user's accounts from $SCEN/accounts; an account's limits (format=user,grptres) from $SCEN/grptres_<account>
 cat > "$T/bin/sacctmgr" <<'EOF'
 #!/bin/bash
 { printf 'sacctmgr'; printf ' %q' "$@"; echo; } >> "$STUB_LOG"
-cat "$SCEN/accounts" 2>/dev/null; exit 0
+case " $* " in
+  *" format=user,grptres "*) a=$(printf '%s\n' "$@" | sed -n 's/^account=//p'); cat "$SCEN/grptres_$a" 2>/dev/null ;;
+  *) cat "$SCEN/accounts" 2>/dev/null ;;
+esac; exit 0
 EOF
 # sacct: answers $SCEN/sacct_jobs (scripts/study status: why failed campaigns ended)
 cat > "$T/bin/sacct" <<'EOF'
@@ -61,7 +65,8 @@ cat > "$T/bin/date" <<'EOF'
 case " $* " in *" -r "*) exec /bin/date "$@" ;; *) exec /bin/date -d @1800000000 "$@" ;; esac
 EOF
 # squeue: rows of $SCEN/jobs are id|user|name|state|comment|node|account|command[|time left]; supports -h -j -n -t -u
-# -A -o. $SCEN/squeue_fail makes every call fail (Slurm not answering).
+# -A -o (%a: the account too) and -O tres-alloc,Reason (every job: 2 CPUs, 8G). $SCEN/squeue_fail makes every call fail
+# (Slurm not answering).
 cat > "$T/bin/squeue" <<'EOF'
 #!/usr/bin/env python3
 import os, re, sys
@@ -70,7 +75,7 @@ with open(os.environ["STUB_LOG"], "a") as log:
 if os.path.exists(os.environ["SCEN"] + "/squeue_fail"):
     sys.stderr.write("slurm_load_jobs error: Socket timed out on send/recv operation\n"); sys.exit(1)
 # squeue_fail_new: fail scripts/study's state query (-j ... -o '%i %T') once it asks about a job submitted in this case
-if os.path.exists(os.environ["SCEN"] + "/squeue_fail_new") and "-j" in sys.argv and "%i %T" in sys.argv and \
+if os.path.exists(os.environ["SCEN"] + "/squeue_fail_new") and "-j" in sys.argv and any(x.startswith("%i %T") for x in sys.argv) and \
         any(int(j) >= 950001 for j in sys.argv[sys.argv.index("-j") + 1].split(",") if j.isdigit()):
     sys.stderr.write("slurm_load_jobs error: Socket timed out on send/recv operation\n"); sys.exit(1)
 keys = "iujTkNAoL"
@@ -82,6 +87,7 @@ if os.path.exists(os.environ["SCEN"] + "/jobs"):
         if line.strip():
             f = dict(zip(keys, line.rstrip("\n").split("|")))
             for k, v in dict(M="1:00:00", L="1-12:00:00", e="2027-01-15T10:00:00").items(): f.setdefault(k, v)
+            f["a"] = f.get("A", "")
             rows.append(f)
 a = sys.argv[1:]; opt = {}; header = True; i = 0
 while i < len(a):
@@ -94,6 +100,9 @@ if "-u" in opt: rows = [r for r in rows if r["u"] == opt["-u"]]
 if "-A" in opt: rows = [r for r in rows if r["A"] in opt["-A"].split(",")]
 if "-j" in opt and not rows:
     sys.stderr.write("slurm_load_jobs error: Invalid job id specified\n"); sys.exit(1)
+if "-O" in opt:
+    for r in rows: print("cpu=2,mem=8G,node=1".ljust(400) + "None")
+    sys.exit(0)
 fmt = opt.get("-o", "%.18i %.9T %j")
 def render(get):
     def one(m):
@@ -126,6 +135,8 @@ done_campaign() {
   printf '%s\n' "# relative_time, cycles_done, cur_item, corpus_count, pending_total, pending_favs, map_size, saved_crashes, saved_hangs, max_depth, execs_per_sec, total_execs, edges_found" \
     "600, 1, 0, 2, 0, 1, 15.29%, 1, 0, 2, 1000.00, 600000, 300" > "$o/plot_data"
   echo '{"jpg-1.py": ["jpg-2.py"]}' > "$o/mutation_log/relationship.json"
+  echo '{"Huffman tables": "x"}' > "$o/feature_pool-jpg.json"; echo '{"Huffman tables": "x"}' > "$o/feature_pool.json"
+  echo '{}' > "$o/feature_programs.json"; echo '{"version": 1}' > "$o/web_ledger.json"
   printf '%s\n' "G2F: LLM step after 10s without finds (+0s per step)" "Fuzzing test case #1" "==== Gen-M start ====" "Fuzzing test case #2" > "$c/fuzz.log"
   printf '%s\n' '{"ts": 1799999000, "model": "Qwen3.8-27B-FP8-nothink", "secs": 50.0, "status": "ok", "attempt": 1}' \
     '{"ts": 1799999500, "model": "Qwen3.8-27B-FP8-nothink", "secs": 61.5, "status": "error", "attempt": 1}' > "$c/llm_calls.jsonl"
@@ -161,7 +172,7 @@ setup_work() {
   mkdir -p "$W/repo/experiments/02-model-sweep/launch"
   cp "$REPO/experiments/02-model-sweep/launch/targets.txt" "$REPO/experiments/02-model-sweep/launch/study.conf" \
     "$W/repo/experiments/02-model-sweep/launch/"
-  local x; for x in 03-test 04-reuse 05-bad 06-badtarget 07-wait 08-trap 09-cont 10-noseeds 11-acct 12-retry 13-dirty 14-output; do mkdir -p "$W/repo/experiments/$x/launch"; done
+  local x; for x in 03-test 04-reuse 05-bad 06-badtarget 07-wait 08-trap 09-cont 10-noseeds 11-acct 12-retry 13-dirty 14-output 15-tweaks 16-setup-shared 17-setup-fresh 18-tweak-afl 19-tweak-bad 20-fuzz-shared 21-extra; do mkdir -p "$W/repo/experiments/$x/launch"; done
   printf '%s\n' "targets = jhead" "arms    = ucb: --scheduler ucb | random: --scheduler random" "        | afl: --afl" \
     "reps    = 2" "secs    = 600" "seeds   = shared   # one seed generation, reused by both G2FUZZ arms" \
     > "$W/repo/experiments/03-test/launch/study.conf"
@@ -205,6 +216,20 @@ setup_work() {
   # 14: AFL++ output in the campaign folders (G2F_OUTPUT=campaign)
   printf '%s\n' "targets = jhead" "arms = ucb: --scheduler ucb | afl: --afl" "name = {target}-{arm}-r{rep}" "output = campaign" \
     > "$W/repo/experiments/14-output/launch/study.conf"
+  # 15-20: tweak switches (set:NAME=VALUE): fuzz-time ones with any seeds, a setup one only with fresh seeds, none on --afl
+  printf '%s\n' "targets = jhead" "arms = control: --scheduler ucb | cont: set:G2F_LLM_MODE=continuous set:G2F_PLATEAU_SEC=120" \
+    "        | rare: set:G2F_STALL_MUTATORS=feature+structure+pattern+rare | afl: --afl" "name = {target}-{arm}-r{rep}" \
+    > "$W/repo/experiments/15-tweaks/launch/study.conf"
+  printf '%s\n' "targets = jhead" "arms = rfdm: set:G2F_RFDM_ALL_FORMATS=1" "seeds = shared" > "$W/repo/experiments/16-setup-shared/launch/study.conf"
+  printf '%s\n' "targets = jhead" "arms = control: --scheduler ucb | rfdm: set:G2F_RFDM_ALL_FORMATS=1" "name = {target}-{arm}-r{rep}" \
+    > "$W/repo/experiments/17-setup-fresh/launch/study.conf"
+  printf '%s\n' "targets = jhead" "arms = a: --afl set:G2F_LLM_MODE=continuous" > "$W/repo/experiments/18-tweak-afl/launch/study.conf"
+  printf '%s\n' "targets = jhead" "arms = a: set:G2F_NOSUCH=1" > "$W/repo/experiments/19-tweak-bad/launch/study.conf"
+  printf '%s\n' "targets = jhead" "arms = cont: set:G2F_LLM_MODE=continuous | c: --scheduler ucb" "seeds = shared" \
+    > "$W/repo/experiments/20-fuzz-shared/launch/study.conf"
+  # 21: quantumcore's account, partition priority: with STUDY_EXTRA_ACCOUNT the class priority account takes the overflow
+  printf '%s\n' "targets = jhead" "arms = g2f: --scheduler ucb | afl: --afl" "reps = 3" "name = {target}-{arm}-r{rep}" \
+    "account = priority-quantumcore" "partition = priority" "gpu = qc-h100" > "$W/repo/experiments/21-extra/launch/study.conf"
 }
 
 # Scenarios: which jobs squeue shows, which accounts sacctmgr lists, whether the server answers
@@ -228,6 +253,9 @@ scenario() {
     revelle)  : > "$s/jobs"; echo group-mattrevelle > "$s/accounts" ;;
     qcmember) : > "$s/jobs"; echo priority-quantumcore >> "$s/accounts" ;;
     qc)       echo "${srv/|$P|/|priority-quantumcore|}" > "$s/jobs" ;;   # the Qwen server on quantumcore's account
+    qcextra)  # the Qwen server on quantumcore's account, which has room for 3 jobs (6 CPUs): the server and 2 campaigns
+      echo "${srv/|$P|/|priority-quantumcore|}" > "$s/jobs"; echo priority-quantumcore >> "$s/accounts"
+      echo "|cpu=6,mem=1T" > "$s/grptres_priority-quantumcore"; echo "|" > "$s/grptres_$P" ;;
     driver)   printf '%s\n' "$srv" "948500|bob|alfred-study-03-test|RUNNING|study=$W/repo/experiments/03-test|cpu010|$G|x" > "$s/jobs" ;;
     otherdriver) printf '%s\n' "$srv" "948501|bob|alfred-study-03-test|RUNNING|study=/home/bob/copy/03-test|cpu011|$G|x" > "$s/jobs" ;;
     driver10) printf '%s\n' "$srv" "948502|tester|alfred-study-10-noseeds|RUNNING|study=$W/repo/experiments/10-noseeds|cpu010|$G|x" > "$s/jobs" ;;
@@ -509,6 +537,34 @@ run_case study_out_campaign solo -- @study start 14-output
 # G2F_LLM_MODE (Alfred, 2026-11-08): the committed version may not have it either
 run_case run_llm_continuous base G2F_LLM_MODE=continuous -- run seeded 300
 run_case run_llm_badmode base G2F_LLM_MODE=sometimes -- run seeded 300
+# --set NAME=VALUE / an arm's set:NAME=VALUE: tweak switches (Alfred, 2026-11-09)
+run_case run_set_fuzz base -- run seeded 300 --set G2F_STALL_MUTATORS=feature+rare --set G2F_PLATEAU_SEC=120
+run_case run_set_mode base -- run seeded 300 --set=G2F_LLM_MODE=continuous
+run_case run_set_unknown base -- run seeded 300 --set G2F_NOSUCH=1
+run_case run_set_badvalue base -- run seeded 300 --set G2F_STALL_MUTATORS=feature,rare
+run_case run_set_novalue base -- run seeded 300 --set G2F_PLATEAU_SEC
+run_case run_set_twice base -- run seeded 300 --set G2F_PLATEAU_SEC=1 --set G2F_PLATEAU_SEC=2
+run_case run_set_afl base -- run seeded 300 --afl --set G2F_PLATEAU_SEC=1
+run_case run_set_test base -- run seeded 300 --test --set G2F_PLATEAU_SEC=1
+run_case run_set_setup_seeded base -- run seeded 300 --set G2F_RFDM_ALL_FORMATS=1
+run_case run_set_setup_fresh base -- run fresh 300 --set G2F_RFDM_ALL_FORMATS=1
+run_case tweaks base -- tweaks
+# the web stall mutator's switches (Alfred, 2026-11-11)
+run_case run_set_web base -- run seeded 300 --set G2F_STALL_MUTATORS=web --set G2F_WEB_SOURCES=wikipedia+links
+run_case run_set_web_badsource base -- run seeded 300 --set G2F_WEB_SOURCES=wikipedia+google
+run_case run_set_sandbox_seeded base -- run seeded 300 --set G2F_SANDBOX_ALL=1
+run_case study_tweaks solo -- @study start 15-tweaks
+run_case study_setup_shared solo -- @study show 16-setup-shared
+run_case study_setup_fresh solo -- @study start 17-setup-fresh
+run_case study_tweak_afl solo -- @study show 18-tweak-afl
+run_case study_tweak_bad solo -- @study show 19-tweak-bad
+run_case study_fuzz_shared solo -- @study show 20-fuzz-shared
+# STUDY_EXTRA_ACCOUNT: a second priority account takes what the main one has no room for (2026-11-09)
+run_case study_extra qcextra STUDY_EXTRA_ACCOUNT=$P STUDY_EXTRA_MAX=2 -- @study start 21-extra
+run_case study_extra_dry qcextra STUDY_EXTRA_ACCOUNT=$P STUDY_EXTRA_MAX=2 -- @study start 21-extra --dry
+run_case study_extra_noconf qcextra STUDY_EXTRA_ACCOUNT=$P STUDY_EXTRA_MAX=2 -- @study start 03-test
+run_case study_extra_notmine solo STUDY_EXTRA_ACCOUNT=priority-other STUDY_EXTRA_MAX=2 -- @study start 21-extra
+run_case study_extra_background qcextra STUDY_EXTRA_ACCOUNT=$P STUDY_EXTRA_MAX=2 -- @study start 21-extra --background
 
 # Contracts (on the current version)
 N=$T/out/new X=$T/out/newonly
@@ -625,6 +681,41 @@ contract "study output = campaign: every campaign, launch.txt" '[ "$(grep -c "su
 contract "G2F_OUTPUT=campaign files pass bash -n"        '! cat "$X"/*/syntax | grep -q FAIL && [ -s "$X/run_out_campaign/syntax" ]'
 contract "G2F_LLM_MODE=continuous reaches the job"       'grep -qF "G2F_LLM_MODE=continuous\\," "$X/run_llm_continuous/gen/seeded/job.sbatch"'
 contract "G2F_LLM_MODE: other values refused"            '[ "$(cat "$X/run_llm_badmode/rc")" = 1 ] && grep -q "G2F_LLM_MODE must be stall or continuous (got .sometimes.)" "$X/run_llm_badmode/err" && ! grep -q "^sbatch" "$X/run_llm_badmode/calls"'
+# tweak switches
+refused() { [ "$(cat "$X/$1/rc")" = 1 ] && grep -q -- "$2" "$X/$1/err" && ! grep -q "^sbatch" "$X/$1/calls"; }
+contract "--set: fuzz switches reach the job"             'grep -qF "G2F_LLM_MODE=stall\\,G2F_STALL_MUTATORS=feature+rare\\,G2F_PLATEAU_SEC=120\\," "$X/run_set_fuzz/gen/seeded/job.sbatch" && grep -q "^tweaks: G2F_STALL_MUTATORS=feature+rare G2F_PLATEAU_SEC=120$" "$X/run_set_fuzz/out"'
+contract "--set: the campaign records its tweaks"         'grep -A2 "^=== repo/experiments/practice/campaigns/seeded/tweaks$" "$X/run_set_fuzz/tree" | grep -qx "G2F_PLATEAU_SEC=120" && ! grep -q "campaigns/seeded/tweaks$" "$X/run_llm_continuous/tree"'
+contract "--set G2F_LLM_MODE replaces the mode"           'grep -qF "G2F_LLM_MODE=continuous\\," "$X/run_set_mode/gen/seeded/job.sbatch" && ! grep -q "G2F_LLM_MODE=stall" "$X/run_set_mode/gen/seeded/job.sbatch"'
+contract "--set: unknown switches refused"                'refused run_set_unknown "no switch .G2F_NOSUCH."'
+contract "--set: values checked (no commas)"              'refused run_set_badvalue "G2F_STALL_MUTATORS must match"'
+contract "--set: NAME=VALUE needed"                       'refused run_set_novalue "--set needs NAME=VALUE"'
+contract "--set: a switch only once"                      'refused run_set_twice "G2F_PLATEAU_SEC given twice"'
+contract "--set: not with --afl"                          'refused run_set_afl "--set and --afl don.t mix"'
+contract "--set: not what --test sets"                    'refused run_set_test "--set G2F_PLATEAU_SEC and --test don.t mix"'
+contract "--set: a setup switch needs seed generation"    'refused run_set_setup_seeded "acts during seed generation, but"'
+contract "--set: a setup switch reaches seed generation"  'grep -qF "G2F_RFDM_ALL_FORMATS=1\\," "$X/run_set_setup_fresh/gen/fresh/job.sbatch" && grep -q "program_gen.py" "$X/run_set_setup_fresh/gen/fresh/run.sh"'
+contract "tweaks lists the switches"                      '[ "$(grep -vc "^#" "$X/tweaks/out")" = 7 ] && grep -q "^G2F_RFDM_ALL_FORMATS setup " "$X/tweaks/out" && grep -q "^G2F_SANDBOX_ALL setup " "$X/tweaks/out"'
+contract "--set: the web mutator and its sources"         'grep -qF "G2F_STALL_MUTATORS=web\\,G2F_WEB_SOURCES=wikipedia+links\\," "$X/run_set_web/gen/seeded/job.sbatch"'
+contract "--set: only the free web sources"               'refused run_set_web_badsource "G2F_WEB_SOURCES must match"'
+contract "--set: sandboxing all generators is setup-time" 'refused run_set_sandbox_seeded "G2F_SANDBOX_ALL acts during seed generation, but"'
+contract "jobs: no home, start folder or shared /tmp"     'grep -qF -- "--no-mount home\\,cwd\\,tmp" "$X/run_set_web/gen/seeded/job.sbatch" && grep -qF -- "--no-mount home\\,cwd\\,tmp" "$X/run_out_campaign/gen/fresh/job.sbatch"'
+contract "jobs: their own /tmp, removed at the end"       '( for j in "$X/run_set_web/gen/seeded/job.sbatch" "$X/run_out_campaign/gen/fresh/job.sbatch"; do grep -qF "jtmp=\${TMPDIR:-/tmp}/alfred-tmp-\$SLURM_JOB_ID" "$j" && grep -qF -- "--bind \"\$jtmp\":/tmp" "$j" && grep -q "rm -rf.*\$jtmp" "$j" || exit 1; done )'
+contract "reuse copies the feature lists, not the ledger" 'grep -q "^=== repo/experiments/practice/campaigns/r1/jhead_output/default/feature_pool-jpg.json$" "$N/reuse_ok/tree" && grep -q "/r1/jhead_output/default/feature_programs.json$" "$N/reuse_ok/tree" && ! grep -q "/r1/jhead_output/default/web_ledger.json$" "$N/reuse_ok/tree" && grep -q "2 generators and 2 feature lists" "$N/reuse_ok/out"'
+contract "study set: each arm's switches reach its job"   '[ "$(grep -c "submitted Slurm job" "$X/study_tweaks/out")" = 4 ] && grep -qF "G2F_LLM_MODE=continuous\\,G2F_PLATEAU_SEC=120\\," "$X/study_tweaks/gen/jhead-cont-r1/job.sbatch" && grep -qF "G2F_STALL_MUTATORS=feature+structure+pattern+rare\\," "$X/study_tweaks/gen/jhead-rare-r1/job.sbatch" && ! grep -q "G2F_PLATEAU_SEC\|G2F_STALL_MUTATORS" "$X/study_tweaks/gen/jhead-control-r1/job.sbatch"'
+contract "study set: launch.txt records the tweaks"       'grep -q "^tweaks: G2F_LLM_MODE=continuous G2F_PLATEAU_SEC=120$" "$X/study_tweaks/tree" && [ "$(grep -c "^tweaks: none$" "$X/study_tweaks/tree")" = 2 ]'
+contract "study set: a setup switch needs fresh seeds"    '[ "$(cat "$X/study_setup_shared/rc")" = 1 ] && grep -q "arm rfdm: G2F_RFDM_ALL_FORMATS acts during seed generation, so it needs seeds = fresh" "$X/study_setup_shared/err"'
+contract "study set: a setup switch with fresh seeds"     'grep -qF "G2F_RFDM_ALL_FORMATS=1\\," "$X/study_setup_fresh/gen/jhead-rfdm-r1/job.sbatch" && ! grep -q G2F_RFDM "$X/study_setup_fresh/gen/jhead-control-r1/job.sbatch"'
+contract "study set: not on --afl arms"                   '[ "$(cat "$X/study_tweak_afl/rc")" = 1 ] && grep -q "arm a: --afl and set: don.t mix" "$X/study_tweak_afl/err"'
+contract "study set: unknown switches refused"            '[ "$(cat "$X/study_tweak_bad/rc")" = 1 ] && grep -q "arm a: no switch .G2F_NOSUCH." "$X/study_tweak_bad/err"'
+contract "study set: fuzz switches with shared seeds"     '[ "$(cat "$X/study_fuzz_shared/rc")" = 0 ]'
+# STUDY_EXTRA_ACCOUNT
+contract "extra account: main first, then extra, then wait" '[ "$(grep -c "submitted Slurm job" "$X/study_extra/out")" = 4 ] && [ "$(grep -c "^sbatch .*--account priority-quantumcore .*job.sbatch" "$X/study_extra/calls")" = 2 ] && [ "$(grep -c "^sbatch .*--account $P .*job.sbatch" "$X/study_extra/calls")" = 2 ] && grep -q "jhead-g2f-r3: no room on priority-quantumcore or $P" "$X/study_extra/out"'
+contract "extra account: its G2FUZZ campaign gets the server" 'grep -qF "OPENAI_BASE_URL=http://gpu027:28000/v1" "$X/study_extra/gen/jhead-g2f-r2/job.sbatch" && grep -q "^account: $P (the extra account, at most 2 campaigns)$" "$X/study_extra/tree" && grep -q "^server: .*(address given to the campaign: http://gpu027:28000/v1)$" "$X/study_extra/tree"'
+contract "extra account: --dry shows where each goes"   'grep -q "would launch jhead-g2f-r1 (new) on priority-quantumcore$" "$X/study_extra_dry/out" && grep -q "would launch jhead-g2f-r2 (new) on $P$" "$X/study_extra_dry/out" && ! grep -q "^sbatch" "$X/study_extra_dry/calls"'
+contract "extra account: needs study.conf's account"    '[ "$(cat "$X/study_extra_noconf/rc")" = 1 ] && grep -q "STUDY_EXTRA_ACCOUNT needs study.conf.s account" "$X/study_extra_noconf/err"'
+contract "extra account: only one of yours"             '[ "$(cat "$X/study_extra_notmine/rc")" = 1 ] && grep -q "you.re not in the Slurm account priority-other" "$X/study_extra_notmine/err"'
+contract "extra account: --background passes it on"     'grep -q "^sbatch .*--wrap exec.*env.*STUDY_EXTRA_ACCOUNT=$P.*STUDY_EXTRA_MAX=2.*scripts/study" "$X/study_extra_background/calls" && grep -q "running: STUDY_EXTRA_ACCOUNT=$P STUDY_EXTRA_MAX=2 scripts/study start 21-extra" "$X/study_extra_background/out"'
+contract "--set files pass bash -n"                       '! cat "$X"/run_set_*/syntax "$X"/study_tweaks/syntax 2>/dev/null | grep -q FAIL'
 # status/results of an Alfred campaign: steps from llm-worker.log, the worker's seeds and how many AFL++ kept
 setup_work "$T/fuzz.new"; scenario base
 o=$E/src/jhead_output; mkdir -p "$o/llm/queue"; rm "$E/src/fuzz.log"
@@ -632,11 +723,13 @@ printf '%s\n' "Fuzzing test case #1" "Fuzzing test case #2" > "$E/src/fuzz.log"
 printf '%s\n' "x G2F: LLM step after 300s without finds (+60s per step)" "x ==== Gen-M start ==== step 1" "x ==== Gen-M end ==== step 1" \
   "x ==== Gen-M start ==== step 2" > "$E/src/llm-worker.log"
 for i in 0 1 2; do echo s > "$o/llm/queue/id:00000$i,orig:jpg-3_$i.jpg"; done
+printf '%s\n' G2F_LLM_MODE=continuous G2F_PLATEAU_SEC=120 > "$E/src/tweaks"
 echo q > "$o/default/queue/id:000002,sync:llm,src:000001,time:9000,execs:99,+cov"
 fz() { env -i PATH="$T/bin:/usr/bin:/bin" HOME="$W/home" USER=tester LANG=C LC_ALL=C TZ=UTC SCEN="$W/scen" STUB_LOG=/dev/null \
   bash "$W/repo/scripts/fuzz" "$@" 2>&1; }
 fz status src > "$T/alfred_status.out"; fz results src > "$T/alfred_results.out"
 contract "status: steps from llm-worker.log"             'grep -q "^llmGen-M     2 steps$" "$T/alfred_status.out" && grep -q "LLM step after 420s without one" "$T/alfred_status.out"'
+contract "status/results: the campaign's tweaks"         'grep -q "^tweaks       G2F_LLM_MODE=continuous G2F_PLATEAU_SEC=120$" "$T/alfred_status.out" && grep -q "^tweaks            : G2F_LLM_MODE=continuous G2F_PLATEAU_SEC=120$" "$T/alfred_results.out"'
 contract "status/results: the worker's seeds"            'grep -q "^LLM seeds    3 handed to AFL++, 1 kept$" "$T/alfred_status.out" && grep -q "^LLM seeds         : 3 handed to AFL++, 1 kept$" "$T/alfred_results.out" && grep -q "^llmGen-M steps    : 2$" "$T/alfred_results.out"'
 
 # Tab completion (current version): load what `completion` prints into a shell, then "press Tab" after the words
@@ -649,7 +742,7 @@ tab() {   # tab <word> ...: what Tab offers for the last word ("" = Tab after a 
 contract "Tab: fuzz <Tab> lists the commands"          '[[ " $(tab fuzz "") " == *" run "*" llm "*" completion "* ]]'
 contract "Tab: fuzz run <Tab> lists campaigns"         '[[ " $(tab fuzz run "") " == *" seeded "*" src "* ]]'
 contract "Tab: --model before the command is skipped"  '[[ " $(tab fuzz --model phi-4 run "") " == *" seeded "* ]]'
-contract "Tab: fuzz run <c> 900 --<Tab> = options"     '[ "$(tab fuzz run seeded 900 --)" = "--test --afl --model --scheduler" ]'
+contract "Tab: fuzz run <c> 900 --<Tab> = options"     '[ "$(tab fuzz run seeded 900 --)" = "--test --afl --model --scheduler --set" ]'
 contract "Tab: fuzz llm <Tab>"                         '[ "$(tab fuzz llm "")" = "start stop status host --model" ]'
 contract "Tab: fuzz llm start 2 <Tab> = GPUs"          '[ "$(tab fuzz llm start 2 "")" = "a40 h100 qc-a40 qc-h100 --model" ]'
 contract "Tab: --model <Tab> lists shared models"      '[ "$(tab fuzz new x --model phi)" = "phi-4" ]'

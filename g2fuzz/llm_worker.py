@@ -90,6 +90,37 @@ def max_queue_id(queue_dir):
     return highest
 
 
+MOVED_RE = re.compile(r"---- Moved \S+ to \S*/gen_seeds/(.+-\d+)_\d+")
+
+
+def step_info(mutate_log, offset):
+    """The mutator a step picked and the generator it made (None if none), from its part of mutate_log
+    (generator_mutation.py prints "cur_mutator: <m>", and mv_files "---- Moved ... gen_seeds/<generator>_<n>.<ext>").
+    The rare and web mutators also print "---- step: {json}" (feature, and the web search's numbers): merged in."""
+    info = {"mutator": None, "generator": None}
+    try:
+        with open(mutate_log, "rb") as f:
+            f.seek(offset)
+            text = f.read().decode("utf-8", "replace")
+    except OSError:
+        return info
+    for line in text.splitlines():
+        if line.startswith("cur_mutator:"):
+            info["mutator"] = line.split(":", 1)[1].strip()
+        elif line.startswith("---- step: "):   # rare/web: the feature targeted and, for web, its search numbers
+            try:
+                extra = json.loads(line[len("---- step: "):])
+            except ValueError:
+                continue
+            if isinstance(extra, dict):
+                info.update({k: v for k, v in extra.items() if k not in ("mutator", "generator")})
+        elif info["generator"] is None:
+            m = MOVED_RE.search(line)
+            if m:
+                info["generator"] = m.group(1)
+    return info
+
+
 class Worker:
     def __init__(self, args):
         self.afl_out = os.path.abspath(args.afl_out)
@@ -165,7 +196,9 @@ class Worker:
         start = time.time()
         log(f"==== Gen-M start ==== step {self.steps}")
         cmd = [sys.executable, self.script, "--output", self.afl_out]
-        with open(os.path.join(self.afl_out, "mutate_log"), "a") as out:
+        mutate_log = os.path.join(self.afl_out, "mutate_log")
+        offset = os.path.getsize(mutate_log) if os.path.exists(mutate_log) else 0
+        with open(mutate_log, "a") as out:
             self.child = subprocess.Popen(cmd, stdout=out, stderr=subprocess.STDOUT, start_new_session=True)
             while self.child.poll() is None:
                 if self.stopping or self.afl_gone():
@@ -180,6 +213,7 @@ class Worker:
         self.llm_ms += int(secs * 1000)
         record = {"step": self.steps, "mode": self.mode, "start": round(start, 3), "secs": round(secs, 3),
                   "exit": rc, "stopped": self.stopping}
+        record.update(step_info(mutate_log, offset))
         record.update(self.publish() if not self.stopping else {"seeds": 0, "published": 0})
         with open(os.path.join(self.sync_dir, "steps.jsonl"), "a") as f:
             f.write(json.dumps(record) + "\n")

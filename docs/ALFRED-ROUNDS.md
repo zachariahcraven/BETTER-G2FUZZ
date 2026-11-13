@@ -1,0 +1,105 @@
+# Alfred rounds: improving Alfred, one 6 h study at a time
+
+From about 2026-11-13 (when study 05 frees the compute) to 2026-11-27, Alfred improves in rounds.
+- **Each round** is a 6 h study `experiments/A<NN>-<name>`: Alfred's current defaults (`control`) against up to three
+  tweaks.
+- **A tweak** is a switch that changes one thing. Off, it is today's behaviour.
+- **A tweak that passes the rule below** becomes the default in code before the next round.
+- **When rounds end:** a 6 h check on three models, then a 24 h study on the paper's 28 targets against upstream
+  G2FUZZ and AFL++ (plan: `A-check`, `A-final`). Rounds end when a round accepts nothing and the backlog has no
+  candidate with evidence behind it, or on 2026-11-27.
+
+## The acceptance rule (fixed 2026-11-09, before round A01)
+`scripts/compare <study>` applies it: per target, then across targets.
+- **Metric:** afl-fuzz's `edges` at the end of each campaign.
+  - Within one round, every arm uses the same image and target builds, so the counts compare.
+  - Across rounds, compare through each round's own control only.
+- **Keep** a tweak if all of these hold:
+  - its per-target median beats the control's on at least 60% of the targets (9 of 15);
+  - the one-sided Wilcoxon signed-rank p on the per-target log ratios of medians is below 0.05;
+  - no target is significantly worse (exact Mann–Whitney p < 0.05 with A12 ≤ 0.29);
+  - it brings no new kind of failure (a failure kind the control's campaigns don't have).
+- **Borderline** (0.05 ≤ p < 0.2, no target significantly worse): test it once more, in the next round, with a new
+  seed set.
+  - Keep it then only if it passes the keep rule.
+- **Bug fixes:** keep one if its failures drop and coverage is no worse (median ratio ≥ 0.98, no target significantly
+  worse).
+- **Ties:** keep the cheaper version (fewer LLM calls, less GPU time).
+- **Tweaks change one thing each.**
+  - Fuzz-time switches share one seed generation per target (`seeds = shared`), so the arms differ only in the switch.
+  - Each round regenerates the shared seeds, so the control sees a new seed set every round.
+- **Setup-time switches** need `seeds = fresh` and run as a round of their own, on the targets they affect.
+  `scripts/study` refuses them with shared seeds.
+
+## Switches
+`scripts/fuzz tweaks` lists them; a study arm sets them with `set:NAME=VALUE`, a single run with `--set NAME=VALUE`.
+
+| Switch | When it acts | Values (default first) | What it changes |
+|---|---|---|---|
+| `G2F_LLM_MODE` | fuzzing | `stall`, `continuous` | when the worker runs an LLM step: after a stall (upstream), or one after another |
+| `G2F_PLATEAU_SEC` | fuzzing | `300`, any whole number | seconds without a find before a step (stall mode) |
+| `G2F_BACKOFF_SEC` | fuzzing | `60`, any whole number | extra seconds per step already run (stall mode) |
+| `G2F_STALL_MUTATORS` | fuzzing | `feature+structure+pattern`; any of those and `rare`, `web`, `+`-separated | which mutators a step may pick; `rare` is Rare-Feature Directed Mutation as a stall mutator (`generator_mutation.py` `mutation_rare_feature`); `web` is the same with the feature taken from documents found on the web at that stall (`mutation_web`, [ALFRED.md](ALFRED.md#the-web-stall-mutator-2026-11-11)) |
+| `G2F_WEB_SOURCES` | fuzzing | all; any of `wikipedia`, `nvd`, `stackexchange`, `github`, `links`, `+`-separated | the free sources the `web` mutator may use (`links`: pages linked from documents already read) |
+| `G2F_RFDM_ALL_FORMATS` | seed generation | `0`, `1` | `1`: 3 seed-generation rounds (with Rare-Feature mutation) for every format, not only single-format targets (`program_gen.py` `setup_epochs`) |
+| `G2F_SANDBOX_ALL` | seed generation and fuzzing | `0`, `1` | `1`: every generator runs in the sandbox (no network, its own `/tmp` and `/dev/shm`), not only the `web` mutator's. In 04, 3.7% of gpt-oss-20b's generators used the network, 40% on mp3gain (they download ffmpeg), so expect mp3gain to lose |
+
+## Friday checklist (2026-11-13, when study 05 ends; before A00)
+1. Read 05's ucb vs random result, and set Alfred's default scheduler from it.
+2. The user commits and pushes. Build and upload the image (`scripts/tempest-image`, about an hour), and keep it
+   as `build/g2fuzz-<commit>.sif`.
+3. Rebuild the paper's 28 targets into `g2f-targets-alfred/paper` (`build/targets/build-paper.sh paper <project>`),
+   then run the image's targets test on each.
+4. Bug checks AFL-1 and AFL-2 (KNOWN_BUGS.md).
+5. The web mutator and the sandbox, on the nodes the rounds use (partition `priority`, account
+   `priority-quantumcore`), with the new image:
+   ```bash
+   srun -A priority-quantumcore -p priority -c 2 --mem 4G -t 10 bash -c '
+     scripts/web-check png tiff mp4                        # every source answers or cools down; documents read
+     apptainer exec --cleanenv --writable-tmpfs --no-mount home,cwd,tmp build/g2fuzz.sif \
+       python3 /AFLplusplus/g2fuzz/tests/test_web.py      # the sandbox tests must run, not be skipped'
+   ```
+6. One short real campaign with the web mutator on a GPU server, to see a whole step:
+   `scripts/fuzz run <campaign> 1800 --test --set G2F_STALL_MUTATORS=web`, then read `llm-worker.log`,
+   `<target>_output/default/web_ledger.json` and `web_docs/`.
+7. Launch A00 (and A02 beside it if there's room). A01 follows A00's decision.
+
+## Each round
+```bash
+# launch (quantumcore first, the class priority account takes the overflow)
+STUDY_EXTRA_ACCOUNT=priority-csci-591-automated-vulnerability-discovery STUDY_EXTRA_MAX=120 \
+  scripts/study start A<NN>-<name> --servers --background
+scripts/study status A<NN>-<name>
+# when it ends (retry failed campaigns first: scripts/study start A<NN>-<name> --retry-failed ...)
+scripts/study results A<NN>-<name>
+srun -A group-csci-591-automated-vulnerability-discovery -p fairshare -c 1 --mem 2G -t 60 \
+  scripts/compare A<NN>-<name>     # results/compare.md: decisions, per target, LLM use, failures
+scripts/lineage A<NN>-<name>       # results/lineage.md: where the queue came from, per arm
+```
+
+After each round:
+1. Fill in the round's row below and its README's Results.
+2. Triage new failures into `docs/KNOWN_BUGS.md` and fix them.
+3. Make the accepted switches the defaults in code.
+4. Commit, rebuild the image (`scripts/tempest-image`), and start the next round.
+
+Keep each round's image as `build/g2fuzz-<commit>.sif`, so a later round can run an older Alfred with `image=`.
+
+## Backlog (in order; each with the evidence for it)
+| Round | Arms | Evidence | Seeds |
+|---|---|---|---|
+| A00-baseline-6h | control, afl, continuous, fast-stall (120 s, no backoff) | Alfred's worker doesn't block afl-fuzz, so more steps cost no fuzzing time; also Alfred's 6 h baseline and its bug check | shared |
+| A01-stall-mutators-6h | control, rare, web, no-pattern (one mutator per arm: a 6 h campaign has a median of 3 stall steps) | 04 lineage: stall seeds about 1% of queue descendants; pattern 0.7 descendants per generator vs 2.6–2.9; Rare-Feature mutation 31.5 per generator, but only at setup. `web`: do fresh documents bring features the model wouldn't name? | shared |
+| A02-rfdm-all-formats-6h | control, rfdm-all (4 multi-format targets) | single-format targets: Rare-Feature mutation 16.2% of 04's descendants, as much as synthesis; multi-format targets never run it (upstream code; paper Table 13: mutation ≈ 0 on exactly them) | fresh |
+| A03+ | wrong-library-API errors (36% of generator failures in 03/04; most no-seed runs on fonts): re-classify the errors first, then e.g. the image's installed packages and versions in the code-generation prompt, or fontTools for ttf/woff2 | 03/04 failure analysis | fresh |
+| later | `G2F_SANDBOX_ALL=1` (safety: no generator downloads anything; a bug-fix-style rule: keep if coverage is no worse) | 3.7% of 04's generators use the network | fresh |
+| later | web documents at seed generation too (the Rare-Feature rounds of `program_gen.py`), if `web` wins A01 | A01 | fresh |
+| later | retests of borderline tweaks; fixes for bugs the rounds find | the rounds | – |
+
+The generator scheduler (ucb vs random) isn't tested again here. Study 05 (24 h, 8 models) answers it, and its result
+sets Alfred's default before A00.
+
+## Rounds log
+| Round | Image (commit) | Arms | Result | Decision |
+|---|---|---|---|---|
+| A00-baseline-6h | – | control, afl, continuous, fast-stall | – | – |

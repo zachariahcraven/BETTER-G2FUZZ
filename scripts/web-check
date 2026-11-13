@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+"""web-check: can the web stall mutator reach its free sources from here, and does it read their answers right?
+No LLM, writes nothing (its ledger is a temporary file).
+
+Usage: scripts/web-check [FORMAT ...]   (default: png tiff; a format as in g2fuzz/program_to_format.json)
+For each format it runs two web steps (g2fuzz/py_utils/web_step.py research) with fixed queries in place of the
+LLM's, so all four searchable sources (Wikipedia, NVD, Stack Exchange, GitHub) and the links read from the first
+step's documents are tried, and prints each request's result and the ledger's numbers. A source that is
+rate-limited shows its cooldown; that's fine as long as the others answer.
+
+Before a round with the web mutator, run it on the login node and on a compute node:
+  srun -p fairshare -c 1 --mem 1G -t 5 scripts/web-check png
+Exit status 1 if no source answered for some format.
+"""
+import json
+import os
+import random
+import re
+import sys
+import tempfile
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "g2fuzz"))
+from py_utils import web_step  # noqa: E402
+from py_utils.web_ledger import Ledger  # noqa: E402
+
+
+def canned(fmt):
+    name = web_step.fmt_name(fmt)
+    queries = iter([[name + " file structure", name + " optional fields", name + " extension"],
+                    [name + " malformed file", name + " rarely used", name + " metadata"]])
+
+    def ask(messages, temperature):
+        p = messages[-1]["content"]
+        if "new search queries" in p:
+            return json.dumps({"queries": next(queries, [])})
+        if "From the documents above" in p:   # quote doc 1's first long sentence: exercises the grounding check
+            docs = re.findall(r'<doc n="(\d+)"[^>]*>\n(.*?)\n</doc>', p, re.S)
+            feats = []
+            for n, text in docs[:2]:
+                s = next((x for x in re.split(r"(?<=[.!?])\s+", text) if len(x) > 40), None)
+                if s:
+                    feats.append({"name": "check feature %s" % n, "description": "a check", "doc": int(n), "quote": s})
+            return json.dumps({"features": feats})
+        return json.dumps({"1": "new", "2": "new"})
+    return ask
+
+
+def main():
+    fmts = sys.argv[1:] or ["png", "tiff"]
+    bad = 0
+    for fmt in fmts:
+        print("== %s (%s)" % (fmt, web_step.fmt_name(fmt)))
+        with tempfile.TemporaryDirectory(prefix="web-check.") as d:
+            led = Ledger(os.path.join(d, "web_ledger.json"))
+            ask = canned(fmt)
+            for _ in range(2):
+                step = led.new_step()
+                new, _, stats = web_step.research(fmt, [], led, ask, ["wikipedia", "nvd", "stackexchange", "github",
+                                                                      "links"], step, random.Random(step),
+                                                  log=lambda m: print("  " + m), docs_dir=os.path.join(d, "docs"))
+            s = led.summary()
+            print("  -> queries %d (failed %d), documents %d, links queued %d, grounded features %d; per source: %s"
+                  % (s["queries"], s["query_errors"], s["docs"], s["frontier"], s["features"],
+                     ", ".join("%s %d->%d" % (k, v[0], v[1]) for k, v in sorted(s["by_source"].items()))))
+            if not s["docs"]:
+                bad += 1
+                print("  !! no source gave a document for %s" % fmt)
+    sys.exit(1 if bad else 0)
+
+
+if __name__ == "__main__":
+    main()

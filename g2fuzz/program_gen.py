@@ -2,6 +2,15 @@ import os
 import sys
 import argparse
 
+
+def setup_epochs(n_formats):
+    """Rounds of feature_analysis per format: 3 (Input Generator Synthesis, then two of Rare-Feature Directed
+    Mutation) for a single-format target and 1 (no rare features) for a multi-format one, as upstream.
+    ALFRED: G2F_RFDM_ALL_FORMATS=1 gives every format 3 rounds."""
+    if n_formats == 1 or os.environ.get("G2F_RFDM_ALL_FORMATS", "0") == "1":
+        return 3
+    return 1
+
 def feature_analysis(model, file_format, tmp_path, seeds_path, generators, output_path, TRY_NUM):
     feature_programs = {} # key:feature    value:corresponding program
     print("++ 1. Get init features")
@@ -174,6 +183,11 @@ def feature_analysis(model, file_format, tmp_path, seeds_path, generators, outpu
     with open(os.path.join(output_path, "feature_programs.json"), 'w') as file:
         json.dump(feature_programs, file)
 
+    # ALFRED: each format's own pool too (feature_pool.json is overwritten by the next format); the rare stall
+    # mutator (generator_mutation.py) asks for features beyond these
+    with open(os.path.join(output_path, "feature_pool-" + file_format + ".json"), 'w') as file:
+        json.dump(feature_pool, file)
+
 
 
 
@@ -227,11 +241,9 @@ if __name__ == "__main__":
                 If there are only one file format, we use both strategies: 'Input Generator Synthesis' and 'Rare-Feature Directed Mutation'.
                 If there are multiple file formats, we only use the strategy 'Input Generator Synthesis' to migrate the overhead of seed generation.
                 In `feature_analysis`, the first epoch is `Input Generator Synthesis`, and the other epochs are `Rare-Feature Directed Mutation`.
+                ALFRED: setup_epochs() (G2F_RFDM_ALL_FORMATS=1: 3 for every format)
             '''
-            if len(file_formats) == 1:
-                feature_analysis(model, file_format, tmp_path, seeds_path, generators, output_path, 3) 
-            else:
-                feature_analysis(model, file_format, tmp_path, seeds_path, generators, output_path, 1) 
+            feature_analysis(model, file_format, tmp_path, seeds_path, generators, output_path, setup_epochs(len(file_formats)))
         except KeyboardInterrupt:
             print("You need install the following library to improve the fuzzing performance")
             for l in library_need_to_be_installed:

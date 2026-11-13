@@ -10,7 +10,12 @@ Start with the folder's `README.md`.
 | [03-model-sweep-qc](03-model-sweep-qc/) | 02's question and design, run on quantumcore's GPUs and CPUs | campaigns finished 2026-11-01; analysis to do |
 | [04-model-sweep-qc-24h](04-model-sweep-qc-24h/) | 03's design with 24 h campaigns (the paper's length), AFL++ output in the campaign folders | campaigns finished 2026-11-07; analysis to do |
 | [05-model-sweep-qc-24h-nosched](05-model-sweep-qc-24h-nosched/) | 04's design with the `random` (upstream) generator scheduler, not `ucb`: a scheduler-off baseline for 04 | not launched |
+| [A00-baseline-6h](A00-baseline-6h/) | Alfred round A00: Alfred's 6 h baseline vs AFL++ 5.03c, and LLM steps more often (continuous, shorter stall) | planned (from about 2026-11-13) |
+| [A01-stall-mutators-6h](A01-stall-mutators-6h/) | Alfred round A01: stall steps that target a new feature, from the model (rare) or from web documents (web); dropping pattern mutation | planned |
+| [A02-rfdm-all-formats-6h](A02-rfdm-all-formats-6h/) | Alfred round A02: Rare-Feature mutation in seed generation for multi-format targets too | planned |
 | [practice](practice/) | Practice and test runs; the `scripts/fuzz` default | always open |
+
+Alfred's rounds (`A<NN>-*`) and their acceptance rule: [docs/ALFRED-ROUNDS.md](../docs/ALFRED-ROUNDS.md).
 
 ## New study
 Copy [TEMPLATE/](TEMPLATE/) to `NN-<name>/` and add a row above. Describe the campaigns in

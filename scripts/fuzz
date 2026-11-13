@@ -6,8 +6,8 @@
 #   new     [name] [--model M]      Create a campaign folder (in experiments/practice/campaigns/ by default) that
 #                                   uses model M (default Qwen3.8-27B-FP8). Default name: <netid>-<target>-MMDD-HHMM
 #   reuse   <from> [name] [--model M]  New campaign with seeds + generators copied from campaign <from>
-#   run     <name> [secs] [--test|--afl] [--scheduler S]  Background run: seed generation (if no seeds yet),
-#                                   then fuzz for <secs> seconds (default 3600)
+#   run     <name> [secs] [--test|--afl] [--scheduler S] [--set NAME=VALUE ...]  Background run: seed generation
+#                                   (if no seeds yet), then fuzz for <secs> seconds (default 3600)
 #   shell   <name> [--test] [--scheduler S]  Interactive shell in the image, in a campaign (manual commands)
 #   watch   <name>                  Live view of a campaign, updated every second
 #   status  [name]                  One campaign's numbers once (no name: same as list)
@@ -22,6 +22,7 @@
 #                                   members of that group's account (partners aren't), with their OK
 #                                   stop, status, host: without --model, all of yours / all / the first one
 #   account                         The Slurm account runs and the server use
+#   tweaks                          The switches --set can change (name, when it acts, values)
 #   completion                      Tab completion (commands, campaign names, models) and an `alfred` alias for bash.
 #                                   Turn it on with one line in ~/.bashrc: eval "$(<repo>/scripts/fuzz completion)"
 #
@@ -30,6 +31,9 @@
 #   --scheduler S  which generator each LLM step mutates: ucb (the default: this repo's UCB bandit,
 #           g2fuzz/py_utils/generator_scheduler.py) or random (upstream G2FUZZ's random pick, for comparisons)
 #   --test  llmGen-M after 10 s without new coverage. Testing only, never for experiments.
+#   --set NAME=VALUE  a tweak switch for this run (repeatable; scripts/fuzz tweaks lists them). Each is off (today's
+#           behaviour) unless set; G2FUZZ runs only. A setup switch acts during seed generation, so it needs a campaign
+#           without seeds yet. The campaign records them in its tweaks file (status and results print it).
 #   --afl   the paper's baseline AFL++(cmplog): the same afl-fuzz with no LLM (no seed generation, no LLM worker),
 #           starting from the stock seeds (or initial_seeds/ if the campaign already has them). Needs no LLM server.
 #   A G2FUZZ run is the same stock afl-fuzz plus g2fuzz/llm_worker.py beside it (Alfred: upstream's afl-fuzz patch is
@@ -101,6 +105,16 @@ MODEL="${G2F_MODEL:-Qwen3.8-27B-FP8-nothink}"   # the name G2Fuzz asks the serve
 SCHED="${G2F_GENERATOR_SCHEDULER:-ucb}"   # ucb: this repo's scheduler; random: upstream's (run --scheduler sets it)
 UCB_C="${G2F_UCB_EXPLORATION:-1.0}"
 LLM_MODE="${G2F_LLM_MODE:-stall}"   # read by g2fuzz/llm_worker.py
+# Tweak switches (run --set NAME=VALUE; a study arm's set:NAME=VALUE): name, when it acts, its values (an extended
+# regex, anchored). fuzz: the LLM worker's steps, so a run that reuses seeds sees it too; setup: seed generation, so
+# only a run that makes its own seeds does. Values have no commas (apptainer's --env splits on them).
+TWEAKS='G2F_LLM_MODE fuzz stall|continuous
+G2F_PLATEAU_SEC fuzz [0-9]+
+G2F_BACKOFF_SEC fuzz [0-9]+
+G2F_STALL_MUTATORS fuzz (feature|structure|pattern|rare|web)([+](feature|structure|pattern|rare|web))*
+G2F_WEB_SOURCES fuzz (wikipedia|nvd|stackexchange|github|links)([+](wikipedia|nvd|stackexchange|github|links))*
+G2F_RFDM_ALL_FORMATS setup 0|1
+G2F_SANDBOX_ALL setup 0|1'
 OUTPUT="${G2F_OUTPUT:-node}"   # node or campaign (write_job_sbatch)
 SHARED_MODELS=/home/group/csci-591-automated-vulnerability-discovery/students/shared-models
 
@@ -164,22 +178,46 @@ need_campaign() {
   [ -d "$EVAL/$1" ] || die "no campaign $EVR/$1 (see: scripts/fuzz list)"
 }
 
-# Parses --test, --afl and --scheduler <s> out of run's or shell's args (--scheduler sets SCHED); leaves the rest in POS.
+# The phase of tweak switch $1 (fuzz or setup), or nothing if there's no such switch
+tweak_phase() { awk -v n="$1" '$1 == n { print $2 }' <<< "$TWEAKS"; }
+# Checks one --set NAME=VALUE against TWEAKS
+tweak_check() {
+  local n=${1%%=*} v=${1#*=} re
+  [[ "$1" == ?*=* ]] || die "--set needs NAME=VALUE (got '$1'; scripts/fuzz tweaks lists the switches)"
+  re=$(awk -v n="$n" '$1 == n { print $3 }' <<< "$TWEAKS")
+  [ -n "$re" ] || die "--set: no switch '$n' (scripts/fuzz tweaks lists them)"
+  [[ "$v" =~ ^($re)$ ]] || die "--set: $n must match $re (got '$v')"
+}
+# Parses --test, --afl, --scheduler <s> and --set NAME=VALUE out of run's or shell's args (--scheduler sets SCHED,
+# --set fills SETS and SET_ENV, and sets LLM_MODE for G2F_LLM_MODE); leaves the rest in POS.
 parse_run_flags() {
-  local sched_flag=0
-  TEST=0; AFL=0; POS=()
+  local sched_flag=0 kv k seen=" "
+  TEST=0; AFL=0; POS=(); SETS=(); SET_ENV=""
   while [ $# -gt 0 ]; do
     case "$1" in
       --test) TEST=1 ;;
       --afl) AFL=1 ;;
       --scheduler) [ $# -ge 2 ] || die "--scheduler needs ucb or random"; SCHED=$2; sched_flag=1; shift ;;
       --scheduler=*) SCHED=${1#--scheduler=}; sched_flag=1 ;;
+      --set) [ $# -ge 2 ] || die "--set needs NAME=VALUE (scripts/fuzz tweaks lists the switches)"; SETS+=("$2"); shift ;;
+      --set=*) SETS+=("${1#--set=}") ;;
       *) POS+=("$1") ;;
     esac
     shift
   done
   [ "$TEST" = 1 ] && [ "$AFL" = 1 ] && die "--test and --afl don't mix (--afl has no LLM step)"
   [ "$sched_flag" = 1 ] && [ "$AFL" = 1 ] && die "--scheduler and --afl don't mix (--afl has no LLM step)"
+  [ ${#SETS[@]} -gt 0 ] && [ "$AFL" = 1 ] && die "--set and --afl don't mix (the switches change G2FUZZ's LLM steps)"
+  for kv in ${SETS[@]+"${SETS[@]}"}; do
+    tweak_check "$kv"; k=${kv%%=*}
+    [[ "$seen" != *" $k "* ]] || die "--set: $k given twice"
+    seen+="$k "
+    case "$k" in
+      G2F_LLM_MODE) LLM_MODE=${kv#*=} ;;   # container_args passes LLM_MODE
+      G2F_PLATEAU_SEC|G2F_BACKOFF_SEC) [ "$TEST" = 0 ] || die "--set $k and --test don't mix (--test sets it)"; SET_ENV+="$kv," ;;
+      *) SET_ENV+="$kv," ;;
+    esac
+  done
   return 0
 }
 
@@ -241,7 +279,12 @@ cmd_reuse() {
   cp -r "$src/initial_seeds" "$d/"
   mkdir -p "$d/$OUT/default"
   cp -r "$src/$OUT/default/generators" "$d/$OUT/default/"
-  echo "copied $(count "$d/initial_seeds") seeds and $(count "$d/$OUT/default/generators") generators from $EVR/$from"
+  # and the seed generation's feature lists, which the rare and web stall mutators extend (not a web ledger:
+  # each campaign starts its own)
+  find "$src/$OUT/default" -maxdepth 1 -type f \( -name 'feature_pool*.json' -o -name feature_programs.json \) \
+    -exec cp -t "$d/$OUT/default/" {} +
+  echo "copied $(count "$d/initial_seeds") seeds, $(count "$d/$OUT/default/generators") generators and" \
+    "$(find "$d/$OUT/default" -maxdepth 1 -name 'feature_pool*.json' | wc -l | tr -d ' ') feature lists from $EVR/$from"
 }
 
 # === 6. run, shell ==================================================================================================
@@ -292,8 +335,12 @@ find_llm_server() {
 container_args() {
   local extra_env=""   # --test's quick LLM step, then the generator scheduler (--afl runs have no LLM steps)
   [ "$TEST" = 1 ] && extra_env="G2F_PLATEAU_SEC=10,G2F_BACKOFF_SEC=0,"
-  [ "${AFL:-0}" = 1 ] || extra_env+="G2F_GENERATOR_SCHEDULER=$SCHED,G2F_UCB_EXPLORATION=$UCB_C,G2F_LLM_MODE=$LLM_MODE,"
-  ARGS=(--cleanenv --writable-tmpfs --pwd /eval --bind "$EVAL/$1:/eval"
+  [ "${AFL:-0}" = 1 ] || extra_env+="G2F_GENERATOR_SCHEDULER=$SCHED,G2F_UCB_EXPLORATION=$UCB_C,G2F_LLM_MODE=$LLM_MODE,${SET_ENV:-}"
+  # --no-mount: LLM-written generator code runs in this container, so it gets neither your home folder, nor the
+  # folder the job started in, nor the node's shared /tmp (other jobs' files; a job gets its own /tmp instead,
+  # write_job_sbatch). It still has the network (the worker needs it); g2fuzz/py_utils/sandbox.py takes that away
+  # from web-informed generators (and from all with G2F_SANDBOX_ALL=1).
+  ARGS=(--cleanenv --writable-tmpfs --no-mount home,cwd,tmp --pwd /eval --bind "$EVAL/$1:/eval"
         --bind "$KEY:/eval/openai_key.txt:ro"
         --env "${extra_env}OPENAI_BASE_URL=$BASE_URL,PIP_USER=1,PYTHONUSERBASE=/eval/.pyuser")
   [ -n "${G2F_TARGETS:-}" ] && ARGS+=(--bind "$(cd "$G2F_TARGETS" && pwd):/targets:ro")
@@ -320,6 +367,12 @@ cmd_run() {
   active "$name" && die "alfred-$name is already queued or running (scripts/fuzz watch $name)"
   [ -d "$d/$OUT/default/queue" ] && die "$EVR/$name was already fuzzed; afl-fuzz won't overwrite it. Use: scripts/fuzz reuse $name"
   seed_step "$d"   # sets SEED_CMD (what runs before fuzzing) and SEEDGEN (1: seed generation first)
+  local kv
+  for kv in ${SETS[@]+"${SETS[@]}"}; do
+    [ "$(tweak_phase "${kv%%=*}")" != setup ] || [ "$SEEDGEN" = 1 ] ||
+      die "--set ${kv%%=*} acts during seed generation, but $EVR/$name already has seeds (use a new campaign)"
+  done
+  if [ ${#SETS[@]} -gt 0 ]; then printf '%s\n' "${SETS[@]}" > "$d/tweaks"; echo "tweaks: ${SETS[*]}"; else rm -f "$d/tweaks"; fi
   if [ "$AFL" = 0 ]; then
     # the campaign records its scheduler (results prints it)
     echo "$SCHED" > "$d/generator_scheduler"
@@ -444,13 +497,16 @@ write_job_sbatch() {
 # Written by scripts/fuzz run. Log: slurm-<jobid>.out in this folder.
 EOF
     [ "$AFL" = 1 ] || echo "curl -s -o /dev/null --max-time 20 $BASE_URL/models || { echo \"fuzz: can't reach $BASE_URL from \$(hostname)\"; exit 1; }"
+    cat <<'EOF'
+jtmp=${TMPDIR:-/tmp}/alfred-tmp-$SLURM_JOB_ID; mkdir -p "$jtmp"   # the container's /tmp: this job's own
+EOF
     if [ "$OUTPUT" = campaign ]; then
       cat <<'EOF'
 shm=/dev/shm/jobs/$SLURM_JOB_ID; [ -d "$shm" ] && [ -w "$shm" ] || { shm=/dev/shm/g2f-$SLURM_JOB_ID; mkdir -p "$shm"; }   # memory: the file the target reads
 EOF
-      printf 'done_out() { [ "$shm" = /dev/shm/jobs/$SLURM_JOB_ID ] || rm -rf "$shm"; chmod -R g+rwX %q; echo "job.sbatch: output made group-writable"; }\n' "$d/$OUT"
+      printf 'done_out() { [ "$shm" = /dev/shm/jobs/$SLURM_JOB_ID ] || rm -rf "$shm"; rm -rf "$jtmp"; chmod -R g+rwX %q; echo "job.sbatch: output made group-writable"; }\n' "$d/$OUT"
       printf 'apptainer exec'; printf ' %q' "${ARGS[@]}"
-      printf ' --bind "$shm" --env AFL_TMPDIR="$shm"'
+      printf ' --bind "$jtmp":/tmp --bind "$shm" --env AFL_TMPDIR="$shm"'
       printf ' %q' --env AFL_NO_UI=1 "$SIF" bash /eval/run.sh; echo ' &'
       cat <<'EOF'
 pid=$!
@@ -462,10 +518,10 @@ EOF
     cat <<'EOF'
 fast=${TMPDIR:-/tmp}/g2f-$SLURM_JOB_ID; mkdir -p "$fast"   # node-local disk for the AFL++ output
 EOF
-    printf 'copy_back() { cp -a -u "$fast"/. %q/ 2>/dev/null; echo "job.sbatch: output copied back (cp exit $?)"; chmod -R g+rwX %q; rm -rf "$fast"; }\n' "$d/$OUT" "$d/$OUT"
-    # the container: ARGS, the node-local output folder, the campaign as /host, then run.sh
+    printf 'copy_back() { cp -a -u "$fast"/. %q/ 2>/dev/null; echo "job.sbatch: output copied back (cp exit $?)"; chmod -R g+rwX %q; rm -rf "$fast" "$jtmp"; }\n' "$d/$OUT" "$d/$OUT"
+    # the container: ARGS, its own /tmp, the node-local output folder, the campaign as /host, then run.sh
     printf 'apptainer exec'; printf ' %q' "${ARGS[@]}"
-    printf ' --bind "$fast":%q --bind %q' "/eval/$OUT" "$d:/host"
+    printf ' --bind "$jtmp":/tmp --bind "$fast":%q --bind %q' "/eval/$OUT" "$d:/host"
     printf ' %q' --env AFL_NO_UI=1 "$SIF" bash /eval/run.sh; echo ' &'
     cat <<'EOF'
 pid=$!
@@ -550,6 +606,7 @@ show_campaign() {
     "LLM seeds    $(llm_seeds "$d")" \
     "scheduler    $sched" \
     "LLM calls    $llm"
+  if [ -f "$d/tweaks" ]; then echo "tweaks       $(xargs < "$d/tweaks")"; fi
 }
 
 cmd_status() {
@@ -582,6 +639,7 @@ cmd_results() {
   grep -E '^(run_time|execs_done|execs_per_sec|corpus_count|edges_found|total_edges|saved_crashes|stability)' "$o/fuzzer_stats"
   echo "generators        : $(count "$o/generators")"
   [ -f "$d/generator_scheduler" ] && echo "scheduler         : $(cat "$d/generator_scheduler")$([ -f "$d/ucb_exploration" ] && echo " (exploration $(cat "$d/ucb_exploration"))")"
+  [ -f "$d/tweaks" ] && echo "tweaks            : $(xargs < "$d/tweaks")"
   echo "llmGen-M steps    : $(gcount 'Gen-M start' "$(steps_log "$d")")"
   echo "LLM seeds         : $(llm_seeds "$d")"
   local calls ok; calls=$(lines "$d/llm_calls.jsonl"); ok=$(gcount '"status": "ok"' "$d/llm_calls.jsonl")
@@ -728,7 +786,7 @@ _alfred_fuzz() {
   else
     case $cmd in
       "") words="new reuse run shell watch status results stop list llm account completion help --model" ;;
-      run)   if [ "$nargs" = 0 ]; then words=$(_alfred_dirs "$camps"); else words="--test --afl --model --scheduler"; fi ;;
+      run)   if [ "$nargs" = 0 ]; then words=$(_alfred_dirs "$camps"); else words="--test --afl --model --scheduler --set"; fi ;;
       shell) if [ "$nargs" = 0 ]; then words=$(_alfred_dirs "$camps"); else words="--test --model --scheduler"; fi ;;
       reuse) if [ "$nargs" = 0 ]; then words=$(_alfred_dirs "$camps"); else words="--model"; fi ;;
       watch|status|results|stop) [ "$nargs" = 0 ] && words=$(_alfred_dirs "$camps") ;;
@@ -769,6 +827,7 @@ case "$cmd" in
   list|ls)  cmd_list ;;
   llm)      cmd_llm "$@" ;;
   account)  slurm_account; echo "$ACCOUNT" ;;
+  tweaks)   echo "# name phase values (run --set NAME=VALUE; fuzz: the LLM steps, setup: seed generation)"; echo "$TWEAKS" ;;
   completion) cmd_completion ;;
   help|-h|--help) usage ;;
   *) die "unknown command '$cmd' (try: scripts/fuzz help)" ;;

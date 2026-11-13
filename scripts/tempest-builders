@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+# tempest-builders: build the target builder images (build/Dockerfile.targets) and install them on Tempest as
+# <targets root>/builder-<stage>.sif, the images build/targets/build-paper.sh compiles the paper's targets in.
+# Run on the Mac, with the VPN on, after scripts/tempest-image: every builder starts from alfred:amd64, the image
+# tempest-image just built and installed, so the targets are compiled with the AFL++ and LLVM that fuzz them.
+#
+# Usage: scripts/tempest-builders [stage ...]
+#   stages: unifuzz fuzzbench magma-libpng magma-libtiff magma-poppler magma-libsndfile (default: all six)
+#   Each: docker build (x86_64), copy to Tempest (~600 MB), convert with Apptainer on a compute node, then
+#   builder-<stage>.sif and builder-<stage>.sif.id (the Docker image id) in the targets root.
+#   Refuses if alfred:amd64 isn't this checkout's HEAD (its g2f.version label, written by tempest-image), or while
+#   alfred-build-* jobs are queued or running (they use the builders).
+#
+# Settings: G2F_TEMPEST_HOST [tempest], G2F_TARGETS_ROOT [the shared students/g2f-targets-alfred],
+#           G2F_ACCOUNT, G2F_PARTITION [fairshare]  the Slurm job that converts each image (as for scripts/fuzz)
+set -euo pipefail
+
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+HOST="${G2F_TEMPEST_HOST:-tempest}"
+ROOT="${G2F_TARGETS_ROOT:-/home/group/csci-591-automated-vulnerability-discovery/students/g2f-targets-alfred}"
+REMOTE_REPO=/home/group/csci-591-automated-vulnerability-discovery/students/alfred   # for scripts/fuzz account
+ALL="unifuzz fuzzbench magma-libpng magma-libtiff magma-poppler magma-libsndfile"
+die() { echo "tempest-builders: $*" >&2; exit 1; }
+
+stages="${*:-$ALL}"
+for s in $stages; do case " $ALL " in *" $s "*) ;; *) die "unknown stage '$s' (stages: $ALL)" ;; esac; done
+
+docker info >/dev/null 2>&1 || die "Docker isn't running (macOS: colima start)"
+ssh -o BatchMode=yes -o ConnectTimeout=10 "$HOST" true 2>/dev/null || die "can't ssh to $HOST. Connect the VPN"
+label=$(docker image inspect alfred:amd64 --format '{{index .Config.Labels "g2f.version"}}' 2>/dev/null) ||
+  die "no alfred:amd64 image here: run scripts/tempest-image first"
+head=$(git -C "$REPO" describe --always --dirty)
+case "$label" in "$head built "*) ;; *) die "alfred:amd64 is '$label', not this checkout ($head): run scripts/tempest-image first" ;; esac
+jobs=$(ssh "$HOST" 'squeue -h -o %j' | grep -c '^alfred-build-' || true)
+[ "$jobs" = 0 ] || die "$jobs alfred-build-* job(s) queued or running on Tempest: wait for them"
+echo "builders from alfred:amd64 ($label) into $HOST:$ROOT: $stages"
+
+for s in $stages; do
+  echo "== $s: building"
+  docker buildx build --platform linux/amd64 -f "$REPO/build/Dockerfile.targets" --build-arg BASE=alfred:amd64 \
+    --label "g2f.version=$label" --target "$s" -t "alfred-builder:$s" --load "$REPO"
+  id=$(docker image inspect --format '{{.Id}}' "alfred-builder:$s")
+  echo "== $s: copying it to $HOST"
+  docker save "alfred-builder:$s" | gzip -1 | ssh "$HOST" "cat > $ROOT/builder-$s.tar.gz"
+  echo "== $s: converting it on a compute node"
+  ssh "$HOST" "bash -l -s" <<REMOTE
+set -e
+cd $ROOT
+gunzip -f builder-$s.tar.gz
+# < /dev/null: srun would otherwise read the rest of this script as its input
+srun -A "\$(G2F_ACCOUNT=${G2F_ACCOUNT:-} $REMOTE_REPO/scripts/fuzz account)" -p ${G2F_PARTITION:-fairshare} -c 4 --mem 8G -t 60 \
+  -J alfred-builder-$s apptainer build --force builder-$s.sif.new docker-archive:builder-$s.tar < /dev/null
+mv builder-$s.sif.new builder-$s.sif && rm builder-$s.tar
+echo "$id" > builder-$s.sif.id
+chmod g+rw builder-$s.sif builder-$s.sif.id
+echo "builder-$s.sif: $id"
+REMOTE
+done
+echo "done. Next: build/targets/build-paper.sh paper|latest BENCH/PROJECT ... (on Tempest, from $REMOTE_REPO)"
