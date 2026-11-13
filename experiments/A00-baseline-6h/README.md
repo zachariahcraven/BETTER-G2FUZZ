@@ -30,7 +30,7 @@ worker's steps more often (continuous, or a shorter stall) help?
   - OURS-4: libpcap runs with 16G.
   - Worker tracebacks.
 - **Before launch:**
-  - Set `scheduler` from 05's result.
+  - Set `scheduler` from 05's result: `random` (2026-11-12, docs/ALFRED-ROUNDS.md, Rounds log).
   - Rebuild the targets.
   - Run `scripts/study show A00-baseline-6h`.
 

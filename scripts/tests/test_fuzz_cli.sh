@@ -671,6 +671,7 @@ contract "study --retry-failed with the driver running" '[ "$(cat "$N/study_retr
 contract "study --retry-failed --dry moves nothing"      'grep -q "would move mp42aac-g2f-r1 (failed)" "$N/study_retry_failed_dry/out" && ! grep -q "retried" "$N/study_retry_failed_dry/tree"'
 contract "study status: why each campaign failed"        'grep -q "^  mp42aac-g2f-r1 (failed): Slurm FAILED (exit 1:0) after 00:20:00$" "$N/study_failed_reasons/out" && grep -q "add --retry-failed" "$N/study_failed_reasons/out"'
 contract "shell starts while the server loads"        'grep -q "^note: .*still loading" "$N/shell_loading/out" && grep -q "^srun" "$N/shell_loading/calls"'
+contract "shell gets its own /tmp, removed on exit"  'grep -qF "apptainer shell --bind \"\$jtmp\":/tmp" "$N/shell_ok/calls" && grep -qF "rm -rf \"\$jtmp\"" "$N/shell_ok/calls"'
 # G2F_OUTPUT=campaign: no node-disk copy, .cur_input in the job's memory folder (OURS-3)
 outc() { local d=$1; grep -qF -- '--bind "$shm" --env AFL_TMPDIR="$shm"' "$d/job.sbatch" && ! grep -q 'fast=\|copy_back' "$d/job.sbatch" &&
   grep -q '^shm=/dev/shm/jobs/\$SLURM_JOB_ID' "$d/job.sbatch" && ! grep -q 'sync_out\|/host' "$d/run.sh"; }

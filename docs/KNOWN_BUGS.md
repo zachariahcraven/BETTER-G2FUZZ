@@ -9,8 +9,8 @@ bug is, how it was found, what it does to results, and whether it's fixed. New o
 | [G2F-1](#g2f-1-in-run-seeds-skip-afls-size-checks) | `afl/src/afl-fuzz.c` `run_gen_seeds()` | in-run generator seeds skip AFL++'s size checks; afl-fuzz segfaults on ones over 1 MiB, or runs out of memory on a 1 GB one | **open** (03 and 04 run with it). Alfred: gone by design (seeds come in through AFL++'s sync), to verify on campaigns |
 | [G2F-2](#g2f-2-pip_debug-runs-any-answer-as-a-pip-command) | `g2fuzz/py_utils/func.py` `pip_debug_loop()` | any LLM answer is run as a pip command | fixed 2026-10-30 (255c12b) |
 | [G2F-3](#g2f-3-afl-fuzz-heap-corruption-in-g2fuzz-runs) | afl-fuzz, G2FUZZ arms only (not located) | heap corruption: glibc stops afl-fuzz mid-run or as it exits | **open** (cause not found). Alfred: upstream's patch is gone; to check with a vorbis G2FUZZ campaign |
-| [AFL-1](#afl-1-afl-fuzz-432c-fuzzes-the-cmplog-binary) | `afl/src/afl-fuzz.c` (AFL++ 4.32c) | fuzzes with the CmpLog binary, not the target | open (fixed upstream in 5.03c). Alfred: runs 5.03c; to verify |
-| [AFL-2](#afl-2-afl-showmap-432c-aborts-on-maps-over-64k) | `afl-showmap` (AFL++ 4.32c) | aborts on coverage maps over 64K | worked around. Alfred: 5.03c resizes the map; to verify, then drop the workaround |
+| [AFL-1](#afl-1-afl-fuzz-432c-fuzzes-the-cmplog-binary) | `afl/src/afl-fuzz.c` (AFL++ 4.32c) | fuzzes with the CmpLog binary, not the target | open (fixed upstream in 5.03c). Alfred: fixed (5.03c), verified 2026-11-12 |
+| [AFL-2](#afl-2-afl-showmap-432c-aborts-on-maps-over-64k) | `afl-showmap` (AFL++ 4.32c) | aborts on coverage maps over 64K | worked around. Alfred: fixed (5.03c), verified 2026-11-12; the workaround stays (harmless) |
 | [OURS-1](#ours-1-ucb-snapshot-held-one-formats-generators) | `g2fuzz/py_utils/generator_scheduler.py` | UCB snapshot held only one format's generators | fixed 2026-10-30 (255c12b) |
 | [OURS-2](#ours-2-scancel-skipped-the-study-drivers-cleanup) | `scripts/study` `start --background` | `scancel` of the driver left its LLM servers running | fixed 2026-10-30 (uncommitted) |
 | [OURS-3](#ours-3-output-on-the-nodes-shared-disk) | `scripts/fuzz run` (each campaign's `job.sbatch`) | AFL++ output is on the node's shared `/tmp`; when it fills, every campaign there stops | **open** (03 and 04 run with it) |
@@ -186,6 +186,9 @@ bug is, how it was found, what it does to results, and whether it's fixed. New o
   setups, don't. Upstream G2FUZZ ships the same AFL++, so the paper's runs likely had it too.
 - **Status:** open, on purpose (01 `DRIFT.md` row 4.1). The backport is about 6 lines and needs an image rebuild,
   so it's for a new study only.
+- **Alfred (AFL++ 5.03c): fixed, verified 2026-11-12.** Image e564c4e, jhead from `g2f-targets-alfred/paper` (rebuilt
+  with 5.03c), `afl-fuzz -c /targets/jhead.cmp -- /targets/jhead.afl @@` for 40 s: the main forkserver's
+  `/proc/<pid>/exe` is `/targets/jhead.afl` and the CmpLog forkserver's is `/targets/jhead.cmp` (4.32c: both `.cmp`).
 
 ### AFL-2: afl-showmap 4.32c aborts on maps over 64K
 - **Where:** `afl-showmap` 4.32c stops with `FS_ERROR_MAP_SIZE` when the target's map is over 64K and `AFL_MAP_SIZE`
@@ -193,6 +196,11 @@ bug is, how it was found, what it does to results, and whether it's fixed. New o
 - **Found:** 2026-10-22, on bloaty.
 - **Status:** worked around. Every showmap-based tool (the targets test, coverage replay) sets
   `AFL_MAP_SIZE=2621440`, FuzzBench's value (01 `DRIFT.md` row 3.2).
+- **Alfred (AFL++ 5.03c): fixed, verified 2026-11-12.** Image e564c4e, bloaty from `g2f-targets-alfred/paper` (rebuilt
+  with 5.03c): `afl-showmap` with `AFL_MAP_SIZE` unset exits 0, sizes the map itself (98595) and captures 1987
+  tuples (edge ids up to 96644), a map byte-identical to the run with `AFL_MAP_SIZE=2621440`. The workaround stays:
+  with 5.03c it changes nothing, and a coverage replay with a 4.32c `afl-showmap` (01's analysis, the final study's
+  upstream arm) still needs it.
 
 ## Our code
 

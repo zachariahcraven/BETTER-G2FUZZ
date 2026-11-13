@@ -356,7 +356,11 @@ container_args() {
 cmd_shell() {
   parse_run_flags "$@"; need_campaign "${POS[0]:-}"
   prepare "${POS[0]}" shell
-  exec srun "${SLURM[@]}" --time 240 --pty apptainer shell "${ARGS[@]}" "$SIF"
+  # the container's /tmp: this job's own folder on the node, as in a run (write_job_sbatch), removed on exit.
+  # Without it /tmp would be --writable-tmpfs's overlay: 64 MB, and folders made there can't be entered.
+  local inner; inner=$(printf ' %q' "${ARGS[@]}" "$SIF")
+  exec srun "${SLURM[@]}" --time 240 --pty bash -c 'jtmp=${TMPDIR:-/tmp}/alfred-tmp-$SLURM_JOB_ID; mkdir -p "$jtmp"
+    apptainer shell --bind "$jtmp":/tmp'"$inner"'; rc=$?; rm -rf "$jtmp"; exit $rc'
 }
 
 cmd_run() {

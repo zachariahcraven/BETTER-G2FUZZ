@@ -56,13 +56,33 @@ From about 2026-11-13 (when study 05 frees the compute) to 2026-11-27, Alfred im
    ```bash
    srun -A priority-quantumcore -p priority -c 2 --mem 4G -t 10 bash -c '
      scripts/web-check png tiff mp4                        # every source answers or cools down; documents read
-     apptainer exec --cleanenv --writable-tmpfs --no-mount home,cwd,tmp build/g2fuzz.sif \
-       python3 /AFLplusplus/g2fuzz/tests/test_web.py      # the sandbox tests must run, not be skipped'
+     J=${TMPDIR:-/tmp}/alfred-tmp-check-$SLURM_JOB_ID; mkdir -p $J   # a private /tmp, as campaign jobs get
+     apptainer exec --cleanenv --no-mount home,cwd,tmp --bind $J:/tmp build/g2fuzz.sif \
+       python3 /AFLplusplus/g2fuzz/tests/test_web.py      # the sandbox tests must run, not be skipped
+     rm -rf $J'
    ```
+   Not `--writable-tmpfs` without a `/tmp` bind: in that overlay, folders made under `/tmp` can't be entered
+   (`Operation not permitted`), so 4 tests fail for a reason campaigns never meet (2026-11-12).
 6. One short real campaign with the web mutator on a GPU server, to see a whole step:
    `scripts/fuzz run <campaign> 1800 --test --set G2F_STALL_MUTATORS=web`, then read `llm-worker.log`,
    `<target>_output/default/web_ledger.json` and `web_docs/`.
 7. Launch A00 (and A02 beside it if there's room). A01 follows A00's decision.
+
+**Results (run 2026-11-12, the day 05 ended):**
+1. Scheduler: `random` for the rounds (Rounds log, first row).
+2. Image e564c4e in `build/g2fuzz.sif` and `build/g2fuzz-e564c4e.sif`; the old one kept as `build/g2fuzz-d1e1695.sif`
+   (the check round's `start` arm). The upload dropped once; it was resumed with `rsync --partial`.
+3. All 25 projects (the 28 paper targets) built with AFL++ 5.03c and clang 18.1.8, tested in e564c4e, copied into
+   `g2f-targets-alfred/paper`.
+4. AFL-1 and AFL-2 fixed in 5.03c, verified (KNOWN_BUGS.md). AFL-2's `AFL_MAP_SIZE` setting stays (harmless).
+5. `web-check png tiff mp4` on epyc022 (priority-quantumcore): every source answered, 14 documents per format.
+   `test_web.py` 21/21, no skips, with a job-style private `/tmp`.
+6. `practice/campaigns/web-jhead-1` (jhead from the image, gpt-oss-20b on an A40, 30 min, `--test`, `web` only):
+   13 web steps, 12 generators (all sandboxed, no package installed), 1 nothing-new, no failures; 94 seeds handed to
+   AFL++, 0 kept; ledger: 30 queries (0 errors), 55 documents from all 5 sources, 16 features with their quotes,
+   16 duplicates and 1 ungrounded rejected. **Weak spot:** relevance. Several targeted features belong to related
+   formats (JPEG 2000, JPEG XT, JPEG XS) or are generic Huffman-coding ideas, not features of the files jhead reads;
+   candidate fix before A01: a relevance rule in the feature prompt (an image change).
 
 ## Each round
 ```bash
@@ -97,9 +117,10 @@ Keep each round's image as `build/g2fuzz-<commit>.sif`, so a later round can run
 | later | retests of borderline tweaks; fixes for bugs the rounds find | the rounds | – |
 
 The generator scheduler (ucb vs random) isn't tested again here. Study 05 (24 h, 8 models) answers it, and its result
-sets Alfred's default before A00.
+sets Alfred's default before A00: `random` (2026-11-12, Rounds log).
 
 ## Rounds log
 | Round | Image (commit) | Arms | Result | Decision |
 |---|---|---|---|---|
+| 05 vs 04 (BETTERG2FUZZ, 24 h, 15 targets, 8 models) | – | `random` (05) vs `ucb` (04) | gpt-oss-20b: random's median edges higher on 10 of 15 targets, median ratio 1.00, exact Wilcoxon one-sided p = 0.084 for random > ucb (0.92 for ucb > random); imginfo 1.59, lcms 1.24. Every model's median ratio 1.00 (afl's, the between-study noise: 1.00, 6 above / 9 below). Cross-study medians, not yet 05's replayed-coverage analysis | `scheduler = random` in A00-A02: ucb adds nothing, random costs the same and is upstream's (a tie: the simpler; one difference fewer from upstream in the final study). `scripts/fuzz`'s own default stays `ucb` for manual runs |
 | A00-baseline-6h | – | control, afl, continuous, fast-stall | – | – |
