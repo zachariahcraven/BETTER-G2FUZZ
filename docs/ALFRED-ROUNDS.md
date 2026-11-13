@@ -81,8 +81,10 @@ From about 2026-11-13 (when study 05 frees the compute) to 2026-11-27, Alfred im
    13 web steps, 12 generators (all sandboxed, no package installed), 1 nothing-new, no failures; 94 seeds handed to
    AFL++, 0 kept; ledger: 30 queries (0 errors), 55 documents from all 5 sources, 16 features with their quotes,
    16 duplicates and 1 ungrounded rejected. **Weak spot:** relevance. Several targeted features belong to related
-   formats (JPEG 2000, JPEG XT, JPEG XS) or are generic Huffman-coding ideas, not features of the files jhead reads;
-   candidate fix before A01: a relevance rule in the feature prompt (an image change).
+   formats (JPEG 2000, JPEG XT, JPEG XS) or are generic Huffman-coding ideas, not features of the files jhead reads.
+   **Fixed the same day:** the relevance rule (`docs/ALFRED.md`, web step 6: a feature names the part of the file
+   that holds it, and the duplicate check may answer `off-format`; turned-down names are remembered). In the
+   image A00 runs on, so A01's `web` arm has it.
 
 ## Each round
 ```bash

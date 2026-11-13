@@ -144,13 +144,19 @@ invents near-copies of features it already has.
    join the reading list.
 5. **Find features.** The LLM gets an excerpt of each new document: the paragraphs with the most format detail and
    the fewest covered features, at most 12,000 characters in all. It names uncovered features, each with a sentence
-   quoted from its document.
+   quoted from its document and the part of the file that holds it (chunk, box, tag, marker, segment, field).
 6. **Check them.**
    - **Grounded:** a feature is dropped unless its quote is really in the excerpt.
    - **New:** it is dropped if it matches a known feature, first by word overlap, then by asking the LLM. The
      document is then linked to the feature it matched, so covered features collect their documents too.
+   - **Relevant** (added 2026-11-12): it must be a part of the format's own files. It is dropped if it names no part
+     of the file, if it is like a feature turned down before, or if the same LLM check (no extra call) answers
+     `off-format`: a related or successor format's feature (one with its own file type or codec) or a general
+     algorithm. A part of another standard that the format's files carry still counts. Why: the first real web
+     campaign (jhead, 13 steps) targeted JPEG 2000, JPEG XT and JPEG XS features and generic Huffman-coding ideas.
+     Turned-down names stay in the ledger and are listed in later steps' prompts.
 7. **Make the generator.** As `rare` does, the parent generator is extended with one new feature. The prompt carries:
-   - the feature's description;
+   - the feature's description and the part of the file that holds it;
    - the quoted sentences and the part of the document around them;
    - the image's installed Python packages.
    If this stall found nothing new, a feature found earlier and not yet targeted is used (each gets 2 tries).
@@ -193,7 +199,7 @@ invents near-copies of features it already has.
   - steps and queries (failed);
   - documents read and features found;
   - generators made and failed;
-  - rejects (ungrounded, duplicate) and links queued;
+  - rejects (ungrounded, duplicate, off-format) and links queued;
   - queries and new documents per source.
 - `lineage`'s `run-web` class.
 - The worker's `steps.jsonl` records each rare or web step's feature and search numbers.

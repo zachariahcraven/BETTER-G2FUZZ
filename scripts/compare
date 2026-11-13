@@ -403,12 +403,12 @@ def main():
             w("## Web stall mutator (sums over the arm's campaigns, from each web_ledger.json)")
             w("")
             w("| arm | campaigns | web steps | queries (failed) | documents read | features found | got a generator "
-              "| generator failed | waiting | rejected: ungrounded / duplicate | links queued |")
+              "| generator failed | waiting | rejected: ungrounded / duplicate / off-format | links queued |")
             w("|---|---|---|---|---|---|---|---|---|---|---|")
             for arm, t in web.items():
                 w(f"| {arm} | {t['campaigns']} | {t['steps']} | {t['queries']} ({t['query_errors']}) | {t['docs']} | "
                   f"{t['features']} | {t['targeted']} | {t['failed']} | {t['candidates']} | "
-                  f"{t['ungrounded']} / {t['duplicates']} | {t['frontier']} |")
+                  f"{t['ungrounded']} / {t['duplicates']} / {t.get('off_format', 0)} | {t['frontier']} |")
             w("")
             for arm, t in web.items():
                 w(f"- {arm}, per source (queries or pages → new documents): " + "; ".join(

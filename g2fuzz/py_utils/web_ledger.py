@@ -4,7 +4,8 @@ For each format it keeps:
 - features: each feature the web steps found, the documents that describe it (url and the sentence quoted from
   it) and what became of it: candidate (found, no generator yet), targeted (with its generator) or failed (its
   generator didn't run; tried again up to MAX_ATTEMPTS times). Features the checks turned down are under rejected,
-  with the reason (ungrounded: the quote isn't in the document; duplicate-of:<feature>).
+  with the reason (ungrounded: the quote isn't in the document; duplicate-of:<feature>; off-format: <why>, not a
+  part of the format's own files, by the relevance rule).
 - docs: each document fetched (url, title, source, the query that found it, the step, the features it gave, and
   the file in web_docs/ holding the excerpt the LLM read). A document is fetched once: later steps skip it, so each
   stall reads new documents.
@@ -154,10 +155,11 @@ class Ledger:
         feats = self.fmt(fmt)["features"]
         return [n for n, v in feats.items() if statuses is None or v["status"] in statuses]
 
-    def add_feature(self, fmt, name, description, url, quote, step):
+    def add_feature(self, fmt, name, description, url, quote, step, part=""):
         f = self.fmt(fmt)
-        feat = f["features"].setdefault(name, {"description": description, "docs": [], "status": "candidate",
-                                               "attempts": 0, "generator": None, "step": step})
+        feat = f["features"].setdefault(name, {"description": description, "part": part, "docs": [],
+                                               "status": "candidate", "attempts": 0, "generator": None,
+                                               "step": step})
         self.link(fmt, name, url, quote)
         return feat
 
@@ -179,6 +181,10 @@ class Ledger:
 
     def reject(self, fmt, name, reason, url, quote):
         self.fmt(fmt)["rejected"].setdefault(name, {"reason": reason, "url": norm_url(url), "quote": quote[:300]})
+
+    def off_format(self, fmt):
+        """Names the relevance rule turned down (not parts of the format's own files), oldest first."""
+        return [n for n, v in self.fmt(fmt)["rejected"].items() if v["reason"].startswith("off-format")]
 
     def candidates(self, fmt):
         """Features found but without a generator yet: never tried, or failed fewer than MAX_ATTEMPTS times."""
@@ -207,7 +213,7 @@ def summarize(data):
     """A ledger's numbers (scripts/compare reads the JSON and calls this; it never rewrites a campaign's ledger)."""
     s = {"steps": data.get("steps", 0), "queries": 0, "query_errors": 0, "docs": 0, "frontier": 0,
          "features": 0, "targeted": 0, "failed": 0, "candidates": 0, "covered": 0, "ungrounded": 0,
-         "duplicates": 0, "by_source": {}}
+         "duplicates": 0, "off_format": 0, "by_source": {}}
     for f in data.get("formats", {}).values():
         for q in f.get("queries", []):
             s["queries"] += 1
@@ -229,5 +235,6 @@ def summarize(data):
             s["features"] += 1
             s[{"targeted": "targeted", "failed": "failed"}.get(v.get("status"), "candidates")] += 1
         for v in f.get("rejected", {}).values():
-            s["ungrounded" if v.get("reason") == "ungrounded" else "duplicates"] += 1
+            r = v.get("reason", "")
+            s["ungrounded" if r == "ungrounded" else "off_format" if r.startswith("off-format") else "duplicates"] += 1
     return s
