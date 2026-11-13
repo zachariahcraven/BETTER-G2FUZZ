@@ -29,8 +29,10 @@ build() {
                 cmake . && make -j)
             ;;
         cmp)
+            # AFL_LLVM_CMPLOG for make too: afl-clang-fast reads it when it compiles, so for cmake only it gave a
+            # .cmp without CmpLog (2026-11-13; every study before had that)
             (cd "$src" && env CC=afl-clang-fast CXX=afl-clang-fast++ AFL_LLVM_CMPLOG=1 \
-                cmake . && make -j)
+                cmake . && env AFL_LLVM_CMPLOG=1 make -j)
             ;;
         *)
             (cd "$src" && env CC=afl-clang-fast CXX=afl-clang-fast++ \

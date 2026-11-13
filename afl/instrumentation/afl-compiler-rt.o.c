@@ -244,6 +244,16 @@ static u32 __afl_child_sync_off = 0;
 static size_t __afl_shm_map_len = 0;
 static size_t __afl_cmp_map_len = 0;
 static size_t __afl_vp_map_len = 0;
+/* ALFRED (ALF-1): the guarded reservation each writable shared map sits in,
+   if it got one (see __alf_guard_reserve()); released by __afl_unmap_shm(). */
+typedef struct {
+
+  void  *base;
+  size_t len;
+
+} alf_map_guard_t;
+
+static alf_map_guard_t __alf_guard_area, __alf_guard_cmp, __alf_guard_vp;
 #ifdef __AFL_CODE_COVERAGE
 static size_t __afl_pcmap_map_len = 0;
 static size_t __afl_modmap_map_len = 0;
@@ -679,6 +689,191 @@ static size_t __afl_shm_clamp_len(int fd, size_t len, const char *what) {
 
 }
 
+/* ALFRED (ALF-1): guard regions around the shared maps.
+
+   A heap overflow in the target can run off the end of a large buffer (one
+   malloc() got from mmap()) into whatever mapping sits right above it. The
+   coverage map is attached before main() and the kernel hands out later
+   mappings top-down, so that is regularly the coverage map: afl-fuzz then
+   reads the overwritten bytes as thousands of new edges, and 5.03c stops with
+   "Incorrect fuzzing setup detected" (gdk-pixbuf's io-bmp.c DoCompressed
+   overflow, docs/KNOWN_BUGS.md ALF-1). So each writable shared map (coverage,
+   CmpLog, value profile) is attached inside a PROT_NONE reservation that
+   leaves ALF_MAP_GUARD_SIZE inaccessible bytes below and above it. An
+   overflow into them faults (SIGSEGV), which afl-fuzz records as the crash it
+   is, instead of corrupting the map.
+
+   No cost per execution: the forkserver sets this up once and its children
+   inherit the mappings. Each guarded map takes 2 * ALF_MAP_GUARD_SIZE more
+   address space, which counts against afl-fuzz -m (RLIMIT_AS). When the
+   reservation or the attach inside it fails, the map is attached the upstream
+   way. A fixed map address (AFL_LLVM_MAP_ADDR) is left alone.
+   AFL_NO_MAP_GUARD=1 turns the guards off (upstream behaviour). */
+
+#define ALF_MAP_GUARD_SIZE (1024 * 1024)
+
+static int __alf_map_guard_enabled(void) {
+
+  char *e = getenv("AFL_NO_MAP_GUARD");
+  return !(e && *e && strcmp(e, "0"));
+
+}
+
+static size_t __alf_page_size(void) {
+
+  long ps = sysconf(_SC_PAGESIZE);
+  return ps > 0 ? (size_t)ps : 4096;
+
+}
+
+/* Reserve guard | map_len | guard as PROT_NONE; returns where the map has to
+   go (aligned to `align`, a power of two, at least a page) or NULL. */
+
+static u8 *__alf_guard_reserve(size_t map_len, size_t align,
+                               alf_map_guard_t *g) {
+
+  size_t page = __alf_page_size();
+  if (!g || !map_len || !__alf_map_guard_enabled()) { return NULL; }
+  if (align < page) { align = page; }
+
+  size_t guard = (ALF_MAP_GUARD_SIZE + align - 1) & ~(align - 1);
+  size_t len = (map_len + page - 1) & ~(page - 1);
+  size_t total = guard + (align - page) + len + guard;
+
+  u8 *base = (u8 *)mmap(NULL, total, PROT_NONE,
+                        MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE, -1, 0);
+  if (base == MAP_FAILED) {
+
+    if (__afl_debug) {
+
+      fprintf(stderr, "DEBUG: map guard: reserving %zu bytes failed: %s\n",
+              total, strerror(errno));
+
+    }
+
+    return NULL;
+
+  }
+
+  g->base = base;
+  g->len = total;
+  return (u8 *)(((uintptr_t)base + guard + align - 1) & ~(uintptr_t)(align - 1));
+
+}
+
+static void __alf_guard_release(alf_map_guard_t *g) {
+
+  if (g && g->base) {
+
+    munmap(g->base, g->len);
+    g->base = NULL;
+    g->len = 0;
+
+  }
+
+}
+
+static void __alf_guard_report(const char *what, void *map, size_t len,
+                               alf_map_guard_t *g) {
+
+  if (__afl_debug && g && g->base) {
+
+    fprintf(stderr,
+            "DEBUG: map guard: %s at %p (%zu bytes) inside PROT_NONE "
+            "[%p, %p)\n",
+            what, map, len, g->base, (u8 *)g->base + g->len);
+
+  }
+
+}
+
+/* mmap() a shared object descriptor between two guards; MAP_FAILED if that
+   does not work out (the caller then maps it the upstream way). */
+
+static void *__alf_guard_mmap(int fd, size_t len, int prot,
+                              alf_map_guard_t *g, const char *what) {
+
+  u8 *at = __alf_guard_reserve(len, 0, g);
+  if (!at) { return MAP_FAILED; }
+
+  void *ret = mmap(at, len, prot, MAP_FIXED | MAP_SHARED, fd, 0);
+  if (ret == MAP_FAILED || ret != (void *)at) {
+
+    if (__afl_debug) {
+
+      fprintf(stderr, "DEBUG: map guard: mmap() of %s failed: %s\n", what,
+              strerror(errno));
+
+    }
+
+    __alf_guard_release(g);  // also drops a stray mapping inside it
+    return MAP_FAILED;
+
+  }
+
+  __alf_guard_report(what, ret, len, g);
+  return ret;
+
+}
+
+#ifndef USEMMAP
+/* shmat() a SysV segment between two guards, sized from IPC_STAT (Linux
+   still answers that for the segment afl-fuzz already marked IPC_RMID); NULL
+   if that does not work out (the caller then attaches it the upstream way). */
+
+static void *__alf_guard_shmat(int shm_id, alf_map_guard_t *g,
+                               const char *what) {
+
+  struct shmid_ds ds;
+  if (!g || !__alf_map_guard_enabled()) { return NULL; }
+  if (shmctl(shm_id, IPC_STAT, &ds) != 0 || !ds.shm_segsz) {
+
+    if (__afl_debug) {
+
+      fprintf(stderr, "DEBUG: map guard: IPC_STAT of %s failed: %s\n", what,
+              strerror(errno));
+
+    }
+
+    return NULL;
+
+  }
+
+  size_t len = (size_t)ds.shm_segsz;
+  u8    *at = __alf_guard_reserve(len, (size_t)SHMLBA, g);
+  if (!at) { return NULL; }
+
+  #ifdef SHM_REMAP
+  void *ret = shmat(shm_id, at, SHM_REMAP);  // replaces the PROT_NONE pages
+  #else
+  /* no SHM_REMAP: open a hole for the segment (we are in a constructor or the
+     forkserver, nothing else maps concurrently) */
+  munmap(at, (len + __alf_page_size() - 1) & ~(__alf_page_size() - 1));
+  void *ret = shmat(shm_id, at, 0);
+  #endif
+
+  if (ret == (void *)-1 || ret != (void *)at) {
+
+    if (__afl_debug) {
+
+      fprintf(stderr, "DEBUG: map guard: shmat() of %s failed: %s\n", what,
+              strerror(errno));
+
+    }
+
+    if (ret != (void *)-1) { shmdt(ret); }
+    __alf_guard_release(g);
+    return NULL;
+
+  }
+
+  __alf_guard_report(what, ret, len, g);
+  return ret;
+
+}
+
+#endif
+
 /* Map a shared region that the tool handed over as an inherited descriptor.
 
    Recent AFL++ tools create their shared maps with shm_open(), mmap() them and
@@ -689,7 +884,8 @@ static size_t __afl_shm_clamp_len(int fd, size_t len, const char *what) {
    length is reported back through `mapped_len` for the matching munmap().
 
    `fixed_addr` requests a mapping at a specific address (AFL_LLVM_MAP_ADDR);
-   NULL lets the kernel place it.
+   NULL lets the kernel place it - between two guards if `guard` is given
+   (ALFRED (ALF-1)).
 
    Returns NULL when the variable is not set or the descriptor is unusable,
    which puts the caller back on the shm_open(name) / shmat(id) path - that is
@@ -700,7 +896,8 @@ static size_t __afl_shm_clamp_len(int fd, size_t len, const char *what) {
    -> __afl_unmap_shm/__afl_map_shm). */
 
 static void *__afl_map_shm_fd(const char *env, size_t len, int prot,
-                              void *fixed_addr, size_t *mapped_len) {
+                              void *fixed_addr, size_t *mapped_len,
+                              alf_map_guard_t *guard) {
 
   const char *fd_str = getenv(env);
 
@@ -756,7 +953,9 @@ static void *__afl_map_shm_fd(const char *env, size_t len, int prot,
 
   } else {
 
-    ret = mmap(NULL, map_len, prot, MAP_SHARED, fd, 0);
+    // ALFRED (ALF-1): between two guards if we can, else as upstream does
+    ret = guard ? __alf_guard_mmap(fd, map_len, prot, guard, env) : MAP_FAILED;
+    if (ret == MAP_FAILED) { ret = mmap(NULL, map_len, prot, MAP_SHARED, fd, 0); }
 
   }
 
@@ -819,7 +1018,7 @@ static void __afl_map_shm_fuzz() {
     /* Preferred path: the map was handed to us as an inherited descriptor. */
 
     map = (u8 *)__afl_map_shm_fd(SHM_FUZZ_FD_ENV_VAR, shm_fuzz_map_size,
-                                 PROT_READ, NULL, NULL);
+                                 PROT_READ, NULL, NULL, NULL);
 
     if (!map && id_str) {
 
@@ -1256,7 +1455,7 @@ static void __afl_map_shm(void) {
 
     __afl_vp_map = (vp_map_t *)__afl_map_shm_fd(
         VP_SHM_FD_ENV_VAR, sizeof(vp_map_t), PROT_READ | PROT_WRITE, NULL,
-        &__afl_vp_map_len);
+        &__afl_vp_map_len, &__alf_guard_vp);  // ALFRED (ALF-1): guarded
 
     if (!__afl_vp_map && vp_id_str) {
 
@@ -1274,8 +1473,17 @@ static void __afl_map_shm(void) {
 
       }
 
-      shm_base = mmap(0, sizeof(vp_map_t), PROT_READ | PROT_WRITE, MAP_SHARED,
-                      shm_fd, 0);
+      // ALFRED (ALF-1): between two guards if we can, else as upstream does
+      shm_base = __alf_guard_mmap(shm_fd, sizeof(vp_map_t),
+                                  PROT_READ | PROT_WRITE, &__alf_guard_vp,
+                                  shm_file_path);
+      if (shm_base == MAP_FAILED) {
+
+        shm_base = mmap(0, sizeof(vp_map_t), PROT_READ | PROT_WRITE,
+                        MAP_SHARED, shm_fd, 0);
+
+      }
+
       if (shm_base == MAP_FAILED) {
 
         close(shm_fd);
@@ -1294,7 +1502,10 @@ static void __afl_map_shm(void) {
 #else
       u32 shm_id = atoi(vp_id_str);
 
-      __afl_vp_map = (vp_map_t *)shmat(shm_id, NULL, 0);
+      // ALFRED (ALF-1): between two guards if we can, else as upstream does
+      __afl_vp_map =
+          (vp_map_t *)__alf_guard_shmat(shm_id, &__alf_guard_vp, "vp map");
+      if (!__afl_vp_map) { __afl_vp_map = (vp_map_t *)shmat(shm_id, NULL, 0); }
 #endif
 
     }
@@ -1364,7 +1575,8 @@ static void __afl_map_shm(void) {
 
     __afl_area_ptr = (u8 *)__afl_map_shm_fd(
         SHM_FD_ENV_VAR, shm_map_len, PROT_READ | PROT_WRITE,
-        (void *)(uintptr_t)__afl_map_addr, &__afl_shm_map_len);
+        (void *)(uintptr_t)__afl_map_addr, &__afl_shm_map_len,
+        &__alf_guard_area);  // ALFRED (ALF-1): guarded
 
     if (!__afl_area_ptr && id_str) {
 
@@ -1395,8 +1607,15 @@ static void __afl_map_shm(void) {
 
       } else {
 
-        shm_base =
-            mmap(0, shm_map_len, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
+        // ALFRED (ALF-1): between two guards if we can, else as upstream does
+        shm_base = __alf_guard_mmap(shm_fd, shm_map_len, PROT_READ | PROT_WRITE,
+                                    &__alf_guard_area, shm_file_path);
+        if (shm_base == MAP_FAILED) {
+
+          shm_base = mmap(0, shm_map_len, PROT_READ | PROT_WRITE, MAP_SHARED,
+                          shm_fd, 0);
+
+        }
 
       }
 
@@ -1447,7 +1666,17 @@ static void __afl_map_shm(void) {
 
       }
 
-      __afl_area_ptr = (u8 *)shmat(shm_id, (void *)__afl_map_addr, 0);
+      // ALFRED (ALF-1): between two guards if we can (not at a fixed map
+      // address), else as upstream does
+      __afl_area_ptr =
+          __afl_map_addr ? NULL
+                         : (u8 *)__alf_guard_shmat(shm_id, &__alf_guard_area,
+                                                   "coverage map");
+      if (!__afl_area_ptr) {
+
+        __afl_area_ptr = (u8 *)shmat(shm_id, (void *)__afl_map_addr, 0);
+
+      }
 
 #endif
 
@@ -1591,7 +1820,7 @@ static void __afl_map_shm(void) {
 
     __afl_cmp_map = (struct cmp_map *)__afl_map_shm_fd(
         CMPLOG_SHM_FD_ENV_VAR, sizeof(struct cmp_map), PROT_READ | PROT_WRITE,
-        NULL, &__afl_cmp_map_len);
+        NULL, &__afl_cmp_map_len, &__alf_guard_cmp);  // ALFRED (ALF-1): guarded
 
     if (!__afl_cmp_map && id_str) {
 
@@ -1611,8 +1840,17 @@ static void __afl_map_shm(void) {
       }
 
       /* map the shared memory segment to the address space of the process */
-      shm_base = mmap(0, sizeof(struct cmp_map), PROT_READ | PROT_WRITE,
-                      MAP_SHARED, shm_fd, 0);
+      // ALFRED (ALF-1): between two guards if we can, else as upstream does
+      shm_base = __alf_guard_mmap(shm_fd, sizeof(struct cmp_map),
+                                  PROT_READ | PROT_WRITE, &__alf_guard_cmp,
+                                  shm_file_path);
+      if (shm_base == MAP_FAILED) {
+
+        shm_base = mmap(0, sizeof(struct cmp_map), PROT_READ | PROT_WRITE,
+                        MAP_SHARED, shm_fd, 0);
+
+      }
+
       if (shm_base == MAP_FAILED) {
 
         close(shm_fd);
@@ -1631,7 +1869,15 @@ static void __afl_map_shm(void) {
 #else
       u32 shm_id = atoi(id_str);
 
-      __afl_cmp_map = (struct cmp_map *)shmat(shm_id, NULL, 0);
+      // ALFRED (ALF-1): between two guards if we can, else as upstream does
+      __afl_cmp_map = (struct cmp_map *)__alf_guard_shmat(
+          shm_id, &__alf_guard_cmp, "cmplog map");
+      if (!__afl_cmp_map) {
+
+        __afl_cmp_map = (struct cmp_map *)shmat(shm_id, NULL, 0);
+
+      }
+
 #endif
 
     }
@@ -1656,7 +1902,8 @@ static void __afl_map_shm(void) {
     size_t pcmap_len = __afl_map_size * sizeof(void *);
     void  *pcmap =
         __afl_map_shm_fd("__AFL_PCMAP_SHM_FD", pcmap_len,
-                         PROT_READ | PROT_WRITE, NULL, &__afl_pcmap_map_len);
+                         PROT_READ | PROT_WRITE, NULL, &__afl_pcmap_map_len,
+                         NULL);
 
     if (!pcmap && pcmap_id_str) {
 
@@ -1688,7 +1935,8 @@ static void __afl_map_shm(void) {
     size_t modmap_len = sizeof(module_entry_t) * MAX_AFL_MODULES;
     void  *modmap =
         __afl_map_shm_fd("__AFL_MODMAP_SHM_FD", modmap_len,
-                         PROT_READ | PROT_WRITE, NULL, &__afl_modmap_map_len);
+                         PROT_READ | PROT_WRITE, NULL, &__afl_modmap_map_len,
+                         NULL);
 
     if (!modmap && modmap_id_str) {
 
@@ -1812,6 +2060,7 @@ static void __afl_unmap_shm(void) {
 
   }
 
+  __alf_guard_release(&__alf_guard_area);  // ALFRED (ALF-1)
   __afl_area_ptr = __afl_area_ptr_dummy;
   __afl_bug_map = __afl_bug_map_active ? __afl_bug_map_local : NULL;
   __afl_bug_map_increased = 0;
@@ -1838,6 +2087,8 @@ static void __afl_unmap_shm(void) {
 
   }
 
+  __alf_guard_release(&__alf_guard_cmp);  // ALFRED (ALF-1)
+
   id_str = getenv(VP_SHM_ENV_VAR);
 
   if (__afl_vp_map && (__afl_vp_map_len || id_str)) {
@@ -1863,6 +2114,7 @@ static void __afl_unmap_shm(void) {
 
   }
 
+  __alf_guard_release(&__alf_guard_vp);  // ALFRED (ALF-1)
   __afl_already_initialized_shm = 0;
 
 }

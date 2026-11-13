@@ -11,6 +11,7 @@ bug is, how it was found, what it does to results, and whether it's fixed. New o
 | [G2F-3](#g2f-3-afl-fuzz-heap-corruption-in-g2fuzz-runs) | afl-fuzz, G2FUZZ arms only (not located) | heap corruption: glibc stops afl-fuzz mid-run or as it exits | **open** (cause not found). Alfred: upstream's patch is gone; to check with a vorbis G2FUZZ campaign |
 | [AFL-1](#afl-1-afl-fuzz-432c-fuzzes-the-cmplog-binary) | `afl/src/afl-fuzz.c` (AFL++ 4.32c) | fuzzes with the CmpLog binary, not the target | open (fixed upstream in 5.03c). Alfred: fixed (5.03c), verified 2026-11-12 |
 | [AFL-2](#afl-2-afl-showmap-432c-aborts-on-maps-over-64k) | `afl-showmap` (AFL++ 4.32c) | aborts on coverage maps over 64K | worked around. Alfred: fixed (5.03c), verified 2026-11-12; the workaround stays (harmless) |
+| [ALF-1](#alf-1-gdk-pixbufs-heap-overflow-writes-into-afls-coverage-map) | gdk-pixbuf `io-bmp.c:1060` `DoCompressed` (the target), seen by AFL++ 5.03c's map check | a heap overflow in the target writes into AFL's coverage map: 5.03c stops the campaign, 4.32c counted the garbage as coverage | **fixed in code, not deployed** (2026-11-13): guard regions around AFL's maps in `afl-compiler-rt` (`AFL_NO_MAP_GUARD=1` turns them off); needs the image, builders and targets rebuilt. Hit 3 A02 gdk-pixbuf campaigns (stopped) and 9 of 04/05's (silent, 100% coverage). Not `AFL_IGNORE_PROBLEMS` |
 | [OURS-1](#ours-1-ucb-snapshot-held-one-formats-generators) | `g2fuzz/py_utils/generator_scheduler.py` | UCB snapshot held only one format's generators | fixed 2026-10-30 (255c12b) |
 | [OURS-2](#ours-2-scancel-skipped-the-study-drivers-cleanup) | `scripts/study` `start --background` | `scancel` of the driver left its LLM servers running | fixed 2026-10-30 (uncommitted) |
 | [OURS-3](#ours-3-output-on-the-nodes-shared-disk) | `scripts/fuzz run` (each campaign's `job.sbatch`) | AFL++ output is on the node's shared `/tmp`; when it fills, every campaign there stops | **open** (03 and 04 run with it) |
@@ -201,6 +202,72 @@ bug is, how it was found, what it does to results, and whether it's fixed. New o
   tuples (edge ids up to 96644), a map byte-identical to the run with `AFL_MAP_SIZE=2621440`. The workaround stays:
   with 5.03c it changes nothing, and a coverage replay with a 4.32c `afl-showmap` (01's analysis, the final study's
   upstream arm) still needs it.
+
+## AFL++ 5.03c (Alfred)
+
+### ALF-1: gdk-pixbuf's heap overflow writes into AFL's coverage map
+- **What happens:** afl-fuzz 5.03c stops a gdk-pixbuf-pixdata campaign with `PROGRAM ABORT : Incorrect fuzzing setup
+  detected. Your target seems to have loaded incorrectly instrumented shared libraries (5684 of 5683/5696)`
+  (`afl/src/afl-fuzz-stats.c` `show_stats_normal()`, about line 919: more map bytes covered than the map has).
+- **Cases (A02, 2026-11-13):** `control/gdk-pixbuf-pixdata-r3` (after 245 of 360 min of fuzzing), `control/...-r4`
+  (85 min), `rfdm-all/...-r1` (237 min), each with the same numbers; Slurm FAILED, status `done (short)`. A00's 25
+  gdk-pixbuf campaigns (shared seeds) never reached it.
+- **Cause (found):** coverage sat near 2,200 edges (39%) and then one input made it jump (r4: 2,170 to 5,673 of 5,683
+  edges, 99.8%; r3: 2,249 to 2,696). That input and its trims, run in the ASan build, give `heap-buffer-overflow` in
+  `DoCompressed` (`gdk-pixbuf/io-bmp.c:1060`, RLE-compressed BMP), reached through the QTIF loader
+  (`io-qtif.c:217`). In the fuzzing build (no ASan) the overflow runs past a large pixel buffer into AFL's shared
+  coverage map, which AFL then reads as thousands of new edges. Not the instrumentation, not shared libraries.
+- **AFL++ 4.32c did the same, silently:** 6 of 04's and 3 of 05's 45 gdk-pixbuf campaigns end with `edges_found` =
+  `total_edges` = 5548 (100%), the corrupted map counted as coverage; afl-fuzz then sees no new coverage for the rest
+  of the run. Their fuzzer_stats coverage is wrong. A queue replay with afl-showmap is fine: there the input crashes
+  (exit 2) and the map holds 232 entries, so replayed coverage (01's method, the final study's) stays valid.
+- **Not a fix:** `AFL_IGNORE_PROBLEMS=1` only turns the stop into a warning, leaving a campaign that fuzzes on with a
+  corrupted map, as 4.32c did. (Prepared on 2026-11-13, withdrawn before deploying.)
+- **Why only sometimes (found 2026-11-13):** the pixel buffer is 20 MB, so glibc mmap()s it, and the kernel puts it
+  right below the lowest mapping. In the forkserver child that is AFL's coverage map (a SysV segment of 8 MB, attached
+  before main()) unless something was mapped in between. On Tempest with the image's defaults something always is:
+  glibc's `gconv-modules.cache` (read-only, 28 KB), mapped when glib's `g_strerror()` converts the error for the
+  missing `loaders.cache` from LANG=C to UTF-8. The overflow then faults on it: 300 afl-showmap runs, 40 forkserver
+  runs, afl-fuzz calibration and 15 min of afl-fuzz from r4's queue all crash cleanly (232 map entries). With
+  `CHARSET=UTF-8` glib skips iconv, nothing lies in between, and the overflow writes into the map every time:
+  afl-showmap exits 0 with all 5,696 entries set (r3's input 4,287, rfdm-all r1's 5,364), and afl-fuzz stops with
+  the campaigns' `5684 of 5683/5696`. Why the A02 campaigns had no mapping in between is not found (same image,
+  kernel, environment and command line; they ran on the rome nodes). So a replay is valid only while that read-only
+  mapping is in the way; with the fix it always is.
+- **Fix (in code 2026-11-13, not deployed):** `afl/instrumentation/afl-compiler-rt.o.c` (`// ALFRED (ALF-1):`)
+  attaches each writable shared map (coverage, CmpLog, value profile) inside a `PROT_NONE` reservation that leaves
+  1 MB of inaccessible guard below and above it: SysV `shmat(SHM_REMAP)` into the reservation, sized by `IPC_STAT`;
+  the descriptor and `shm_open` paths `mmap(MAP_FIXED)` into it. An overflow into a guard is a SIGSEGV, which
+  afl-fuzz records as a crash. It is set up once in the forkserver (children inherit it), released and redone by
+  `__afl_unmap_shm()`/`__afl_map_shm()` (late-module remap), and falls back to the upstream attach if the
+  reservation fails; a fixed map address (`AFL_LLVM_MAP_ADDR`) keeps upstream's layout. `AFL_NO_MAP_GUARD=1` turns
+  it off (listed in `afl/include/envs.h`, so afl-fuzz doesn't call it mistyped; documented in
+  `afl/docs/env_variables.md`). Regression test: `scripts/tests/test_map_guard.sh` (passes with the patched source,
+  5 checks fail with the installed runtime).
+- **Evidence (Tempest, 2026-11-13; runtime built from the patched source in the builder image, targets rebuilt into a
+  scratch tree; afl-fuzz -c -m 1024 as `scripts/fuzz` runs it):**
+  - gdk-pixbuf-pixdata, `CHARSET=UTF-8`, the r4 trigger: with the current runtime afl-fuzz stops at calibration
+    (`5684 of 5683/5696`), and with the trigger handed over through the LLM worker's sync dir (`-t 1000`) it adds
+    `id:000065,sync:llm,src:000000,+cov` and stops, as in A02. Patched: the seed "results in a crash, skipping", the
+    sync import is saved as `crashes/id:000000,sig:11,sync:llm,src:000000`, and fuzzing goes on (300 s, edges stay
+    near 400 of 5,683). `AFL_NO_MAP_GUARD=1` stops again. Without `CHARSET` the patched build also crashes cleanly.
+  - A synthetic target (malloc 20 MB, write 64 KB past its end): current runtime, afl-fuzz stops (`52 of 50/64`) at
+    calibration and on a sync import; patched, a saved crash and normal fuzzing; the same through the descriptor
+    map path (`__AFL_SHM_FD`).
+  - Nothing else changes: afl-showmap over the stock seeds of gdk-pixbuf (28), jhead (4) and zlib (77, persistent
+    mode) gives identical maps, `.afl` and `.cmp`, for the live build, the patched build and `AFL_NO_MAP_GUARD=1`.
+    In afl-fuzz -c the CmpLog child's CmpLog map (145 MB) is guarded too, and jhead and zlib fuzz normally.
+- **Limits:** a write that jumps more than 1 MB past the end of a buffer can still land in a map. Each guarded map
+  takes 2 MB more address space, which counts against `-m 1024` (RLIMIT_AS). No cost per execution (no syscalls,
+  two more mappings per map to copy at fork): 30 s afl-fuzz runs, one at a time on one node, current vs patched,
+  jhead 331/339 vs 336/332 execs/s, gdk-pixbuf 280/280 vs 279/273; zlib (persistent) 27.3k/27.0k vs 29.5k/20.9k
+  (noise: the guard isn't in the persistent loop).
+- **Deploy (after A00 and A02 end):** the runtime is linked into every target, so all three layers need rebuilding:
+  the run image (`scripts/tempest-image`), then the builder images (`scripts/tempest-builders`; they are built FROM
+  the run image and use its `/usr/local/lib/afl`), then the 28 paper targets
+  (`build/targets/build-paper.sh paper <25 projects>`). Then `RT=installed scripts/tests/test_map_guard.sh` and
+  `nm /targets/<t>.afl | grep __alf_guard_reserve` for each target. Until then: a stopped campaign's data up to the
+  stop is valid; compare gdk-pixbuf on replayed coverage or note the short runs. Retrying reruns into the same bug.
 
 ## Our code
 

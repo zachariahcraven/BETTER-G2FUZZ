@@ -16,9 +16,11 @@ if [ "$V" = "paper" ]; then
     local variant="$1" cc="$2" cxx="$3"; shift 3
     local B="$W/build-$variant"
     cp -a "$SRC" "$B"
+    # the variant's settings go to make too: afl-clang-fast reads AFL_LLVM_CMPLOG when it compiles (under make), so
+    # setting it for autogen.sh only gave a .cmp without CmpLog (2026-11-13; every study before had that)
     (cd "$B" && env "$@" CC="$cc" CXX="$cxx" \
       ./autogen.sh --enable-static=yes --enable-shared=no --with-included-loaders=yes \
-      && make -j)
+      && env "$@" make -j)
     cp "$B/gdk-pixbuf/gdk-pixbuf-pixdata" "$OUT/$T.$variant"
   }
   build afl afl-clang-fast afl-clang-fast++

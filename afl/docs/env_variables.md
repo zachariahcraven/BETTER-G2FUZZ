@@ -623,6 +623,12 @@ The following environment variables are for a compiled AFL++ target.
   - Setting `AFL_DISABLE_LLVM_INSTRUMENTATION` will disable collecting
     instrumentation. (More of an internal option.)
 
+  - Alfred (ALF-1): the runtime attaches each writable shared map (coverage,
+    CmpLog, value profile) between two 1 MB `PROT_NONE` guard regions, so a
+    heap overflow in the target that runs into them crashes instead of writing
+    fake coverage into the map. Setting `AFL_NO_MAP_GUARD=1` turns that off
+    (the upstream layout), e.g. for comparisons.
+
 ## 5) Settings for afl-fuzz
 
 The main fuzzer binary accepts several options that disable a couple of sanity
