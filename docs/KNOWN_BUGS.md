@@ -5,15 +5,16 @@ bug is, how it was found, what it does to results, and whether it's fixed. New o
 
 | ID | Where | What | Status |
 |---|---|---|---|
-| [G2F-1](#g2f-1-in-run-seeds-skip-afls-size-checks) | `afl/src/afl-fuzz.c` `run_gen_seeds()` | in-run generator seeds skip AFL++'s size checks; afl-fuzz segfaults on ones over 1 MiB, or runs out of memory on a 1 GB one | **open** (03 and 04 run with it) |
+| [G2F-1](#g2f-1-in-run-seeds-skip-afls-size-checks) | `afl/src/afl-fuzz.c` `run_gen_seeds()` | in-run generator seeds skip AFL++'s size checks; afl-fuzz segfaults on ones over 1 MiB, or runs out of memory on a 1 GB one | **open** (03, 04 and 05 run with it) |
 | [G2F-2](#g2f-2-pip_debug-runs-any-answer-as-a-pip-command) | `g2fuzz/py_utils/func.py` `pip_debug_loop()` | any LLM answer is run as a pip command | fixed 2026-10-30 (255c12b) |
 | [G2F-3](#g2f-3-afl-fuzz-heap-corruption-in-g2fuzz-runs) | afl-fuzz, G2FUZZ arms only (not located) | heap corruption: glibc stops afl-fuzz mid-run or as it exits | **open** (cause not found) |
 | [AFL-1](#afl-1-afl-fuzz-432c-fuzzes-the-cmplog-binary) | `afl/src/afl-fuzz.c` (AFL++ 4.32c) | fuzzes with the CmpLog binary, not the target | open (fixed upstream in 5.03c) |
 | [AFL-2](#afl-2-afl-showmap-432c-aborts-on-maps-over-64k) | `afl-showmap` (AFL++ 4.32c) | aborts on coverage maps over 64K | worked around |
 | [OURS-1](#ours-1-ucb-snapshot-held-one-formats-generators) | `g2fuzz/py_utils/generator_scheduler.py` | UCB snapshot held only one format's generators | fixed 2026-10-30 (255c12b) |
 | [OURS-2](#ours-2-scancel-skipped-the-study-drivers-cleanup) | `scripts/study` `start --background` | `scancel` of the driver left its LLM servers running | fixed 2026-10-30 (uncommitted) |
-| [OURS-3](#ours-3-output-on-the-nodes-shared-disk) | `scripts/fuzz run` (each campaign's `job.sbatch`) | AFL++ output is on the node's shared `/tmp`; when it fills, every campaign there stops | **open** (03 and 04 run with it) |
-| [OURS-4](#ours-4-the-kernels-file-name-cache-counts-against-a-campaigns-memory) | each campaign's 8 GB (`scripts/fuzz run`) | the libpcap target's temp files fill it with kernel cache; a 24 h run can be killed for memory | **open** (found in 04) |
+| [OURS-3](#ours-3-output-on-the-nodes-shared-disk) | `scripts/fuzz run` (each campaign's `job.sbatch`) | AFL++ output is on the node's shared `/tmp`; when it fills, every campaign there stops | **open** (03, 04 and 05 run with it) |
+| [OURS-4](#ours-4-the-kernels-file-name-cache-counts-against-a-campaigns-memory) | each campaign's 8 GB (`scripts/fuzz run`) | the libpcap target's temp files fill it with kernel cache; a 24 h run can be killed for memory | **open** (found in 04; 7 kills in 05) |
+| [OURS-5](#ours-5-a-transient-nfs-error-stops-afl-fuzz) | each campaign's output on the group share (`output = campaign`) | one failed `open()` of a queue entry on NFS (`ERESTARTSYS`, "Unknown error 512") stops afl-fuzz | **open** (found in 05) |
 
 ## Upstream G2FUZZ
 
@@ -72,6 +73,31 @@ bug is, how it was found, what it does to results, and whether it's fixed. New o
   4.8 MB `.apng`) and libpcap_fuzz_both-r4 (2026-11-06 11:15, 20 h 55, while fuzzing a 3.7 MB in-run `.pcap`
   imported seconds before). Each is run again once; the reruns of Qwen vorbis_decode_fuzzer-r2, -r4 and -r5, of
   Seed-Coder vorbis_decode_fuzzer-r1 and -r2 and of Mistral vorbis_decode_fuzzer-r5 crashed too (below).
+- **In 05, segfaults as in 03 and 04** (04's design with the `random` scheduler): 23 runs, 16 first runs and
+  7 reruns, by 2026-11-12 04:41. First runs: DeepSeek libpcap_fuzz_both-r5 (2026-11-08 17:33, 1 h 20 of fuzzing,
+  seconds after 5.2 MB in-run `.pcap` entries were imported), vorbis_decode_fuzzer-r2 (17:35, 1 h 17, a 1.8 MB
+  in-run `.wav` just imported; afl-fuzz had grown to 8.1 GB as it crashed, so Slurm shows `OUT_OF_MEMORY`) and -r4
+  (18:55, 2 h 19, seconds after two 1.8 MB in-run `.wav` entries; 8.1 GB and `OUT_OF_MEMORY` again), Llama
+  vorbis_decode_fuzzer-r1 (21:53, 1 h 14, seconds after two 1.8 MB in-run `.wav` entries) and -r4 (22:48, 1 h 41,
+  4 min after a 1.8 MB in-run `.wav`), Qwen vorbis_decode_fuzzer-r4 (22:12, 1 h 45, seconds after a 1.9 MB in-run
+  `.ogg`), Qwen libpng_read_fuzzer-r4 (2026-11-09 04:39, 6 h 47, while fuzzing a 4.9 MB in-run `.png` imported
+  4 h 34 earlier), Llama libpng_read_fuzzer-r4 (09:05, 10 h 56, afl-fuzz at 4.9 GB while fuzzing a 3.6 MB in-run
+  `.png` imported 1 h 56 earlier), Qwen lcms_cms_transform_fuzzer-r4 (11:15, 15 h 38, 10 s after a 3.1 MB in-run
+  `.icc`), phi-4 bloaty_fuzz_target-r4 (2026-11-10 08:52, 2 h 01, seconds after two 6.3 MB in-run `.elf` entries),
+  gemma libpng_read_fuzzer-r3 (12:36, 8 h 23, seconds after a 2.1 MB in-run `.png`) and vorbis_decode_fuzzer-r1
+  (13:35, 10 h 17, seconds after a 2.7 MB in-run `.ogg`), Seed-Coder vorbis_decode_fuzzer-r4 (2026-11-11 03:48,
+  3 h 17, seconds after a 1.3 MB in-run `.ogg`), Mistral libpcap_fuzz_both-r5 (04:10, 3 h 06, seconds after two
+  10 MB in-run `.pcap` entries), Seed-Coder vorbis_decode_fuzzer-r2 (06:30, 6 h 48, seconds after an 8.6 MB in-run
+  `.ogg`) and -r3 (13:44, 13 h 29, seconds after a 1.3 MB in-run `.wav`; afl-fuzz at 7.7 GB, so `OUT_OF_MEMORY`).
+  Each is run again once; the reruns of DeepSeek libpcap_fuzz_both-r5, Qwen vorbis_decode_fuzzer-r4, Llama
+  vorbis_decode_fuzzer-r4, phi-4 bloaty_fuzz_target-r4 and Seed-Coder vorbis_decode_fuzzer-r2 crashed too, as did
+  the reruns of phi-4 vorbis_decode_fuzzer-r4 and Seed-Coder bloaty_fuzz_target-r1, whose first runs had hit G2F-3
+  (below). One more segfault came at exit, after the full 24 h: Llama libpcap_fuzz_both-r5 (2026-11-09 20:48),
+  counted as done.
+  - When afl-fuzz reaches the job's 8 GB before it segfaults, Slurm records `OUT_OF_MEMORY`, not `FAILED` (three
+    runs above; one in 04). Such a run is told from an [OURS-4](#ours-4-the-kernels-file-name-cache-counts-against-a-campaigns-memory)
+    kill by `fuzzer_stats` `peak_rss_mb` (7700–8100 here, under 450 for OURS-4) and by an in-run entry over 1 MiB
+    in its queue.
 - **In 04, a 1.08 GB entry:** gpt-oss mp42aac-r1 was killed for memory (Slurm `OUT_OF_MEMORY`, 8 GB) on
   2026-11-02 at 08:51, 5 h 21 into its 24 h, as afl-fuzz started on a 1.08 GB in-run entry.
   - During seed generation, one of its generators had downloaded a static ffmpeg build into `gen_seeds` and written
@@ -104,6 +130,17 @@ bug is, how it was found, what it does to results, and whether it's fixed. New o
   (06:38, 17 h 58 in, 3 min after a 1.6 MB in-run `.ogg`), and Mistral vorbis_decode_fuzzer-r3, whose first run hit
   G2F-3 and whose rerun segfaulted at 09:53, 1 h 24 in, while fuzzing a 1.8 MB in-run `.wav` imported seconds
   before.
+  05 (finished 2026-11-12) excludes eight: Qwen vorbis_decode_fuzzer-r4, whose rerun segfaulted at 00:08
+  (2026-11-09), 1 h 30 into fuzzing, on a 2.5 MB in-run `.ogg` just imported, Llama vorbis_decode_fuzzer-r4, whose
+  rerun segfaulted at 00:50, 1 h 34 in, on a 1.8 MB in-run `.wav` just imported, DeepSeek libpcap_fuzz_both-r5,
+  whose rerun segfaulted at 12:18, 1 h 47 in, on a 2.5 MB in-run `.pcap` just imported (between the two, a run
+  killed for memory, OURS-4, which doesn't count), phi-4 bloaty_fuzz_target-r4, whose rerun segfaulted at 12:26
+  (2026-11-10), 2 h 52 in, on a 4.2 MB in-run `.elf` just imported, phi-4 vorbis_decode_fuzzer-r4, whose first run
+  hit G2F-3 and whose rerun segfaulted at 12:37, 1 h 23 in, on a 1.8 MB in-run `.wav` just imported, Seed-Coder
+  bloaty_fuzz_target-r1, whose first run hit G2F-3 and whose rerun segfaulted at 04:10 (2026-11-11), 3 h 26 in, on
+  a 6.2 MB in-run entry just imported, Seed-Coder vorbis_decode_fuzzer-r2, whose rerun segfaulted at 04:41
+  (2026-11-12), 21 h 43 in, on a 1.8 MB in-run `.wav` just imported, and DeepSeek libpcap_fuzz_both-r2, whose two
+  runs both hit G2F-3 (below).
   - 03 also reports a sensitivity analysis that keeps crashed runs at their coverage before the crash.
   - Candidate fix, for after 04: in `run_gen_seeds()`, skip files over `MAX_FILE` (or cap `len` at it) and empty
     files, as `read_testcases()` does. It may not fix G2F-3. It changes G2FUZZ's behaviour, so it starts a new study.
@@ -165,10 +202,31 @@ bug is, how it was found, what it does to results, and whether it's fixed. New o
     DeepSeek's r1); Mistral lcms_cms_transform_fuzzer-r2 (13:00) and vorbis_decode_fuzzer-r2 (14:33), both
     `double free or corruption (out)`, and libpng_read_fuzzer-r2 (15:44, `free(): invalid size`) and -r3 (15:44, a
     segfault).
+  - **In 05:** 5 mid-run, all `realloc(): invalid pointer`, all seconds after an in-run LLM step had imported
+    entries over 1 MiB: DeepSeek libpcap_fuzz_both-r2 (2026-11-07 21:52, 2 h 07 of fuzzing, on a 4.6 MB in-run
+    `.pcap`, 17 entries over 1 MiB in its queue) and its rerun (2026-11-08 17:09, 55 min, on a 10.4 MB in-run
+    `.pcap` just imported), so it is excluded; Llama lcms_cms_transform_fuzzer-r4 (2026-11-09 07:03, 11 h 10, as
+    afl-fuzz started on a 9.4 MB in-run `.icc`); phi-4 vorbis_decode_fuzzer-r4 (2026-11-10 10:39, 1 h 21, seconds
+    after its first in-run import, with a 6.5 MB initial seed in the queue; its rerun hit G2F-1, so it is excluded);
+    Seed-Coder bloaty_fuzz_target-r1 (2026-11-10 21:16, 1 h 40, seconds after its first in-run import, two 4.2 MB
+    in-run entries; its rerun hit G2F-1, so it is excluded). At exit, after the full 24 h (counted as done): 32
+    runs, against 19 in 04 (22 vorbis_decode_fuzzer, 4 libpng_read_fuzzer, 4 libpcap_fuzz_both, 2
+    lcms_cms_transform_fuzzer). `munmap_chunk(): invalid pointer`: DeepSeek libpcap_fuzz_both-r1 and
+    vorbis_decode_fuzzer-r4 and -r5, Qwen vorbis_decode_fuzzer-r2, -r3 and -r5 and libpng_read_fuzzer-r1, Llama
+    vorbis_decode_fuzzer-r2 and libpng_read_fuzzer-r2, gpt-oss lcms_cms_transform_fuzzer-r5 and
+    vorbis_decode_fuzzer-r2 and -r5, gemma vorbis_decode_fuzzer-r5 and libpng_read_fuzzer-r1, phi-4
+    vorbis_decode_fuzzer-r1, -r2 and -r5, Mistral vorbis_decode_fuzzer-r1, -r2 and -r5 and libpcap_fuzz_both-r5's
+    rerun (21). `free(): invalid size`: DeepSeek vorbis_decode_fuzzer-r1, Qwen lcms_cms_transform_fuzzer-r3,
+    libpcap_fuzz_both-r3 and vorbis_decode_fuzzer-r1, and Seed-Coder vorbis_decode_fuzzer-r4's rerun (5). `double
+    free or corruption (out)`: DeepSeek libpcap_fuzz_both-r4, Llama vorbis_decode_fuzzer-r5 (afl-fuzz at 7.7 GB, so
+    Slurm shows `OUT_OF_MEMORY`), gemma libpng_read_fuzzer-r3, Mistral vorbis_decode_fuzzer-r3, Seed-Coder
+    vorbis_decode_fuzzer-r5 and vorbis_decode_fuzzer-r3's rerun (2026-11-12 14:08, the study's last run) (6). Llama libpcap_fuzz_both-r5 segfaulted at exit instead (2026-11-09 20:48), as three
+    runs did in 04.
 - **Not only G2F-1:** some of these runs had no in-run entries over 1 MiB and no empty ones (Qwen vorbis r1, gpt-oss
   vorbis r3 and r4). But Mistral vorbis_decode_fuzzer-r3's third run stopped (`realloc(): invalid pointer`) while
   fuzzing an entry its generator had just written at 2.65 MB (`ogg-30_1.ogg`; afl-fuzz had trimmed its queue copy
   to 12 KB). So some G2F-3 stops may be G2F-1's oversized entries, caught by glibc before they could segfault.
+  05's five mid-run stops all came seconds after an in-run import of entries over 1 MiB (above).
 - **Effect on results:** a mid-run stop is handled like G2F-1's (run again once, listed). Stops at exit don't change
   the measured results. What the corruption did inside afl-fuzz before glibc caught it isn't known.
 - **Status:** open, cause not found. Next step, after 04: run a G2FUZZ vorbis campaign with afl-fuzz built with ASan
@@ -314,6 +372,12 @@ bug is, how it was found, what it does to results, and whether it's fixed. New o
   22 h 34 in (2026-11-05 14:02; the job at 8.4 GB, afl-fuzz at 0.36 GB) and -r3, 23 h 06 in (14:24, the same).
   Kills stayed rare: 4 of 04's 52 libpcap jobs, none after 2026-11-05 14:30. 03's 6 h runs didn't get near the
   limit.
+  - In 05 (04's design, `random` scheduler): 7 of its 54 libpcap jobs, all with afl-fuzz under 0.45 GB and no
+    in-run entry over 1 MiB: afl libpcap_fuzz_both-r5 (2026-11-07 19:37, 3 h 32 of 24 h), Llama
+    libpcap_fuzz_both-r2 (2026-11-09 02:07, 5 h 54) and -r3 (15:53, 19 h 30), DeepSeek libpcap_fuzz_both-r5's rerun
+    (10:22, 16 h 37), Qwen libpcap_fuzz_both-r4 (13:37, 17 h 37) and gemma libpcap_fuzz_both-r2 (2026-11-10 08:11,
+    5 h 29), each run again; and Qwen libpcap_fuzz_both-r2 (2026-11-09 18:58) at 23 h 10, past 95% of its 24 h,
+    so counted as done.
 - **Effect on results:** a killed run is run again. Time the kernel spends freeing memory may slow libpcap
   campaigns (not measured); all arms run libpcap under the same limit, and comparisons are per target.
 - **Status:** open. A stop is run again and, like a full disk, doesn't count toward the two-failure limit: it's
@@ -321,13 +385,33 @@ bug is, how it was found, what it does to results, and whether it's fixed. New o
   - Candidate fix, for after 04: give each campaign its own `/tmp` (OURS-3's fix), and test whether that keeps the
     cache down.
 
+### OURS-5: a transient NFS error stops afl-fuzz
+- **Where:** each campaign's AFL++ output folder when it's on the group share (`output = campaign`, 04 and 05:
+  `/home/group/csci-591-…`, an NFS mount), which [OURS-3](#ours-3-output-on-the-nodes-shared-disk) made the default.
+- **What:** afl-fuzz reads every queue entry back from disk as it fuzzes (`queue_testcase_get()`,
+  `afl/src/afl-fuzz-queue.c:1571`). If one `open()` fails it stops with `SYSTEM ERROR : Unable to open '<queue
+  entry>'` and exit code 1. On NFS an `open()` can fail with errno 512, `ERESTARTSYS` ("Unknown error 512"): a
+  code the kernel means to retry itself, which leaks to the program when an NFS request is interrupted or stalls.
+  One such failure in 24 h ends the campaign.
+- **Found:** 2026-11-08 09:12, study 05: gpt-oss-20b gdk-pixbuf-pixdata-r1 (Slurm job 1116896), 16 h 08 of 24 h in
+  (5548 edges, 97 crashes saved, 26 M runs of the target; the job at 2.2 GB, the share 10% full). None of 04's 675
+  campaigns and none of 05's other 702 runs (675 campaigns and 28 reruns) ended this way, so it's rare.
+- **Effect on results:** the stopped run is run again; the first run's coverage and crashes stay in
+  `campaigns/.retried/` and aren't counted, like every rerun's.
+- **Status:** open. A stop is run again and, like a full disk or OURS-4, doesn't count toward the two-failure limit:
+  it's the file system, not the fuzzer, and plain AFL++ reads its queue the same way.
+  - Candidate fix: a few lines in `queue_testcase_get()` retrying `open()` on `ERESTARTSYS`/`EINTR`, or AFL++'s
+    in-memory test-case cache (`AFL_TESTCACHE_SIZE`) sized above the queue so it rarely reads from disk. Neither
+    was used in 05.
+
 ## Not bugs: failures that look like them
 - **A seed that times out stops AFL++.** If one initial seed takes over 1000 ms in afl-fuzz's start-up check,
   AFL++ (4.32c and 5.03c) aborts. That's by design; `AFL_IGNORE_SEED_PROBLEMS=1` skips the seed instead, and our
   studies don't set it.
   - Seen in 01 (`B-mp42aac-g2503-r3`, `DRIFT.md` row 5.7) and in 03: Llama `imginfo-r2` (2026-10-30) and `sndfile_fuzzer-r3`
     (2026-10-31; both then ended `OUT_OF_MEMORY`), gpt-oss `vorbis_decode_fuzzer-r3` and Llama `libpng_read_fuzzer-r3`
-    (2026-10-31); in 04: Qwen `mp42aac-r3` (2026-11-02, a 2.3 MB generated `.mp4`).
+    (2026-10-31); in 04: Qwen `mp42aac-r3` (2026-11-02, a 2.3 MB generated `.mp4`); in 05: Mistral
+    `gdk-pixbuf-pixdata-r3` (2026-11-10, a generated `bmp-line-overflow.bmp`; its rerun ran the full 24 h).
   - Each counts as a failure: the campaign is run again once (with new seeds, since each run generates its own).
 - **`OUT_OF_MEMORY` on runs that finished.** 9 in 03: DeepSeek mp3gain-r5, Llama mp3gain-r1, -r3, -r5 and
   sndfile_fuzzer-r4, Mistral tiffsplit-r4 and -r5 and sndfile_fuzzer-r5 (its second run, 2026-11-01), and phi-4
@@ -340,6 +424,11 @@ bug is, how it was found, what it does to results, and whether it's fixed. New o
     afl-fuzz had grown to 8.1 GB, and its queue holds a 10 MB in-run `.aiff`), Mistral mp3gain-r3 (2026-11-06 06:18,
     4 s after "We're done here"; `peak_rss_mb` 7705), Seed-Coder sndfile_fuzzer-r3 (11:33; `peak_rss_mb` 8106) and
     Mistral sndfile_fuzzer-r1 (16:31), -r3 (16:46) and -r4 (16:56; `peak_rss_mb` 8101, 8098 and 8099).
+  - In 05 (the same, run_time 86400): Llama imginfo-r4 (2026-11-08 18:20; `peak_rss_mb` 8101) and DeepSeek
+    pdftotext-r1 (18:01; 8060), Llama sndfile_fuzzer-r1 (2026-11-09 22:54; 8091) and -r3 (22:45; 8096), gemma
+    sndfile_fuzzer-r1 (2026-11-11 05:04; 8104), phi-4 vorbis_decode_fuzzer-r3 (09:09; 8101) and sndfile_fuzzer-r1
+    (10:35; 8097), Mistral imginfo-r4 (15:57; 8103), tiffsplit-r5 (17:02; 8102) and mp3gain-r5 (17:39; 7678).
+    Llama vorbis_decode_fuzzer-r5 (2026-11-09 21:12; 7681) also aborted in glibc at exit (G2F-3).
 - **A target corrupts the coverage map.** AFL++ aborts with `Incorrect fuzzing setup detected`. Seen once:
   01 `C-exiv2-afl432-r3` (`DRIFT.md` row 5.11).
 - **`Bus error (core dumped)` from afl-fuzz** when an `--afl` run was stopped about 66 s in. Seen once (2026-10-29);

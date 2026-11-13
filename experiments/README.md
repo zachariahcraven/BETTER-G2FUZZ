@@ -9,7 +9,7 @@ Start with the folder's `README.md`.
 | [02-model-sweep](02-model-sweep/) | How much does the choice of LLM change what G2FUZZ finds on 15 targets? | on hold: 03 runs this design on quantumcore |
 | [03-model-sweep-qc](03-model-sweep-qc/) | 02's question and design, run on quantumcore's GPUs and CPUs | campaigns finished 2026-11-01; analysis to do |
 | [04-model-sweep-qc-24h](04-model-sweep-qc-24h/) | 03's design with 24 h campaigns (the paper's length), AFL++ output in the campaign folders | campaigns finished 2026-11-07; analysis to do |
-| [05-model-sweep-qc-24h-nosched](05-model-sweep-qc-24h-nosched/) | 04's design with the `random` (upstream) generator scheduler, not `ucb`: a scheduler-off baseline for 04 | not launched |
+| [05-model-sweep-qc-24h-nosched](05-model-sweep-qc-24h-nosched/) | 04's design with the `random` (upstream) generator scheduler, not `ucb`: a scheduler-off baseline for 04 | campaigns finished 2026-11-12; analysis to do |
 | [practice](practice/) | Practice and test runs; the `scripts/fuzz` default | always open |
 
 ## New study

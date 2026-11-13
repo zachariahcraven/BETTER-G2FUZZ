@@ -1,0 +1,76 @@
+study,campaign,arm,target,rep,state,edges,crashes,execs/s,run_s,generators,llm_steps,llm_calls,llm_errors,llm_400,llm_cut
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/jhead-r1,DeepSeek-Coder-V2-Lite-Instruct,jhead,1,done,621,193,1257.27,86400,38,28,147,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/jhead-r2,DeepSeek-Coder-V2-Lite-Instruct,jhead,2,done,626,222,1246.47,86400,34,30,199,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/jhead-r3,DeepSeek-Coder-V2-Lite-Instruct,jhead,3,done,617,274,1321.65,86400,37,29,129,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/jhead-r4,DeepSeek-Coder-V2-Lite-Instruct,jhead,4,done,612,298,1065.23,86400,37,29,139,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/jhead-r5,DeepSeek-Coder-V2-Lite-Instruct,jhead,5,done,624,280,1151.76,86400,45,28,91,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/gdk-pixbuf-pixdata-r1,DeepSeek-Coder-V2-Lite-Instruct,gdk-pixbuf-pixdata,1,done,5548,18,475.24,86400,110,34,364,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/gdk-pixbuf-pixdata-r2,DeepSeek-Coder-V2-Lite-Instruct,gdk-pixbuf-pixdata,2,done,2209,159,447.07,86400,92,21,275,1,1,1
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/gdk-pixbuf-pixdata-r3,DeepSeek-Coder-V2-Lite-Instruct,gdk-pixbuf-pixdata,3,done,2255,14,394.06,86400,94,22,342,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/gdk-pixbuf-pixdata-r4,DeepSeek-Coder-V2-Lite-Instruct,gdk-pixbuf-pixdata,4,done,2167,110,448.71,86400,91,20,284,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/gdk-pixbuf-pixdata-r5,DeepSeek-Coder-V2-Lite-Instruct,gdk-pixbuf-pixdata,5,done,5548,20,392.18,86400,91,26,299,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/imginfo-r1,DeepSeek-Coder-V2-Lite-Instruct,imginfo,1,done,2111,11,1326.06,86400,73,19,241,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/imginfo-r2,DeepSeek-Coder-V2-Lite-Instruct,imginfo,2,done,2114,25,1019.08,86400,69,25,292,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/imginfo-r3,DeepSeek-Coder-V2-Lite-Instruct,imginfo,3,done,2060,4,911.69,86400,76,25,279,1,1,1
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/imginfo-r4,DeepSeek-Coder-V2-Lite-Instruct,imginfo,4,done,2098,24,974.01,86400,76,23,320,1,1,1
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/imginfo-r5,DeepSeek-Coder-V2-Lite-Instruct,imginfo,5,done,2097,13,1007.06,86400,80,26,332,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/tiffsplit-r1,DeepSeek-Coder-V2-Lite-Instruct,tiffsplit,1,done,1840,232,536.73,86400,42,22,140,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/tiffsplit-r2,DeepSeek-Coder-V2-Lite-Instruct,tiffsplit,2,done,1826,192,524.20,86400,52,28,205,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/tiffsplit-r3,DeepSeek-Coder-V2-Lite-Instruct,tiffsplit,3,done,1828,201,670.57,86400,36,13,129,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/tiffsplit-r4,DeepSeek-Coder-V2-Lite-Instruct,tiffsplit,4,done,1815,277,856.21,86400,38,19,128,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/tiffsplit-r5,DeepSeek-Coder-V2-Lite-Instruct,tiffsplit,5,done,1728,226,751.13,86400,30,17,108,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/mp3gain-r1,DeepSeek-Coder-V2-Lite-Instruct,mp3gain,1,done,878,111,357.86,86400,71,35,187,1,1,1
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/mp3gain-r2,DeepSeek-Coder-V2-Lite-Instruct,mp3gain,2,done,875,123,270.47,86400,40,36,386,5,5,6
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/mp3gain-r3,DeepSeek-Coder-V2-Lite-Instruct,mp3gain,3,done,881,126,251.86,86400,54,30,148,2,2,2
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/mp3gain-r4,DeepSeek-Coder-V2-Lite-Instruct,mp3gain,4,done,881,81,230.73,86400,56,36,231,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/mp3gain-r5,DeepSeek-Coder-V2-Lite-Instruct,mp3gain,5,done,878,107,236.44,86400,70,35,279,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/mp42aac-r1,DeepSeek-Coder-V2-Lite-Instruct,mp42aac,1,done,1318,76,952.37,86400,43,9,320,0,0,1
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/mp42aac-r2,DeepSeek-Coder-V2-Lite-Instruct,mp42aac,2,done,1424,148,1271.34,86400,32,13,387,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/mp42aac-r3,DeepSeek-Coder-V2-Lite-Instruct,mp42aac,3,done,1227,100,993.79,86400,31,14,472,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/mp42aac-r4,DeepSeek-Coder-V2-Lite-Instruct,mp42aac,4,no seeds,,,,,0,,472,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/mp42aac-r5,DeepSeek-Coder-V2-Lite-Instruct,mp42aac,5,done,1253,137,1634.68,86400,29,8,305,1,1,1
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/pdftotext-r1,DeepSeek-Coder-V2-Lite-Instruct,pdftotext,1,done,6690,131,238.74,86400,33,9,104,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/pdftotext-r2,DeepSeek-Coder-V2-Lite-Instruct,pdftotext,2,done,6595,170,221.24,86402,29,6,155,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/pdftotext-r3,DeepSeek-Coder-V2-Lite-Instruct,pdftotext,3,done,6460,122,264.99,86400,30,9,126,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/pdftotext-r4,DeepSeek-Coder-V2-Lite-Instruct,pdftotext,4,done,6903,204,257.46,86400,42,8,184,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/pdftotext-r5,DeepSeek-Coder-V2-Lite-Instruct,pdftotext,5,done,5794,75,240.81,86400,24,5,231,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/bloaty_fuzz_target-r1,DeepSeek-Coder-V2-Lite-Instruct,bloaty_fuzz_target,1,done,8625,29,642.30,86400,28,9,119,1,1,1
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/bloaty_fuzz_target-r2,DeepSeek-Coder-V2-Lite-Instruct,bloaty_fuzz_target,2,done,8653,52,683.36,86400,27,13,75,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/bloaty_fuzz_target-r3,DeepSeek-Coder-V2-Lite-Instruct,bloaty_fuzz_target,3,done,8697,31,726.56,86400,34,13,93,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/bloaty_fuzz_target-r4,DeepSeek-Coder-V2-Lite-Instruct,bloaty_fuzz_target,4,done,8677,32,738.07,86400,31,12,87,1,1,1
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/bloaty_fuzz_target-r5,DeepSeek-Coder-V2-Lite-Instruct,bloaty_fuzz_target,5,done,8805,33,790.57,86400,31,12,120,1,1,1
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/freetype2_ftfuzzer-r1,DeepSeek-Coder-V2-Lite-Instruct,freetype2_ftfuzzer,1,no seeds,,,,,52,,347,2,2,2
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/freetype2_ftfuzzer-r2,DeepSeek-Coder-V2-Lite-Instruct,freetype2_ftfuzzer,2,done,8346,0,7303.40,86400,26,4,393,3,3,3
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/freetype2_ftfuzzer-r3,DeepSeek-Coder-V2-Lite-Instruct,freetype2_ftfuzzer,3,no seeds,,,,,0,,318,2,2,2
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/freetype2_ftfuzzer-r4,DeepSeek-Coder-V2-Lite-Instruct,freetype2_ftfuzzer,4,done,8407,0,7266.83,86400,33,5,182,4,4,4
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/freetype2_ftfuzzer-r5,DeepSeek-Coder-V2-Lite-Instruct,freetype2_ftfuzzer,5,no seeds,,,,,0,,353,1,1,1
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/lcms_cms_transform_fuzzer-r1,DeepSeek-Coder-V2-Lite-Instruct,lcms_cms_transform_fuzzer,1,done,1274,0,6594.14,86402,48,39,148,4,4,4
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/lcms_cms_transform_fuzzer-r2,DeepSeek-Coder-V2-Lite-Instruct,lcms_cms_transform_fuzzer,2,done,1483,0,3491.46,86400,51,29,108,3,3,3
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/lcms_cms_transform_fuzzer-r3,DeepSeek-Coder-V2-Lite-Instruct,lcms_cms_transform_fuzzer,3,done,1599,0,2221.05,86400,48,29,100,2,2,2
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/lcms_cms_transform_fuzzer-r4,DeepSeek-Coder-V2-Lite-Instruct,lcms_cms_transform_fuzzer,4,done,643,0,11888.49,86400,58,47,107,3,3,3
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/lcms_cms_transform_fuzzer-r5,DeepSeek-Coder-V2-Lite-Instruct,lcms_cms_transform_fuzzer,5,done,655,0,11468.21,86400,78,43,144,1,1,1
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/libpcap_fuzz_both-r1,DeepSeek-Coder-V2-Lite-Instruct,libpcap_fuzz_both,1,done,1747,0,1484.19,86400,50,18,186,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/libpcap_fuzz_both-r2,DeepSeek-Coder-V2-Lite-Instruct,libpcap_fuzz_both,2,done (short),1404,0,5845.22,3305,32,1,96,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/libpcap_fuzz_both-r3,DeepSeek-Coder-V2-Lite-Instruct,libpcap_fuzz_both,3,done,1927,0,1503.75,86400,33,13,58,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/libpcap_fuzz_both-r4,DeepSeek-Coder-V2-Lite-Instruct,libpcap_fuzz_both,4,done,1932,0,1441.33,86400,36,10,64,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/libpcap_fuzz_both-r5,DeepSeek-Coder-V2-Lite-Instruct,libpcap_fuzz_both,5,done (short),1429,0,4727.18,6435,22,1,83,1,1,1
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/vorbis_decode_fuzzer-r1,DeepSeek-Coder-V2-Lite-Instruct,vorbis_decode_fuzzer,1,done,1075,0,783.04,86400,41,31,152,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/vorbis_decode_fuzzer-r2,DeepSeek-Coder-V2-Lite-Instruct,vorbis_decode_fuzzer,2,done,1070,0,487.46,86400,38,35,343,1,1,1
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/vorbis_decode_fuzzer-r3,DeepSeek-Coder-V2-Lite-Instruct,vorbis_decode_fuzzer,3,done,1068,0,596.66,86400,52,36,279,1,1,1
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/vorbis_decode_fuzzer-r4,DeepSeek-Coder-V2-Lite-Instruct,vorbis_decode_fuzzer,4,done,1070,0,508.33,86400,35,34,307,1,1,1
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/vorbis_decode_fuzzer-r5,DeepSeek-Coder-V2-Lite-Instruct,vorbis_decode_fuzzer,5,done,1070,0,520.14,86400,46,26,199,1,1,1
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/woff2_convert_woff2ttf_fuzzer-r1,DeepSeek-Coder-V2-Lite-Instruct,woff2_convert_woff2ttf_fuzzer,1,no seeds,,,,,0,,194,17,17,18
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/woff2_convert_woff2ttf_fuzzer-r2,DeepSeek-Coder-V2-Lite-Instruct,woff2_convert_woff2ttf_fuzzer,2,no seeds,,,,,0,,153,14,14,14
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/woff2_convert_woff2ttf_fuzzer-r3,DeepSeek-Coder-V2-Lite-Instruct,woff2_convert_woff2ttf_fuzzer,3,done,2374,0,287.44,86400,23,10,90,5,5,5
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/woff2_convert_woff2ttf_fuzzer-r4,DeepSeek-Coder-V2-Lite-Instruct,woff2_convert_woff2ttf_fuzzer,4,no seeds,,,,,0,,177,9,9,9
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/woff2_convert_woff2ttf_fuzzer-r5,DeepSeek-Coder-V2-Lite-Instruct,woff2_convert_woff2ttf_fuzzer,5,no seeds,,,,,0,,202,11,11,11
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/libpng_read_fuzzer-r1,DeepSeek-Coder-V2-Lite-Instruct,libpng_read_fuzzer,1,done,1572,6,7008.93,86400,35,16,118,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/libpng_read_fuzzer-r2,DeepSeek-Coder-V2-Lite-Instruct,libpng_read_fuzzer,2,done,1574,3,5082.40,86400,22,14,117,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/libpng_read_fuzzer-r3,DeepSeek-Coder-V2-Lite-Instruct,libpng_read_fuzzer,3,done,1574,7,10032.75,86400,30,21,92,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/libpng_read_fuzzer-r4,DeepSeek-Coder-V2-Lite-Instruct,libpng_read_fuzzer,4,done,1570,0,5753.33,86400,50,25,125,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/libpng_read_fuzzer-r5,DeepSeek-Coder-V2-Lite-Instruct,libpng_read_fuzzer,5,done,1581,5,7647.43,86400,32,12,82,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/sndfile_fuzzer-r1,DeepSeek-Coder-V2-Lite-Instruct,sndfile_fuzzer,1,done,3277,47,554.82,86400,57,11,401,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/sndfile_fuzzer-r2,DeepSeek-Coder-V2-Lite-Instruct,sndfile_fuzzer,2,done,3493,55,565.02,86400,66,10,298,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/sndfile_fuzzer-r3,DeepSeek-Coder-V2-Lite-Instruct,sndfile_fuzzer,3,done,3384,49,488.88,86400,66,16,287,2,2,2
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/sndfile_fuzzer-r4,DeepSeek-Coder-V2-Lite-Instruct,sndfile_fuzzer,4,done,3388,52,559.74,86400,70,12,278,0,0,0
+05-model-sweep-qc-24h-nosched,DeepSeek-Coder-V2-Lite-Instruct/sndfile_fuzzer-r5,DeepSeek-Coder-V2-Lite-Instruct,sndfile_fuzzer,5,done,3442,36,649.31,86400,55,6,311,0,0,0
