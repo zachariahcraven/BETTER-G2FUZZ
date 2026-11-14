@@ -96,7 +96,7 @@ scripts/study status A<NN>-<name>
 # when it ends (retry failed campaigns first: scripts/study start A<NN>-<name> --retry-failed ...)
 scripts/study results A<NN>-<name>
 srun -A group-csci-591-automated-vulnerability-discovery -p fairshare -c 1 --mem 2G -t 60 \
-  scripts/compare A<NN>-<name>     # results/compare.md: decisions, per target, LLM use, failures
+  scripts/compare A<NN>-<name>     # results/compare.md: decisions, per target, LLM use, coverage after LLM steps, failures
 scripts/lineage A<NN>-<name>       # results/lineage.md: where the queue came from, per arm
 ```
 

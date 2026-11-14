@@ -6,6 +6,7 @@ Usage (on Tempest, after `scripts/study results <study>`):
     <study>      a folder in experiments/ (or a path to one); reads its results/campaigns.csv
     --control    the arm the others are compared with [control]
     --no-triage  skip reading the campaigns' logs (the failure table then has only results/campaigns.csv's numbers)
+    --window     minutes before and after an LLM step's first kept seed, for "Coverage after LLM steps" [10]
     --out        where the report goes [<study>/results/compare.md]; it is printed too
 
 For each arm against the control:
@@ -14,8 +15,9 @@ For each arm against the control:
   overall:    targets better and worse, and the exact one-sided Wilcoxon signed-rank p on the per-target log ratios
               (H1: the arm beats the control), counting each target once;
   decision:   keep / borderline / drop by the rule below; an --afl arm is a baseline and gets none.
-LLM use per arm (medians), the kept seeds per stall mutator (llm/steps.jsonl and the queue's sync:llm entries), and
-the failures and bug signs found in each campaign's files.
+LLM use per arm (medians), the kept seeds per stall mutator (llm/steps.jsonl and the queue's sync:llm entries), the
+coverage gained right after each LLM step that had a seed kept (plot_data; see "Coverage after LLM steps" in the
+report for how to read it), and the failures and bug signs found in each campaign's files.
 
 Rule (docs/ALFRED-ROUNDS.md, fixed before round A01):
   keep        the arm's median beats the control's on at least 60% of the targets (9 of 15), Wilcoxon p < 0.05,
@@ -191,6 +193,103 @@ def mutator_yield(cdir, target):
     return res
 
 
+def read_plot(path):
+    """afl-fuzz's plot_data as [(relative_time, corpus_count, edges_found)], in time order."""
+    out = []
+    try:
+        with open(path) as f:
+            for line in f:
+                p = line.split(",")
+                if line.startswith("#") or len(p) < 13:
+                    continue
+                try:
+                    out.append((int(p[0]), int(p[3]), int(p[12])))
+                except ValueError:
+                    pass
+    except OSError:
+        pass
+    return out
+
+
+def edges_at(plot, t):
+    """edges_found at relative time t: the last row at or before t (the first row's, before it)."""
+    lo, hi = 0, len(plot)
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if plot[mid][0] <= t:
+            lo = mid + 1
+        else:
+            hi = mid
+    return plot[max(lo - 1, 0)][2]
+
+
+def step_coverage(cdir, target, window):
+    """Coverage around the LLM steps that had a seed kept, for one campaign, or None without the files.
+
+    A step's time is when afl-fuzz imported its first kept seed (queue entry id N: the first plot_data row whose
+    corpus_count is over N; plot_data has a row about every 5 s). Returns
+      {"steps": [(mutator, edges gained in the window before, in the window after)],   # one per step with a kept seed
+       "run": edges gained from plot_data's first row to its last, "run_secs": that span,
+       "after": edges gained inside the union of the after-windows, "after_secs": the union's length}
+    A window cut by the run's start or end is used as it is (shorter)."""
+    out = os.path.join(cdir, target + "_output")
+    plot = read_plot(os.path.join(out, "default", "plot_data"))
+    gen_step = {}
+    try:
+        with open(os.path.join(out, "llm", "steps.jsonl")) as f:
+            for line in f:
+                s = json.loads(line)
+                if s.get("generator"):
+                    gen_step[s["generator"]] = (s.get("step"), s.get("mutator") or "unknown")
+    except (OSError, ValueError):
+        return None
+    if len(plot) < 2:
+        return None
+    orig = {}
+    try:
+        for n in os.listdir(os.path.join(out, "llm", "queue")):
+            mm = re.match(r"id:(\d+),orig:(.*)", n)
+            if mm:
+                orig[int(mm.group(1))] = mm.group(2)
+    except OSError:
+        pass
+    first = {}   # step (or a key of its own for an import no step explains) -> (the first kept seed's id, mutator)
+    try:
+        for n in os.listdir(os.path.join(out, "default", "queue")):
+            mm = re.match(r"id:(\d+),sync:llm,src:(\d+)", n)
+            if not mm:
+                continue
+            qid = int(mm.group(1))
+            g = GEN.match(orig.get(int(mm.group(2)), ""))
+            step, mut = gen_step.get(g.group(1), (None, "unknown")) if g else (None, "unknown")
+            key = step if step is not None else ("?", qid)
+            if key not in first or qid < first[key][0]:
+                first[key] = (qid, mut)
+    except OSError:
+        pass
+    t0, t1 = plot[0][0], plot[-1][0]
+    steps, spans = [], []
+    i = 0
+    for qid, mut in sorted(first.values()):
+        while i < len(plot) and plot[i][1] <= qid:
+            i += 1
+        if i == len(plot):
+            break   # imported after the last row
+        t = plot[i - 1][0] if i else t0   # the last row before the seed is in the corpus
+        e = edges_at(plot, t)
+        steps.append((mut, e - edges_at(plot, max(t - window, t0)), edges_at(plot, min(t + window, t1)) - e))
+        spans.append((t, min(t + window, t1)))
+    after = after_secs = 0
+    end = None
+    for a, b in spans:   # in time order: sorted by queue id
+        a = a if end is None else max(a, end)
+        if b > a:
+            after += edges_at(plot, b) - edges_at(plot, a)
+            after_secs += b - a
+            end = b
+    return {"steps": steps, "run": plot[-1][2] - plot[0][2], "run_secs": t1 - t0, "after": after, "after_secs": after_secs}
+
+
 def web_summary(cdir, target):
     """The web stall mutator's numbers for one campaign (its web_ledger.json), or None if it has none."""
     try:
@@ -224,6 +323,7 @@ def main():
     ap.add_argument("study")
     ap.add_argument("--control", default="control")
     ap.add_argument("--no-triage", action="store_true")
+    ap.add_argument("--window", type=float, default=10.0)
     ap.add_argument("--out")
     a = ap.parse_args()
     study = a.study if os.path.isdir(a.study) else os.path.join(REPO, "experiments", a.study)
@@ -381,6 +481,55 @@ def main():
                 w(f"| {arm} | {m} | {s} | {h} | {k} | {fmt(k / s, 2) if s else '–'} |")
             if not tot:
                 w(f"| {arm} | (no llm/steps.jsonl: not an Alfred campaign, or no LLM step ran) | | | | |")
+
+        win = int(a.window * 60)
+        cov = {}   # arm -> {"m": {mutator: [steps, before, after, steps with more after]}, run, run_secs, after, after_secs}
+        for arm in arms:
+            if arm in afl_arms:
+                continue
+            for r in rows:
+                if r["arm"] != arm or r["state"] != "done":
+                    continue
+                sc = step_coverage(os.path.join(camps, r["campaign"]), r["target"], win)
+                if sc is None:
+                    continue
+                t = cov.setdefault(arm, {"m": {}, "run": 0, "run_secs": 0, "after": 0, "after_secs": 0, "n": 0})
+                t["n"] += 1
+                for k in ("run", "run_secs", "after", "after_secs"):
+                    t[k] += sc[k]
+                for mut, before, after in sc["steps"]:
+                    m = t["m"].setdefault(mut, [0, 0, 0, 0])
+                    m[0] += 1
+                    m[1] += before
+                    m[2] += after
+                    m[3] += after > before
+        if cov:
+            wm = f"{a.window:g} min"
+            w("")
+            w(f"## Coverage after LLM steps (done campaigns; window {wm})")
+            w("")
+            w(f"For each LLM step that had a seed kept: afl-fuzz's `edges` gained in the {wm} before its first kept seed "
+              f"entered the corpus, and in the {wm} after (the seed's own new edges are in \"after\"). Sums over the arm's "
+              "campaigns, so targets with many edges weigh more. Coverage gain slows during a run, so \"before\" is the "
+              "higher bar; but a stall-mode step runs after a stall, where \"before\" is near 0 by design: compare arms "
+              "of one mode, and read \"after\" against the last two columns. Windows of nearby steps overlap in the "
+              "per-mutator rows, not in the arm's share.")
+            w("")
+            w("| arm | mutator | steps with a kept seed | edges before | edges after | after per step | steps with more after |")
+            w("|---|---|---|---|---|---|---|")
+            for arm, t in cov.items():
+                for mut, (n, before, after, more) in sorted(t["m"].items()):
+                    w(f"| {arm} | {mut} | {n} | {before} | {after} | {fmt(after / n, 1) if n else '–'} | "
+                      f"{more} ({100 * more / n:.0f}%) |")
+                if not t["m"]:
+                    w(f"| {arm} | (no LLM seed was kept) | 0 | | | | |")
+            w("")
+            w("| arm | campaigns | edges gained in the run | of them in the windows after kept steps | share of the run's time in those windows |")
+            w("|---|---|---|---|---|")
+            for arm, t in cov.items():
+                w(f"| {arm} | {t['n']} | {t['run']} | {t['after']} ({100 * t['after'] / t['run']:.1f}%) | "
+                  f"{100 * t['after_secs'] / t['run_secs']:.1f}% |" if t["run"] and t["run_secs"] else
+                  f"| {arm} | {t['n']} | {t['run']} | {t['after']} | – |")
 
         web = {}
         for arm in arms:
