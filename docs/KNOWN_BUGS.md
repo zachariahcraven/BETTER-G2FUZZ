@@ -16,7 +16,7 @@ bug is, how it was found, what it does to results, and whether it's fixed. New o
 | [OURS-2](#ours-2-scancel-skipped-the-study-drivers-cleanup) | `scripts/study` `start --background` | `scancel` of the driver left its LLM servers running | fixed 2026-10-30 |
 | [OURS-3](#ours-3-output-on-the-nodes-shared-disk) | `scripts/fuzz run` (each campaign's `job.sbatch`) | AFL++ output is on the node's shared `/tmp`; when it fills, every campaign there stops | **open** (03 and 04 run with it) |
 | [OURS-4](#ours-4-the-kernels-file-name-cache-counts-against-a-campaigns-memory) | each campaign's 8 GB (`scripts/fuzz run`) | the libpcap target's temp files fill it with kernel cache; a 24 h run can be killed for memory | **open** (found in 04). Alfred: libpcap gets 16G by default (headroom, not a fix) |
-| [OURS-5](#ours-5-a-transient-nfs-error-stops-afl-fuzz) | each campaign's output on the group share (`output = campaign`) | one failed `open()` of a queue entry on NFS (`ERESTARTSYS`) stops afl-fuzz | **open** (found in BETTERG2FUZZ's 05; Alfred's rounds use `output = campaign` too) |
+| [OURS-5](#ours-5-a-transient-nfs-error-stops-afl-fuzz) | each campaign's output on the group share (`output = campaign`) | one failed `open()` of a queue entry on NFS (`ERESTARTSYS`) stops afl-fuzz | **fixed in code, not deployed** (2026-11-13); found in BETTERG2FUZZ's 05, Alfred's rounds use `output = campaign` too |
 | [OURS-6](#ours-6-two-cmplog-builds-had-no-cmplog) | `build/targets/unifuzz/gdk-pixbuf/build.sh`, `bento4/build.sh` | `gdk-pixbuf-pixdata.cmp` and `mp42aac.cmp` had no CmpLog instrumentation | **fixed in code, not deployed** (f8ddcbb, 2026-11-13); every study before ran these two without CmpLog |
 
 ## Upstream G2FUZZ
@@ -407,8 +407,12 @@ bug is, how it was found, what it does to results, and whether it's fixed. New o
   On NFS an `open()` can fail with errno 512, `ERESTARTSYS`, when a request is interrupted or stalls.
 - **Found:** 2026-11-08, BETTERG2FUZZ study 05 (gpt-oss-20b gdk-pixbuf-pixdata-r1, 16 h into 24 h); 1 of about 1,400
   runs in 04/05. Copied here 2026-11-13; not seen in A00/A02 so far.
-- **Status:** open. Candidate fixes: retry `open()` on `ERESTARTSYS`/`EINTR` in `queue_testcase_get()`, or AFL++'s
-  in-memory test-case cache (`AFL_TESTCACHE_SIZE`) sized above the queue.
+- **Status:** fixed in code, not deployed (2026-11-13).
+- **Fix:** afl-fuzz opens queue entries it reads back through `queue_testcase_open()` (`afl/src/afl-fuzz-queue.c`),
+  which tries again on `EINTR` and errno 512, up to 5 times over about 0.75 s, and only then stops as before. Any
+  other error stops it at once, as before. It covers `queue_testcase_get()`/`queue_testcase_retake()` and the
+  re-read of a new entry in `afl/src/afl-fuzz-bitmap.c`. Built and checked with a faked failing `open()` on a Mac;
+  not tested on NFS. A failing `read()` isn't retried. Deployed with the next image build.
 
 ### OURS-6: two CmpLog builds had no CmpLog
 - **Where:** `build/targets/unifuzz/gdk-pixbuf/build.sh` (the paper version's autotools build) and

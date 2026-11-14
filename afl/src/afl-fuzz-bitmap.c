@@ -1315,7 +1315,7 @@ u8 __attribute__((hot)) save_if_interesting(afl_state_t *afl, void *mem,
 
     if (unlikely(file_modified)) {
 
-      s32 rfd = open((char *)afl->queue_top->fname, O_RDONLY);
+      s32 rfd = queue_testcase_open(afl->queue_top->fname);
       if (unlikely(rfd < 0)) {
 
         PFATAL("Unable to open '%s'", (char *)afl->queue_top->fname);

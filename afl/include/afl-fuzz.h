@@ -1788,6 +1788,10 @@ static inline u64 next_p2(u64 val) {
 
 }
 
+/* Open an existing queue entry read-only, retrying transient (NFS) errors.
+   Returns the fd, or -1 with errno set. */
+s32 queue_testcase_open(const u8 *fname);
+
 /* Returns the testcase buf from the file behind this queue entry.
   Increases the refcount. */
 u8 *queue_testcase_get(afl_state_t *afl, struct queue_entry *q);

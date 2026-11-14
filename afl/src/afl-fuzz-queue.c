@@ -112,9 +112,42 @@ static void update_coe_fuzz_mu(afl_state_t *afl) {
 
 }
 
+/* Open an existing queue entry for reading. On NFS an open() can fail
+   transiently with EINTR, or with the kernel-internal ERESTARTSYS (512) that
+   some NFS clients leak to user space, so retry these a few times with a
+   growing delay (50+100+200+400 ms at most) before giving up. Any other
+   error is returned at once. Returns the fd or -1 with errno set; the caller
+   handles the failure. */
+
+#define QUEUE_OPEN_TRIES 5
+#define QUEUE_OPEN_ERESTARTSYS 512 /* not defined in user space headers */
+
+s32 queue_testcase_open(const u8 *fname) {
+
+  u32 tries = 0, delay_us = 50000;
+  s32 fd;
+
+  while (1) {
+
+    fd = open((const char *)fname, O_RDONLY);
+
+    if (likely(fd >= 0)) { return fd; }
+
+    if (errno != EINTR && errno != QUEUE_OPEN_ERESTARTSYS) { return -1; }
+    if (++tries >= QUEUE_OPEN_TRIES) { return -1; }
+
+    s32 saved_errno = errno;
+    usleep(delay_us);
+    delay_us *= 2;
+    errno = saved_errno;
+
+  }
+
+}
+
 static void load_testcase(struct queue_entry *q, u8 *buf, u32 len) {
 
-  int fd = open((char *)q->fname, O_RDONLY);
+  s32 fd = queue_testcase_open(q->fname);
 
   if (unlikely(fd < 0)) { PFATAL("Unable to open '%s'", (char *)q->fname); }
 
