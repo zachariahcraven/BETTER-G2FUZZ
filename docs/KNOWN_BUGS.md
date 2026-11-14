@@ -18,6 +18,7 @@ bug is, how it was found, what it does to results, and whether it's fixed. New o
 | [OURS-4](#ours-4-the-kernels-file-name-cache-counts-against-a-campaigns-memory) | each campaign's 8 GB (`scripts/fuzz run`) | the libpcap target's temp files fill it with kernel cache; a 24 h run can be killed for memory | **open** (found in 04). Alfred: libpcap gets 16G by default (headroom, not a fix) |
 | [OURS-5](#ours-5-a-transient-nfs-error-stops-afl-fuzz) | each campaign's output on the group share (`output = campaign`) | one failed `open()` of a queue entry on NFS (`ERESTARTSYS`) stops afl-fuzz | **fixed in code, not deployed** (2026-11-13); found in BETTERG2FUZZ's 05, Alfred's rounds use `output = campaign` too |
 | [OURS-6](#ours-6-two-cmplog-builds-had-no-cmplog) | `build/targets/unifuzz/gdk-pixbuf/build.sh`, `bento4/build.sh` | `gdk-pixbuf-pixdata.cmp` and `mp42aac.cmp` had no CmpLog instrumentation | **fixed in code, not deployed** (f8ddcbb, 2026-11-13); every study before ran these two without CmpLog |
+| [OURS-7](#ours-7-a-file-it-cannot-delete-ends-the-llm-worker) | `publish()`, `g2fuzz/llm_worker.py` | one `gen_seeds/` file that can't be removed (an NFS `.nfs*` leftover, `EBUSY`) ends the LLM worker; the campaign goes on as plain AFL++ | **fixed in code, not deployed** (2026-11-13); 3 of A00's continuous campaigns |
 
 ## Upstream G2FUZZ
 
@@ -425,6 +426,23 @@ bug is, how it was found, what it does to results, and whether it's fixed. New o
   targets don't.
 - **Fix:** pass the variant's settings to `make` too (f8ddcbb). A test build has 2,423 (gdk-pixbuf) and 4,683
   (mp42aac) hook calls. Deployed with the next target rebuild.
+
+### OURS-7: a file it cannot delete ends the LLM worker
+- **Where:** `publish()` in `g2fuzz/llm_worker.py`, when the campaign's output is on the group share
+  (`output = campaign`, NFS).
+- **What:** after each LLM step the worker moves `gen_seeds/`'s files into its sync queue and removes the empty and
+  over-1-MiB ones. On NFS a file deleted while a process still has it open stays as `.nfs<number>`; removing that
+  fails with `OSError: [Errno 16] Device or resource busy`. The error wasn't caught, so the worker ended with a
+  traceback. afl-fuzz keeps running, so the campaign reads `done` at full length but has no LLM steps after that.
+- **Found:** 2026-11-13 in A00-baseline-6h, by `scripts/compare`'s "worker traceback" count: continuous
+  `mp42aac-r3`, `-r4` and `-r5`, whose last LLM steps started 13,971 s, 12,926 s and 8,470 s into the 21,600 s run
+  (r1 and r2 ran 189 and 131 steps to the end; these three stopped at 76, 70 and 72). No other A00 campaign has it.
+- **Effect on results:** those three continuous campaigns ran 35% to 61% of their time without the LLM. Rerun them
+  before judging the continuous arm on mp42aac.
+- **Fix:** `publish()` skips `.nfs*` names (they are no seeds and go away by themselves), and an `OSError` on one
+  file is logged (`publish: skipped <name>`), counted as `skipped` in the step's line of `llm/steps.jsonl`, and the
+  worker goes on. Test: `test_publish_survives_files_it_cannot_remove` in `g2fuzz/tests/test_llm_worker.py`.
+  Deployed with the next image build. Why a generator's file is still open at that point isn't known.
 
 ## Not bugs: failures that look like them
 - **A seed that times out stops AFL++.** If one initial seed takes over 1000 ms in afl-fuzz's start-up check,

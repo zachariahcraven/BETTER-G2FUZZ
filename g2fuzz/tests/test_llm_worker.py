@@ -136,6 +136,30 @@ class WorkerTest(unittest.TestCase):
         self.assertEqual(log.count("==== Gen-M start ===="), len(steps))
         self.assertIn("cnt:2", read(os.path.join(out, "gen_seeds_energy_log")))
 
+    def test_publish_survives_files_it_cannot_remove(self):
+        """KNOWN_BUGS OURS-7: an NFS .nfs* leftover, or a failing remove, ended the worker (3 of A00's campaigns)."""
+        import llm_worker
+        from unittest import mock
+        tmp = tempfile.mkdtemp(prefix="llm-worker-test.")
+        w = llm_worker.Worker.__new__(llm_worker.Worker)
+        w.gen_seeds, w.queue, w.staging = (os.path.join(tmp, d) for d in ("gen", "queue", "staging"))
+        w.next_id = 0
+        for d in (w.gen_seeds, w.queue, w.staging):
+            os.makedirs(d)
+        open(os.path.join(w.gen_seeds, ".nfs00aa0000011c623100509b74"), "wb").close()   # empty: it would be removed
+        open(os.path.join(w.gen_seeds, "a-1_1.jpg"), "wb").close()                      # empty, and remove() fails
+        for n in ("b-2_1.jpg", "c-3_1.jpg"):
+            with open(os.path.join(w.gen_seeds, n), "wb") as f:
+                f.write(b"seed")
+        real = os.remove
+        with mock.patch.object(llm_worker.os, "remove",
+                               side_effect=lambda p: (_ for _ in ()).throw(OSError(16, "Device or resource busy", p))
+                               if p.endswith("a-1_1.jpg") else real(p)):
+            counts = w.publish()
+        self.assertEqual((counts["seeds"], counts["published"], counts["empty"], counts.get("skipped")), (3, 2, 1, 1))
+        self.assertEqual(sorted(os.listdir(w.queue)), ["id:000000,orig:b-2_1.jpg", "id:000001,orig:c-3_1.jpg"])
+        self.assertIn(".nfs00aa0000011c623100509b74", os.listdir(w.gen_seeds))            # left alone, not counted
+
     def test_no_step_before_plateau(self):
         _, _, _, steps = self.run_campaign(2, G2F_PLATEAU_SEC="60", G2F_LLM_MODE="stall")
         self.assertEqual(steps, [])

@@ -235,23 +235,35 @@ class Worker:
         except OSError:
             return counts
         for name in names:
-            path = os.path.join(self.gen_seeds, name)
-            if not os.path.isfile(path) or os.path.islink(path):
+            # .nfs*: on NFS, a file deleted while a process still has it open (a generator's leftover). It is no
+            # seed, it goes away by itself, and removing it fails with EBUSY (KNOWN_BUGS OURS-7)
+            if name.startswith(".nfs"):
                 continue
-            counts["seeds"] += 1
-            size = os.path.getsize(path)
-            if size == 0 or size > MAX_FILE:
-                counts["empty" if size == 0 else "too_big"] += 1
-                os.remove(path)
-                continue
-            # write fully elsewhere, then rename: AFL++ never sees a partial file, and ids appear in order
-            # (it remembers the highest id it has synced and skips lower ones)
-            final = os.path.join(self.queue, "id:%06u,orig:%s" % (self.next_id, name.replace(",", "_")))
-            tmp = os.path.join(self.staging, "%06u" % self.next_id)
-            shutil.move(path, tmp)
-            os.rename(tmp, final)
-            self.next_id += 1
-            counts["published"] += 1
+            try:
+                self.publish_one(name, counts)
+            except OSError as e:   # one bad file must not end the worker (OURS-7)
+                counts["skipped"] = counts.get("skipped", 0) + 1
+                log(f"publish: skipped {name}: {e}")
+        return counts
+
+    def publish_one(self, name, counts):
+        path = os.path.join(self.gen_seeds, name)
+        if not os.path.isfile(path) or os.path.islink(path):
+            return
+        counts["seeds"] += 1
+        size = os.path.getsize(path)
+        if size == 0 or size > MAX_FILE:
+            counts["empty" if size == 0 else "too_big"] += 1
+            os.remove(path)
+            return
+        # write fully elsewhere, then rename: AFL++ never sees a partial file, and ids appear in order
+        # (it remembers the highest id it has synced and skips lower ones)
+        final = os.path.join(self.queue, "id:%06u,orig:%s" % (self.next_id, name.replace(",", "_")))
+        tmp = os.path.join(self.staging, "%06u" % self.next_id)
+        shutil.move(path, tmp)
+        os.rename(tmp, final)
+        self.next_id += 1
+        counts["published"] += 1
         return counts
 
     def run(self):
