@@ -11,6 +11,7 @@ from enum import IntEnum, auto
 import json 
 import random
 from .llm_utils import *
+from .font_hint import with_font_hint   # ALFRED: G2F_FONT_HINT=1 (off: prompts unchanged)
 
 CURRENT_TIME = time.time()
 
@@ -321,6 +322,7 @@ def messages_for_feature_reask(TARGET, known_features):
 def messages_for_code_gen(TARGET, TARGET_FEATURES):
     prompt = code_gen_prompt.replace("<TARGET>", TARGET)
     prompt = prompt.replace("<TARGET_FEATURES>", TARGET_FEATURES)
+    prompt = with_font_hint(prompt, TARGET)
 
     messages = copy.deepcopy(messages_code_gen)
     messages[-1]["content"] = prompt
@@ -353,6 +355,7 @@ def messages_for_generator_mutation(file_format, feature, feature_description, t
     prompt = prompt.replace("<NEW_FEATURE>", feature)
     prompt = prompt.replace("<FEATURE_DES>", feature_description)
     prompt = prompt.replace("<TARGET_GENERATOR>", target_generator_code)
+    prompt = with_font_hint(prompt, file_format)
 
     messages = copy.deepcopy(messages_code_gen)
     messages[-1]["content"] = prompt

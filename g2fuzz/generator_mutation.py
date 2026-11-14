@@ -4,6 +4,8 @@ import sys
 import json
 import argparse
 
+from py_utils.font_hint import with_font_hint   # ALFRED: G2F_FONT_HINT=1; no dependencies
+
 
 # ALFRED: the stall mutators G2F_STALL_MUTATORS may name ('+'-separated). Unset: upstream's feature, structure and
 # (once a useful mutation exists) pattern. rare: the paper's Rare-Feature Directed Mutation as a stall mutator.
@@ -202,6 +204,7 @@ def mutation_based_on_pattern(model, tmp_path, seeds_path, generators, output_pa
     prompt = prompt.replace("<ORI>", ori_code)
     prompt = prompt.replace("<MUT>", mutated_code)
     prompt = prompt.replace("<TARGET_CODE>", target_generator_code)
+    prompt = with_font_hint(prompt, file_format)   # ALFRED: G2F_FONT_HINT=1 (off: unchanged)
     target_generator_log.append({"role": "user", "content": prompt})
 
 
@@ -257,6 +260,7 @@ def mutation_based_on_predefined_mutators(model, tmp_path, seeds_path, generator
     init = copy.deepcopy(prompt_init)
     init = init.replace("<FROMAT>", file_format)
     init = init.replace("<TARGET_GENERATOR>", target_generator_code)
+    init = with_font_hint(init, file_format)   # ALFRED: G2F_FONT_HINT=1 (off: unchanged)
     target_generator_log.append({"role": "user", "content": init})
     # print(target_generator_log[-1]["content"])
     

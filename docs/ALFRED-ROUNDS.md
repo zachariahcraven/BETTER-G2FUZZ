@@ -43,6 +43,7 @@ From about 2026-11-13 (when study 05 frees the compute) to 2026-11-27, Alfred im
 | `G2F_WEB_SOURCES` | fuzzing | all; any of `wikipedia`, `nvd`, `stackexchange`, `github`, `links`, `+`-separated | the free sources the `web` mutator may use (`links`: pages linked from documents already read) |
 | `G2F_RFDM_ALL_FORMATS` | seed generation | `0`, `1` | `1`: 3 seed-generation rounds (with Rare-Feature mutation) for every format, not only single-format targets (`program_gen.py` `setup_epochs`) |
 | `G2F_SANDBOX_ALL` | seed generation and fuzzing | `0`, `1` | `1`: every generator runs in the sandbox (no network, its own `/tmp` and `/dev/shm`), not only the `web` mutator's. In 04, 3.7% of gpt-oss-20b's generators used the network, 40% on mp3gain (they download ffmpeg), so expect mp3gain to lose |
+| `G2F_FONT_HINT` | seed generation and fuzzing | `0`, `1` | `1`: for the font formats (`ttf`, `otf`, `woff`, `woff2`), the prompts that ask for a generator (new, extended or mutated) end with a note on the real fontTools API: a `FontBuilder` skeleton that runs on fontTools 4.65.0, and the invented names A00's logs show (`py_utils/font_hint.py`). Other formats' prompts, and the repair prompts, are unchanged. Not yet run against a model |
 
 ## Friday checklist (2026-11-13, when study 05 ends; before A00)
 1. Read 05's ucb vs random result, and set Alfred's default scheduler from it.

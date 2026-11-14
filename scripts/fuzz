@@ -116,7 +116,8 @@ G2F_BACKOFF_SEC fuzz [0-9]+
 G2F_STALL_MUTATORS fuzz (feature|structure|pattern|rare|web)([+](feature|structure|pattern|rare|web))*
 G2F_WEB_SOURCES fuzz (wikipedia|nvd|stackexchange|github|links)([+](wikipedia|nvd|stackexchange|github|links))*
 G2F_RFDM_ALL_FORMATS setup 0|1
-G2F_SANDBOX_ALL setup 0|1'
+G2F_SANDBOX_ALL setup 0|1
+G2F_FONT_HINT setup 0|1'
 OUTPUT="${G2F_OUTPUT:-node}"   # node or campaign (write_job_sbatch)
 SHARED_MODELS=/home/group/csci-591-automated-vulnerability-discovery/students/shared-models
 
@@ -424,7 +425,9 @@ cmd_run() {
   write_run_sh "$d/run.sh" "$SEED_CMD $(fuzz_command "$secs")"
   write_job_sbatch "$d/job.sbatch" "$d"
   mins=$(time_limit "$secs")
-  id=$(sbatch --parsable "${SLURM[@]}" --time "$mins" --output "$d/slurm-%j.out" "$d/job.sbatch")
+  # --no-requeue: after a node failure Slurm would start the job again, in this folder, perhaps beside the first
+  # copy still running on the lost node (2026-11-13 outage). A lost campaign reads "done (short)": retry it instead.
+  id=$(sbatch --parsable "${SLURM[@]}" --no-requeue --time "$mins" --output "$d/slurm-%j.out" "$d/job.sbatch")
   echo "${id%%;*}" > "$d/slurm.jobid"
   # A run keeps the server's address: a server started later lands on another node, so the run can't switch to it.
   echo "submitted Slurm job ${id%%;*} (fuzz ${secs}s, limit ${mins} min, account $ACCOUNT). Watch it: scripts/fuzz watch $name"
@@ -742,7 +745,8 @@ llm_start() {
   sacctmgr -nP show assoc user="$USER" format=account 2>/dev/null | grep -qx "$acct" ||
     die "$gpu needs the Slurm account $acct, which you're not in. Use: scripts/fuzz llm start $hours h100"
   # --comment: the model, for llm_jobs. G2F_REPO: where llm-serve.sbatch finds scripts/chat-templates
-  id=$(sbatch --parsable --account "$acct" "${where[@]}" --time $((hours * 60)) --chdir "$LLM_DIR" \
+  # --no-requeue: a requeued server starts on another node, where running campaigns (which keep its address) never look
+  id=$(sbatch --parsable --account "$acct" "${where[@]}" --time $((hours * 60)) --chdir "$LLM_DIR" --no-requeue \
     --comment "model=$MODEL" --export "ALL,G2F_SERVE_MODEL=$MODEL_DIR,G2F_REPO=$REPO" "$REPO/scripts/llm-serve.sbatch")
   echo "submitted $MODEL server job ${id%%;*} ($gpu, ${hours} h, account $acct). Ready ~5 min after it starts: scripts/fuzz llm status"
   if [ "$MODEL_DIR" = Mistral-Small-3.1-24B-Instruct-2503 ] && [[ "$gpu" == *a40 ]]; then

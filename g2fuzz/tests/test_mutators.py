@@ -5,6 +5,8 @@
 - the rare stall mutator: Rare-Feature Directed Mutation in a stall step, end to end against a fake LLM server
   that replays fixed answers (needs the openai package, as in the image; skipped without it).
 - G2F_RFDM_ALL_FORMATS (program_gen.py): setup rounds per format.
+- G2F_FONT_HINT (py_utils/font_hint.py): the fontTools note on the font formats' generator prompts; off, or another
+  format: the prompt is unchanged. Its skeleton is run where fontTools is installed (skipped elsewhere).
 Run: python3 g2fuzz/tests/test_mutators.py   (in the image: all tests; elsewhere the end-to-end ones are skipped)
 """
 import importlib.util
@@ -23,7 +25,10 @@ sys.path.insert(0, G2F)
 import generator_mutation  # noqa: E402  (module level: no LLM client, no openai needed)
 import program_gen  # noqa: E402
 
+from py_utils import font_hint  # noqa: E402  (no dependencies)
+
 HAVE_OPENAI = importlib.util.find_spec("openai") is not None
+HAVE_FONTTOOLS = importlib.util.find_spec("fontTools") is not None
 
 
 class StallMutatorsTest(unittest.TestCase):
@@ -79,6 +84,100 @@ class SetupEpochsTest(unittest.TestCase):
         self.assertEqual(program_gen.setup_epochs(1), 3)
         os.environ["G2F_RFDM_ALL_FORMATS"] = "0"
         self.assertEqual(program_gen.setup_epochs(9), 1)
+
+
+class FontHintTest(unittest.TestCase):
+    PROMPT = "Generate 'x' files.\n```\nfeature\n```\nPlease ensure that there is only one code block.\n"
+
+    def setUp(self):
+        self.saved = os.environ.pop("G2F_FONT_HINT", None)
+
+    def tearDown(self):
+        os.environ.pop("G2F_FONT_HINT", None)
+        if self.saved is not None:
+            os.environ["G2F_FONT_HINT"] = self.saved
+
+    def test_off_is_unchanged(self):
+        for value in (None, "0", ""):
+            if value is not None:
+                os.environ["G2F_FONT_HINT"] = value
+            for fmt in ("ttf", "woff2", "png"):
+                self.assertEqual(font_hint.with_font_hint(self.PROMPT, fmt), self.PROMPT)
+
+    def test_on_font_format(self):
+        os.environ["G2F_FONT_HINT"] = "1"
+        for fmt in ("ttf", "otf", "woff", "woff2", "TTF"):
+            got = font_hint.with_font_hint(self.PROMPT, fmt)
+            self.assertEqual(got, self.PROMPT + font_hint.HINT)
+            self.assertIn("fontTools.fontBuilder", got)
+
+    def test_on_other_format_is_unchanged(self):
+        os.environ["G2F_FONT_HINT"] = "1"
+        for fmt in ("png", "jpg", "pdf", "tiff", "binary_large_object_BLOB"):
+            self.assertEqual(font_hint.with_font_hint(self.PROMPT, fmt), self.PROMPT)
+
+    @unittest.skipUnless(HAVE_OPENAI, "py_utils/func.py needs the openai package")
+    def test_the_prompts_that_write_generators(self):
+        """func.py's two prompt builders: off, exactly the template with its placeholders filled; on, + the hint."""
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, "openai_key.txt"), "w") as f:   # llm_utils reads it on import
+                f.write("dummy")
+            cwd = os.getcwd()
+            os.chdir(d)
+            try:
+                import py_utils.func as F
+            finally:
+                os.chdir(cwd)
+        new = F.code_gen_prompt.replace("<TARGET>", "ttf").replace("<TARGET_FEATURES>", "1. Kerning")
+        ext = (F.generator_mutation_prompt.replace("<FROMAT>", "ttf").replace("<NEW_FEATURE>", "Kerning")
+               .replace("<FEATURE_DES>", "1. Kerning").replace("<TARGET_GENERATOR>", "print(1)"))
+        self.assertEqual(F.messages_for_code_gen("ttf", "1. Kerning")[-1]["content"], new)
+        self.assertEqual(F.messages_for_generator_mutation("ttf", "Kerning", "1. Kerning", "print(1)")[-1]["content"], ext)
+        os.environ["G2F_FONT_HINT"] = "1"
+        self.assertEqual(F.messages_for_code_gen("ttf", "1. Kerning")[-1]["content"], new + font_hint.HINT)
+        self.assertEqual(F.messages_for_generator_mutation("ttf", "Kerning", "1. Kerning", "print(1)")[-1]["content"],
+                         ext + font_hint.HINT)
+        self.assertEqual(F.messages_for_code_gen("png", "1. Kerning")[-1]["content"],
+                         F.code_gen_prompt.replace("<TARGET>", "png").replace("<TARGET_FEATURES>", "1. Kerning"))
+
+    @unittest.skipUnless(HAVE_FONTTOOLS, "needs fontTools (the hint was checked against 4.65.0)")
+    def test_the_skeleton_runs(self):
+        """The hint's code block, run as a generator would be: it must write a font fontTools can read back."""
+        blocks = font_hint.HINT.split("```")
+        self.assertEqual(len(blocks), 3)   # one code block
+        with tempfile.TemporaryDirectory() as d:
+            script = os.path.join(d, "skeleton.py")
+            with open(script, "w") as f:
+                f.write(blocks[1])
+            r = subprocess.run([sys.executable, script], cwd=d, capture_output=True, text=True, timeout=120)
+            self.assertEqual(r.returncode, 0, r.stderr[-2000:])
+            from fontTools.ttLib import TTFont
+            font = TTFont(os.path.join(d, "tmp", "font.ttf"))
+            self.assertEqual(font.getBestCmap(), {0x41: "A"})
+            for tag in ("glyf", "hmtx", "name", "OS/2", "gasp", "zzzz", "GPOS"):
+                self.assertIn(tag, font)
+
+    @unittest.skipUnless(HAVE_FONTTOOLS, "needs fontTools")
+    def test_the_names_to_avoid_do_not_exist(self):
+        from fontTools.fontBuilder import FontBuilder
+        from fontTools.ttLib import TTFont, newTable
+        for name in ("setupName", "setupHmtx", "addGlyph"):
+            self.assertFalse(hasattr(FontBuilder, name), name)
+        self.assertFalse(hasattr(TTFont, "newTable"))
+        self.assertFalse(hasattr(newTable("cmap"), "newSubtable"))
+        self.assertFalse(hasattr(newTable("name"), "NameRecord"))
+        for module, name in (("fontTools.varLib.builder", "FontBuilder"), ("fontTools.feaLib.builder", "FontBuilder"),
+                             ("fontTools.ttLib.tables._c_m_a_p", "CmapTable"),
+                             ("fontTools.ttLib.tables._c_m_a_p", "CmapSubtableFormat4"),
+                             ("fontTools.ttLib.tables._g_l_y_f", "GlyfTable"),
+                             ("fontTools.ttLib.tables._g_l_y_f", "GlyphSet"),
+                             ("fontTools.ttLib.tables._h_m_t_x", "HmtxTable"),
+                             ("fontTools.ttLib.tables._h_e_a_d", "HeadTable"),
+                             ("fontTools.ttLib.tables.otTables", "NameRecord"),
+                             ("fontTools.ttLib.tables.otTables", "OS_2")):
+            self.assertFalse(hasattr(importlib.import_module(module), name), module + "." + name)
+        for module in ("_cmap", "_head", "_glyf", "_o_s_2"):
+            self.assertIsNone(importlib.util.find_spec("fontTools.ttLib.tables." + module), module)
 
 
 # --- the rare stall mutator, end to end -----------------------------------------------------------------------
@@ -152,9 +251,11 @@ class RareMutatorTest(unittest.TestCase):
             f.write("dummy")
         return camp, out
 
-    def step(self, camp, out):
+    def step(self, camp, out, **switches):
         env = dict(os.environ, G2F_STALL_MUTATORS="rare", G2F_GENERATOR_SCHEDULER="random",
                    OPENAI_BASE_URL="http://127.0.0.1:%d/v1" % self.server.server_address[1], G2F_LLM_RETRIES="0")
+        env.pop("G2F_FONT_HINT", None)
+        env.update(switches)
         return subprocess.run([sys.executable, os.path.join(G2F, "generator_mutation.py"), "--output", out],
                               cwd=camp, env=env, capture_output=True, text=True, timeout=120)
 
@@ -182,6 +283,25 @@ class RareMutatorTest(unittest.TestCase):
         self.assertIn("rare features offered: 1, new: 0", r.stdout)
         self.assertEqual(sorted(os.listdir(os.path.join(out, "generators"))), ["tiff-1.py"])
         self.assertEqual(os.listdir(os.path.join(out, "gen_seeds")), [])
+
+    def test_font_hint_reaches_the_stall_prompts(self):
+        """G2F_FONT_HINT in a step: a ttf parent's feature and rare prompts end with the hint; off, or a tiff
+        parent, they don't have it. (The fake LLM's answers don't matter here.)"""
+        FakeLLM.features = "1. Kerning: pair adjustments\n2. Hinting: instructions\n"
+        for mutator, marker in (("feature", "more complex file features"), ("rare", "additional `")):
+            for fmt, hint, want in (("ttf", "1", True), ("ttf", "0", False), ("ttf", None, False), ("tiff", "1", False)):
+                camp, out = self.campaign()
+                os.rename(os.path.join(out, "generators", "tiff-1.py"), os.path.join(out, "generators", fmt + "-1.py"))
+                del FakeLLM.prompts[:]
+                switches = {"G2F_STALL_MUTATORS": mutator}
+                if hint is not None:
+                    switches["G2F_FONT_HINT"] = hint
+                r = self.step(camp, out, **switches)
+                self.assertEqual(r.returncode, 0, r.stdout[-2000:] + r.stderr[-2000:])
+                asked = [q for q in FakeLLM.prompts if marker in q]
+                self.assertTrue(asked, (mutator, fmt, hint))
+                self.assertEqual(asked[0].endswith(font_hint.HINT), want, (mutator, fmt, hint))
+                self.assertEqual("fontBuilder" in asked[0], want, (mutator, fmt, hint))
 
 
 if __name__ == "__main__":

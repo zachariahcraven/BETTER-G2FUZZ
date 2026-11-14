@@ -95,6 +95,8 @@ and the rounds log).
 - **New switches:**
   - `G2F_STALL_MUTATORS` (the `rare` stall mutator, in `generator_mutation.py`).
   - `G2F_RFDM_ALL_FORMATS` (in `program_gen.py`).
+  - `G2F_FONT_HINT` (2026-11-13, in `py_utils/font_hint.py`): a note on the real fontTools API at the end of the
+    font formats' generator prompts. A setup switch; off, every prompt is unchanged. Not yet run against a model.
   - Together with the worker's existing `G2F_LLM_MODE`, `G2F_PLATEAU_SEC` and `G2F_BACKOFF_SEC`.
 - **What `program_gen.py` and the worker now record:**
   - `program_gen.py` also writes each format's own `feature_pool-<format>.json`.
