@@ -67,3 +67,5 @@ experiments/**/results/*-crashes.tar.xz
 *.sif
 *.sif.version
 g2fuzz-amd64.tar*
+# the web limiter's shared state (scripts/fuzz, g2fuzz/py_utils/web_limit.py)
+.web-limits/

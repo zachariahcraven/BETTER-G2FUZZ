@@ -342,7 +342,11 @@ def research(fmt, covered, ledger, ask, sources, step, rng, log=print, docs_dir=
         for url, meta in ledger.take_frontier(fmt, MAX_FRONTIER_FETCH):
             try:
                 page = ws.fetch_page(url)
-            except (ws.Cooling, ws.WebError) as e:
+            except ws.Cooling as e:   # the shared limit: back on the reading list for a later step
+                ledger.add_frontier(fmt, url, meta.get("title", ""), meta.get("from"), meta.get("score", 1))
+                log("web: link %s: %s" % (url, e))
+                continue
+            except ws.WebError as e:
                 log("web: link %s: %s" % (url, e))
                 continue
             if page is None:

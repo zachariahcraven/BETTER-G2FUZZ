@@ -111,15 +111,37 @@ Keep each round's image as `build/g2fuzz-<commit>.sif`, so a later round can run
 | Round | Arms | Evidence | Seeds |
 |---|---|---|---|
 | A00-baseline-6h | control, afl, continuous, fast-stall (120 s, no backoff) | Alfred's worker doesn't block afl-fuzz, so more steps cost no fuzzing time; also Alfred's 6 h baseline and its bug check | shared |
-| A01-stall-mutators-6h | control, rare, web, no-pattern (one mutator per arm: a 6 h campaign has a median of 3 stall steps) | 04 lineage: stall seeds about 1% of queue descendants; pattern 0.7 descendants per generator vs 2.6–2.9; Rare-Feature mutation 31.5 per generator, but only at setup. `web`: do fresh documents bring features the model wouldn't name? | shared |
+| A01-mutators-warm-2h | control, rare, web, no-pattern, afl-only; every campaign a warm start from A00's control/<target>-r<rep> (its queue after 6 h), LLM arms continuous, 2 h (about 1,900 steps per arm) | A00: 93% of 6 h coverage after 1 h in every arm; first stall step at 74 min; 0.07-0.10 kept LLM seeds per step, so a 6 h stall-mode round gives about 450 steps per arm; 04 lineage: stall seeds about 1% of descendants, pattern 0.7 per generator | warm (A00) |
 | A02-rfdm-all-formats-6h | control, rfdm-all (4 multi-format targets) | single-format targets: Rare-Feature mutation 16.2% of 04's descendants, as much as synthesis; multi-format targets never run it (upstream code; paper Table 13: mutation ≈ 0 on exactly them) | fresh |
-| A03+ | wrong-library-API errors (36% of generator failures in 03/04; most no-seed runs on fonts): re-classify the errors first, then e.g. the image's installed packages and versions in the code-generation prompt, or fontTools for ttf/woff2 | 03/04 failure analysis | fresh |
+| A03-scouts (proposal below) | control; `library-scout` (setup: vetted, pinned writer libraries per format, their verified APIs in the generation prompt); `library-swap` (stall mutator: rewrite a working generator with another library); both | 36% of 03/04 generator failures are wrong-library-API errors; A00's freetype2 seed generation failed twice (1 generator in 5.5 h) on invented fontTools names, while 10 of 04's 12 working ttf generators wrote the bytes with `struct`; 04's mp3gain generators download ffmpeg | fresh (library-scout acts at setup) |
+| A03+ | format scout (automates `program_to_format.json` for new targets: not needed for the 28 paper targets, so after A03); fonts and other wrong-library-API follow-ups | A03 | fresh |
 | later | `G2F_SANDBOX_ALL=1` (safety: no generator downloads anything; a bug-fix-style rule: keep if coverage is no worse) | 3.7% of 04's generators use the network | fresh |
 | later | web documents at seed generation too (the Rare-Feature rounds of `program_gen.py`), if `web` wins A01 | A01 | fresh |
 | later | retests of borderline tweaks; fixes for bugs the rounds find | the rounds | – |
 
 The generator scheduler (ucb vs random) isn't tested again here. Study 05 (24 h, 8 models) answers it, and its result
 sets Alfred's default before A00: `random` (2026-11-12, Rounds log).
+
+## A03 proposal: scouts and a library-swap mutator (2026-11-13)
+Today a person writes which formats each target reads (`g2fuzz/program_to_format.json`), and the LLM picks a Python
+library for each generator from memory, pip-installing whatever is missing. Both are where generators fail most.
+- **Format scout** (setup, new targets): derive a target's formats from its fuzzing harness, its documentation and the
+  magic bytes of its stock seeds (`file`), and write the `program_to_format.json` entry; a person confirms it. The 28
+  paper targets already have entries, so this serves new targets (the latest versions, Butler's) more than the rounds.
+- **Library scout** (setup, per format): search PyPI, GitHub and Wikipedia (the web mutator's free sources) for
+  libraries that write the format, plus "no library: `struct`" as a candidate. For each candidate: install a pinned
+  version into the campaign (outside the sandbox, from a vetted list, before any web-informed code runs), import it,
+  and record its version and the real names of the classes and functions a generator needs (from `dir()`/`help()`,
+  not from the web). The code-generation prompt then lists only installed, checked libraries with their real API
+  names. Remembered per format in the campaign (`library_ledger.json`, beside `web_ledger.json`).
+- **Library-swap mutator** (a stall mutator, `G2F_STALL_MUTATORS=libswap`): take a working generator and rewrite it
+  with a different checked library (or with `struct`). Different encoders make different, still valid, files of the
+  same features, a cheap source of variety at a stall.
+- **Safety:** libraries come from a vetted index (PyPI only, pinned versions, no install from web-found URLs); install
+  happens at setup, outside generator code; generators still can't install anything when `G2F_SANDBOX_ALL=1`.
+- **Round A03:** arms control, `library-scout` (setup switch, fresh seeds), `library-swap` (stall switch) and both.
+  Primary measures: seed-generation success (generators per format, no-seed runs, wrong-API errors), then coverage.
+  Font targets (freetype2, woff2) and mp3gain are where it should show.
 
 ## Rounds log
 | Round | Image (commit) | Arms | Result | Decision |

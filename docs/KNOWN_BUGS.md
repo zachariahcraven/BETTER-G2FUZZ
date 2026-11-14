@@ -6,16 +6,18 @@ bug is, how it was found, what it does to results, and whether it's fixed. New o
 
 | ID | Where | What | Status |
 |---|---|---|---|
-| [G2F-1](#g2f-1-in-run-seeds-skip-afls-size-checks) | `afl/src/afl-fuzz.c` `run_gen_seeds()` | in-run generator seeds skip AFL++'s size checks; afl-fuzz segfaults on ones over 1 MiB, or runs out of memory on a 1 GB one | **open** (03 and 04 run with it). Alfred: gone by design (seeds come in through AFL++'s sync), to verify on campaigns |
+| [G2F-1](#g2f-1-in-run-seeds-skip-afls-size-checks) | `afl/src/afl-fuzz.c` `run_gen_seeds()` | in-run generator seeds skip AFL++'s size checks; afl-fuzz segfaults on ones over 1 MiB, or runs out of memory on a 1 GB one | **open** in BETTERG2FUZZ (03 and 04 run with it). Alfred: gone (no in-run path; seeds come in through AFL++'s sync). Verified 2026-11-13: no afl-fuzz crash in 332 A00/A02 campaigns; their 268 queue files over 1 MiB are all initial seeds (up to 5.9 MB), which AFL++ loads with its own "too big, partially skipping" handling |
 | [G2F-2](#g2f-2-pip_debug-runs-any-answer-as-a-pip-command) | `g2fuzz/py_utils/func.py` `pip_debug_loop()` | any LLM answer is run as a pip command | fixed 2026-10-30 (255c12b) |
-| [G2F-3](#g2f-3-afl-fuzz-heap-corruption-in-g2fuzz-runs) | afl-fuzz, G2FUZZ arms only (not located) | heap corruption: glibc stops afl-fuzz mid-run or as it exits | **open** (cause not found). Alfred: upstream's patch is gone; to check with a vorbis G2FUZZ campaign |
+| [G2F-3](#g2f-3-afl-fuzz-heap-corruption-in-g2fuzz-runs) | afl-fuzz, G2FUZZ arms only (not located) | heap corruption: glibc stops afl-fuzz mid-run or as it exits | **open** (cause not found) in BETTERG2FUZZ. Alfred: not seen (2026-11-13: no glibc abort in 332 A00/A02 campaigns, 20 of them vorbis; 04 and 05 had 19-32 each) |
 | [AFL-1](#afl-1-afl-fuzz-432c-fuzzes-the-cmplog-binary) | `afl/src/afl-fuzz.c` (AFL++ 4.32c) | fuzzes with the CmpLog binary, not the target | open (fixed upstream in 5.03c). Alfred: fixed (5.03c), verified 2026-11-12 |
 | [AFL-2](#afl-2-afl-showmap-432c-aborts-on-maps-over-64k) | `afl-showmap` (AFL++ 4.32c) | aborts on coverage maps over 64K | worked around. Alfred: fixed (5.03c), verified 2026-11-12; the workaround stays (harmless) |
 | [ALF-1](#alf-1-gdk-pixbufs-heap-overflow-writes-into-afls-coverage-map) | gdk-pixbuf `io-bmp.c:1060` `DoCompressed` (the target), seen by AFL++ 5.03c's map check | a heap overflow in the target writes into AFL's coverage map: 5.03c stops the campaign, 4.32c counted the garbage as coverage | **fixed in code, not deployed** (2026-11-13): guard regions around AFL's maps in `afl-compiler-rt` (`AFL_NO_MAP_GUARD=1` turns them off); needs the image, builders and targets rebuilt. Hit 3 A02 gdk-pixbuf campaigns (stopped) and 9 of 04/05's (silent, 100% coverage). Not `AFL_IGNORE_PROBLEMS` |
 | [OURS-1](#ours-1-ucb-snapshot-held-one-formats-generators) | `g2fuzz/py_utils/generator_scheduler.py` | UCB snapshot held only one format's generators | fixed 2026-10-30 (255c12b) |
-| [OURS-2](#ours-2-scancel-skipped-the-study-drivers-cleanup) | `scripts/study` `start --background` | `scancel` of the driver left its LLM servers running | fixed 2026-10-30 (uncommitted) |
+| [OURS-2](#ours-2-scancel-skipped-the-study-drivers-cleanup) | `scripts/study` `start --background` | `scancel` of the driver left its LLM servers running | fixed 2026-10-30 |
 | [OURS-3](#ours-3-output-on-the-nodes-shared-disk) | `scripts/fuzz run` (each campaign's `job.sbatch`) | AFL++ output is on the node's shared `/tmp`; when it fills, every campaign there stops | **open** (03 and 04 run with it) |
 | [OURS-4](#ours-4-the-kernels-file-name-cache-counts-against-a-campaigns-memory) | each campaign's 8 GB (`scripts/fuzz run`) | the libpcap target's temp files fill it with kernel cache; a 24 h run can be killed for memory | **open** (found in 04). Alfred: libpcap gets 16G by default (headroom, not a fix) |
+| [OURS-5](#ours-5-a-transient-nfs-error-stops-afl-fuzz) | each campaign's output on the group share (`output = campaign`) | one failed `open()` of a queue entry on NFS (`ERESTARTSYS`) stops afl-fuzz | **open** (found in BETTERG2FUZZ's 05; Alfred's rounds use `output = campaign` too) |
+| [OURS-6](#ours-6-two-cmplog-builds-had-no-cmplog) | `build/targets/unifuzz/gdk-pixbuf/build.sh`, `bento4/build.sh` | `gdk-pixbuf-pixdata.cmp` and `mp42aac.cmp` had no CmpLog instrumentation | **fixed in code, not deployed** (f8ddcbb, 2026-11-13); every study before ran these two without CmpLog |
 
 ## Upstream G2FUZZ
 
@@ -396,6 +398,29 @@ bug is, how it was found, what it does to results, and whether it's fixed. New o
   Tempest's memory accounting, not the fuzzer, and it hits plain AFL++ too.
   - Candidate fix, for after 04: give each campaign its own `/tmp` (OURS-3's fix), and test whether that keeps the
     cache down.
+
+### OURS-5: a transient NFS error stops afl-fuzz
+- **Where:** each campaign's AFL++ output folder when it's on the group share (`output = campaign`), an NFS mount.
+  Alfred's rounds use it (A00-A02).
+- **What:** afl-fuzz reads queue entries back from disk as it fuzzes (`queue_testcase_get()` in
+  `afl/src/afl-fuzz-queue.c`). If one `open()` fails it stops with `SYSTEM ERROR : Unable to open '<queue entry>'`.
+  On NFS an `open()` can fail with errno 512, `ERESTARTSYS`, when a request is interrupted or stalls.
+- **Found:** 2026-11-08, BETTERG2FUZZ study 05 (gpt-oss-20b gdk-pixbuf-pixdata-r1, 16 h into 24 h); 1 of about 1,400
+  runs in 04/05. Copied here 2026-11-13; not seen in A00/A02 so far.
+- **Status:** open. Candidate fixes: retry `open()` on `ERESTARTSYS`/`EINTR` in `queue_testcase_get()`, or AFL++'s
+  in-memory test-case cache (`AFL_TESTCACHE_SIZE`) sized above the queue.
+
+### OURS-6: two CmpLog builds had no CmpLog
+- **Where:** `build/targets/unifuzz/gdk-pixbuf/build.sh` (the paper version's autotools build) and
+  `build/targets/unifuzz/bento4/build.sh`: `AFL_LLVM_CMPLOG=1` went to `autogen.sh`/`cmake`, not to `make`, where
+  afl-clang-fast reads it.
+- **Found:** 2026-11-13 by the ALF-1 fix's checks: `gdk-pixbuf-pixdata.cmp` and `mp42aac.cmp` have 0 calls to the
+  CmpLog hooks, in Alfred's targets and in BETTERG2FUZZ's (the other 26 targets have hundreds to thousands).
+- **Effect on results:** every study so far (01-05, A00, A02) fuzzed these two targets without CmpLog, in every arm
+  (the AFL++ CmpLog baseline too). Comparisons inside a study stay fair; comparisons with the paper on these two
+  targets don't.
+- **Fix:** pass the variant's settings to `make` too (f8ddcbb). A test build has 2,423 (gdk-pixbuf) and 4,683
+  (mp42aac) hook calls. Deployed with the next target rebuild.
 
 ## Not bugs: failures that look like them
 - **A seed that times out stops AFL++.** If one initial seed takes over 1000 ms in afl-fuzz's start-up check,

@@ -19,7 +19,11 @@ import re
 import sys
 import tempfile
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "g2fuzz"))
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(REPO, "g2fuzz"))
+# take turns with the campaigns (they share <repo>/.web-limits, scripts/fuzz): Tempest has one address
+if not os.environ.get("G2F_WEB_LIMIT_DIR") and os.path.isdir(os.path.join(REPO, ".web-limits")):
+    os.environ["G2F_WEB_LIMIT_DIR"] = os.path.join(REPO, ".web-limits")
 from py_utils import web_step  # noqa: E402
 from py_utils.web_ledger import Ledger  # noqa: E402
 

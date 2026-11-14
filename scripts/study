@@ -43,6 +43,10 @@
 #                 seed_secs [60]), then every arm reuses its seeds and generators: the arms differ only in their options
 #                 reuse:<campaign>: every arm reuses that campaign (a path relative to the study's campaigns/;
 #                 it needs seeds and generators for each target, so usually one target)
+#                 warm:<campaign>: a warm start: each campaign starts from that finished campaign's AFL++ queue (its
+#                 coverage where it stalled), generators and feature lists (scripts/fuzz reuse --queue). A path
+#                 relative to campaigns/ with {target} and {rep}, e.g. warm:../../A00-baseline-6h/campaigns/control/
+#                 {target}-r{rep}: every arm's rep r starts from the same campaign. It waits until that one is done.
 #   name [{target}-{arm}-r{rep}]  campaign names; {model} works too; a / makes a subfolder ({arm}/{target}-r{rep})
 #   order [target]  target: one target's campaigns, then the next; rep: rep 1 of every target, then rep 2, ...
 #   max_seedgen [4] campaigns of one model in seed generation at once (more push LLM calls past the 300 s limit)
@@ -174,7 +178,7 @@ fi
 [ -z "${C[server_hours]}" ] || [[ "${C[server_hours]}" =~ ^[0-9]+$ ]] || die "server_hours must be a whole number of hours"
 for k in secs max_seedgen seed_secs; do [[ "${C[$k]}" =~ ^[0-9]+$ ]] || die "$k must be a whole number (got '${C[$k]}')"; done
 case "${C[order]}" in target|rep) ;; *) die "order must be target or rep (got '${C[order]}')" ;; esac
-case "${C[seeds]}" in fresh|shared|reuse:?*) ;; *) die "seeds must be fresh, shared or reuse:<campaign> (got '${C[seeds]}')" ;; esac
+case "${C[seeds]}" in fresh|shared|reuse:?*|warm:?*) ;; *) die "seeds must be fresh, shared, reuse:<campaign> or warm:<campaign> (got '${C[seeds]}')" ;; esac
 case "${C[output]}" in node|campaign) export G2F_OUTPUT=${C[output]} ;; *) die "output must be node or campaign (got '${C[output]}')" ;; esac
 model_ok() { [ -f "$SHARED_MODELS/$1/config.json" ] || die "no model '$1' in $SHARED_MODELS"; }
 
@@ -267,6 +271,11 @@ if [[ "${C[seeds]}" == reuse:* ]]; then
   done
 fi
 
+# seeds = warm:<campaign>: with several targets the path must name {target} (else every target would start from one)
+if [[ "${C[seeds]}" == warm:* ]] && [ "${#TARGETS[@]}" -gt 1 ] && [[ "${C[seeds]}" != *"{target}"* ]]; then
+  die "seeds = ${C[seeds]}: with several targets, the warm start's path needs {target} (and usually {rep})"
+fi
+
 # === The campaigns ==================================================================================================
 # Each planned campaign: target, arm, rep, its folder (campaigns/<name>) and where its seeds come from.
 # Shared seed campaigns are planned too (arm "seeds"), once per target and model a G2FUZZ arm needs.
@@ -302,6 +311,7 @@ add() {   # add <target> <arm> <rep>: plans one campaign (and, with seeds = shar
       shared) src="seeds/${A_MODEL[$a]}-$t"
               [ -n "${PLANNED[$src]+x}" ] || { plan "$t" seeds - "$src" new "${A_MODEL[$a]}"; SEED_ARM[$src]=$a; } ;;
       reuse:*) src=${C[seeds]#reuse:} ;;
+      warm:*) src=${C[seeds]//\{target\}/$t}; src=${src//\{rep\}/$r} ;;   # keeps the warm: prefix
     esac
   fi
   plan "$t" "$a" "$r" "$n" "$src" "${A_MODEL[$a]}"
@@ -372,7 +382,18 @@ shown_state() {
   echo "$s"
 }
 seeds_ready() {   # does campaign $1 (a path relative to campaigns/) have seeds and generators to reuse?
-  local c; c=$(realpath -m "$CAMPAIGNS/$1")   # -m: campaigns/ itself may not exist yet
+  local c
+  if [[ "$1" == warm:* ]]; then   # a warm start: its source must be done (fuzzed, its job over), with a queue and generators
+    # realpath -m: the path goes up from this study's campaigns/, which may not exist yet (so not state())
+    local id
+    c=$(realpath -m "$CAMPAIGNS/${1#warm:}")
+    id=$(cat "$c/slurm.jobid" 2>/dev/null) || return 1
+    [ -z "${JOB[$id]:-}" ] || return 1   # still queued or running
+    [ -f "$(ls -d "$c"/*_output/default 2>/dev/null | head -1)/fuzzer_stats" ] &&
+      [ -n "$(ls -A "$c"/*_output/default/queue 2>/dev/null)" ] && [ -n "$(ls -A "$c"/*_output/default/generators 2>/dev/null)" ]
+    return
+  fi
+  c=$(realpath -m "$CAMPAIGNS/$1")   # -m: campaigns/ itself may not exist yet
   [ -n "$(ls -A "$c/initial_seeds" 2>/dev/null)" ] && [ -n "$(ls -A "$c"/*_output/default/generators 2>/dev/null)" ]
 }
 
@@ -614,7 +635,8 @@ launch() {   # launch <i> <the model server it uses, or empty>
     else
       # reuse's source, relative to the campaign's own folder (G2F_EVAL)
       [[ "$n" == */* ]] && up=$(echo "${n%/*}" | sed 's#[^/][^/]*#..#g')/
-      out=$(fuzz_for "$i" reuse "$up$src" "${n##*/}" --model "$m" 2>&1) || rc=$?
+      if [[ "$src" == warm:* ]]; then out=$(fuzz_for "$i" reuse "$up${src#warm:}" "${n##*/}" --model "$m" --queue 2>&1) || rc=$?
+      else out=$(fuzz_for "$i" reuse "$up$src" "${n##*/}" --model "$m" 2>&1) || rc=$?; fi
     fi
     [ "$rc" = 0 ] || { echo "$out" | sed "s#^#  $n: #"; return 1; }
   fi
@@ -632,7 +654,8 @@ launch() {   # launch <i> <the model server it uses, or empty>
     echo "fuzz secs: $secs"
     echo "scheduler: $( afl_of "$i" && echo "none (--afl)" || { [ "$a" = seeds ] && echo "${C[scheduler]}" || echo "${A_SCHED[$a]}"; })"
     echo "tweaks: $( [ "$a" != seeds ] && [ -n "${A_SET[$a]:-}" ] && echo "${A_SET[$a]}" || echo "none")"
-    echo "seeds: $( afl_of "$i" && echo "stock (--afl)" || { [ "$src" = new ] && echo "own seed generation" || echo "reused from $src"; })"
+    echo "seeds: $( afl_of "$i" && echo "stock (--afl)" || { [ "$src" = new ] && echo "own seed generation" ||
+      { [[ "$src" == warm:* ]] && echo "warm start from ${src#warm:} (its queue)" || echo "reused from $src"; }; })"
     echo "image: $(cat "${A_SIF[$ia]}.version" 2>/dev/null)"
     echo "server: ${server:-none (--afl)}${L_URL:+ (address given to the campaign: $L_URL)}"
     [ -z "$EXTRA" ] || echo "account: $L_ACCT$( [ "$L_ACCT" = "$EXTRA" ] && echo " (the extra account, at most $EXTRA_MAX campaigns)" || echo " (the main account; extra: $EXTRA)")"

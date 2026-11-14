@@ -5,7 +5,8 @@
 #
 #   new     [name] [--model M]      Create a campaign folder (in experiments/practice/campaigns/ by default) that
 #                                   uses model M (default Qwen3.8-27B-FP8). Default name: <netid>-<target>-MMDD-HHMM
-#   reuse   <from> [name] [--model M]  New campaign with seeds + generators copied from campaign <from>
+#   reuse   <from> [name] [--model M] [--queue]  New campaign with seeds + generators copied from campaign <from>;
+#                                   --queue: <from>'s AFL++ queue as the seeds instead (a warm start from where it stalled)
 #   run     <name> [secs] [--test|--afl] [--scheduler S] [--set NAME=VALUE ...]  Background run: seed generation
 #                                   (if no seeds yet), then fuzz for <secs> seconds (default 3600)
 #   shell   <name> [--test] [--scheduler S]  Interactive shell in the image, in a campaign (manual commands)
@@ -46,6 +47,7 @@
 #   G2F_SEEDS [/AFLplusplus/testcases/images/jpeg]  (stock seeds, path inside the image)
 #   G2F_EVAL [<repo>/experiments/practice/campaigns]  where campaign folders go (a study: experiments/<study>/campaigns)
 #   G2F_SIF [<repo>/build/g2fuzz.sif]   G2F_PARTITION [fairshare]   G2F_CPUS [2]   G2F_MEM [8G; 16G for libpcap_fuzz_both]
+#   G2F_WEB_LIMITS [<repo>/.web-limits]  the folder every campaign's web requests take turns from (web_limit.py)
 #   G2F_SEEDGEN_MIN [120]  minutes of seed generation the job's time limit allows for (G2FUZZ runs without seeds)
 #   G2F_ACCOUNT [group-csci-591-automated-vulnerability-discovery, else group-mattrevelle]
 #   G2F_BASE_URL [the team's running `llm` server]   G2F_KEY [~/llm-alfred/dummy.key, made if missing]   G2F_LLM_DIR [~/llm-alfred]
@@ -268,22 +270,46 @@ cmd_new() {
 }
 
 cmd_reuse() {
-  local from="${1:-}"
-  [ -n "$from" ] || die "usage: scripts/fuzz reuse <from-campaign> [new-name]"
+  local from="" name="" queue=0 a f
+  for a in "$@"; do
+    case "$a" in
+      --queue) queue=1 ;;
+      -*) die "reuse: unknown option '$a' (usage: scripts/fuzz reuse <from-campaign> [new-name] [--queue])" ;;
+      *) if [ -z "$from" ]; then from=$a; elif [ -z "$name" ]; then name=$a
+         else die "usage: scripts/fuzz reuse <from-campaign> [new-name] [--queue]"; fi ;;
+    esac
+  done
+  [ -n "$from" ] || die "usage: scripts/fuzz reuse <from-campaign> [new-name] [--queue]"
   need_campaign "$from"
   local src="$EVAL/$from"
-  [ -d "$src/initial_seeds" ] || die "$EVR/$from has no initial_seeds/"
+  if [ "$queue" = 1 ]; then
+    [ -n "$(find "$src/$OUT/default/queue" -maxdepth 1 -type f -print -quit 2>/dev/null)" ] ||
+      die "$EVR/$from has no AFL++ queue ($OUT/default/queue): --queue needs a campaign that has fuzzed"
+  else
+    [ -d "$src/initial_seeds" ] || die "$EVR/$from has no initial_seeds/"
+  fi
   [ -d "$src/$OUT/default/generators" ] || die "$EVR/$from has no generators ($OUT/default/generators)"
-  cmd_new "${2:-}"
+  cmd_new "$name"
   local d="$EVAL/$NEW_NAME"
-  cp -r "$src/initial_seeds" "$d/"
+  if [ "$queue" = 1 ]; then
+    # --queue, a warm start (docs/ALFRED-ROUNDS.md, A01): the source's whole AFL++ queue (its own finds and the LLM
+    # seeds it kept) becomes this campaign's seeds, so it starts where the source's coverage had stalled. Each copy
+    # gets a w- prefix: afl-fuzz treats -i files named id:NNNNNN,... as a resumed run, and the rest of the name
+    # (src:, op:, sync:llm) stays for lineage.
+    mkdir -p "$d/initial_seeds"
+    for f in "$src/$OUT/default/queue"/*; do [ -f "$f" ] && cp "$f" "$d/initial_seeds/w-${f##*/}"; done
+    echo "$EVR/$from" > "$d/warm_start"
+  else
+    cp -r "$src/initial_seeds" "$d/"
+  fi
   mkdir -p "$d/$OUT/default"
   cp -r "$src/$OUT/default/generators" "$d/$OUT/default/"
   # and the seed generation's feature lists, which the rare and web stall mutators extend (not a web ledger:
   # each campaign starts its own)
   find "$src/$OUT/default" -maxdepth 1 -type f \( -name 'feature_pool*.json' -o -name feature_programs.json \) \
     -exec cp -t "$d/$OUT/default/" {} +
-  echo "copied $(count "$d/initial_seeds") seeds, $(count "$d/$OUT/default/generators") generators and" \
+  echo "copied $(count "$d/initial_seeds") $( [ "$queue" = 1 ] && echo "queue entries (a warm start)" || echo seeds)," \
+    "$(count "$d/$OUT/default/generators") generators and" \
     "$(find "$d/$OUT/default" -maxdepth 1 -name 'feature_pool*.json' | wc -l | tr -d ' ') feature lists from $EVR/$from"
 }
 
@@ -340,9 +366,13 @@ container_args() {
   # folder the job started in, nor the node's shared /tmp (other jobs' files; a job gets its own /tmp instead,
   # write_job_sbatch). It still has the network (the worker needs it); g2fuzz/py_utils/sandbox.py takes that away
   # from web-informed generators (and from all with G2F_SANDBOX_ALL=1).
+  # the web limiter shared by every campaign on Tempest (g2fuzz/py_utils/web_limit.py): one group folder, so all
+  # campaigns together keep to each free API's per-address limit (Tempest has one address)
+  local limits="${G2F_WEB_LIMITS:-$REPO/.web-limits}"
+  mkdir -p "$limits" && chmod 2775 "$limits" 2>/dev/null || true
   ARGS=(--cleanenv --writable-tmpfs --no-mount home,cwd,tmp --pwd /eval --bind "$EVAL/$1:/eval"
-        --bind "$KEY:/eval/openai_key.txt:ro"
-        --env "${extra_env}OPENAI_BASE_URL=$BASE_URL,PIP_USER=1,PYTHONUSERBASE=/eval/.pyuser")
+        --bind "$KEY:/eval/openai_key.txt:ro" --bind "$limits:/weblimits"
+        --env "${extra_env}OPENAI_BASE_URL=$BASE_URL,PIP_USER=1,PYTHONUSERBASE=/eval/.pyuser,G2F_WEB_LIMIT_DIR=/weblimits")
   [ -n "${G2F_TARGETS:-}" ] && ARGS+=(--bind "$(cd "$G2F_TARGETS" && pwd):/targets:ro")
   # libpcap_fuzz_both: the kernel's cache of its temp-file names counts against the job and reached 8G in 4-16 h in
   # 04's G2FUZZ arms (OURS-4 in docs/KNOWN_BUGS.md), so it gets 16G unless G2F_MEM says otherwise
@@ -792,7 +822,7 @@ _alfred_fuzz() {
       "") words="new reuse run shell watch status results stop list llm account completion help --model" ;;
       run)   if [ "$nargs" = 0 ]; then words=$(_alfred_dirs "$camps"); else words="--test --afl --model --scheduler --set"; fi ;;
       shell) if [ "$nargs" = 0 ]; then words=$(_alfred_dirs "$camps"); else words="--test --model --scheduler"; fi ;;
-      reuse) if [ "$nargs" = 0 ]; then words=$(_alfred_dirs "$camps"); else words="--model"; fi ;;
+      reuse) if [ "$nargs" = 0 ]; then words=$(_alfred_dirs "$camps"); else words="--model --queue"; fi ;;
       watch|status|results|stop) [ "$nargs" = 0 ] && words=$(_alfred_dirs "$camps") ;;
       new)   words="--model" ;;
       llm)   if [ "$nargs" = 0 ]; then words="start stop status host --model"

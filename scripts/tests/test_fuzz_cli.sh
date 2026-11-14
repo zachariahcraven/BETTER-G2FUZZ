@@ -172,13 +172,21 @@ setup_work() {
   mkdir -p "$W/repo/experiments/02-model-sweep/launch"
   cp "$REPO/experiments/02-model-sweep/launch/targets.txt" "$REPO/experiments/02-model-sweep/launch/study.conf" \
     "$W/repo/experiments/02-model-sweep/launch/"
-  local x; for x in 03-test 04-reuse 05-bad 06-badtarget 07-wait 08-trap 09-cont 10-noseeds 11-acct 12-retry 13-dirty 14-output 15-tweaks 16-setup-shared 17-setup-fresh 18-tweak-afl 19-tweak-bad 20-fuzz-shared 21-extra; do mkdir -p "$W/repo/experiments/$x/launch"; done
+  local x; for x in 03-test 04-reuse 05-bad 06-badtarget 07-wait 08-trap 09-cont 10-noseeds 11-acct 12-retry 13-dirty 14-output 15-tweaks 16-setup-shared 17-setup-fresh 18-tweak-afl 19-tweak-bad 20-fuzz-shared 21-extra 22-warm 23-warm-bad; do mkdir -p "$W/repo/experiments/$x/launch"; done
   printf '%s\n' "targets = jhead" "arms    = ucb: --scheduler ucb | random: --scheduler random" "        | afl: --afl" \
     "reps    = 2" "secs    = 600" "seeds   = shared   # one seed generation, reused by both G2FUZZ arms" \
     > "$W/repo/experiments/03-test/launch/study.conf"
   printf '%s\n' "targets = jhead" "arms = ucb: --scheduler ucb" "secs = 600" "seeds = reuse:../../practice/campaigns/src" \
     > "$W/repo/experiments/04-reuse/launch/study.conf"
   printf '%s\n' "targets = jhead" "arms = a: --afl" "colour = red" > "$W/repo/experiments/05-bad/launch/study.conf"
+  # 22: a warm start from another study's finished campaigns (22-warm-src's control/<target>-r<rep>); 23: several
+  # targets but a warm path without {target}
+  printf '%s\n' "targets = jhead" "arms = c: set:G2F_LLM_MODE=continuous | r: set:G2F_LLM_MODE=continuous set:G2F_STALL_MUTATORS=rare" \
+    "secs = 600" "name = {arm}/{target}-r{rep}" "seeds = warm:../../22-warm-src/campaigns/control/{target}-r{rep}" \
+    > "$W/repo/experiments/22-warm/launch/study.conf"
+  done_campaign "$W/repo/experiments/22-warm-src/campaigns/control/jhead-r1"
+  printf '%s\n' "targets = jhead mp42aac" "arms = c: set:G2F_LLM_MODE=continuous" \
+    "seeds = warm:../../22-warm-src/campaigns/control/jhead-r1" > "$W/repo/experiments/23-warm-bad/launch/study.conf"
   printf '%s\n' "targets = nosuch" "arms = a: --afl" > "$W/repo/experiments/06-badtarget/launch/study.conf"
   # 07: arm g2f is done (on a Qwen server the study started), arm afl isn't launched yet
   printf '%s\n' "targets = jhead" "arms = g2f: --scheduler ucb | afl: --afl" "secs = 600" "name = {target}-{arm}-r{rep}" \
@@ -328,6 +336,8 @@ all_cases() {
   run_case reuse_nogens base -- reuse seedsonly r4
   run_case reuse_noarg base -- reuse
   run_case reuse_model base -- reuse src r5 --model phi-4
+  run_case reuse_queue base -- reuse src r6 --queue
+  run_case reuse_queue_noqueue base -- reuse seeded r7 --queue
   # run
   run_case run_seedgen base -- run fresh 900
   run_case run_reused_test base -- run seeded 300 --test
@@ -466,6 +476,8 @@ all_cases() {
   run_case study_nostudy solo -- @study show nosuch
   run_case study_badonly solo -- @study show 03-test --only colour=red
   run_case study_reuse_show solo -- @study show 04-reuse   # the reuse source is checked when settings load
+  run_case study_warm solo -- @study start 22-warm
+  run_case study_warm_bad solo -- @study show 23-warm-bad
   # scripts/study: servers, the driver, --wait, results
   run_case study_02_servers_dry none -- @study start 02-model-sweep --servers --dry
   run_case study_servers none -- @study start 03-test --servers
@@ -598,6 +610,11 @@ contract "study: shared seeds start with the seed run"  'grep -q "^  seeds/Qwen3
 contract "study: --afl arms launch without a server"    '[ "$(grep -c "submitted Slurm job" "$N/study_noserver/out")" = 2 ] && grep -q "server isn.t running" "$N/study_noserver/out"'
 contract "study: never launches a campaign twice"       '[ "$(grep -c "submitted Slurm job" "$N/study_twice/out")" = 2 ]'
 contract "study: reuse copies the seeds"                'grep -q "04-reuse/campaigns/jhead-ucb-r1/initial_seeds/jpg-1_0" "$N/study_reuse/tree" && grep -q "^seeds: reused from ../../practice/campaigns/src$" "$N/study_reuse/tree"'
+contract "campaigns share the web limiter folder"     'grep -qF -- "--bind $W/repo/.web-limits:/weblimits" "$N/run_seedgen/gen/fresh/job.sbatch" && grep -q "G2F_WEB_LIMIT_DIR=/weblimits" "$N/run_seedgen/gen/fresh/job.sbatch" && grep -q "repo/.web-limits" "$N/run_seedgen/tree"'
+contract "reuse --queue: the source's queue is the seeds" 'grep -q "practice/campaigns/r6/initial_seeds/w-id:000001,src:000000,time:5000,execs:9,op:havoc" "$N/reuse_queue/tree" && ! grep -q "practice/campaigns/r6/initial_seeds/jpg-1_0" "$N/reuse_queue/tree" && grep -q "practice/campaigns/r6/jhead_output/default/generators/jpg-2.py" "$N/reuse_queue/tree" && grep -q "practice/campaigns/r6/warm_start" "$N/reuse_queue/tree" && grep -q "2 queue entries (a warm start)" "$N/reuse_queue/out"'
+contract "reuse --queue needs a campaign that fuzzed"    'grep -q "has no AFL++ queue" "$N/reuse_queue_noqueue/err" && ! grep -q "practice/campaigns/r7" "$N/reuse_queue_noqueue/tree"'
+contract "study warm: each arm's rep starts from its source" '( for a in c r; do grep -q "22-warm/campaigns/$a/jhead-r1/initial_seeds/w-id:000000,time:0,execs:0,orig:jpg-1_0" "$N/study_warm/tree" || exit 1; done ) && [ "$(grep -c "^seeds: warm start from ../../22-warm-src/campaigns/control/jhead-r1 (its queue)$" "$N/study_warm/tree")" = 2 ]'
+contract "study warm: several targets need {target}"     'grep -q "warm start.s path needs {target}" "$N/study_warm_bad/err"'
 contract "study: launch.txt records arm and options"    'grep -q "^arm: afl$" "$N/study_start/tree" && grep -q "^options: --afl$" "$N/study_start/tree"'
 contract "study: --dry shows the plan without a server" 'grep -q "would launch seeds/Qwen3.8-27B-FP8-jhead" "$N/study_dry_noserver/out" && grep -q "^note: no Qwen3.8-27B-FP8 server is running" "$N/study_dry_noserver/out"'
 contract "study 02: all 75 campaigns submit cleanly"    '[ "$(grep -c "submitted Slurm job" "$N/study_02_all/out")" = 75 ] && ! grep -q "^fuzz:\|study:" "$N/study_02_all/out" "$N/study_02_all/err"'

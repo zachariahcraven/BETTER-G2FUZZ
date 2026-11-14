@@ -20,6 +20,7 @@ import subprocess
 import sys
 import tempfile
 import threading
+import time
 import unittest
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlsplit
@@ -27,7 +28,7 @@ from urllib.parse import parse_qs, urlsplit
 HERE = os.path.dirname(os.path.abspath(__file__))
 G2F = os.path.dirname(HERE)
 sys.path.insert(0, G2F)
-from py_utils import sandbox, web_search as ws, web_step  # noqa: E402
+from py_utils import sandbox, web_limit, web_search as ws, web_step  # noqa: E402
 from py_utils.web_ledger import Ledger, norm_url, similar  # noqa: E402
 
 HAVE_OPENAI = importlib.util.find_spec("openai") is not None
@@ -429,6 +430,89 @@ class ResearchTest(unittest.TestCase):
             new, _, stats = self.run_step([], ("wikipedia",))   # both Wikipedia hits were read in step 1
             self.assertEqual(stats["docs_new"], 0)
             self.assertEqual(new, [])
+
+
+# --- the limiter shared by all campaigns ---------------------------------------------------------------------
+class LimiterTest(unittest.TestCase):
+    """web_limit: turns from a shared folder, so all campaigns together keep to each API's limit."""
+
+    def setUp(self):
+        self.dir = tempfile.mkdtemp(prefix="limit-test.")
+        self.saved = {k: os.environ.get(k) for k in ("G2F_WEB_LIMIT_DIR", "G2F_WEB_LIMIT_SCALE")}
+        os.environ["G2F_WEB_LIMIT_DIR"] = self.dir
+        os.environ["G2F_WEB_LIMIT_SCALE"] = str(0.25 / web_limit.INTERVALS["github"])   # github: a turn per 0.25 s
+
+    def tearDown(self):
+        for k, v in self.saved.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+        shutil.rmtree(self.dir)
+
+    def test_keys(self):
+        self.assertEqual(web_limit.key_for("https://en.wikipedia.org/w/api.php?x=1"), "wikipedia")
+        self.assertEqual(web_limit.key_for("https://api.github.com/search/issues?q=a"), "github")
+        self.assertEqual(web_limit.key_for("https://services.nvd.nist.gov/rest/json/cves/2.0"), "nvd")
+        self.assertEqual(web_limit.key_for("https://api.stackexchange.com/2.3/search/advanced"), "stackexchange")
+        self.assertEqual(web_limit.key_for("https://specs.example.org/spec/tiff6.html"), "host:specs.example.org")
+        self.assertEqual(web_limit.source_of("host:specs.example.org"), "links")
+
+    def test_off_without_a_folder(self):
+        os.environ.pop("G2F_WEB_LIMIT_DIR")
+        self.assertEqual(web_limit.take("github"), 0.0)
+        web_limit.cool("github", 100)
+        self.assertEqual(web_limit.take("github"), 0.0)
+
+    def test_turns_are_spaced_across_processes(self):
+        code = ("import sys, time; sys.path.insert(0, %r); from py_utils import web_limit as L\n"
+                "for _ in range(3):\n    r = L.take('github'); print(r is not None, time.time())" % G2F)
+        procs = [subprocess.Popen([sys.executable, "-c", code], stdout=subprocess.PIPE, text=True) for _ in range(3)]
+        lines = [l.split() for p in procs for l in p.communicate(timeout=60)[0].split("\n") if l.strip()]
+        self.assertEqual(len(lines), 9)
+        self.assertTrue(all(ok == "True" for ok, _ in lines))
+        times = sorted(float(t) for _, t in lines)
+        gaps = [b - a for a, b in zip(times, times[1:])]
+        self.assertGreater(min(gaps), 0.2, gaps)   # 9 turns from 3 processes, at least 0.25 s apart (less jitter)
+
+    def test_a_cooldown_makes_every_campaign_skip(self):
+        web_limit.cool("nvd", 5)
+        self.assertIsNone(web_limit.take("nvd", max_wait=1))
+        self.assertGreater(web_limit.wait_left("nvd"), 3)
+        self.assertIsNotNone(web_limit.take("wikipedia", max_wait=1))      # other sources aren't held up
+
+    def test_a_dead_owners_lock_is_taken_over(self):
+        lock = os.path.join(self.dir, "github.lock")
+        os.mkdir(lock)
+        os.utime(lock, (time.time() - 3600, time.time() - 3600))
+        start = time.time()
+        self.assertIsNotNone(web_limit.take("github"))
+        self.assertLess(time.time() - start, 2)
+        self.assertFalse(os.path.exists(lock))
+
+    def test_a_rate_limit_answer_is_shared(self):
+        with WebServer():
+            FakeWeb.github_limited = True
+            with self.assertRaises(ws.Cooling):
+                ws.search("github", "tiff tiles")
+            hits = len(FakeWeb.hits)
+            self.assertGreater(web_limit.wait_left("github"), 30)          # every campaign now waits
+            with self.assertRaises(ws.Cooling):                             # another campaign: no request sent
+                ws.search("github", "tiff strips")
+            self.assertEqual(len(FakeWeb.hits), hits)
+
+    def test_a_skipped_link_goes_back_on_the_reading_list(self):
+        with WebServer():
+            ledger = Ledger(os.path.join(self.dir, "web_ledger.json"))
+            url = "https://specs.example.org/spec/tiff6.html"
+            ledger.add_frontier("tiff", url, "TIFF 6.0", "https://en.wikipedia.org/wiki/TIFF", 3)
+            web_limit.cool("host:specs.example.org", 120)
+            log = []
+            web_step.research("tiff", ["Multi-page support"], ledger, fake_ask([]), ["links"], ledger.new_step(),
+                              random.Random(1), log=log.append)
+            self.assertIn(url, ledger.fmt("tiff")["frontier"])
+            self.assertNotIn("/spec/tiff6.html", FakeWeb.hits)
+            self.assertTrue(any("shared limit" in l for l in log), log)
 
 
 # --- the sandbox ----------------------------------------------------------------------------------------------

@@ -9,6 +9,10 @@ Each source returns Doc objects whose text is already there, except Wikipedia's 
 text of new ones). Rate limits raise Cooling(source, secs); other failures raise WebError. Requests to one host
 are at least HOST_GAP seconds apart.
 
+Every request also takes a turn from web_limit (shared by all campaigns on Tempest when G2F_WEB_LIMIT_DIR is set): a
+turn too far away raises Cooling instead of sending, and every rate-limit answer is shared, so all of Tempest keeps
+to each API's published limits (web_limit.INTERVALS).
+
 G2F_WEB_TEST_BASE (tests only, e.g. http://127.0.0.1:8080) sends every request to that server instead, keeping
 the path and query, so tests run without the internet.
 """
@@ -24,6 +28,11 @@ import urllib.request
 import urllib.robotparser
 import zlib
 from html.parser import HTMLParser
+
+try:
+    from py_utils import web_limit
+except ImportError:   # imported from inside py_utils
+    import web_limit
 
 UA = "alfred-g2fuzz/1.0 (university fuzzing research)"
 UA_TOKEN = "alfred-g2fuzz"
@@ -78,7 +87,12 @@ def _route(url):
 
 
 def http_get(url, accept="*/*"):
-    """GET url -> (status, headers, body bytes). Follows redirects; body cut at MAX_BYTES; gzip undone."""
+    """GET url -> (status, headers, body bytes). Follows redirects; body cut at MAX_BYTES; gzip undone.
+    Takes a shared turn first (web_limit): raises Cooling if it's too far away."""
+    key = web_limit.key_for(url)   # the real host, before a test's routing
+    if web_limit.take(key) is None:
+        raise Cooling(web_limit.source_of(key), max(30, int(web_limit.wait_left(key))),
+                      "shared limit (all campaigns on Tempest)")
     url = _route(url)
     host = urllib.parse.urlsplit(url).netloc
     gap = 0 if os.environ.get("G2F_WEB_TEST_BASE") else HOST_GAP
@@ -115,7 +129,9 @@ def get_json(url, source):
         secs = 60
         if reset and reset.isdigit():
             secs = max(30, int(reset) - int(time.time())) if int(reset) > 10 ** 9 else max(30, int(reset))
-        raise Cooling(source, min(secs, 3600), "HTTP %d" % status)
+        secs = min(secs, 3600)
+        web_limit.cool(source if source in web_limit.INTERVALS else web_limit.key_for(url), secs)   # for all
+        raise Cooling(source, secs, "HTTP %d" % status)
     if status != 200:
         raise WebError("%s: HTTP %d" % (source, status))
     try:
@@ -229,6 +245,7 @@ def search_stackexchange(query, n=5):
                                                       "site": "stackoverflow", "pagesize": n,
                                                       "filter": "withbody"}), "stackexchange")
     if data.get("error_id"):
+        web_limit.cool("stackexchange", 3600)
         raise Cooling("stackexchange", 3600, data.get("error_name", "error"))
     docs = []
     for it in data.get("items") or []:
@@ -239,6 +256,7 @@ def search_stackexchange(query, n=5):
     if data.get("backoff") or (data.get("quota_remaining") is not None and data["quota_remaining"] < 5):
         cool = Cooling("stackexchange", 3600 if (data.get("quota_remaining") or 0) < 5 else int(data["backoff"]),
                        "backoff/quota")
+        web_limit.cool("stackexchange", cool.secs)
         cool.docs = [d for d in docs if d.url]
         raise cool
     return [d for d in docs if d.url]

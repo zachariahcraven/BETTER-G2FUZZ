@@ -1,0 +1,13 @@
+{
+  "names": {
+    "37998ad4-b40c-4666-81ca-a9629611015d": "",
+    "8c650c01-96a1-470c-8b0f-6c426605173f": "nom-nom"
+  },
+  "agents": {
+    "nom-nom": "claude --resume 8c650c01-96a1-470c-8b0f-6c426605173f"
+  },
+  "order": [
+    "nom-nom"
+  ],
+  "boss": "Sprocket"
+}

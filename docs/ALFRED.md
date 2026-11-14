@@ -173,9 +173,16 @@ invents near-copies of features it already has.
 - **`web_docs/`** holds the excerpts the LLM read.
 - **Campaigns never share** a ledger, so repetitions stay independent. `scripts/fuzz reuse` copies the setup's
   feature lists, never a ledger.
-- **Not repeatable exactly:** the web changes, and the ledger is the record of what each campaign saw. The shared
-  rate limits (one address for all of Tempest) are the only link between campaigns. A rate-limited source cools down
-  (GitHub about 10 searches a minute, NVD 5 per 30 s, Stack Exchange 300 a day) and the other sources go on.
+- **Not repeatable exactly:** the web changes, and the ledger is the record of what each campaign saw.
+- **One limiter for all of Tempest** (`py_utils/web_limit.py`, added 2026-11-13): Tempest reaches the internet through
+  one address and the free APIs count per address, so campaigns that each kept to a limit would together exceed it
+  many times over (A01's `web` arm: about 9,000 requests an hour) and throttle every other Tempest user of those
+  APIs. Every request takes a turn from one group folder (`<repo>/.web-limits`, bound into each campaign by
+  `scripts/fuzz`): GitHub and NVD a turn per 7 s, Stack Exchange per 300 s (300 a day), Wikipedia per 1 s, any other
+  site per 2 s, all across Tempest. A rate-limit answer makes every campaign back off; a turn more than 30 s away is
+  skipped (the source cools down in that campaign; a skipped link goes back on the reading list). Turns are taken
+  under a `mkdir` lock (atomic on NFS, and it can't hang if the file server stalls); a dead process's lock is taken
+  over after 30 s. This is the only link between campaigns.
 
 **Safety:** web text reaches prompts whose answers run as Python, so a page could carry instructions. Three layers:
 - **Prompts:** web text is marked as reference data, not instructions, in every prompt.

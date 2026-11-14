@@ -2,7 +2,7 @@
 
 **Question:** does running Rare-Feature Directed Mutation during seed generation for multi-format targets too
 (`G2F_RFDM_ALL_FORMATS=1`) help them?
-**Owner:** n59m742. **Status:** planned (beside A01). **Started:** –
+**Owner:** n59m742. **Status:** launched 2026-11-12 beside A00. **Started:** –
 
 ## Design
 - **Background:**
