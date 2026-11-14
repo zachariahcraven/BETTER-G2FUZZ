@@ -766,11 +766,13 @@ start_driver() {
   mkdir -p "$CAMPAIGNS"
   # exec: the driver is the job's own process, so scancel's TERM runs its EXIT trap (which stops its servers)
   # the extra-account settings, spelled out (they show in the job's script)
+  # --no-requeue: a driver restarted after a node failure could launch beside the first copy, still alive on the lost node
   local -a envs=()
   [ -z "$EXTRA" ] || envs=(STUDY_EXTRA_ACCOUNT="$EXTRA" STUDY_EXTRA_MAX="$EXTRA_MAX")
   [ -z "$MAIN_MAX" ] || envs+=(STUDY_MAIN_MAX="$MAIN_MAX")
   id=$(sbatch --parsable --account "$acct" --partition "${G2F_PARTITION:-fairshare}" --cpus-per-task 1 --mem 2G \
     --time "${STUDY_DRIVER_DAYS:-7}-00:00:00" --job-name "alfred-study-${STUDY##*/}" --comment "study=$STUDY" \
+    --no-requeue \
     --output "$CAMPAIGNS/study-driver-%j.log" \
     --wrap "exec $( [ ${#envs[@]} = 0 ] || printf '%q ' env "${envs[@]}")$(printf '%q ' "$REPO/scripts/study" start "$REF" "${opts[@]}")")
   id=${id%%;*}

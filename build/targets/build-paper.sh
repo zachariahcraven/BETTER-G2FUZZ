@@ -35,7 +35,7 @@ for bp in "$@"; do
   st=$ROOT/stage/$V/$b-$p; log=$ROOT/logs/$V-$b-$p
   # one test command per run image; all must pass before the copy into the tree
   tests=""; for s in $RUN_SIFS; do tests+="BENCH=$b SIF=$s bash $HERE/test_paper_targets.sh $st $V $p >> $log.test 2>&1 && "; done
-  sbatch --parsable -A group-csci-591-automated-vulnerability-discovery -p fairshare -c 16 --mem 32G -t 08:00:00 \
+  sbatch --parsable -A group-csci-591-automated-vulnerability-discovery -p fairshare -c 16 --mem 32G -t 08:00:00 --no-requeue \
     -J "alfred-build-$V-$b-$p" -o "$log.out" --wrap "set -e
     if [ -e '$st' ]; then mv '$st' '$st'.old-\$(date +%s); fi; mkdir -p '$st'
     apptainer exec --cleanenv -B /home/group --env RUN_LIBS=$RUN_LIBS,G2F_BUILDER=$(basename "$bsif")@\$(sha256sum < '$bsif' | cut -c1-12) \
