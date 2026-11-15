@@ -10,20 +10,20 @@ from py_utils.font_hint import with_font_hint   # ALFRED: G2F_FONT_HINT=1; no de
 # ALFRED: the stall mutators G2F_STALL_MUTATORS may name ('+'-separated). Unset: upstream's feature, structure and
 # (once a useful mutation exists) pattern. rare: the paper's Rare-Feature Directed Mutation as a stall mutator.
 # web: like rare, but the new feature comes from documents found on the web at that stall (mutation_web).
-STALL_MUTATORS = ("feature", "structure", "pattern", "rare", "web")
+STALL_MUTATORS = ("feature", "structure", "pattern", "rare", "web", "uncovered")
 # G2F_WEB_SOURCES: the free sources the web mutator may use ('+'-separated; unset: all of them)
 WEB_SOURCES = ("wikipedia", "nvd", "stackexchange", "github", "links")
 
 
 def stall_mutators(setting, have_patterns):
     """The mutators this step may pick, in upstream's order (it matters for random.choice): feature, structure,
-    then rare and web, then pattern if a mutation pattern exists. setting: G2F_STALL_MUTATORS (None: upstream's
+    then rare, web and uncovered, then pattern if a mutation pattern exists. setting: G2F_STALL_MUTATORS (None: upstream's
     set)."""
     wanted = [m for m in re.split(r"[+,]", setting or "feature+structure+pattern") if m]
     unknown = [m for m in wanted if m not in STALL_MUTATORS]
     if unknown:
         raise SystemExit("G2F_STALL_MUTATORS: no mutator %s (have: %s)" % ("+".join(unknown), "+".join(STALL_MUTATORS)))
-    mutators = [m for m in ("feature", "structure", "rare", "web") if m in wanted]
+    mutators = [m for m in ("feature", "structure", "rare", "web", "uncovered") if m in wanted]
     if have_patterns and "pattern" in wanted:
         mutators.append("pattern")
     return mutators
@@ -486,6 +486,69 @@ def mutation_web(model, tmp_path, seeds_path, generators, output_path, mutation_
     return True
 
 
+def mutation_uncovered(model, tmp_path, seeds_path, generators, output_path, mutation_log, scheduler_context):
+    """ALFRED (G2F_STALL_MUTATORS=...+uncovered, 2026-11-14): coverage feedback for the LLM. Picks a function of the
+    target that earlier campaigns entered but never finished (<targets>/<target>.uncovered.json, made by
+    scripts/uncovered from a source-coverage replay of their queues), shows the LLM its source with the lines no
+    input reached marked, and asks for a change to the parent generator whose files reach them. Retries and debug
+    budget as the rare mutator. Without the target's file the step does nothing."""
+    from py_utils import uncovered
+    target = uncovered.target_of(output_path)
+    entries = uncovered.load(target)
+    if not entries:
+        print("uncovered: no %s.uncovered.json for this target: nothing to do" % target)
+        step_line(uncovered="no-data")
+        return False
+    tried_path = os.path.join(mutation_log, "uncovered_tried.json")
+    tried = []
+    if os.path.exists(tried_path):
+        with open(tried_path, 'r') as file:
+            tried = json.load(file)
+    entry = uncovered.pick(entries, set(tried))
+    tried.append(uncovered.key(entry))
+    with open(tried_path, 'w') as file:
+        json.dump(tried, file)
+
+    generator_list = [f for f in os.listdir(generators) if os.path.isfile(os.path.join(generators, f))]
+    target_generator = select_parent_generator(generator_list, **scheduler_context)
+    file_format = target_generator.split('-')[0]
+    print(os.path.join(generators, target_generator))
+    with open(os.path.join(generators, target_generator), 'r') as file:
+        target_generator_code = file.read()
+    print("uncovered: %s (%d lines never executed), %d of %d functions tried" % (
+        uncovered.key(entry), entry["missed"], len(set(tried)), len(entries)))
+    info = {"function": entry["function"], "file": entry["file"], "missed": entry["missed"]}
+
+    messages_c = copy.deepcopy(messages_code_gen)
+    messages_c[-1]["content"] = with_font_hint(
+        uncovered.describe(entry, target, file_format, target_generator_code), file_format)
+    generator = None
+    try:
+        generator = reask(messages_c, extract_res_for_code_gen, 3, 0.7, model)
+    except Exception as e:
+        print(">>>>>>>> LLM error while generating, skipping attempt:", repr(e))
+    debugged = self_debug(generator, 3, model, temperature=0.2, output_path=os.path.dirname(tmp_path)) if generator else None
+    if not debugged:
+        step_line(uncovered="generator-failed", **info)
+        return False
+
+    generator_cnt = count_files_in_directory(generators) + 1
+    new_generator = file_format + "-" + str(generator_cnt) + ".py"
+    mv_files(tmp_path, seeds_path, file_format + "-" + str(generator_cnt))
+    with open(os.path.join(generators, new_generator), 'w') as file:
+        file.write(debugged)
+    relationship_path = os.path.join(mutation_log, "relationship.json")
+    relationship = {}
+    if os.path.exists(relationship_path):
+        with open(relationship_path, 'r') as file:
+            relationship = json.load(file)
+    relationship.setdefault(target_generator, []).append(new_generator)
+    with open(relationship_path, 'w') as file:
+        json.dump(relationship, file)
+    step_line(uncovered="generator", generator=new_generator, **info)
+    return True
+
+
 if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description='Description of your script.')
@@ -571,5 +634,7 @@ if __name__ == "__main__":
         mutation_rare_feature(model, tmp_path, seeds_path, generators, output_path, mutation_log, scheduler_context)
     elif cur_mutator == "web":
         mutation_web(model, tmp_path, seeds_path, generators, output_path, mutation_log, scheduler_context)
+    elif cur_mutator == "uncovered":
+        mutation_uncovered(model, tmp_path, seeds_path, generators, output_path, mutation_log, scheduler_context)
     else:
         mutation_based_on_predefined_mutators(model, tmp_path, seeds_path, generators, output_path, mutation_log, cur_mutator, scheduler_context)

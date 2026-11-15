@@ -26,3 +26,11 @@ What this deploys (both committed in f8ddcbb, not yet in the image):
 ## Note nom-nom 2026-11-14 19:37
 Blocked: Approve card-2 (commits the A02 row), then push branch alfred to GitHub so the deploy can build from it.
 Command: git push origin alfred
+
+## Note human 2026-11-14 19:57
+Unblocked: done.
+
+## Note nom-nom 2026-11-14 20:07
+Brief: now: push done, Tempest pulled to 455d690; image build running on the Mac
+next: install image, builders, rebuild 25 targets, swap paper tree
+you: nothing

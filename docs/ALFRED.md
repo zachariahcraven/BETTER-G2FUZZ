@@ -94,6 +94,10 @@ and the rounds log).
   - A setup switch needs seed generation, so `scripts/study` refuses it with shared or reused seeds.
 - **New switches:**
   - `G2F_STALL_MUTATORS` (the `rare` stall mutator, in `generator_mutation.py`).
+  - The `uncovered` stall mutator (2026-11-14): coverage feedback for the LLM. `build/targets/build-uncovered.sh`
+    rebuilds a target with clang source coverage, replays earlier campaigns' queues and lists the functions they
+    entered but never finished (`<targets>/<target>.uncovered.json`); a step shows the LLM one of them, the lines
+    no input reached marked, and asks for a generator change that reaches them (`py_utils/uncovered.py`).
   - `G2F_RFDM_ALL_FORMATS` (in `program_gen.py`).
   - `G2F_FONT_HINT` (2026-11-13, in `py_utils/font_hint.py`): a note on the real fontTools API at the end of the
     font formats' generator prompts. A setup switch; off, every prompt is unchanged. Not yet run against a model.

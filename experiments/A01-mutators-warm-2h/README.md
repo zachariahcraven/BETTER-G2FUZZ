@@ -28,9 +28,13 @@ mix without pattern mutation? And how much does AFL++ alone still find from the 
     NVD, Stack Overflow, GitHub issues, and the pages those link to), checked for relevance (part of the file),
     grounding and novelty. Each campaign's ledger remembers features and documents.
   - `no-pattern`: feature and structure only.
+  - `uncovered` (added 2026-11-14, before launch): every step shows the LLM the source of a target function that
+    A00 control's queues entered but never finished, the lines no queue file reached marked, and asks for a change
+    to the parent generator that reaches them (`build/targets/build-uncovered.sh` makes the lists).
+  - `uncovered-mix`: `uncovered` beside upstream's three (feature, structure, pattern, uncovered).
   - `afl-only`: the same warm start with no LLM step (`G2F_PLATEAU_SEC=1000000`): what AFL++ alone still finds.
-- **Runs:** 15 targets x 5 reps x 5 arms = 375 campaigns of 2 h (about 750 campaign-hours, under half of a 6 h
-  round), gpt-oss-20b on one qc-h100 server, quantumcore first with the class priority account as overflow.
+- **Runs:** 15 targets x 5 reps x 7 arms = 525 campaigns of 2 h (about 1,050 campaign-hours, under two thirds of a
+  6 h round), gpt-oss-20b on one qc-h100 server, quantumcore first with the class priority account as overflow.
 - **Measures:**
   - edges at the end (`scripts/compare`; all arms of a rep start from the same queue, so the difference is the gain);
   - LLM seeds kept per step and per mutator (`scripts/compare`'s LLM table), and their descendants
@@ -50,7 +54,7 @@ mix without pattern mutation? And how much does AFL++ alone still find from the 
     warm-start queues were found on A00's builds. The same for every arm.
   - A warm start measures what a mutator adds after AFL++ stalls, not how it shapes the queue early on.
 - **Before launch:** A00 done (its control campaigns are the sources; the study waits for each), the new image and
-  targets deployed, `scripts/study show A01-mutators-warm-2h` lists 375 campaigns.
+  targets deployed, `scripts/study show A01-mutators-warm-2h` lists 525 campaigns, and `ls <targets>/*.uncovered.json` shows the 15 round targets.
 
 ## Results
 Filled in when the round ends.

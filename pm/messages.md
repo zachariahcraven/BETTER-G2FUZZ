@@ -10,3 +10,7 @@ Go on, and answer with card_note if needed.
 ## M human -> nom-nom 2026-11-14 08:26
 Changes requested on card-3 (A00 analysis: pick the winner that feeds A01's control): control feeds A01
 (read)
+
+## M human -> nom-nom 2026-11-14 19:57
+The human did it: Approve card-2 (commits the A02 row), then push branch alfred to GitHub so the deploy can build from it. (card-5). Go on.
+(read)

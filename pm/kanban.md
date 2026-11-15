@@ -12,14 +12,13 @@ kanban-plugin: board
 
 ## Doing
 
-- [ ] #nom-nom New stall mutator "uncovered": show the LLM source of target functions the queue has not reached (A03 arm) [[threads/card-13|thread]] ^card-13
+- [ ] #nom-nom Deploy window after A02: new image, builders, rebuild all 25 targets (ALF-1 guard + CmpLog fix) [[threads/card-5|thread]] ^card-5
 
 ## Needs Human
 
-- [ ] #nom-nom Deploy window after A02: new image, builders, rebuild all 25 targets (ALF-1 guard + CmpLog fix) [[threads/card-5|thread]] ^card-5
-
 ## Review
 
+- [ ] #nom-nom New stall mutator "uncovered": show the LLM source of target functions the queue has not reached (A03 arm) [[threads/card-13|thread]] ^card-13
 - [ ] #nom-nom Relaunch A02, then A00 freetype2 reruns, on Tempest (owned by session alfred-tweak-rounds-study) [[threads/card-2|thread]] ^card-2
 
 ## Done

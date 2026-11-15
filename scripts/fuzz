@@ -113,7 +113,7 @@ LLM_MODE="${G2F_LLM_MODE:-stall}"   # read by g2fuzz/llm_worker.py
 TWEAKS='G2F_LLM_MODE fuzz stall|continuous
 G2F_PLATEAU_SEC fuzz [0-9]+
 G2F_BACKOFF_SEC fuzz [0-9]+
-G2F_STALL_MUTATORS fuzz (feature|structure|pattern|rare|web)([+](feature|structure|pattern|rare|web))*
+G2F_STALL_MUTATORS fuzz (feature|structure|pattern|rare|web|uncovered)([+](feature|structure|pattern|rare|web|uncovered))*
 G2F_WEB_SOURCES fuzz (wikipedia|nvd|stackexchange|github|links)([+](wikipedia|nvd|stackexchange|github|links))*
 G2F_RFDM_ALL_FORMATS setup 0|1
 G2F_SANDBOX_ALL setup 0|1
