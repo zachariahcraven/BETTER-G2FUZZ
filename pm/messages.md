@@ -6,3 +6,7 @@ Agent to agent notes (mr-klanky). Newest at the bottom.
 The human sent card-1 (Ask RCI to fix DNS on Tempest compute nodes (blocks the relaunch)) back to you with a note: No on the msg RCI is working on this no msgs from me are needed.
 Go on, and answer with card_note if needed.
 (read)
+
+## M human -> nom-nom 2026-11-14 08:26
+Changes requested on card-3 (A00 analysis: pick the winner that feeds A01's control): control feeds A01
+(read)

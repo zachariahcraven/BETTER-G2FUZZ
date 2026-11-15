@@ -34,3 +34,31 @@ Re-check with the same two commands on epyc019/epyc004/epyc010 before the relaun
 Brief: now: RCI is working on it; DNS still broken on epyc019/004/010 (checked 2026-11-13 evening)
 next: re-check getent + sacctmgr on those nodes, then card-2 relaunch can go
 you: nothing
+
+## Note nom-nom 2026-11-13 18:09
+**2026-11-13 18:08 MST: still broken** (epyc019, epyc004, epyc010, gpu010, epyc036: resolv.conf has one nameserver and no `search` line). epyc021 is good.
+
+**Workaround, no code change, no node restriction.** In the shell that starts the studies (and the watcher), before `scripts/study start ...`:
+
+```
+export LOCALDOMAIN=rci.montana.edu APPTAINERENV_LOCALDOMAIN=rci.montana.edu
+```
+
+`LOCALDOMAIN` is the resolver's own override for resolv.conf's `search` line; the `APPTAINERENV_` copy carries it into the campaign container, which runs with `--cleanenv`. sbatch passes the submitting shell's environment to the job by default, so the driver, the campaigns it submits and the LLM server all inherit both.
+
+**Verified** in a 1-second test job on a bad node (epyc036, job 1279437, the only job submitted; queue empty afterwards), with both variables exported on the login node:
+- both variables arrive in the job;
+- `getent hosts gpu056` resolves to gpu056.rci.montana.edu;
+- `sacctmgr -nP show assoc user=n59m742` lists the four accounts (this is the check that killed driver 1275504);
+- `sbatch --test-only` from the node is accepted;
+- inside `build/g2fuzz.sif` with `--cleanenv`, Python resolves `gpu056` (without the variable: "Name or service not known", checked on epyc019).
+
+**Not verified:** a whole campaign end to end, and the LLM server's own container. The variables are harmless once RCI restores the `search` line.
+
+## Note nom-nom 2026-11-13 18:09
+Brief: now: DNS still broken at 18:08; workaround verified on a bad node (two env variables, in the notes)
+next: relaunch session can start with the workaround (card-2) or wait for RCI
+you: say whether the relaunch should go ahead with the workaround
+
+## Note nom-nom 2026-11-13 18:40
+18:40 MST: the relaunch went ahead with the workaround and campaigns on bad-DNS nodes reach the LLM server (card-2). RCI's fix is no longer blocking. Closing this card; if RCI restores the `search` line the variables simply stop mattering. Any new shell that starts or restarts a study before then needs the two exports again.

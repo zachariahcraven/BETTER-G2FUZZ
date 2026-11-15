@@ -11,3 +11,6 @@ Uncommitted on branch `alfred` in `~/Desktop/Fall2026/Cyber/alfred`:
 - Untracked: `.mr-klanky/`, `pm/`.
 
 Timing: push before the deploy window (card-5). Do not pull on Tempest while A00/A02 run from the 01db4f3 image.
+
+## Note nom-nom 2026-11-13 17:27
+Done by the user: commit ba21f59 "experiments updates and agentic harness mds" on `alfred`; the Mac clone is clean and level with `origin/alfred`. Tempest still sits at f8ddcbb: do not pull there until A02 ends (card-5).
