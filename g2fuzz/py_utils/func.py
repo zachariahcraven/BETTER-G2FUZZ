@@ -24,6 +24,29 @@ CURRENT_TIME = time.time()
 SANDBOX = os.environ.get("G2F_SANDBOX_ALL") == "1"
 ALLOW_PIP = True
 
+# ALFRED (2026-11-15, A03): limits on one run of generator code. With the `uncovered` mutator the LLM writes
+# generators that make files of hundreds of MB to reach a target's size checks: 21 of 70 continuous campaigns had
+# OOM kills in their job, and one arm left 128 GB of such files. The worker hands AFL++ no file over 1 MiB anyway.
+# G2F_GEN_MEM_MB [6144]: address space of the generator process; G2F_GEN_FILE_MB [64]: largest file it can write.
+# 0 turns a limit off. Over the limit the generator gets MemoryError or OSError (EFBIG), as any other exception.
+def _limit_mb(name, default):
+    try:
+        return max(0, int(os.environ.get(name, default)))
+    except ValueError:
+        return default
+
+GEN_MEM_MB = _limit_mb("G2F_GEN_MEM_MB", 6144)
+GEN_FILE_MB = _limit_mb("G2F_GEN_FILE_MB", 64)
+
+def _generator_limits():   # runs in the child, before the generator starts
+    import resource
+    for kind, mb in ((resource.RLIMIT_AS, GEN_MEM_MB), (resource.RLIMIT_FSIZE, GEN_FILE_MB)):
+        if mb:
+            try:
+                resource.setrlimit(kind, (mb << 20, mb << 20))
+            except (ValueError, OSError):
+                pass
+
 class ExecutionStatus(IntEnum):
     SUCCESS = auto()
     EXCEPTION = auto()
@@ -42,7 +65,8 @@ def run_cmd(
 ) -> (ExecutionStatus, str):
     try:
         output = subprocess.run(
-            cmd_args, stdout=stdout, stderr=stderr, timeout=timeout, shell=shell, cwd=cwd
+            cmd_args, stdout=stdout, stderr=stderr, timeout=timeout, shell=shell, cwd=cwd,
+            preexec_fn=_generator_limits if (GEN_MEM_MB or GEN_FILE_MB) else None,
         )
     except subprocess.TimeoutExpired as te:
         if verbose:

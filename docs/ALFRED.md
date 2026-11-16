@@ -204,6 +204,11 @@ invents near-copies of features it already has.
   - its own `/tmp` (`${TMPDIR:-/tmp}/alfred-tmp-<job>`, removed at the end), instead of the node's.
   - Before this, a generator could write anywhere in your home folder, and campaigns on one node shared `/tmp`.
     For example, 04's mp3gain generators download ffmpeg into it, so a later campaign could find it there.
+- **Generator limits** (2026-11-15, after A03; `py_utils/func.py`): one run of generator code gets at most
+  `G2F_GEN_MEM_MB` of address space (default 6144) and can write no file over `G2F_GEN_FILE_MB` (default 64);
+  0 turns a limit off. With the `uncovered` mutator the LLM makes files of hundreds of MB to reach a target's
+  size checks: 21 of 70 continuous campaigns in A03 had OOM kills, and that arm left 128 GB in `default/tmp`
+  (control: 6.7 GB for the whole arm). The worker hands AFL++ no file over 1 MiB, so nothing useful is lost.
 - **`G2F_SANDBOX_ALL=1`** sandboxes every generator. It's a setup-time switch to test as a round. In 04, 3.7% of
   gpt-oss-20b's generators used the network, 40% on mp3gain (ffmpeg downloads).
 
