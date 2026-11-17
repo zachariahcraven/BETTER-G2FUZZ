@@ -98,6 +98,14 @@ and the rounds log).
     rebuilds a target with clang source coverage, replays earlier campaigns' queues and lists the functions they
     entered but never finished (`<targets>/<target>.uncovered.json`); a step shows the LLM one of them, the lines
     no input reached marked, and asks for a generator change that reaches them (`py_utils/uncovered.py`).
+  - Two switches of the `uncovered` mutator (2026-11-17, round A06; both off by default):
+    `G2F_UNCOVERED_CONDITIONS=1` adds to the prompt the conditions of the function that only ever went one way.
+    `G2F_UNCOVERED_CHECK=N` (1 to 5) runs a new generator's files through the target's source-coverage build
+    (`<targets root>/uncovered/<target>/build`, which `scripts/fuzz` mounts at `/uncovered`); if they reach none of
+    the marked lines, the LLM is told whether the function was called at all and is asked again, at most N times.
+    A function whose lines were reached, or that failed 3 checked steps, is not picked again in the campaign
+    (`mutation_log/uncovered_state.json`). Both need lists made after 2026-11-17
+    (`LISTS_ONLY=1 build/targets/build-uncovered.sh` makes them again from the kept coverage data).
   - `G2F_RFDM_ALL_FORMATS` (in `program_gen.py`).
   - `G2F_FONT_HINT` (2026-11-13, in `py_utils/font_hint.py`): a note on the real fontTools API at the end of the
     font formats' generator prompts. A setup switch; off, every prompt is unchanged. Not yet run against a model.

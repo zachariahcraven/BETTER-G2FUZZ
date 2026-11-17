@@ -115,6 +115,8 @@ G2F_PLATEAU_SEC fuzz [0-9]+
 G2F_BACKOFF_SEC fuzz [0-9]+
 G2F_STALL_MUTATORS fuzz (feature|structure|pattern|rare|web|uncovered)([+](feature|structure|pattern|rare|web|uncovered))*
 G2F_WEB_SOURCES fuzz (wikipedia|nvd|stackexchange|github|links)([+](wikipedia|nvd|stackexchange|github|links))*
+G2F_UNCOVERED_CONDITIONS fuzz 0|1
+G2F_UNCOVERED_CHECK fuzz [0-5]
 G2F_RFDM_ALL_FORMATS setup 0|1
 G2F_SANDBOX_ALL setup 0|1
 G2F_FONT_HINT setup 0|1'
@@ -375,6 +377,10 @@ container_args() {
         --bind "$KEY:/eval/openai_key.txt:ro" --bind "$limits:/weblimits"
         --env "${extra_env}OPENAI_BASE_URL=$BASE_URL,PIP_USER=1,PYTHONUSERBASE=/eval/.pyuser,G2F_WEB_LIMIT_DIR=/weblimits")
   [ -n "${G2F_TARGETS:-}" ] && ARGS+=(--bind "$(cd "$G2F_TARGETS" && pwd):/targets:ro")
+  # the source-coverage builds next to the targets folder (build/targets/build-uncovered.sh), which
+  # G2F_UNCOVERED_CHECK runs new generators' files through (g2fuzz/py_utils/uncovered.py)
+  [ -n "${G2F_TARGETS:-}" ] && [ -d "$G2F_TARGETS/../uncovered" ] &&
+    ARGS+=(--bind "$(cd "$G2F_TARGETS/../uncovered" && pwd):/uncovered:ro")
   # libpcap_fuzz_both: the kernel's cache of its temp-file names counts against the job and reached 8G in 4-16 h in
   # 04's G2FUZZ arms (OURS-4 in docs/KNOWN_BUGS.md), so it gets 16G unless G2F_MEM says otherwise
   local mem=$MEM; [ -z "${G2F_MEM:-}" ] && [ "$TARGET" = libpcap_fuzz_both ] && mem=16G

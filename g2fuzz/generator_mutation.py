@@ -1,4 +1,5 @@
 import os
+import shutil
 import re
 import sys
 import json
@@ -504,7 +505,17 @@ def mutation_uncovered(model, tmp_path, seeds_path, generators, output_path, mut
     if os.path.exists(tried_path):
         with open(tried_path, 'r') as file:
             tried = json.load(file)
-    entry = uncovered.pick(entries, set(tried))
+    # ALFRED (A06): G2F_UNCOVERED_CHECK=N runs the new files through the target's source-coverage build
+    rounds = uncovered.setting("G2F_UNCOVERED_CHECK", 5)
+    build = uncovered.coverage_build(target) if rounds else None
+    if rounds and not build:
+        print("uncovered: G2F_UNCOVERED_CHECK is set but %s has no source-coverage build: steps are not checked" % target)
+    state_path = os.path.join(mutation_log, "uncovered_state.json")
+    state = {}
+    if build and os.path.exists(state_path):
+        with open(state_path, 'r') as file:
+            state = json.load(file)
+    entry = uncovered.pick(entries, set(tried), skip=uncovered.skipped(state))
     tried.append(uncovered.key(entry))
     with open(tried_path, 'w') as file:
         json.dump(tried, file)
@@ -521,7 +532,8 @@ def mutation_uncovered(model, tmp_path, seeds_path, generators, output_path, mut
 
     messages_c = copy.deepcopy(messages_code_gen)
     messages_c[-1]["content"] = with_font_hint(
-        uncovered.describe(entry, target, file_format, target_generator_code), file_format)
+        uncovered.describe(entry, target, file_format, target_generator_code,
+                           conditions=bool(uncovered.setting("G2F_UNCOVERED_CONDITIONS", 1))), file_format)
     generator = None
     try:
         generator = reask(messages_c, extract_res_for_code_gen, 3, 0.7, model)
@@ -531,6 +543,38 @@ def mutation_uncovered(model, tmp_path, seeds_path, generators, output_path, mut
     if not debugged:
         step_line(uncovered="generator-failed", **info)
         return False
+
+    if build:
+        work, held = os.path.join(mutation_log, "uncovered_check"), os.path.join(mutation_log, "uncovered_held")
+        result = None
+        for asked in range(rounds + 1):
+            result = uncovered.check(entry, build, tmp_path, work)
+            print("uncovered: check %d of %s: %s" % (asked, uncovered.key(entry), json.dumps(result, sort_keys=True)))
+            if result is None or result["reached"] or asked == rounds:
+                break
+            # none of the marked lines reached: tell the LLM and ask again; the files so far are kept in case the
+            # new code does not run
+            messages_c += [{"role": "assistant", "content": "```python\n" + debugged + "\n```"},
+                           {"role": "user", "content": uncovered.feedback(entry, target, result)}]
+            shutil.rmtree(held, ignore_errors=True)
+            os.rename(tmp_path, held)
+            os.makedirs(tmp_path)
+            again = None
+            try:
+                again = reask(messages_c, extract_res_for_code_gen, 2, 0.7, model)
+            except Exception as e:
+                print(">>>>>>>> LLM error while generating, keeping the last generator:", repr(e))
+            fixed = self_debug(again, 2, model, temperature=0.2, output_path=os.path.dirname(tmp_path)) if again else None
+            if not fixed or not os.path.isdir(tmp_path) or not os.listdir(tmp_path):
+                shutil.rmtree(tmp_path, ignore_errors=True)
+                os.rename(held, tmp_path)
+                break
+            debugged = fixed
+        shutil.rmtree(held, ignore_errors=True)
+        if result is not None:
+            info.update(entered=result["entered"], reached=result["reached"], asked=asked)
+            with open(state_path, 'w') as file:
+                json.dump(uncovered.record(state, entry, result), file)
 
     generator_cnt = count_files_in_directory(generators) + 1
     new_generator = file_format + "-" + str(generator_cnt) + ".py"

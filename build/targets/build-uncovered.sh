@@ -13,6 +13,8 @@
 #   3. llvm-cov export, then uncovered.py's build_entries.
 # Work and logs: <targets root>/uncovered/<target>/ (build/, src/, prof/, cov.json, log). Nothing in paper/ but the
 # .uncovered.json is touched.
+# LISTS_ONLY=1: only step 3's build_entries again, from the cov.json that is there (after a change to uncovered.py's
+# entries; no build, no replay).
 set -euo pipefail
 HERE=$(cd "$(dirname "$0")" && pwd); REPO=$(cd "$HERE/../.." && pwd)
 ROOT=${G2F_TARGETS_ROOT:-/home/group/csci-591-automated-vulnerability-discovery/students/g2f-targets-alfred}
@@ -27,12 +29,14 @@ for t in "$@"; do
   b=$(echo "$row" | cut -f2); p=$(echo "$row" | cut -f3)
   case $b in unifuzz|fuzzbench) bsif=$ROOT/builder-$b.sif ;; magma) bsif=$ROOT/builder-magma-$p.sif ;; esac
   [ -f "$bsif" ] || { echo "builder image missing: $bsif" >&2; exit 2; }
-  ls -d "$Q/$t"-r*/"${t}_output/default/queue" >/dev/null 2>&1 || { echo "no queues for $t under $Q" >&2; exit 2; }
+  CPUS=16; [ -z "${LISTS_ONLY:-}" ] || CPUS=2
+  [ -n "${LISTS_ONLY:-}" ] || ls -d "$Q/$t"-r*/"${t}_output/default/queue" >/dev/null 2>&1 || { echo "no queues for $t under $Q" >&2; exit 2; }
   U=$ROOT/uncovered/$t
   mkdir -p "$U"
   cat > "$U/inside.sh" <<'EOS'
 set -euo pipefail
 # inside the builder image. Given: U (work folder), T (target), BUILD (its build.sh), Q (campaigns), UNCOVERED_PY
+if [ -z "${LISTS_ONLY:-}" ]; then
 rm -rf "$U/build" "$U/src" "$U/prof" "$U/bin"; mkdir -p "$U/build" "$U/src" "$U/prof" "$U/bin"
 COV="-fprofile-instr-generate -fcoverage-mapping -g"
 # libFuzzer harnesses (FuzzBench, MAGMA): -fsanitize=fuzzer and libAFLDriver.a become a main() that runs each file named on the
@@ -107,6 +111,7 @@ xargs -a "$U/files.txt" -d '\n' -P "$(nproc)" -n 1 bash -c 'run_one "$0"'
 llvm-profdata-18 merge -sparse "$U"/prof/*.profraw -o "$U/all.profdata"
 llvm-cov-18 report "$BIN" -instr-profile="$U/all.profdata" 2>/dev/null | tail -1
 llvm-cov-18 export "$BIN" -instr-profile="$U/all.profdata" -format=text > "$U/cov.json" 2>/dev/null
+fi
 python3 - "$U" "$T" "$UNCOVERED_PY" <<'PY'
 import glob, importlib.util, json, re, sys, time
 u, target, path = sys.argv[1:4]
@@ -131,9 +136,9 @@ print("%s: %d functions entered but not finished, %d lines never executed" % (
     target, len(entries), sum(e["missed"] for e in entries)))
 PY
 EOS
-  sbatch --parsable -A "$ACCOUNT" -p "$PARTITION" -c 16 --mem 32G -t 08:00:00 --no-requeue \
+  sbatch --parsable -A "$ACCOUNT" -p "$PARTITION" -c "$CPUS" --mem 32G -t 08:00:00 --no-requeue \
     -J "alfred-uncovered-$t" -o "$U/log" --wrap "set -e
-    apptainer exec --cleanenv -B /home/group -B '$REPO' --env U=$U,T=$t,BUILD=$HERE/$b/$p/build.sh,Q=$Q,UNCOVERED_PY=$REPO/g2fuzz/py_utils/uncovered.py,RUN_LIBS=$ROOT/run-libs.txt,G2F_BUILDER=uncovered \
+    apptainer exec --cleanenv -B /home/group -B '$REPO' --env U=$U,T=$t,BUILD=$HERE/$b/$p/build.sh,Q=$Q,UNCOVERED_PY=$REPO/g2fuzz/py_utils/uncovered.py,LISTS_ONLY=${LISTS_ONLY:-},RUN_LIBS=$ROOT/run-libs.txt,G2F_BUILDER=uncovered \
       '$bsif' bash '$U/inside.sh'
     mkdir -p '$ROOT/paper' && cp '$U/$t.uncovered.json' '$ROOT/paper/$t.uncovered.json'
     echo 'build-uncovered: $t done: $ROOT/paper/$t.uncovered.json'"
