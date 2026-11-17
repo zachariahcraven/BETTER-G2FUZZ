@@ -34,3 +34,24 @@ Unblocked: done.
 Brief: now: push done, Tempest pulled to 455d690; image build running on the Mac
 next: install image, builders, rebuild 25 targets, swap paper tree
 you: nothing
+
+## Note nom-nom 2026-11-14 20:47
+**Deploy progress, 2026-11-14 20:50 MST.**
+
+1. Pull on Tempest: done (now `abe2246`, with the `uncovered` mutator and A01's 7 arms).
+2. Image `455d690`: installed 20:08. `tempest-image`'s last step printed "mv: cannot stat build/g2fuzz.sif.new" and still wrote the version file, so `g2fuzz.sif` was the old image under the new version name; I renamed the new file in by hand (kept as `g2fuzz-455d690.sif`; the old one stays as `g2fuzz-01db4f3.sif`). Likely an NFS delay between the compute node and the login node; worth a retry loop in the script.
+3. Builders: all six installed 20:18-20:46 (from the `455d690` image).
+4. Target rebuilds: 25 jobs submitted, 1291033-1291057, into the staging root `g2f-targets-alfred/staging-455d690/paper` (builders symlinked in; `run-libs.txt` made from the new image).
+5. Image again, from `abe2246` (only `g2fuzz/` Python differs, so builders and targets stay valid): building now with `--force` (the build jobs count as `alfred-*` jobs).
+
+Still to do: check each build's test log, `nm <t>.afl | grep __alf_guard_reserve`, CmpLog hooks in gdk-pixbuf-pixdata.cmp and mp42aac.cmp; rename `paper` to `paper-01db4f3`, move the staged tree in, copy the 15 `*.uncovered.json` across.
+
+## Note nom-nom 2026-11-14 21:03
+**Deploy done, 2026-11-14 21:00 MST.**
+
+- Image: `build/g2fuzz.sif` is `abe2246 built 2026-11-14 20:47` (carries `py_utils/uncovered.py`); copies `g2fuzz-abe2246.sif`, `g2fuzz-455d690.sif`, `g2fuzz-01db4f3.sif`. Both installs hit the same `mv: cannot stat g2fuzz.sif.new` at the end of `tempest-image`; finished by hand both times.
+- Builders: six, from the `455d690` image (AFL++ and LLVM identical to `abe2246`: only `g2fuzz/` Python differs).
+- Targets: 25 projects rebuilt in 5-9 min each (jobs 1291033-1291057, all COMPLETED, every test log "0 failure(s)"), 28 `.afl`. Old tree is `g2f-targets-alfred/paper-01db4f3`; new tree is `paper`; file lists identical.
+- Checks: `__alf_guard_reserve` in 28 of 28 `.afl` (old jhead.afl: none). CmpLog hook calls: gdk-pixbuf-pixdata.cmp 2,423 (old 0), mp42aac.cmp 4,683 (old 0), jhead.cmp 938 (unchanged).
+- The 15 `*.uncovered.json` copied into the new `paper`.
+- Left in place: `staging-455d690/` (logs, stage), `uncovered/` (coverage builds and sources).

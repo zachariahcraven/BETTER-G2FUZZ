@@ -55,6 +55,9 @@ int main(int argc, char **argv) {
 }
 EOC
 clang -O1 -c "$U/bin/standalone.c" -o "$U/bin/standalone.o"
+# libAFLDriver.a is replaced by an archive, as it is one: MAGMA's libtiff has it in LIBS for every link, also of
+# configure's test programs and of tiffcp, which have a main() of their own (an object would define main twice)
+ar rcs "$U/bin/standalone.a" "$U/bin/standalone.o"
 for cc in clang clang++; do
   w="$U/bin/afl-clang-fast"; [ $cc = clang ] || w="$w++"
   cat > "$w" <<EOF
@@ -63,7 +66,8 @@ args=(); compile=0
 for a in "\$@"; do case \$a in -c|-E|-S) compile=1 ;; esac; done
 for a in "\$@"; do
   case \$a in
-    -fsanitize=fuzzer|*/libAFLDriver.a) [ \$compile = 1 ] || args+=("$U/bin/standalone.o") ;;
+    -fsanitize=fuzzer) [ \$compile = 1 ] || args+=("$U/bin/standalone.o") ;;
+    */libAFLDriver.a) [ \$compile = 1 ] || args+=("$U/bin/standalone.a") ;;
     -fsanitize=fuzzer-no-link) ;;
     *) args+=("\$a") ;;
   esac
@@ -77,7 +81,7 @@ cat > "$U/bin/rm" <<EOF
 for a in "\$@"; do case \$a in "$U/src"/*/*) ;; "$U/src"/*) exit 0 ;; esac; done
 exec /bin/rm "\$@"
 EOF
-chmod +x "$U/bin"/*
+chmod +x "$U/bin/afl-clang-fast" "$U/bin/afl-clang-fast++" "$U/bin/rm"
 echo "== coverage build of $T ($(date '+%F %T'))"
 TMPDIR="$U/src" PATH="$U/bin:$PATH" LLVM_PROFILE_FILE=/dev/null bash "$BUILD" paper "$U/build" > "$U/build.log" 2>&1 ||
   { tail -20 "$U/build.log"; echo "build failed: $U/build.log"; exit 1; }
@@ -94,7 +98,8 @@ export BIN ARGS U
 run_one() {   # one queue file through the binary; %m: profiles merge in place, 1 file per worker pool slot
   local w; w=$(mktemp -d -p /tmp); cd "$w"
   ulimit -v 4194304   # 4 GB: imginfo (jasper) otherwise takes the job's memory with 16 runs at once
-  LLVM_PROFILE_FILE="$U/prof/%8m.profraw" timeout 10 "$BIN" ${ARGS//@@/"$1"} > /dev/null 2>&1 < /dev/null || true
+  cp "$1" "$w/input"   # not the queue file itself: tiffcp reads the commas in "id:000001,src:..." as "file,image number"
+  LLVM_PROFILE_FILE="$U/prof/%8m.profraw" timeout 10 "$BIN" ${ARGS//@@/"$w/input"} > /dev/null 2>&1 < /dev/null || true
   cd /; /bin/rm -rf "$w"
 }
 export -f run_one
@@ -103,16 +108,22 @@ llvm-profdata-18 merge -sparse "$U"/prof/*.profraw -o "$U/all.profdata"
 llvm-cov-18 report "$BIN" -instr-profile="$U/all.profdata" 2>/dev/null | tail -1
 llvm-cov-18 export "$BIN" -instr-profile="$U/all.profdata" -format=text > "$U/cov.json" 2>/dev/null
 python3 - "$U" "$T" "$UNCOVERED_PY" <<'PY'
-import importlib.util, json, sys, time
+import glob, importlib.util, json, re, sys, time
 u, target, path = sys.argv[1:4]
 spec = importlib.util.spec_from_file_location("uncovered", path); mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 def read_source(p):
-    try:
-        with open(p, errors="replace") as f:
-            return f.read().split("\n")
-    except OSError:
-        return None
+    # an out-of-tree build (ffmpeg: <work>/build-afl, removed when build.sh ends) names its sources in the build
+    # folder: they are in <work>/src or <work>/src/<project folder>
+    m = re.match(r"(.*)/build-[^/]+/(.*)", p)
+    more = [m.group(1) + "/src/" + m.group(2)] + glob.glob(m.group(1) + "/src/*/" + m.group(2)) if m else []
+    for q in [p] + more:
+        try:
+            with open(q, errors="replace") as f:
+                return f.read().split("\n")
+        except OSError:
+            pass
+    return None
 entries = mod.build_entries(json.load(open(u + "/cov.json")), read_source)
 json.dump({"target": target, "made": time.strftime("%Y-%m-%d %H:%M"), "files": sum(1 for _ in open(u + "/files.txt")),
            "entries": entries}, open(u + "/%s.uncovered.json" % target, "w"), indent=1)

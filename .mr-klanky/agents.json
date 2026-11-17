@@ -1,13 +1,16 @@
 {
   "names": {
     "37998ad4-b40c-4666-81ca-a9629611015d": "",
-    "8c650c01-96a1-470c-8b0f-6c426605173f": "nom-nom"
+    "8c650c01-96a1-470c-8b0f-6c426605173f": "nom-nom",
+    "3b08664d-965f-4985-b9b1-34929ebfc61e": "Flick"
   },
   "agents": {
-    "nom-nom": "claude --resume 8c650c01-96a1-470c-8b0f-6c426605173f"
+    "nom-nom": "claude --resume 8c650c01-96a1-470c-8b0f-6c426605173f",
+    "Flick": "claude --resume 3b08664d-965f-4985-b9b1-34929ebfc61e"
   },
   "order": [
-    "nom-nom"
+    "nom-nom",
+    "Flick"
   ],
-  "boss": "Sprocket"
+  "boss": "nom-nom"
 }

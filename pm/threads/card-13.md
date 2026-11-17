@@ -89,3 +89,6 @@ Review:
 New stall mutator `uncovered`: shows the LLM target source the queues never executed and asks for a generator that reaches it.
 `build-uncovered.sh` makes the per-target data (done for all 15 round targets from A00 control).
 A01 gets two more arms: `uncovered` and `uncovered-mix` (525 campaigns).
+
+## Note human 2026-11-14 21:15
+Approved. The change is in commit abe2246.

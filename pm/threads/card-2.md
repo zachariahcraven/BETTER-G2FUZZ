@@ -93,3 +93,6 @@ Review:
 Relaunch finished: A00 315/315, A02 39/40 (1 cut short by ALF-1, not retried).
 A02 analysed: rfdm-all dropped (median ratio 0.997, p 0.562, 3x set-up LLM calls).
 Added A02's row to the Rounds log.
+
+## Note human 2026-11-14 21:15
+Approved. The change is in commit abe2246.

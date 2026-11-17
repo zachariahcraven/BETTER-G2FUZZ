@@ -1,0 +1,15 @@
+# The 13 paper targets that A00 did not run (A00's 15: experiments/A00-baseline-6h/launch/targets.txt).
+# Together they are the 28 targets of the check round and the final study.
+exiv2
+tiffcp
+flvmeta
+pdfimages
+pdftoppm
+ffmpeg
+harfbuzz_hb-shape-fuzzer
+libjpeg-turbo_libjpeg_turbo_fuzzer
+libpng_libpng_read_fuzzer
+openssl_x509
+zlib_zlib_uncompress_fuzzer
+tiff_read_rgba_fuzzer
+pdf_fuzzer

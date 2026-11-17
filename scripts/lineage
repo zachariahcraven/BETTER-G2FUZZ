@@ -32,7 +32,7 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GEN = re.compile(r"^(.+-\d+)_\d+")
 MOVED = re.compile(r"---- Moved \S+ to \S*/gen_seeds/(\S+)")
 CLASSES = ["stock", "setup-e0", "setup-rfdm", "setup-readded", "run-feature", "run-structure", "run-pattern",
-           "run-rare", "run-web", "run-unknown", "sync-other", "unknown"]
+           "run-rare", "run-web", "run-uncovered", "run-unknown", "sync-other", "unknown"]
 
 
 def setup_map(log):

@@ -62,6 +62,8 @@ gunzip -f build/g2fuzz-amd64.tar.gz
 # < /dev/null: srun would otherwise read the rest of this script as its input
 srun -A "\$(G2F_ACCOUNT=${G2F_ACCOUNT:-} scripts/fuzz account)" -p ${G2F_PARTITION:-fairshare} -c 4 --mem 8G -t 60 -J alfred-image \
   apptainer build --force build/g2fuzz.sif.new docker-archive:build/g2fuzz-amd64.tar < /dev/null
+# the compute node wrote the file: the login node can see it a little later (NFS), so wait for it (2 min at most)
+for i in \$(seq 1 24); do [ -s build/g2fuzz.sif.new ] && break; sleep 5; done
 mv build/g2fuzz.sif.new build/g2fuzz.sif && rm build/g2fuzz-amd64.tar
 echo "$version" > build/g2fuzz.sif.version
 echo "g2fuzz.sif is now: \$(cat build/g2fuzz.sif.version)"
